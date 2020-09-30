@@ -5,5 +5,5 @@ InputLayer::InputLayer(/* args */) {}
 
 InputLayer::~InputLayer() {}
 
-LayerNode* addInputNode(InputLayer* layer) { return nullptr; }
+PipeNode* addInputNode(InputLayer* layer) { return nullptr; }
 }  // namespace aoce

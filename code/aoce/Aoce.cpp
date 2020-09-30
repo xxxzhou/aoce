@@ -41,7 +41,8 @@ void logMessage(AOCE_LOG_LEVEL level, const char* message) {
         localtime_s(&t, &now);
         // 用std::coute有可能会导致UE4烘陪失败,记录下
         std::wcout << std::put_time(&t, L"%Y-%m-%d %X") << " Level: " << level
-                   << L" " << message << std::endl;
+                   << L" " << message << "\" in " << __FILE__ << " at line "
+                   << __LINE__ << std::endl;
 #elif __ANDROID__
         switch (level) {
             case AOCE_LOG_INFO:
@@ -124,11 +125,11 @@ std::string utf8TString(const std::wstring& wstr) {
 }
 
 void copywcharstr(wchar_t* dest, const wchar_t* source, int32_t maxlength) {
-	int length = sizeof(wchar_t) * (wcslen(source) + 1);
-	memcpy(dest, source, min(length, maxlength));
+    int length = sizeof(wchar_t) * (wcslen(source) + 1);
+    memcpy(dest, source, min(length, maxlength));
 }
 
 void copycharstr(char* dest, const char* source, int32_t maxlength) {
-	int length = sizeof(char) * (strlen(source) + 1);
-	memcpy(dest, source, min(length, maxlength));
+    int length = sizeof(char) * (strlen(source) + 1);
+    memcpy(dest, source, min(length, maxlength));
 }

@@ -9,12 +9,11 @@ int main() {
 
     int a;
     ModuleManager::Get().regAndLoad("aoce_win_mf");
-    auto& deviceList =
+    const auto& deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
     std::cout << deviceList.size() << std::endl;
     for (const auto& video : deviceList) {
-        wchar_t* pname = (wchar_t*)video->getName().data();
-        std::wstring name(pname);
+        std::wstring name((wchar_t*)video->getName().data());
         std::wstring id((wchar_t*)video->getId().data());
         std::wcout << "name: " << name << std::endl;
         std::wcout << "id: " << id << std::endl;
@@ -26,8 +25,7 @@ int main() {
     //     AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
     std::cout << deviceList.size() << std::endl;
     for (const auto& video : deviceList) {
-        wchar_t* pname = (wchar_t*)video->getName().data();
-        std::wstring name(pname);
+        std::wstring name((wchar_t*)video->getName().data());
         std::wstring id((wchar_t*)video->getId().data());
         std::wcout << "name: " << name << std::endl;
         std::wcout << "id: " << id << std::endl;

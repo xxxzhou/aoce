@@ -96,7 +96,9 @@ enum class CameraType {
     and_camera2,
 };
 
+// aoce外部接收图像暂时就包含这几种
 enum class ImageType {
+    other,
     r8,
     r16,
     rgba8,
@@ -120,6 +122,12 @@ struct VideoFormat {
     int32_t height = 0;
     int32_t fps = 0;
     VideoType videoType = VideoType::other;
+};
+
+struct ImageFormat {
+    int32_t width = 0;
+    int32_t height = 0;
+    ImageType imageType = ImageType::other;
 };
 
 // 视频流,视频编解码需要的主要信息

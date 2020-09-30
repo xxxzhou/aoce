@@ -38,12 +38,15 @@ class ACOE_EXPORT VideoDevice {
     VideoDevice(/* args */);
     virtual ~VideoDevice();
 
+   protected:
+    void onVideoFrameAction(VideoFrame frame);
+    void onDeviceAction(VideoHandleId id, int32_t codeId);
+
    public:
     // 支持是否自己设置长宽
     bool bSetFormat() { return false; }
     const std::vector<VideoFormat>& getFormats() { return formats; };
-    void onVideoFrameAction(VideoFrame frame);
-    void onDeviceAction(VideoHandleId id, int32_t codeId);
+
     const std::vector<char>& getName() { return name; };
     const std::vector<char>& getId() { return id; };
     const VideoFormat& getSelectFormat() { return selectFormat; }

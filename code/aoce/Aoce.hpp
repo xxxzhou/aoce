@@ -4,7 +4,7 @@
 #include "Aoce.h"
 // #include "Module/IModule.hpp"
 // #include "VideoDevice/VideoManager.hpp"
-// #include "LayerGraph/LayerGraph.hpp"
+// #include "PipeGraph/PipeGraph.hpp"
 
 ACOE_EXPORT void logMessage(aoce::LogLevel level, const std::string& message);
 

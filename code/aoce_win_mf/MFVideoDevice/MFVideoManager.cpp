@@ -31,7 +31,7 @@ void MFVideoManager::getDevices() {
                 } else {
                     auto videoPtr = std::make_shared<MFVideoDevice>();
                     if (videoPtr->init(ppDevices[i])) {
-                        this->videoList.push_back(std::move(videoPtr));
+                        this->videoList.push_back(videoPtr);
                     }
                 }
                 ppDevices[i]->Release();

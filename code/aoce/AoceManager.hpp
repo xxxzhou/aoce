@@ -2,6 +2,8 @@
 #include <map>
 
 #include "Aoce.hpp"
+#include "Layer/LayerFactory.hpp"
+#include "Layer/PipeGraph.hpp"
 #include "VideoDevice/VideoManager.hpp"
 namespace aoce {
 
@@ -23,7 +25,6 @@ namespace aoce {
         return OBJCLASS##Map[s_type];                              \
     }
 
-
 class ACOE_EXPORT AoceManager {
    public:
     static AoceManager& Get();
@@ -40,6 +41,8 @@ class ACOE_EXPORT AoceManager {
     ~AoceManager();
 
     AOCE_MANAGER_OBJ(CameraType, VideoManager)
+    AOCE_MANAGER_OBJ(GpuType, PipeGraphFactory)
+    AOCE_MANAGER_OBJ(GpuType, LayerFactory)
 };
 
 }  // namespace aoce

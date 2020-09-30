@@ -32,11 +32,11 @@ int main() {
     std::wcout << "id: " << id << std::endl;
     auto& formats = video->getFormats();
     std::wcout << "formats count: " << formats.size() << std::endl;
-    for (const auto& vf : formats) {
-        std::cout << "index:" << vf.index << " width: " << vf.width
-                  << " hight:" << vf.height << " fps:" << vf.fps
-                  << " format:" << to_string(vf.videoType) << std::endl;
-    }
+    // for (const auto& vf : formats) {
+    //     std::cout << "index:" << vf.index << " width: " << vf.width
+    //               << " hight:" << vf.height << " fps:" << vf.fps
+    //               << " format:" << to_string(vf.videoType) << std::endl;
+    // }
     if (formats.size() > 355) {
         formatIndex = 355;
     }

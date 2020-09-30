@@ -189,18 +189,17 @@ bool MFVideoDevice::open() {
             if (!logHResult(hr, "the video formt is not video.")) {
                 return false;
             }
-            if (subtype == MFVideoFormat_MJPG) {
-                subtype = MFVideoFormat_YUY2;
-                hr = pType->SetGUID(MF_MT_SUBTYPE, subtype);
-            }
-            hr = sourceReader->SetCurrentMediaType(videoIndex, nullptr, pType);
-            if (!logHResult(hr, "change video format failed.")) {
-                return false;
-            }
-            // 重新打开数据读取
-            setPlay(true);
         }
-        return true;
+        if (subtype == MFVideoFormat_MJPG) {
+            subtype = MFVideoFormat_YUY2;
+            hr = pType->SetGUID(MF_MT_SUBTYPE, subtype);
+        }
+        hr = sourceReader->SetCurrentMediaType(videoIndex, nullptr, pType);
+        if (!logHResult(hr, "change video format failed.")) {
+            return false;
+        }
+        // 重新打开数据读取
+        return setPlay(true);;
     }
 }
 

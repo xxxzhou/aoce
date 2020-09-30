@@ -9,6 +9,11 @@ class ACOE_EXPORT InputLayer : public virtual BaseLayer {
    public:
     InputLayer(/* args */);
     virtual ~InputLayer();
+
+   public:
+   
+   public:
+    void setImage(ImageFormat imageFormat, int32_t index = 0);
 };
 
 }  // namespace aoce

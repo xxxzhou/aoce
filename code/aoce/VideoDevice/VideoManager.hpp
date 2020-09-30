@@ -9,6 +9,7 @@ class ACOE_EXPORT VideoManager {
    protected:
     /* data */
     std::vector<VideoDevicePtr> videoList;
+    bool oldUpdate = false;
 
    public:
     VideoManager(/* args */);
@@ -18,6 +19,6 @@ class ACOE_EXPORT VideoManager {
     virtual void getDevices(){};
 
    public:
-    const std::vector<VideoDevicePtr>& getDeviceList();
+    const std::vector<VideoDevicePtr>& getDeviceList(bool bUpdate = false);
 };
 }  // namespace aoce

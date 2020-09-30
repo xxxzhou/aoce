@@ -44,16 +44,15 @@ std::unique_ptr<T> make_unique(Args&&... args) {
         #ModuleName);
 #else
 #define ADD_MODULE(ModuleClass, ModuleName) \
-    extern "C" DLLEXPORT IModule* NewModule() { \
-        return new ModuleClass(); }
+    extern "C" DLLEXPORT IModule* NewModule() { return new ModuleClass(); }
 #endif
 
 #ifndef max
-#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
 #ifndef min
-#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
 //回调定义,C++传值改用std::function.
