@@ -13,29 +13,49 @@ namespace aoce {
 // layer包含图像本身处理
 class ACOE_EXPORT PipeGraph {
    private:
-    /* data */
+    struct PipeLine {
+       public:
+        int32_t fromNode = -1;
+        int32_t fromOutIndex = -1;
+        int32_t toNode = -1;
+        int32_t toInIndex = -1;
+
+        bool bOutput() { return toNode < 0; }
+
+        inline bool operator==(const PipeLine& right) {
+            return this->fromNode == right.fromNode &&
+                   this->fromOutIndex == right.fromOutIndex &&
+                   this->toNode == right.toNode &&
+                   this->toInIndex == right.toInIndex;
+        }
+    };
+    std::vector<PipeLine> lines;
+
+   private:
     GpuType gpu = GpuType::other;
-    std::vector<PipeNodePtr> inputNodes;
+    std::vector<PipeNodePtr> nodes;
     // 需要重新reset.
     bool bReset = false;
+    // 图表的执行顺序
+    std::vector<int32_t> nodeExcs;
 
    public:
     PipeGraph(/* args */);
     virtual ~PipeGraph();
     // 当前图使用的gpu类型
     inline GpuType getGpuType() { return gpu; }
-    PipeNodePtr addInputNode(InputLayer* layer);
     void setReset() { bReset = true; }
 
-   private:
-    bool resetGraph(const PipeNodePtr& node);
+    PipeNodePtr addNode(BaseLayer* layer);
+    void addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut = 0,
+                 int32_t toIn = 0);
 
    public:
     // 限定不能直接创建
     virtual bool onRun() = 0;
 
    public:
-    // 把图的结构变成线性执行结构
+    // 重新构建有序无环图的执行顺序
     bool resetGraph();
     bool run();
 };

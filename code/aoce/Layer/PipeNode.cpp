@@ -2,10 +2,7 @@
 
 #include "PipeGraph.hpp"
 namespace aoce {
-PipeNode::PipeNode(BaseLayer* _layer) {
-    this->layer = layer;
-    this->nodes.resize(layer->outputCount);
-}
+PipeNode::PipeNode(BaseLayer* _layer) { this->layer = layer; }
 
 PipeNode::~PipeNode() {}
 
@@ -19,20 +16,18 @@ void PipeNode::setEnable(bool benable) {
     layer->pipeGraph->setReset();
 }
 
-PipeNodePtr PipeNode::addNode(BaseLayer* layer, int32_t childIndex,
-                              int32_t index) {
+PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
     if (this->layer->gpu != layer->gpu) {
         logMessage(LogLevel::error, "layer gpu not equal node");
         return nullptr;
     }
-    if (index >= this->nodes.size()) {
-        logMessage(LogLevel::error, "index > nodesize");
-        return nullptr;
-    }
-    PipeNodePtr cnode(new PipeNode(layer));
-    nodes[index].node = cnode;
-    nodes[index].index = childIndex;
-    return cnode;
+    PipeNodePtr ptr = this->layer->pipeGraph->addNode(layer);
+    return addLine(ptr,0,0);    
+}
+
+PipeNodePtr PipeNode::addLine(PipeNodePtr to, int32_t formOut, int32_t toIn) {
+    this->layer->pipeGraph->addLine(std::shared_ptr<PipeNode>(this), to, formOut, toIn);
+    return to;
 }
 
 }  // namespace aoce

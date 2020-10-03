@@ -64,6 +64,8 @@
         "numeric": "cpp",
         "queue": "cpp",
         "set": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "cstdarg": "cpp",
+        "stack": "cpp"
     }
 }
