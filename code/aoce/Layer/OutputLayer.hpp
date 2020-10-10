@@ -3,11 +3,11 @@
 #include "BaseLayer.hpp"
 
 namespace aoce {
-class ACOE_EXPORT OutputLayer {
-   private:
-    /* data */
-   public:
-    OutputLayer(/* args */);
-    virtual ~OutputLayer();
+
+struct OutputParamet {
+    int32_t bCpu = true;
+    int32_t bGpu = false;
 };
+
+class OutputLayer : public ILayer<OutputParamet> {};
 }  // namespace aoce

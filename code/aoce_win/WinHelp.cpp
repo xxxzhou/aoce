@@ -2,8 +2,8 @@
 
 #include <comdef.h>
 namespace aoce {
-bool logHResult(HRESULT hr, const std::string& message,
-                LogLevel level) {
+namespace win {
+bool logHResult(HRESULT hr, const std::string& message, LogLevel level) {
     if (FAILED(hr)) {
         _com_error err(hr);
         LPCTSTR errMsg = err.ErrorMessage();
@@ -12,4 +12,5 @@ bool logHResult(HRESULT hr, const std::string& message,
     }
     return SUCCEEDED(hr);
 }
+}  // namespace win
 }  // namespace aoce

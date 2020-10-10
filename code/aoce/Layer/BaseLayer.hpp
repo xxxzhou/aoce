@@ -19,8 +19,23 @@ enum class GpuBit {
 // 其二是外部插件提供new obj,需要自己设定gpu类型
 class ACOE_EXPORT BaseLayer {
    protected:
+    struct InputLayer {
+        int32_t nodeIndex = -1;
+        int32_t outputIndex = -1;
+    };
+
+   protected:
     friend class PipeNode;
     friend class PipeGraph;
+
+#if WIN32
+    int32_t groupX = 32;
+    int32_t groupY = 8;
+#else
+    int32_t groupX = 16;
+    int32_t groupY = 16;
+#endif
+    int32_t groupZ = 1;
 
     GpuType gpu = GpuType::other;
     // 定义当前层需要的输入数量
@@ -32,14 +47,24 @@ class ACOE_EXPORT BaseLayer {
     std::vector<ImageFormat> inputFormats;
     // 每个层的imagetype对应shader里类型,连接时需要检测
     std::vector<ImageFormat> outputFormats;
+    bool bInput = false;
+    bool bOutput = false;
+
+    std::vector<InputLayer> inLayers;
 
    public:
-    BaseLayer(/* args */);
+    BaseLayer(/* args */) : BaseLayer(1, 1){};
+    BaseLayer(int32_t inSize, int32_t outSize);
     virtual ~BaseLayer();
+   
+   protected:
+    bool addInLayer(int32_t inIndex, int32_t nodeIndex, int32_t outputIndex);
+    bool vaildInLayers();
+    void initLayer();
 
    protected:
-    // 根据inputCount/outputCount做资源初始化,inputFormats/outputFormats确定imagetype
-    virtual void onInit(){};
+    // 添加进pipeGraph
+    virtual void onInit() = 0;
     // 已经添加进pipeGraph,pipeGraph把所有层连接起来,此时知道inputFormats的长宽
     // 并根据当前层的需求,设定对应outFormats,也就是下一层的inputFormats
     // 可分配线程组的大小了
@@ -48,10 +73,24 @@ class ACOE_EXPORT BaseLayer {
     virtual void onInitBuffer(){};
     // 更新参数,子类会有updateParamet(T t)保存参数,等到运行前提交执行
     virtual void onUpdateParamet(){};
-    virtual void onRun(){};
+    virtual void onRun() = 0;
+};
+
+template <typename T>
+class ILayer {
+   protected:
+    T t;
 
    public:
-    void init();
+    // 请看下面宏AOCE_QUERYINTERFACE提供的默认实现
+    virtual BaseLayer* getLayer() = 0;
 };
+
+// 每个继承ILayer的类,请在类头文件里添加这个宏,或是自己实现
+#define AOCE_LAYER_QUERYINTERFACE(OBJCLASS)           \
+    virtual inline BaseLayer* getLayer() override {   \
+        OBJCLASS* obj = static_cast<OBJCLASS*>(this); \
+        return static_cast<BaseLayer*>(obj);          \
+    }
 
 }  // namespace aoce

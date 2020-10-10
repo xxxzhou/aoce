@@ -36,9 +36,9 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 }  // namespace std
 #endif
 
-#define MONOLITHIC 0
+#define AOCE_STATICLINK 0
 
-#if MONOLITHIC
+#if AOCE_STATICLINK
 #define ADD_MODULE(ModuleClass, ModuleName)                            \
     static aoce::StaticLinkModule<ModuleClass> LinkModule##ModuleName( \
         #ModuleName);
@@ -63,4 +63,4 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 
 //日志回调
 typedef void (*logEventAction)(int32_t level, const char* message);
-typedef std::function<void(int32_t, const char*)> logEventHandle;
+typedef std::function<void(int32_t level, const char* message)> logEventHandle;

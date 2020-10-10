@@ -1,6 +1,6 @@
 
-set(targets findmodule)
-set(targetopencvs showdevice)
+set(targets 01_findmodule)
+set(targetopencvs 02_showdevice) 
 
 SET(OpenCV_DIR D:/WorkSpace/C++/opencv/opencv41/build/install)
 find_package(OpenCV)   

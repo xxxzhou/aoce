@@ -2,18 +2,16 @@
 #include "BaseLayer.hpp"
 
 namespace aoce {
-// inputlayer 应该从VkBaseLayer/Dx11BaseLayer/CudaBaseLayer继承
-class ACOE_EXPORT InputLayer : public virtual BaseLayer {
-   private:
-    /* data */
-   public:
-    InputLayer(/* args */);
-    virtual ~InputLayer();
 
+struct InputParamet {
+    int32_t bCpu = true;
+    int32_t bGpu = false;
+};
+
+// inputlayer 应该从VkBaseLayer/Dx11BaseLayer/CudaBaseLayer继承
+class InputLayer : public ILayer<InputParamet> {
    public:
-   
-   public:
-    void setImage(ImageFormat imageFormat, int32_t index = 0);
+    virtual void setImage(ImageFormat imageFormat, int32_t index = 0) = 0;
 };
 
 }  // namespace aoce

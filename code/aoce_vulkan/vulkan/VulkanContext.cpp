@@ -3,16 +3,17 @@
 namespace aoce {
 namespace vulkan {
 VulkanContext::VulkanContext(/* args */) {
-#ifdef __ANDROID__
-    // This place is the first place for samples to use Vulkan APIs.
-    // Here, we are going to open Vulkan.so on the device and retrieve function
-    // pointers using vulkan_wrapper helper.
-    if (!InitVulkan()) {
-        LOGE("Failied initializing Vulkan APIs!");
-        return;
-    }
-    LOGI("Loaded Vulkan APIs.");
-#endif
+    // #ifdef __ANDROID__
+    //     // This place is the first place for samples to use Vulkan APIs.
+    //     // Here, we are going to open Vulkan.so on the device and retrieve
+    //     function
+    //     // pointers using vulkan_wrapper helper.
+    //     if (!InitVulkan()) {
+    //         LOGE("Failied initializing Vulkan APIs!");
+    //         return;
+    //     }
+    //     LOGI("Loaded Vulkan APIs.");
+    // #endif
 }
 
 VulkanContext::~VulkanContext() {
@@ -128,5 +129,5 @@ void VulkanContext::BlitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
                    VK_FILTER_LINEAR);
 }
 
-}  // namespace common
-}  // namespace vkx
+}  // namespace vulkan
+}  // namespace aoce

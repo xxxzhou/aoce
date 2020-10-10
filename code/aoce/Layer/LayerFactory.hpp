@@ -17,4 +17,5 @@ class ACOE_EXPORT LayerFactory {
 };
 
 // 在外部第三方插件,可以直接提供new XXXLayer(),里面注明对应的gpu类型就行
+// 以及这个层对应更新接口
 }

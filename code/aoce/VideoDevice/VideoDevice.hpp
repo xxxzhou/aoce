@@ -8,9 +8,9 @@
 namespace aoce {
 
 enum class VideoHandleId : int32_t {
-    none,
-    open,
-    close,
+    none = 0,
+    open = 1,
+    close = 2,
     unKnownError = -1,
     lost = -2,
     openFailed = -3,

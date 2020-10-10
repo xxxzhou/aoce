@@ -1,38 +1,32 @@
 #pragma once
 
+#include <list>
+#include <memory>
 #include <vector>
 
 #include "../Aoce.hpp"
 #include "InputLayer.hpp"
 #include "PipeNode.hpp"
+
 namespace aoce {
 
 // 参考 https://zhuanlan.zhihu.com/p/147207161
 // 设计为有向无环图,node包含layer.
 // node承担图像流程功能
 // layer包含图像本身处理
+
 class ACOE_EXPORT PipeGraph {
-   private:
-    struct PipeLine {
-       public:
-        int32_t fromNode = -1;
-        int32_t fromOutIndex = -1;
-        int32_t toNode = -1;
-        int32_t toInIndex = -1;
-
-        bool bOutput() { return toNode < 0; }
-
-        inline bool operator==(const PipeLine& right) {
-            return this->fromNode == right.fromNode &&
-                   this->fromOutIndex == right.fromOutIndex &&
-                   this->toNode == right.toNode &&
-                   this->toInIndex == right.toInIndex;
-        }
-    };
-    std::vector<PipeLine> lines;
+   public:
+    PipeGraph(/* args */);
+    virtual ~PipeGraph();
 
    private:
+    void validNode();
+
+   protected:
     GpuType gpu = GpuType::other;
+    std::vector<PipeLinePtr> lines;
+    std::vector<PipeLinePtr> validLines;
     std::vector<PipeNodePtr> nodes;
     // 需要重新reset.
     bool bReset = false;
@@ -40,17 +34,18 @@ class ACOE_EXPORT PipeGraph {
     std::vector<int32_t> nodeExcs;
 
    public:
-    PipeGraph(/* args */);
-    virtual ~PipeGraph();
     // 当前图使用的gpu类型
     inline GpuType getGpuType() { return gpu; }
     void setReset() { bReset = true; }
 
     PipeNodePtr addNode(BaseLayer* layer);
-    void addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut = 0,
+    bool addLine(int32_t from, int32_t to, int32_t formOut = 0,
+                 int32_t toIn = 0);
+    bool addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut = 0,
                  int32_t toIn = 0);
 
    public:
+    virtual bool onInitLayers() { return false; };
     // 限定不能直接创建
     virtual bool onRun() = 0;
 
@@ -67,7 +62,7 @@ class ACOE_EXPORT PipeGraphFactory {
     virtual ~PipeGraphFactory(){};
 
    public:
-    PipeGraph* createGraph() { return nullptr; };
+    virtual PipeGraph* createGraph() { return nullptr; };
 };
 
 }  // namespace aoce

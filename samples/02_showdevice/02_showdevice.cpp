@@ -49,8 +49,11 @@ int main() {
         cv::imshow("a", *show);
         if (key == 'q') {
             break;
+        } else if (key == 'c') {
+            video->close();
+        } else if (key == 'o') {
+            video->open();
         }
     }
-
     ModuleManager::Get().unloadModule("aoce_win_mf");
 }

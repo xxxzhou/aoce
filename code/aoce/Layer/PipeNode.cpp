@@ -22,11 +22,12 @@ PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
         return nullptr;
     }
     PipeNodePtr ptr = this->layer->pipeGraph->addNode(layer);
-    return addLine(ptr,0,0);    
+    return addLine(ptr, 0, 0);
 }
 
 PipeNodePtr PipeNode::addLine(PipeNodePtr to, int32_t formOut, int32_t toIn) {
-    this->layer->pipeGraph->addLine(std::shared_ptr<PipeNode>(this), to, formOut, toIn);
+    this->layer->pipeGraph->addLine(std::shared_ptr<PipeNode>(this), to,
+                                    formOut, toIn);
     return to;
 }
 

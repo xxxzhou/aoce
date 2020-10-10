@@ -34,7 +34,7 @@ enum class GpuType {
     vulkan = AOCE_GPU_VULKAN,
 };
 
-// 视频设备与游戏内部纹理使用,YUV格式是Interleaved/Semi-Planar,没相到android设备直接读出p格式
+// 视频设备与游戏内部纹理使用,YUV格式是Interleaved/Semi-Planar,没想到android设备直接读出p格式
 // 难道android图像设备直接输出的是编码过的数据?还需要解码?等以后验证
 enum class VideoType {
     other,
@@ -128,6 +128,18 @@ struct ImageFormat {
     int32_t width = 0;
     int32_t height = 0;
     ImageType imageType = ImageType::other;
+    inline bool operator==(const ImageFormat& right) {
+        return this->width == right.width && this->height == right.height &&
+               this->imageType == right.imageType;
+    }
+    inline ImageFormat& operator=(const ImageFormat& right) {
+        if (this != &right) {
+            width = right.width;
+            height = right.height;
+            imageType = right.imageType;
+        }
+        return *this;
+    }
 };
 
 // 视频流,视频编解码需要的主要信息

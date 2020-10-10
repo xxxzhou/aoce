@@ -133,3 +133,5 @@ void copycharstr(char* dest, const char* source, int32_t maxlength) {
     int length = sizeof(char) * (strlen(source) + 1);
     memcpy(dest, source, min(length, maxlength));
 }
+
+uint32_t divUp(int32_t x, int32_t y) { return (x + y - 1) / y; }

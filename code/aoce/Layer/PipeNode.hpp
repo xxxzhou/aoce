@@ -11,7 +11,7 @@ namespace aoce {
 typedef std::shared_ptr<PipeNode> PipeNodePtr;
 
 // 对应layer,管理layer的连接
-class ACOE_EXPORT PipeNode {
+class PipeNode {
    private:
     /* data */
     friend class PipeGraph;
@@ -37,4 +37,39 @@ class ACOE_EXPORT PipeNode {
 
     PipeNodePtr addLine(PipeNodePtr to, int32_t formOut = 0, int32_t toIn = 0);
 };
+
+class PipeLine {
+   public:
+    PipeLine(){};
+    ~PipeLine(){};
+
+   public:
+    int32_t fromNode = -1;
+    int32_t fromOutIndex = -1;
+    int32_t toNode = -1;
+    int32_t toInIndex = -1;
+
+   public:
+    bool valid() {
+        return toNode >= 0 && fromNode >= 0 && fromOutIndex >= 0 &&
+               toInIndex >= 0;
+    }
+
+    inline bool operator==(const PipeLine& right) {
+        return this->fromNode == right.fromNode &&
+               this->fromOutIndex == right.fromOutIndex &&
+               this->toNode == right.toNode &&
+               this->toInIndex == right.toInIndex;
+    }
+
+    inline void operator=(const PipeLine& right) {
+        this->fromNode = right.fromNode;
+        this->fromOutIndex = right.fromOutIndex;
+        this->toNode = right.toNode;
+        this->toInIndex = right.toInIndex;
+    }
+};
+
+typedef std::shared_ptr<PipeLine> PipeLinePtr;
+
 }  // namespace aoce
