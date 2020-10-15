@@ -3,7 +3,7 @@
 #include <Layer/LayerFactory.hpp>
 
 namespace aoce {
-namespace vk {
+namespace vulkan {
 namespace layer {
 
 class VkLayerFactory : public LayerFactory {
@@ -11,13 +11,13 @@ class VkLayerFactory : public LayerFactory {
     /* data */
    public:
     VkLayerFactory(/* args */);
-    ~VkLayerFactory() override;
+    virtual ~VkLayerFactory() override;
 
    public:
     virtual InputLayer* crateInput() override;
-    virtual OutputLayer* createOutput() override { return nullptr; }
+    virtual OutputLayer* createOutput() override;
 };
 
 }  // namespace layer
-}  // namespace vk
+}  // namespace vulkan
 }  // namespace aoce

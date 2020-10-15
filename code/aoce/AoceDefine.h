@@ -36,6 +36,7 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 }  // namespace std
 #endif
 
+// 后期会考虑使用静态链接
 #define AOCE_STATICLINK 0
 
 #if AOCE_STATICLINK
@@ -64,3 +65,9 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 //日志回调
 typedef void (*logEventAction)(int32_t level, const char* message);
 typedef std::function<void(int32_t level, const char* message)> logEventHandle;
+
+typedef void (*imageProcessAction)(uint8_t* data, int32_t width, int32_t height,
+                                   int32_t outIndex);
+typedef std::function<void(uint8_t* data, int32_t width, int32_t height,
+                           int32_t outIndex)>
+    imageProcessHandle;

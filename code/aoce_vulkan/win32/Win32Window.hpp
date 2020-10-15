@@ -18,4 +18,4 @@ class Win32Window {
                     class VulkanWindow* swapChain);
 };
 }  // namespace common
-}  // namespace vkx
+}  // namespace vulkanx

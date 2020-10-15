@@ -20,6 +20,7 @@ int main() {
     }
     ModuleManager::Get().unloadModule("aoce_win_mf");
 
+    // 验证再次加载
     // ModuleManager::Get().regAndLoad("aoce_win_mf");
     // deviceList =
     //     AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();

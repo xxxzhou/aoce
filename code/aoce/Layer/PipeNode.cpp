@@ -2,18 +2,24 @@
 
 #include "PipeGraph.hpp"
 namespace aoce {
-PipeNode::PipeNode(BaseLayer* _layer) { this->layer = layer; }
+PipeNode::PipeNode(BaseLayer* _layer) {
+    if (_layer == nullptr) {
+        logMessage(LogLevel::error, "node layer can not be empty");
+    }
+    assert(_layer != nullptr);
+    this->layer = _layer;
+}
 
 PipeNode::~PipeNode() {}
 
 void PipeNode::setVisable(bool bvisable) {
     bInvisible = !bvisable;
-    layer->pipeGraph->setReset();
+    layer->pipeGraph->reset();
 }
 
 void PipeNode::setEnable(bool benable) {
     bDisable = !benable;
-    layer->pipeGraph->setReset();
+    layer->pipeGraph->reset();
 }
 
 PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
@@ -25,9 +31,13 @@ PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
     return addLine(ptr, 0, 0);
 }
 
+PipeNodePtr PipeNode::addNode(ILayer* layer) {
+    assert(layer != nullptr);
+    return addNode(layer->getLayer());
+}
+
 PipeNodePtr PipeNode::addLine(PipeNodePtr to, int32_t formOut, int32_t toIn) {
-    this->layer->pipeGraph->addLine(std::shared_ptr<PipeNode>(this), to,
-                                    formOut, toIn);
+    layer->pipeGraph->addLine(this->graphIndex, to->graphIndex, formOut, toIn);
     return to;
 }
 

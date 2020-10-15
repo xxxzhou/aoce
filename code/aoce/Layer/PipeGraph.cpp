@@ -11,6 +11,10 @@ PipeGraph::PipeGraph(/* args */) {}
 PipeGraph::~PipeGraph() {}
 
 PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
+    if (layer == nullptr) {
+        logMessage(LogLevel::error, "node layer can not be empty");
+    }
+    assert(layer != nullptr);
     if (this->gpu != layer->gpu) {
         return nullptr;
     }
@@ -20,6 +24,11 @@ PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
     ptr->graphIndex = (int32_t)nodes.size();
     nodes.push_back(ptr);
     return ptr;
+}
+
+PipeNodePtr PipeGraph::addNode(ILayer* layer) {
+    assert(layer != nullptr);
+    return addNode(layer->getLayer());
 }
 
 bool PipeGraph::addLine(int32_t from, int32_t to, int32_t formOut,
@@ -48,6 +57,14 @@ bool PipeGraph::addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut,
     return addLine(from->graphIndex, to->graphIndex, formOut, toIn);
 }
 
+void PipeGraph::getImageFormat(int32_t nodeIndex, int32_t outputIndex,
+                               ImageFormat& format) {
+    if (nodeIndex < nodes.size() &&
+        outputIndex < nodes[nodeIndex]->layer->outputFormats.size()) {
+        format = nodes[nodeIndex]->layer->outputFormats[outputIndex];
+    }
+}
+
 void PipeGraph::validNode() {
     // 本节点的输入线
     std::vector<std::vector<PipeLinePtr>> toLines(nodes.size());
@@ -58,14 +75,15 @@ void PipeGraph::validNode() {
         toLines[line->toNode].push_back(line);
         formLines[line->fromNode].push_back(line);
     }
-    // 检查节点自身的输入输出线是否正确(注意,可能一个接点有多个输入,配合后面disable检查)
+    // 检查节点自身的输入输出线是否正确(注意,可能一个接点有多个输入,配合后面disable检查去掉相应)
     for (auto& node : nodes) {
         // 检查输入节点
         if (!node->bDisable && !node->layer->bInput) {
             auto& tns = toLines[node->graphIndex];
             uint32_t tmask = 0;
             for (auto& tn : tns) {
-                tmask |= tn->toInIndex;
+                uint32_t maskIndex = std::pow(2, tn->toInIndex);
+                tmask |= maskIndex;
             }
             int32_t inCount = node->layer->inputCount;
             // 输入节点差
@@ -160,15 +178,21 @@ bool PipeGraph::resetGraph() {
             return false;
         }
     }
-    // 3. 保存还没查找到前置节点
-    std::queue<int32_t> tempQueue;
+    // 3. 得到有效节点的前置节点  如:2[1] 3[2] 4[1] 5[3,4] (2需要1),(5需要3,4)
     std::vector<std::vector<int>> reqNodes(nodes.size());
+    std::queue<int32_t> tempQueue;
     for (auto& line : validLines) {
         reqNodes[line->toNode].push_back(line->fromNode);
         tempQueue.push(line->toNode);
         // 填充layer的,此时经过enable/visable过滤后,每个输入节点应该是一一对应的
         nodes[line->toNode]->layer->addInLayer(line->toInIndex, line->fromNode,
                                                line->fromOutIndex);
+    }
+    for (int32_t i = 0; i < nodes.size(); i++) {
+        const auto& reqNode = reqNodes[i];
+        if (reqNode.size() == 0 || nodes[i]->layer->bInput) {
+            nodeExcs.push_back(i);
+        }
     }
     // 4. 重新构建有序无环图的执行顺序
     while (!tempQueue.empty()) {
@@ -204,6 +228,7 @@ bool PipeGraph::resetGraph() {
     for (auto index : nodeExcs) {
         nodes[index]->layer->onInitBuffer();
     }
+    onInitBuffers();
     return true;
 }
 
@@ -214,6 +239,7 @@ bool PipeGraph::run() {
             return false;
         }
     }
+    onRun();
     return true;
 }
 

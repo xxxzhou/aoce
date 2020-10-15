@@ -1,21 +1,38 @@
 #pragma once
 
 #include <Layer/PipeGraph.hpp>
+#include <memory>
+
+#include "../vulkan/VulkanContext.hpp"
+#include "VkLayer.hpp"
 
 namespace aoce {
-namespace vk {
+namespace vulkan {
 namespace layer {
 
-class VkPipeGraph : public PipeGraph {
+class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
    private:
-    /* data */
+    std::unique_ptr<VulkanContext> context;
+    // 输入层
+    // std::vector<VkLayer*> vkInputLayers;
+    // 输出层
+    std::vector<VkLayer*> vkOutputLayers;
+    // 余下层
+    std::vector<VkLayer*> vkLayers;
+    VkFence computerFence;
+
    public:
     VkPipeGraph(/* args */);
     ~VkPipeGraph();
 
    public:
+    inline VulkanContext* getContext() { return context.get(); };
+
+    VulkanTexturePtr getOutTex(int32_t node, int32_t outIndex);
+
    public:
-    // 限定不能直接创建
+    // 所有layer调用initbuffer后
+    virtual bool onInitBuffers();
     virtual bool onRun();
 };
 
@@ -25,9 +42,11 @@ class VkPipeGraphFactory : public PipeGraphFactory {
     virtual ~VkPipeGraphFactory(){};
 
    public:
-    inline virtual PipeGraph* createGraph() override { return new VkPipeGraph(); };
+    inline virtual PipeGraph* createGraph() override {
+        return new VkPipeGraph();
+    };
 };
 
 }  // namespace layer
-}  // namespace vk
+}  // namespace vulkan
 }  // namespace aoce

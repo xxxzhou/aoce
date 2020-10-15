@@ -8,7 +8,7 @@ namespace aoce {
 namespace vulkan {
 
 // 把context与swapchain分开,用来Compture Shader做纯GPGPU运行时不需要swapchain
-class VKX_COMMON_EXPORT VulkanContext {
+class AOCE_VULKAN_EXPORT VulkanContext {
    private:
     bool bAloneCompute = false;
 
@@ -28,13 +28,14 @@ class VKX_COMMON_EXPORT VulkanContext {
     ~VulkanContext();
 
    public:
-    void CreateInstance(const char* appName);
-    void CreateDevice(uint32_t queueIndex, bool bAloneCompute = false);
+    void InitContext();
 
     bool CheckFormat(VkFormat format, VkFormatFeatureFlags feature, bool bLine);
 
     void BufferToImage(VkCommandBuffer cmd, const VulkanBuffer* buffer,
                        const VulkanTexture* texture);
+    void ImageToBuffer(VkCommandBuffer cmd, const VulkanTexture* texture,
+                       const VulkanBuffer* buffer);
     void BlitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
                        const VulkanTexture* dest);
     void BlitFillImage(
@@ -43,5 +44,5 @@ class VKX_COMMON_EXPORT VulkanContext {
         VkImageLayout destLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     bool IsAloneCompute() { return bAloneCompute; };
 };
-}  // namespace common
-}  // namespace vkx
+}  // namespace vulkan
+}  // namespace aoce

@@ -256,4 +256,4 @@ VkComputePipelineCreateInfo VulkanPipeline::CreateComputePipelineInfo(
 }
 
 }  // namespace common
-}  // namespace vkx
+}  // namespace vulkanx

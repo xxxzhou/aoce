@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Aoce.hpp"
+#include "Module/ModuleManager.hpp"
 #if WIN32
 #include <Windows.h>
 
@@ -20,6 +21,8 @@
 #define LOGD(...) \
     ((void)__android_log_print(ANDROID_LOG_DEBUG, "aoce", __VA_ARGS__))
 #endif
+
+using namespace aoce;
 
 static logEventHandle logHandle = nullptr;
 
@@ -41,8 +44,8 @@ void logMessage(AOCE_LOG_LEVEL level, const char* message) {
         localtime_s(&t, &now);
         // 用std::coute有可能会导致UE4烘陪失败,记录下
         std::wcout << std::put_time(&t, L"%Y-%m-%d %X") << " Level: " << level
-                   << L" " << message << "\" in " << __FILE__ << " at line "
-                   << __LINE__ << std::endl;
+                   << L" " << message << std::endl;
+        // << "\" in " << __FILE__ << " at line " << __LINE__
 #elif __ANDROID__
         switch (level) {
             case AOCE_LOG_INFO:
@@ -78,7 +81,7 @@ long long getNowTimeStamp() {
     return timeStamp;
 }
 
-// ansi用char表示多字节编码(中国ansi对应GB2312),unicode(UTF-16)用wchar表示编码(多世界同一编码)
+// ansi用char表示多字节编码(中国ansi对应GB2312),unicode(UTF-16)用wchar表示编码(多国家同一编码)
 // uft8在unicode基础上,变长1-4Byte表示,用于传输与保存节约空间
 // https://stackoverflow.com/questions/6693010/how-do-i-use-multibytetowidechar
 // https://stackoverflow.com/questions/4804298/how-to-convert-wstring-into-string
@@ -135,3 +138,75 @@ void copycharstr(char* dest, const char* source, int32_t maxlength) {
 }
 
 uint32_t divUp(int32_t x, int32_t y) { return (x + y - 1) / y; }
+
+aoce::ImageType videoType2ImageType(const aoce::VideoType& videoType) {
+    switch (videoType) {
+        case VideoType::nv12:
+        case VideoType::yuv420P:
+        case VideoType::yuy2P:
+            return ImageType::r8;
+        case VideoType::yuv2I:
+        case VideoType::yvyuI:
+        case VideoType::uyvyI:
+        case VideoType::mjpg:
+        case VideoType::rgba8:
+            return ImageType::rgba8;
+        // 这几个信息需要在InputLayer输出中转化成rgba
+        case VideoType::argb8:
+        case VideoType::rgb8:
+        case VideoType::bgra8:
+            return ImageType::rgba8;
+        case VideoType::depth16u:
+            return ImageType::r16;
+        case VideoType::other:
+        default:
+            return ImageType::other;
+    }
+}
+
+ImageFormat videoFormat2ImageFormat(const VideoFormat& videoFormat) {
+    ImageFormat imageFormat = {};
+    imageFormat.imageType = videoType2ImageType(videoFormat.videoType);
+    imageFormat.width = videoFormat.width;
+    imageFormat.height = videoFormat.height;
+    if (videoFormat.videoType == VideoType::nv12 ||
+        videoFormat.videoType == VideoType::yuv420P) {
+        imageFormat.height = videoFormat.height * 3 / 2;
+    } else if (videoFormat.videoType == VideoType::yuy2P) {
+        imageFormat.height = videoFormat.height / 2;
+    } else if (videoFormat.videoType == VideoType::uyvyI ||
+               videoFormat.videoType == VideoType::yuv2I ||
+               videoFormat.videoType == VideoType::yvyuI) {
+        imageFormat.width = videoFormat.width / 2;
+    }
+    return imageFormat;
+}
+
+int32_t getImageTypeSize(const aoce::ImageType& imageType) {
+    switch (imageType) {
+        case ImageType::bgra8:
+            return 4;
+        case ImageType::r16:
+            return 2;
+        case ImageType::r8:
+            return 1;
+        case ImageType::rgba8:
+            return 4;
+        default:
+            return 0;
+    }
+}
+
+void loadAoce() {
+#if WIN32
+    ModuleManager::Get().regAndLoad("aoce_win_mf");
+#endif
+    ModuleManager::Get().regAndLoad("aoce_vulkan");
+}
+
+void unloadAoce() {
+#if WIN32
+    ModuleManager::Get().unloadModule("aoce_win_mf");
+#endif
+    ModuleManager::Get().unloadModule("aoce_vulkan");
+}

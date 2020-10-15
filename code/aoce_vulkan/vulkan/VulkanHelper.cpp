@@ -491,4 +491,4 @@ void changeLayout(VkCommandBuffer command, VkImage image,
 }
 
 }  // namespace common
-}  // namespace vkx
+}  // namespace vulkanx

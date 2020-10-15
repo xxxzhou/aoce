@@ -625,4 +625,4 @@ void VulkanWindow::Run(std::function<void()> onPreDrawAction) {
 }
 
 }  // namespace common
-}  // namespace vkx
+}  // namespace vulkanx

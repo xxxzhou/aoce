@@ -1,0 +1,29 @@
+#version 450
+
+layout (local_size_x = 256, local_size_y = 1) in;
+layout (binding = 0) buffer inBuffer{
+    uint dataIn[];
+};
+
+layout (binding = 1, rgba8) uniform image2D resultImage;
+
+layout (binding = 2) uniform UBO 
+{
+	int width;
+	int height;
+} ubo;
+
+
+
+uint4 uint32Unzip(uint data) {
+	uint4 xrgba = uint4(data & 0x000000FF, (data & 0x0000FF00) >> 8, (data & 0x00FF0000) >> 16, (data & 0xFF000000) >> 24);
+	return xrgba;
+}
+
+uint uint8Zip(uint4 rgba) {
+	uint data = rgba.x | rgba.y << 8 | rgba.z << 16 | rgba.w << 24;
+	return data;
+}
+
+void main(){
+}

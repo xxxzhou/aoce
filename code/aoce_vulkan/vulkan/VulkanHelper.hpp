@@ -14,38 +14,38 @@
 
 namespace aoce {
 namespace vulkan {
-VKX_COMMON_EXPORT const std::string getAssetPath();
+AOCE_VULKAN_EXPORT const std::string getAssetPath();
 
 // errorcode转显示
-VKX_COMMON_EXPORT std::string errorString(VkResult errorCode);
+AOCE_VULKAN_EXPORT std::string errorString(VkResult errorCode);
 // 物理显卡类型
-VKX_COMMON_EXPORT std::string physicalDeviceTypeString(
+AOCE_VULKAN_EXPORT std::string physicalDeviceTypeString(
     VkPhysicalDeviceType type);
 // 创建一个vulkan实例
-VKX_COMMON_EXPORT VkResult createInstance(VkInstance& instance,
+AOCE_VULKAN_EXPORT VkResult createInstance(VkInstance& instance,
                                           const char* appName);
 // 得到所有物理显卡
-VKX_COMMON_EXPORT VkResult enumerateDevice(
+AOCE_VULKAN_EXPORT VkResult enumerateDevice(
     VkInstance instance, std::vector<PhysicalDevice>& physicalDevices);
 // 创建一个满足条件的逻辑设置,是否使用单独的计算通道
-VKX_COMMON_EXPORT VkResult
+AOCE_VULKAN_EXPORT VkResult
 createLogicalDevice(LogicalDevice& device, const PhysicalDevice& physicalDevice,
                     uint32_t queueFamilyIndex, bool bAloneCompute = false);
-VKX_COMMON_EXPORT bool getMemoryTypeIndex(const PhysicalDevice& physicalDevice,
+AOCE_VULKAN_EXPORT bool getMemoryTypeIndex(const PhysicalDevice& physicalDevice,
                                           uint32_t typeBits,
                                           VkFlags quirementsMaks,
                                           uint32_t& index);
-VKX_COMMON_EXPORT int32_t getByteSize(VkFormat format);
+AOCE_VULKAN_EXPORT int32_t getByteSize(VkFormat format);
 // Load a SPIR-V shader (binary)
 #if defined(__ANDROID__)
 VkShaderModule loadShader(AAssetManager* assetManager, const char* fileName,
                           VkDevice device);
 #else
-VKX_COMMON_EXPORT VkShaderModule loadShader(const char* fileName,
+AOCE_VULKAN_EXPORT VkShaderModule loadShader(const char* fileName,
                                             VkDevice device);
 #endif
 
-VKX_COMMON_EXPORT void changeLayout(
+AOCE_VULKAN_EXPORT void changeLayout(
     VkCommandBuffer command, VkImage image, VkImageLayout oldLayout,
     VkImageLayout newLayout, VkPipelineStageFlags oldStageFlags,
     VkPipelineStageFlags newStageFlags,

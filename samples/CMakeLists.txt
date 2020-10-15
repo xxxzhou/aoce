@@ -1,6 +1,6 @@
 
 set(targets 01_findmodule)
-set(targetopencvs 02_showdevice) 
+set(targetopencvs 02_showdevice 03_findvulkan) 
 
 SET(OpenCV_DIR D:/WorkSpace/C++/opencv/opencv41/build/install)
 find_package(OpenCV)   
@@ -12,8 +12,8 @@ message(STATUS "    libraries: ${OpenCV_LIBS}")
 message(STATUS "    librarie path: ${OpenCV_LIB_PATH}")
 message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
 
-function(generate target isopencv)
-    set(source ${target}/${target}.cpp)
+function(generate target isopencv) 
+    set(source ${target}/${target}.cpp) 
     add_executable(${target} ${source})
     # target_link_options(${target} PRIVATE -mwindows)
     target_link_libraries(${target} aoce)

@@ -19,13 +19,13 @@
 #endif
 
 #ifdef _WIN32
-#if defined(VKX_COMMON_EXPORT_DEFINE)
-#define VKX_COMMON_EXPORT __declspec(dllexport)
+#if defined(AOCE_VULKAN_EXPORT_DEFINE)
+#define AOCE_VULKAN_EXPORT __declspec(dllexport)
 #else
-#define VKX_COMMON_EXPORT __declspec(dllimport)
+#define AOCE_VULKAN_EXPORT __declspec(dllimport)
 #endif
 #else
-#define VKX_COMMON_EXPORT
+#define AOCE_VULKAN_EXPORT
 #endif
 
 namespace aoce {

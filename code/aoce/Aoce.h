@@ -100,8 +100,9 @@ enum class CameraType {
 enum class ImageType {
     other,
     r8,
-    r16,
     rgba8,
+    r16,
+    // 游戏中fbo,rtt常用,在与游戏交互中使用?先暂时不用
     bgra8,
 };
 
@@ -195,4 +196,8 @@ ACOE_EXPORT void setLogAction(logEventAction action);
 ACOE_EXPORT void logMessage(AOCE_LOG_LEVEL level, const char* message);
 
 ACOE_EXPORT long long getNowTimeStamp();
+
+ACOE_EXPORT void loadAoce();
+
+ACOE_EXPORT void unloadAoce();
 }

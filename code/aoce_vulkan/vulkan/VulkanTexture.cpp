@@ -10,15 +10,19 @@ VulkanTexture::VulkanTexture() {}
 VulkanTexture::~VulkanTexture() {
     if (sampler) {
         vkDestroySampler(device, sampler, nullptr);
+        sampler = VK_NULL_HANDLE;
     }
     if (view) {
         vkDestroyImageView(device, view, nullptr);
+        view = VK_NULL_HANDLE;
     }
     if (image) {
         vkDestroyImage(device, image, nullptr);
+        image = VK_NULL_HANDLE;
     }
     if (memory) {
         vkFreeMemory(device, memory, nullptr);
+        memory = VK_NULL_HANDLE;
     }
 }
 
@@ -170,5 +174,5 @@ void VulkanTexture::AddBarrier(VkCommandBuffer command, VkImageLayout newLayout,
     accessFlags = newAccessFlags;
 }
 
-}  // namespace common
-}  // namespace vkx
+}  // namespace vulkan
+}  // namespace aoce

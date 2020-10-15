@@ -4,24 +4,24 @@
 
 namespace aoce {
 namespace vulkan {
-class VKX_COMMON_EXPORT VulkanTexture {
+class AOCE_VULKAN_EXPORT VulkanTexture {
    private:
-    VkDeviceMemory memory;
-    VkDevice device;
+    VkDeviceMemory memory = VK_NULL_HANDLE;
+    VkDevice device = VK_NULL_HANDLE;
 
    public:
-    uint32_t width;
-    uint32_t height;
-    VkFormat format;
-    VkSampler sampler;
+    uint32_t width = 0;
+    uint32_t height = 0;
+    VkFormat format = VK_FORMAT_UNDEFINED;
+    VkSampler sampler = VK_NULL_HANDLE;
     // image可能创建多个mipmap,多层级图像,view针对具体
-    VkImageView view;
-    VkImage image;
+    VkImageView view = VK_NULL_HANDLE;
+    VkImage image = VK_NULL_HANDLE;
     // 这二个可以get出去,不能直接修改
     VkImageLayout layout = VK_IMAGE_LAYOUT_UNDEFINED;
     VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
     VkAccessFlags accessFlags = VK_ACCESS_HOST_WRITE_BIT;
-    VkDescriptorImageInfo descInfo;
+    VkDescriptorImageInfo descInfo = {};
 
    public:
     VulkanTexture();
@@ -38,5 +38,5 @@ class VKX_COMMON_EXPORT VulkanTexture {
                     VkPipelineStageFlags newStageFlags,
                     VkAccessFlags newAccessFlags = 0);
 };
-}  // namespace common
-}  // namespace vkx
+}  // namespace vulkan
+}  // namespace aoce

@@ -13,6 +13,14 @@ enum class GpuBit {
     cuda = 4,
 };
 
+// 每个从继承ILayer的类,请在类头文件里添加这个宏,或是自己实现
+#define AOCE_LAYER_QUERYINTERFACE(OBJCLASS)           \
+   public:                                            \
+    virtual inline BaseLayer* getLayer() override {   \
+        OBJCLASS* obj = static_cast<OBJCLASS*>(this); \
+        return static_cast<BaseLayer*>(obj);          \
+    }
+
 // BaseLayer定义可以在外部new,这样可以外接插件只管处理逻辑
 // layer知道自己的gpu类型.设计分为二种
 // 其一是本身插件提供公共处理,配合factory.
@@ -27,15 +35,6 @@ class ACOE_EXPORT BaseLayer {
    protected:
     friend class PipeNode;
     friend class PipeGraph;
-
-#if WIN32
-    int32_t groupX = 32;
-    int32_t groupY = 8;
-#else
-    int32_t groupX = 16;
-    int32_t groupY = 16;
-#endif
-    int32_t groupZ = 1;
 
     GpuType gpu = GpuType::other;
     // 定义当前层需要的输入数量
@@ -56,7 +55,11 @@ class ACOE_EXPORT BaseLayer {
     BaseLayer(/* args */) : BaseLayer(1, 1){};
     BaseLayer(int32_t inSize, int32_t outSize);
     virtual ~BaseLayer();
-   
+
+   public:
+    virtual void onParametChange(){};
+    class PipeGraph* getGraph();
+
    protected:
     bool addInLayer(int32_t inIndex, int32_t nodeIndex, int32_t outputIndex);
     bool vaildInLayers();
@@ -73,24 +76,29 @@ class ACOE_EXPORT BaseLayer {
     virtual void onInitBuffer(){};
     // 更新参数,子类会有updateParamet(T t)保存参数,等到运行前提交执行
     virtual void onUpdateParamet(){};
-    virtual void onRun() = 0;
+    virtual bool onFrame() = 0;
 };
 
-template <typename T>
+// 层不会单独从ILayer继承,还一个继承路径应该从BaseLayer来
 class ILayer {
-   protected:
-    T t;
-
    public:
     // 请看下面宏AOCE_QUERYINTERFACE提供的默认实现
     virtual BaseLayer* getLayer() = 0;
 };
 
-// 每个继承ILayer的类,请在类头文件里添加这个宏,或是自己实现
-#define AOCE_LAYER_QUERYINTERFACE(OBJCLASS)           \
-    virtual inline BaseLayer* getLayer() override {   \
-        OBJCLASS* obj = static_cast<OBJCLASS*>(this); \
-        return static_cast<BaseLayer*>(obj);          \
-    }
+// 分离导致层不同参数的差异
+template <typename T>
+class ITLayer : public ILayer {
+   protected:
+    T oldParamet = {};
+    T paramet = {};
+
+   public:
+    inline void updateParamet(const T& t) {
+        oldParamet = this->paramet;
+        this->paramet = t;
+        getLayer()->onParametChange();
+    };
+};
 
 }  // namespace aoce

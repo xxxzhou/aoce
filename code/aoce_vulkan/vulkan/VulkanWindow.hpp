@@ -7,7 +7,7 @@
 #if WIN32
 #include "../win32/Win32Window.hpp"
 #elif __ANDROID__
-#include <android/native_window_jni.h>
+#include <android/native_activity.h>
 #endif
 #include <functional>
 
@@ -16,17 +16,17 @@
 namespace aoce {
 namespace vulkan {
 #if WIN32
-template class VKX_COMMON_EXPORT std::unique_ptr<VulkanTexture>;
-template class VKX_COMMON_EXPORT std::vector<VkImage>;
-template class VKX_COMMON_EXPORT std::vector<VkImageView>;
-template class VKX_COMMON_EXPORT std::vector<VkFramebuffer>;
-template class VKX_COMMON_EXPORT std::vector<VkCommandBuffer>;
-template class VKX_COMMON_EXPORT std::unique_ptr<Win32Window>;
-template class VKX_COMMON_EXPORT std::function<void(uint32_t)>;
-template class VKX_COMMON_EXPORT std::function<void()>;
+template class AOCE_VULKAN_EXPORT std::unique_ptr<VulkanTexture>;
+template class AOCE_VULKAN_EXPORT std::vector<VkImage>;
+template class AOCE_VULKAN_EXPORT std::vector<VkImageView>;
+template class AOCE_VULKAN_EXPORT std::vector<VkFramebuffer>;
+template class AOCE_VULKAN_EXPORT std::vector<VkCommandBuffer>;
+template class AOCE_VULKAN_EXPORT std::unique_ptr<Win32Window>;
+template class AOCE_VULKAN_EXPORT std::function<void(uint32_t)>;
+template class AOCE_VULKAN_EXPORT std::function<void()>;
 #endif
 
-class VKX_COMMON_EXPORT VulkanWindow {
+class AOCE_VULKAN_EXPORT VulkanWindow {
    private:
     class VulkanContext* context;
     VkSurfaceKHR surface;

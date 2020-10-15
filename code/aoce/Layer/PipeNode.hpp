@@ -11,7 +11,7 @@ namespace aoce {
 typedef std::shared_ptr<PipeNode> PipeNodePtr;
 
 // 对应layer,管理layer的连接
-class PipeNode {
+class ACOE_EXPORT PipeNode {
    private:
     /* data */
     friend class PipeGraph;
@@ -30,10 +30,14 @@ class PipeNode {
    public:
     void setVisable(bool bvisable);
     void setEnable(bool benable);
+    inline BaseLayer* getLayer() { return layer; };
+    inline int32_t getNodeIndex() { return graphIndex; };
 
    public:
     // 有一个隐藏的line关系,当前节点第一个输出连接下一节点的第一个输入
     PipeNodePtr addNode(BaseLayer* layer);
+
+    PipeNodePtr addNode(ILayer* layer);
 
     PipeNodePtr addLine(PipeNodePtr to, int32_t formOut = 0, int32_t toIn = 0);
 };

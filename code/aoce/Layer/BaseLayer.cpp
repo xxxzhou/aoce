@@ -1,5 +1,6 @@
 #include "BaseLayer.hpp"
 
+#include "PipeGraph.hpp"
 namespace aoce {
 BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
     inputCount = inSize;
@@ -18,6 +19,8 @@ BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
 
 BaseLayer::~BaseLayer() {}
 
+PipeGraph* BaseLayer::getGraph() { return pipeGraph; }
+
 bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,
                            int32_t outputIndex) {
     if (inIndex >= inputCount) {
@@ -34,6 +37,10 @@ bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,
 }
 
 bool BaseLayer::vaildInLayers() {
+    // 输入层没有inLayers
+    if (bInput) {
+        return true;
+    }
     for (const auto& layer : inLayers) {
         if (layer.nodeIndex < 0 || layer.outputIndex < 0) {
             return false;
@@ -44,9 +51,19 @@ bool BaseLayer::vaildInLayers() {
 
 void BaseLayer::initLayer() {
     int32_t size = inLayers.size();
-    for (int32_t i = 0; i < size; i++) {
-        // inputFormats[i] = pipeGraph // inLayers[i]
+    if (!bInput) {
+        for (int32_t i = 0; i < size; i++) {
+            pipeGraph->getImageFormat(inLayers[i].nodeIndex,
+                                      inLayers[i].outputIndex, inputFormats[i]);
+        }
     }
+    // 默认所有outputFormat == inputFormats[0]
+    if (inputFormats.size() > 0) {
+        for (auto& outFormat : outputFormats) {
+            outFormat = inputFormats[0];
+        }
+    }
+    // 如果每层的outputFormat需要更新,请在如下函数单独处理
     onInitLayer();
 }
 

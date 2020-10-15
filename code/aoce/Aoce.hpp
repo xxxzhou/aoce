@@ -1,4 +1,6 @@
 #pragma once
+#include <assert.h>
+
 #include <functional>
 #include <string>
 #include <vector>
@@ -74,3 +76,11 @@ ACOE_EXPORT void copywcharstr(wchar_t* dest, const wchar_t* source,
 ACOE_EXPORT void copycharstr(char* dest, const char* source, int32_t maxlength);
 
 ACOE_EXPORT uint32_t divUp(int32_t x, int32_t y);
+
+ACOE_EXPORT aoce::ImageType videoType2ImageType(
+    const aoce::VideoType& videoType);
+
+ACOE_EXPORT aoce::ImageFormat videoFormat2ImageFormat(
+    const aoce::VideoFormat& videoFormat);
+
+ACOE_EXPORT int32_t getImageTypeSize(const aoce::ImageType& imageType);

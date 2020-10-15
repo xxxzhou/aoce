@@ -10,11 +10,11 @@ namespace aoce {
 namespace vulkan {
 
 #if _WIN32
-template class VKX_COMMON_EXPORT std::vector<VkDynamicState>;
-template class VKX_COMMON_EXPORT std::vector<VkDescriptorSetLayout>;
-template class VKX_COMMON_EXPORT std::vector<int32_t>;
-template class VKX_COMMON_EXPORT std::map<VkDescriptorType, uint32_t>;
-template class VKX_COMMON_EXPORT std::vector<std::vector<VkDescriptorSet>>;
+template class AOCE_VULKAN_EXPORT std::vector<VkDynamicState>;
+template class AOCE_VULKAN_EXPORT std::vector<VkDescriptorSetLayout>;
+template class AOCE_VULKAN_EXPORT std::vector<int32_t>;
+template class AOCE_VULKAN_EXPORT std::map<VkDescriptorType, uint32_t>;
+template class AOCE_VULKAN_EXPORT std::vector<std::vector<VkDescriptorSet>>;
 #endif
 
 // 可以由VulkanPipeline创建一个默认填充的FixPipelineState.
@@ -45,10 +45,10 @@ struct UBOLayoutItem {
     VkShaderStageFlags shaderStageFlags;
 };
 #if _WIN32
-template class VKX_COMMON_EXPORT std::vector<std::vector<UBOLayoutItem>>;
+template class AOCE_VULKAN_EXPORT std::vector<std::vector<UBOLayoutItem>>;
 #endif
 // 对应shader里固定结构的结构以及数据
-class VKX_COMMON_EXPORT UBOLayout {
+class AOCE_VULKAN_EXPORT UBOLayout {
    public:
     UBOLayout(class VulkanContext* _context);
     ~UBOLayout();
@@ -79,7 +79,7 @@ class VKX_COMMON_EXPORT UBOLayout {
     void UpdateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...);
 };
 
-class VKX_COMMON_EXPORT VulkanPipeline {
+class AOCE_VULKAN_EXPORT VulkanPipeline {
    private:
     /* data */
    public:

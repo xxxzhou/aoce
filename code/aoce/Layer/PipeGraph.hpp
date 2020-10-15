@@ -21,6 +21,7 @@ class ACOE_EXPORT PipeGraph {
     virtual ~PipeGraph();
 
    private:
+    // friend class BaseLayer;
     void validNode();
 
    protected:
@@ -33,25 +34,32 @@ class ACOE_EXPORT PipeGraph {
     // 图表的执行顺序
     std::vector<int32_t> nodeExcs;
 
+   protected:
+    // 重新构建有序无环图的执行顺序
+    bool resetGraph();
+
    public:
     // 当前图使用的gpu类型
     inline GpuType getGpuType() { return gpu; }
-    void setReset() { bReset = true; }
+    void reset() { bReset = true; }
 
     PipeNodePtr addNode(BaseLayer* layer);
+    PipeNodePtr addNode(ILayer* layer);
     bool addLine(int32_t from, int32_t to, int32_t formOut = 0,
                  int32_t toIn = 0);
     bool addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut = 0,
-                 int32_t toIn = 0);
+                  int32_t toIn = 0);
+
+    void getImageFormat(int32_t nodeIndex, int32_t outputIndex,
+                        ImageFormat& format);
 
    public:
     virtual bool onInitLayers() { return false; };
+    virtual bool onInitBuffers() { return false; }
     // 限定不能直接创建
     virtual bool onRun() = 0;
 
    public:
-    // 重新构建有序无环图的执行顺序
-    bool resetGraph();
     bool run();
 };
 

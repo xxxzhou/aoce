@@ -8,21 +8,20 @@
 namespace aoce {
 
 #define AOCE_MANAGER_OBJ(OBJTYPE, OBJCLASS)                        \
-    typedef std::shared_ptr<OBJCLASS> OBJCLASS##Ptr;               \
+    typedef std::unique_ptr<OBJCLASS> OBJCLASS##Ptr;               \
                                                                    \
    private:                                                        \
     std::map<OBJTYPE, OBJCLASS##Ptr> OBJCLASS##Map;                \
                                                                    \
    public:                                                         \
     inline void add##OBJCLASS(OBJTYPE s_type, OBJCLASS* manager) { \
-        OBJCLASS##Ptr ptr(manager);                                \
-        OBJCLASS##Map[s_type] = ptr;                               \
+        OBJCLASS##Map[s_type] = OBJCLASS##Ptr(manager);            \
     }                                                              \
     inline void remove##OBJCLASS(OBJTYPE s_type) {                 \
-        OBJCLASS##Map[s_type] = nullptr;                           \
+        OBJCLASS##Map[s_type].reset();                             \
     }                                                              \
-    inline OBJCLASS##Ptr get##OBJCLASS(OBJTYPE s_type) {           \
-        return OBJCLASS##Map[s_type];                              \
+    inline OBJCLASS* get##OBJCLASS(OBJTYPE s_type) {               \
+        return OBJCLASS##Map[s_type].get();                        \
     }
 
 class ACOE_EXPORT AoceManager {

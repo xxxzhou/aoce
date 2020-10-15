@@ -3,7 +3,7 @@
 #include <Module/IModule.hpp>
 
 namespace aoce {
-namespace vk {
+namespace vulkan {
 class VulkanModule : public IModule {
    private:
     /* data */
@@ -15,5 +15,5 @@ class VulkanModule : public IModule {
     virtual bool loadModule() override;
     virtual void unloadModule() override;
 };
-}  // namespace vk
+}  // namespace vulkan
 }  // namespace aoce

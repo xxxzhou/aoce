@@ -7,20 +7,39 @@
 using namespace aoce;
 using namespace cv;
 
-#define ENUMSTR(str) #str
-
 static cv::Mat* show = nullptr;
 static int index = 0;
 static int formatIndex = 0;
+static PipeGraph* vkGraph;
+static InputLayer* inputLayer;
+static OutputLayer* outputLayer;
+
+static GpuType gpuType = GpuType::vulkan;
 
 static void onDrawFrame(VideoFrame frame) {
-    std::cout << "time stamp:" << frame.timeStamp << std::endl;
+    // std::cout << "time stamp:" << frame.timeStamp << std::endl;
+    inputLayer->inputCpuData(frame.data[0]);
+    vkGraph->run();
+}
+
+static void onImageProcessHandle(uint8_t* data, int32_t width, int32_t height,
+                                 int32_t outIndex) {
+    std::cout << "data:" << data[10000] << std::endl;
 }
 
 int main() {
-    ModuleManager::Get().regAndLoad("aoce_win_mf");
+    loadAoce();
     auto& deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
+    // 生成一张执行图
+    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
+    inputLayer = layerFactory->crateInput();
+    outputLayer = layerFactory->createOutput();
+    // 生成图
+    vkGraph->addNode(inputLayer)->addNode(outputLayer);
+    // 设定输出函数回调
+    outputLayer->setImageProcessHandle(onImageProcessHandle);
     std::cout << "deivce count:" << deviceList.size() << std::endl;
     if (deviceList.size() > 1) {
         index = 1;
@@ -44,6 +63,8 @@ int main() {
     video->open();
     auto& selectFormat = video->getSelectFormat();
     video->setVideoFrameHandle(onDrawFrame);
+    // 设定输入格式
+    inputLayer->setImage(selectFormat);
     show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
     while (int key = cv::waitKey(20)) {
         cv::imshow("a", *show);
@@ -55,5 +76,5 @@ int main() {
             video->open();
         }
     }
-    ModuleManager::Get().unloadModule("aoce_win_mf");
+    unloadAoce();
 }

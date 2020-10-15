@@ -1,20 +1,9 @@
 #include "VulkanContext.hpp"
 
+#include "VulkanManager.hpp"
 namespace aoce {
 namespace vulkan {
-VulkanContext::VulkanContext(/* args */) {
-    // #ifdef __ANDROID__
-    //     // This place is the first place for samples to use Vulkan APIs.
-    //     // Here, we are going to open Vulkan.so on the device and retrieve
-    //     function
-    //     // pointers using vulkan_wrapper helper.
-    //     if (!InitVulkan()) {
-    //         LOGE("Failied initializing Vulkan APIs!");
-    //         return;
-    //     }
-    //     LOGI("Loaded Vulkan APIs.");
-    // #endif
-}
+VulkanContext::VulkanContext(/* args */) {}
 
 VulkanContext::~VulkanContext() {
     if (pipelineCache) {
@@ -22,25 +11,16 @@ VulkanContext::~VulkanContext() {
     }
 }
 
-void VulkanContext::CreateInstance(const char* appName) {
-    createInstance(instace, appName);
-    std::vector<PhysicalDevice> physicalDevices;
-    enumerateDevice(instace, physicalDevices);
-    // 选择第一个物理设备
-    this->physicalDevice = physicalDevices[0];
-}
-
-void VulkanContext::CreateDevice(uint32_t graphicsIndex, bool bAloneCompute) {
-    // 创建虚拟设备
-    createLogicalDevice(logicalDevice, physicalDevice, graphicsIndex,
-                        bAloneCompute);
+void VulkanContext::InitContext() {
+    // 得到全局设置
+    this->instace = VulkanManager::Get().instace;
+    this->physicalDevice = VulkanManager::Get().physicalDevice;
+    this->logicalDevice = VulkanManager::Get().logicalDevice;
+    this->computeQueue = VulkanManager::Get().computeQueue;
+    this->graphicsQueue = VulkanManager::Get().graphicsQueue;
     this->bAloneCompute =
         logicalDevice.computeIndex != logicalDevice.graphicsIndex;
-    vkGetDeviceQueue(logicalDevice.device, logicalDevice.computeIndex, 0,
-                     &computeQueue);
-    vkGetDeviceQueue(logicalDevice.device, logicalDevice.graphicsIndex, 0,
-                     &graphicsQueue);
-    //
+    // 得到当前graph需要的VkCommandBuffer
     VkPipelineCacheCreateInfo pipelineCacheInfo = {};
     pipelineCacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
     VK_CHECK_RESULT(vkCreatePipelineCache(
@@ -93,6 +73,27 @@ void VulkanContext::BufferToImage(VkCommandBuffer cmd,
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
                            &copyRegion);
 }
+
+void VulkanContext::ImageToBuffer(VkCommandBuffer cmd,
+                                  const VulkanTexture* texture,
+                                  const VulkanBuffer* buffer) {
+    VkBufferImageCopy copyRegion = {};
+    copyRegion.bufferOffset = 0;
+    // copyRegion.bufferRowLength = texture->width *
+    // getByteSize(texture->format); copyRegion.bufferImageHeight =
+    // texture->height;
+    copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    copyRegion.imageSubresource.mipLevel = 0;
+    copyRegion.imageSubresource.baseArrayLayer = 0;
+    copyRegion.imageSubresource.layerCount = 1;
+    copyRegion.imageExtent.width = texture->width;
+    copyRegion.imageExtent.height = texture->height;
+    copyRegion.imageExtent.depth = 1;
+    vkCmdCopyImageToBuffer(cmd, texture->image,
+                           VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer->buffer,
+                           1, &copyRegion);
+}
+
 void VulkanContext::BlitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
                                   const VulkanTexture* dest) {
     BlitFillImage(cmd, src, dest->image, dest->width, dest->height,
