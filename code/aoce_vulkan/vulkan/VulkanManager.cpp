@@ -16,7 +16,17 @@ VulkanManager& VulkanManager::Get() {
     return *instance;
 }
 
-VulkanManager::~VulkanManager() {}
+VulkanManager::~VulkanManager() {
+    if (logicalDevice.device) {
+        vkDestroyDevice(logicalDevice.device, nullptr);
+        logicalDevice.device = nullptr;
+    }
+    if (instace) {
+        vkDestroyInstance(instace, nullptr);
+        instace = VK_NULL_HANDLE;
+    }
+    // physicalDevice.clear();
+}
 
 void VulkanManager::CreateInstance(const char* appName) {
 #if __ANDROID__

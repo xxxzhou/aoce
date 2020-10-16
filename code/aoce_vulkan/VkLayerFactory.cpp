@@ -1,7 +1,8 @@
 #include "VkLayerFactory.hpp"
 
-#include "VkInputLayer.hpp"
-#include "VkOutputLayer.hpp"
+#include "layer/VkInputLayer.hpp"
+#include "layer/VkOutputLayer.hpp"
+#include "layer/VkYUV2RGBALayer.hpp"
 
 namespace aoce {
 namespace vulkan {
@@ -17,6 +18,10 @@ InputLayer* VkLayerFactory::crateInput() {
 }
 
 OutputLayer* VkLayerFactory::createOutput() { return new VkOutputLayer(); }
+
+YUV2RGBALayer* VkLayerFactory::createYUV2RGBA() {
+    return new VkYUV2RGBALayer();
+}
 
 }  // namespace layer
 }  // namespace vulkan

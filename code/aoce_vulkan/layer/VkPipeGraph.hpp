@@ -12,6 +12,7 @@ namespace layer {
 
 class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
    private:
+    // 对应一个vkCommandBuffer
     std::unique_ptr<VulkanContext> context;
     // 输入层
     // std::vector<VkLayer*> vkInputLayers;

@@ -9,8 +9,8 @@ VkOutputLayer::VkOutputLayer(/* args */) { bOutput = true; }
 VkOutputLayer::~VkOutputLayer() {}
 
 void VkOutputLayer::onInitVkBuffer() {
-    int32_t size = outputFormats[0].width * outputFormats[0].height *
-                   getImageTypeSize(outputFormats[0].imageType);
+    int32_t size = outFormats[0].width * outFormats[0].height *
+                   getImageTypeSize(outFormats[0].imageType);
     assert(size > 0);
     outBuffer = std::make_unique<VulkanBuffer>();
     outBuffer->initResoure(context, BufferUsage::store, size,
@@ -27,8 +27,8 @@ void VkOutputLayer::onPreCmd() {
 
 bool VkOutputLayer::onFrame() {
     // outBuffer->upload(cpuData.data());
-    onImageProcessHandle(outBuffer->getCpuData(), outputFormats[0].width,
-                         outputFormats[0].height, 0);
+    onImageProcessHandle(outBuffer->getCpuData(), outFormats[0].width,
+                         outFormats[0].height, 0);
     return true;
 }
 

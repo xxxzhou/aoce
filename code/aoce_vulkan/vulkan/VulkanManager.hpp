@@ -22,11 +22,13 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     void CreateDevice(uint32_t queueIndex, bool bAloneCompute = false);
 
    public:
-    VkInstance instace;
-    PhysicalDevice physicalDevice;
-    LogicalDevice logicalDevice;
-    VkQueue computeQueue;
-    VkQueue graphicsQueue;
+    VkInstance instace = VK_NULL_HANDLE;
+    PhysicalDevice physicalDevice = {};
+    // 一般来说,主机会有1-3个左右queueFamily,手机一般只一个.
+    // 而第0个一般要满足graph/compute/present
+    LogicalDevice logicalDevice = {};
+    VkQueue computeQueue = VK_NULL_HANDLE;
+    VkQueue graphicsQueue = VK_NULL_HANDLE;
 
 #if defined(__ANDROID__)
     android_app* androidApp;

@@ -38,14 +38,14 @@ class ACOE_EXPORT BaseLayer {
 
     GpuType gpu = GpuType::other;
     // 定义当前层需要的输入数量
-    int32_t inputCount = 1;
+    int32_t inCount = 1;
     // 定义当前层需要的输出数量
-    int32_t outputCount = 1;
+    int32_t outCount = 1;
     class PipeGraph* pipeGraph = nullptr;
     // 每个层的imagetype对应shader里类型,连接时需要检测
-    std::vector<ImageFormat> inputFormats;
+    std::vector<ImageFormat> inFormats;
     // 每个层的imagetype对应shader里类型,连接时需要检测
-    std::vector<ImageFormat> outputFormats;
+    std::vector<ImageFormat> outFormats;
     bool bInput = false;
     bool bOutput = false;
 
@@ -100,5 +100,11 @@ class ITLayer : public ILayer {
         getLayer()->onParametChange();
     };
 };
+
+struct YUVParamet {
+    VideoType type = VideoType::nv12;
+};
+
+class YUV2RGBALayer : public ITLayer<YUVParamet> {};
 
 }  // namespace aoce

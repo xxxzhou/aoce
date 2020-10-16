@@ -1,16 +1,18 @@
 #include <AoceManager.hpp>
 #include <Module/ModuleManager.hpp>
 #include <iostream>
-#include <opencv2/opencv.hpp>
+#include <memory>
 #include <string>
+#include <vulkan/VulkanContext.hpp>
+#include <vulkan/VulkanWindow.hpp>
 
 using namespace aoce;
-using namespace cv;
+using namespace aoce::vulkan;
 
-static cv::Mat* show = nullptr;
-static cv::Mat* show2 = nullptr;
 static int index = 0;
 static int formatIndex = 0;
+static std::unique_ptr<VulkanContext> context = {};
+static std::unique_ptr<VulkanWindow> window = nullptr;
 static PipeGraph* vkGraph;
 static InputLayer* inputLayer;
 static OutputLayer* outputLayer;
@@ -24,13 +26,38 @@ static void onDrawFrame(VideoFrame frame) {
     vkGraph->run();
 }
 
-static void onImageProcessHandle(uint8_t* data, int32_t width, int32_t height,
-                                 int32_t outIndex) {
-    // std::cout << "data:" << (int)data[10000] << std::endl;
-    memcpy(show->ptr<char>(0), data, width * height * 4);
+void onPreCommand(uint32_t index) {
+    VkImage winImage = window->images[index];
+    VkCommandBuffer cmd = window->cmdBuffers[index];
+    // 我们要把cs生成的图复制到正在渲染的图上,先改变渲染图的layout
+    changeLayout(cmd, winImage, VK_IMAGE_LAYOUT_UNDEFINED,
+                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                 VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                 VK_PIPELINE_STAGE_TRANSFER_BIT);
+    // context->BlitFillImage(cmd, csDestTex.get(), winImage, window->width,
+    //                        window->height);
+    // 复制完成后,改变渲染图的layout准备呈现
+    changeLayout(cmd, winImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                 VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                 VK_PIPELINE_STAGE_TRANSFER_BIT,
+                 VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
 }
 
-int main() {
+void onPreDraw() {
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &context->computerCmd;
+
+    vkQueueSubmit(context->graphicsQueue, 1, &submitInfo, nullptr);
+}
+
+#if _WIN32
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
+#else __ANDROID__
+void android_main(struct android_app* app)
+#endif
+{
     loadAoce();
     auto& deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
@@ -67,23 +94,16 @@ int main() {
     yuv2rgbLayer->updateParamet({VideoType::nv12});
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
-    // vkGraph->addNode(inputLayer)->addNode(outputLayer);
-    // 设定输出函数回调
-    outputLayer->setImageProcessHandle(onImageProcessHandle);
     // 设定输入格式
     inputLayer->setImage(selectFormat);
-    show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
-    show2 = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
-    while (int key = cv::waitKey(20)) {
-        cv::cvtColor(*show, *show2, cv::COLOR_RGBA2BGRA);
-        cv::imshow("a", *show2);
-        if (key == 'q') {
-            break;
-        } else if (key == 'c') {
-            video->close();
-        } else if (key == 'o') {
-            video->open();
-        }
-    }
+
+    // window窗口
+    context = std::make_unique<VulkanContext>();
+    context->InitContext();
+    window = std::make_unique<VulkanWindow>(context.get());
+    window->InitWindow(hInstance, 1280, 720, "vulkan test");
+    window->CreateSwipChain(context->logicalDevice.device, onPreCommand);
+    window->Run(onPreDraw);
+
     unloadAoce();
 }

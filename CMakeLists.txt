@@ -15,6 +15,7 @@ include(GNUInstallDirs)
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND WIN32)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "default install path" FORCE)
 endif()
+message(STATUS "install:" ${CMAKE_INSTALL_PREFIX})
 
 # 添加win32平台下的编译符号
 if(WIN32)
@@ -34,19 +35,22 @@ if(WIN32)
 endif()
 
 message(STATUS "build type:" ${CMAKE_BUILD_TYPE})
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "choose the type of build" FORCE)
+endif()
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-DDEBUG)
+    add_definitions(-DDEBUG) 
 endif ()
 
-
 set(AOCE_HEADER_DIR "${CMAKE_SOURCE_DIR}/code/aoce")
+set(AOCE_VULKAN_HEADER_DIR "${CMAKE_SOURCE_DIR}/code/aoce_vulkan")
 
 # 设置build的子目录
 set(AOCE_RUNTIME_DIR ${CMAKE_BINARY_DIR}/bin)
 set(AOCE_LIBRARY_DIR ${CMAKE_BINARY_DIR}/lib)
 
 # 生成目录
-function(aoce_output targetname)
+function(aoce_output targetname) 
     # message(STATUS "output" ${targetname})
     set_target_properties(${targetname} PROPERTIES 
     RUNTIME_OUTPUT_DIRECTORY ${AOCE_RUNTIME_DIR}

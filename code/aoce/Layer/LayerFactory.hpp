@@ -14,6 +14,7 @@ class ACOE_EXPORT LayerFactory {
    public:
     virtual InputLayer* crateInput() = 0;
     virtual OutputLayer* createOutput() = 0;
+    virtual YUV2RGBALayer* createYUV2RGBA() = 0;
 };
 
 // 在外部第三方插件,可以直接提供new XXXLayer(),里面注明对应的gpu类型就行

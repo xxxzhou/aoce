@@ -8,6 +8,15 @@ VulkanContext::VulkanContext(/* args */) {}
 VulkanContext::~VulkanContext() {
     if (pipelineCache) {
         vkDestroyPipelineCache(logicalDevice.device, pipelineCache, nullptr);
+        pipelineCache = VK_NULL_HANDLE;
+    }
+    if (computerCmd) {
+        vkFreeCommandBuffers(logicalDevice.device, cmdPool, 1, &computerCmd);
+        computerCmd = VK_NULL_HANDLE;
+    }
+    if (cmdPool) {
+        vkDestroyCommandPool(logicalDevice.device, cmdPool, nullptr);
+        cmdPool = VK_NULL_HANDLE;
     }
 }
 

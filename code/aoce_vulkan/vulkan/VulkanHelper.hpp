@@ -14,7 +14,6 @@
 
 namespace aoce {
 namespace vulkan {
-AOCE_VULKAN_EXPORT const std::string getAssetPath();
 
 // errorcode转显示
 AOCE_VULKAN_EXPORT std::string errorString(VkResult errorCode);

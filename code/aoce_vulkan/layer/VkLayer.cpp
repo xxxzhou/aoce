@@ -1,5 +1,6 @@
 #include "VkLayer.hpp"
 
+#include "../vulkan/VulkanPipeline.hpp"
 #include "VkPipeGraph.hpp"
 
 #ifdef _WIN32
@@ -23,11 +24,12 @@ void VkLayer::onInit() {
     assert(context != nullptr);
     cmd = context->computerCmd;
     if (!bInput) {
-        inTexs.resize(inputCount);
+        inTexs.resize(inCount);
     }
-    outTexs.resize(outputCount);
+    outTexs.resize(outCount);
     layout = std::make_unique<UBOLayout>(context);
-    onInitPipe();
+    shader = std::make_unique<VulkanShader>();
+    onInitGraph();
 }
 
 // void VkLayer::onInitLayer() { }
@@ -35,7 +37,7 @@ void VkLayer::onInit() {
 void VkLayer::onInitBuffer() {
     if (!bInput) {
         inTexs.clear();
-        for (int32_t i = 0; i < inputCount; i++) {
+        for (int32_t i = 0; i < inCount; i++) {
             auto& inLayer = this->inLayers[i];
             inTexs.push_back(
                 vkPipeGraph->getOutTex(inLayer.nodeIndex, inLayer.outputIndex));
@@ -43,8 +45,8 @@ void VkLayer::onInitBuffer() {
     }
     if (!bOutput) {
         outTexs.clear();
-        for (int32_t i = 0; i < outputCount; i++) {
-            const ImageFormat& format = outputFormats[i];
+        for (int32_t i = 0; i < outCount; i++) {
+            const ImageFormat& format = outFormats[i];
             VkFormat vkft = ImageFormat2Vk(format.imageType);
             VulkanTexturePtr texPtr(new VulkanTexture());
             texPtr->InitResource(context, format.width, format.height, vkft,
@@ -53,6 +55,7 @@ void VkLayer::onInitBuffer() {
         }
     }
     onInitVkBuffer();
+    onInitPipe();
 }
 
 bool VkLayer::onFrame() { return true; }

@@ -32,18 +32,24 @@ namespace aoce {
 namespace vulkan {
 // 物理显卡封装
 struct PhysicalDevice {
-    VkPhysicalDevice physicalDevice;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     // queueFlags包含每个通道VK_QUEUE_GRAPHICS_BIT/VK_QUEUE_COMPUTE_BIT能力表示
     std::vector<VkQueueFamilyProperties> queueFamilyProps;
     VkPhysicalDeviceMemoryProperties mempryProperties;
     VkPhysicalDeviceProperties properties;
     std::vector<uint32_t> queueGraphicsIndexs;
     std::vector<uint32_t> queueComputeIndexs;
+
+    inline void clear() {
+        queueFamilyProps.clear();
+        queueGraphicsIndexs.clear();
+        queueComputeIndexs.clear();
+    }
 };
 
 // 逻辑显卡封装
 struct LogicalDevice {
-    VkDevice device;
+    VkDevice device = VK_NULL_HANDLE;
     // 选用的渲染通道索引
     uint32_t graphicsIndex;
     // 选用的计算通道过些

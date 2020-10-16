@@ -13,15 +13,15 @@ class AOCE_VULKAN_EXPORT VulkanContext {
     bool bAloneCompute = false;
 
    public:
-    VkInstance instace;
-    PhysicalDevice physicalDevice;
-    LogicalDevice logicalDevice;
-    VkQueue computeQueue;
-    VkQueue graphicsQueue;
+    VkInstance instace = VK_NULL_HANDLE;
+    PhysicalDevice physicalDevice = {};
+    LogicalDevice logicalDevice = {};
+    VkQueue computeQueue = VK_NULL_HANDLE;
+    VkQueue graphicsQueue = VK_NULL_HANDLE;
     // 管线缓存,加速管线创建
-    VkPipelineCache pipelineCache;
-    VkCommandBuffer computerCmd;
-    VkCommandPool cmdPool;
+    VkPipelineCache pipelineCache = VK_NULL_HANDLE;
+    VkCommandBuffer computerCmd = VK_NULL_HANDLE;
+    VkCommandPool cmdPool = VK_NULL_HANDLE;
 
    public:
     VulkanContext(/* args */);

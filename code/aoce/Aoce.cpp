@@ -164,6 +164,20 @@ aoce::ImageType videoType2ImageType(const aoce::VideoType& videoType) {
     }
 }
 
+bool bYuv(const aoce::VideoType& videoType) {
+    switch (videoType) {
+        case VideoType::nv12:
+        case VideoType::yuv420P:
+        case VideoType::yuy2P:
+        case VideoType::yuv2I:
+        case VideoType::yvyuI:
+        case VideoType::uyvyI:
+            return true;
+        default:
+            return false;
+    }
+}
+
 ImageFormat videoFormat2ImageFormat(const VideoFormat& videoFormat) {
     ImageFormat imageFormat = {};
     imageFormat.imageType = videoType2ImageType(videoFormat.videoType);

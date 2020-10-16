@@ -3,16 +3,16 @@
 #include "PipeGraph.hpp"
 namespace aoce {
 BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
-    inputCount = inSize;
-    outputCount = outSize;
-    inputFormats.resize(inputCount);
-    outputFormats.resize(outputCount);
-    inLayers.resize(inputCount);
+    inCount = inSize;
+    outCount = outSize;
+    inFormats.resize(inCount);
+    outFormats.resize(outCount);
+    inLayers.resize(inCount);
     // 默认imagetype
-    for (auto& format : inputFormats) {
+    for (auto& format : inFormats) {
         format.imageType = ImageType::rgba8;
     }
-    for (auto& format : outputFormats) {
+    for (auto& format : outFormats) {
         format.imageType = ImageType::rgba8;
     }
 }
@@ -23,7 +23,7 @@ PipeGraph* BaseLayer::getGraph() { return pipeGraph; }
 
 bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,
                            int32_t outputIndex) {
-    if (inIndex >= inputCount) {
+    if (inIndex >= inCount) {
         logMessage(LogLevel::warn, "layer add in layer error inindex.");
         return false;
     }
@@ -54,13 +54,13 @@ void BaseLayer::initLayer() {
     if (!bInput) {
         for (int32_t i = 0; i < size; i++) {
             pipeGraph->getImageFormat(inLayers[i].nodeIndex,
-                                      inLayers[i].outputIndex, inputFormats[i]);
+                                      inLayers[i].outputIndex, inFormats[i]);
         }
     }
     // 默认所有outputFormat == inputFormats[0]
-    if (inputFormats.size() > 0) {
-        for (auto& outFormat : outputFormats) {
-            outFormat = inputFormats[0];
+    if (inFormats.size() > 0) {
+        for (auto& outFormat : outFormats) {
+            outFormat = inFormats[0];
         }
     }
     // 如果每层的outputFormat需要更新,请在如下函数单独处理

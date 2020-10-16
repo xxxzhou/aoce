@@ -16,6 +16,7 @@ class VkLayerFactory : public LayerFactory {
    public:
     virtual InputLayer* crateInput() override;
     virtual OutputLayer* createOutput() override;
+    virtual YUV2RGBALayer* createYUV2RGBA() override;
 };
 
 }  // namespace layer

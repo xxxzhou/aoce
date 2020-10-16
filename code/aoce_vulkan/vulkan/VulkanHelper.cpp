@@ -141,16 +141,6 @@ const std::map<VkFormat, FormatInfo> formatTable = {
     {VK_FORMAT_D32_SFLOAT_S8_UINT, {8, 2}},
 };
 
-const std::string getAssetPath() {
-#if defined(VK_USE_PLATFORM_ANDROID_KHR)
-    return "";
-#elif defined(VK_EXAMPLE_DATA_DIR)
-    return VK_EXAMPLE_DATA_DIR;
-#else
-    return "./../data/";
-#endif
-}
-
 std::string errorString(VkResult errorCode) {
     switch (errorCode) {
 #define STR(r)   \
@@ -295,6 +285,7 @@ VkResult enumerateDevice(VkInstance instance,
 VkResult createLogicalDevice(LogicalDevice& device,
                              const PhysicalDevice& physicalDevice,
                              uint32_t queueFamilyIndex, bool bAloneCompute) {
+    // 创建一个device,这个device根据条件能否访问graphics/compute
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 
     float queuePriorities[1] = {0.0};
@@ -338,6 +329,7 @@ VkResult createLogicalDevice(LogicalDevice& device,
     return vkCreateDevice(physicalDevice.physicalDevice, &deviceCreateInfo,
                           nullptr, &device.device);
 }
+
 int32_t getByteSize(VkFormat format) {
     auto item = formatTable.find(format);
     if (item != formatTable.end()) {
@@ -346,9 +338,8 @@ int32_t getByteSize(VkFormat format) {
     return 0;
 }
 
-bool getMemoryTypeIndex(const PhysicalDevice& physicalDevice,
-                        uint32_t typeBits, VkFlags quirementsMaks,
-                        uint32_t& index) {
+bool getMemoryTypeIndex(const PhysicalDevice& physicalDevice, uint32_t typeBits,
+                        VkFlags quirementsMaks, uint32_t& index) {
     for (uint32_t i = 0; i < physicalDevice.mempryProperties.memoryTypeCount;
          i++) {
         if ((typeBits & 1) == 1) {
@@ -490,5 +481,5 @@ void changeLayout(VkCommandBuffer command, VkImage image,
                          0, nullptr, 1, &imageMemoryBarrier);
 }
 
-}  // namespace common
-}  // namespace vulkanx
+}  // namespace vulkan
+}  // namespace aoce

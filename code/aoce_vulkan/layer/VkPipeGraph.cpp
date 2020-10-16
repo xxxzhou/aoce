@@ -21,7 +21,7 @@ VkPipeGraph::~VkPipeGraph() {}
 VulkanTexturePtr VkPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
     assert(node < nodes.size());
     VkLayer* vkLayer = static_cast<VkLayer*>(nodes[node]->getLayer());
-    assert(outIndex < vkLayer->outputCount);
+    assert(outIndex < vkLayer->outCount);
     return vkLayer->outTexs[outIndex];
 }
 

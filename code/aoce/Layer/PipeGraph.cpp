@@ -39,8 +39,8 @@ bool PipeGraph::addLine(int32_t from, int32_t to, int32_t formOut,
     line->toNode = to;
     line->toInIndex = toIn;
     // 数据连接节点无效
-    if (formOut >= nodes[from]->layer->outputCount ||
-        toIn >= nodes[to]->layer->inputCount) {
+    if (formOut >= nodes[from]->layer->outCount ||
+        toIn >= nodes[to]->layer->inCount) {
         return false;
     }
     // 节点有效性与重复性
@@ -60,8 +60,8 @@ bool PipeGraph::addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut,
 void PipeGraph::getImageFormat(int32_t nodeIndex, int32_t outputIndex,
                                ImageFormat& format) {
     if (nodeIndex < nodes.size() &&
-        outputIndex < nodes[nodeIndex]->layer->outputFormats.size()) {
-        format = nodes[nodeIndex]->layer->outputFormats[outputIndex];
+        outputIndex < nodes[nodeIndex]->layer->outFormats.size()) {
+        format = nodes[nodeIndex]->layer->outFormats[outputIndex];
     }
 }
 
@@ -85,7 +85,7 @@ void PipeGraph::validNode() {
                 uint32_t maskIndex = std::pow(2, tn->toInIndex);
                 tmask |= maskIndex;
             }
-            int32_t inCount = node->layer->inputCount;
+            int32_t inCount = node->layer->inCount;
             // 输入节点差
             if (tmask != (std::pow(2, inCount) - 1)) {
                 node->bDisable = true;
@@ -165,9 +165,9 @@ bool PipeGraph::resetGraph() {
     // 2. 检查节点连接的ImageType是否符合
     for (auto& line : validLines) {
         if (nodes[line->fromNode]
-                ->layer->outputFormats[line->fromOutIndex]
+                ->layer->outFormats[line->fromOutIndex]
                 .imageType != nodes[line->toNode]
-                                  ->layer->inputFormats[line->toInIndex]
+                                  ->layer->inFormats[line->toInIndex]
                                   .imageType) {
             std::string message;
             string_format(message, "graph error,",

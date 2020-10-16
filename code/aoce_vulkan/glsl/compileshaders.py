@@ -13,7 +13,7 @@ if len(sys.argv) > 2:
 
 shaderfiles = []
 for exts in ('*.vert', '*.frag', '*.comp', '*.geom', '*.tesc', '*.tese'):
-	shaderfiles.extend(glob.glob(os.path.join(path, exts)))
+	shaderfiles.extend(glob.glob(os.path.join(path, exts))) 
 
 failedshaders = []
 for shaderfile in shaderfiles:

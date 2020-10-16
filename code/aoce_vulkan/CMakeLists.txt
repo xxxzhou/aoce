@@ -8,7 +8,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Android")
     add_definitions(-DVK_USE_PLATFORM_ANDROID_KHR)
 else()
     message(FATAL_ERROR "unsupported platform.")
-endif()
+endif() 
 
 # 查找vulkan库引用
 message(STATUS "using find_package to locate vulkan")
@@ -24,15 +24,25 @@ file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURC
 
 add_sub_path(vulkan AOCE_HEADER AOCE_SOURCE)
 add_sub_path(layer AOCE_HEADER AOCE_SOURCE)
-if(WIN32)
-    add_sub_path(win32 AOCE_HEADER AOCE_SOURCE) 
+if(WIN32)  
+    add_sub_path(win32 AOCE_HEADER AOCE_SOURCE)   
 elseif(ANDROID)
     add_sub_path(android AOCE_HEADER AOCE_SOURCE) 
-endif() 
-
+endif()  
 
 add_library(aoce_vulkan SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
 target_link_libraries(aoce_vulkan ${Vulkan_LIBRARY} aoce)
 aoce_output(aoce_vulkan)
+
+# 复制glsl文件到bin目录
+file(GLOB AOCE_SPV_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/glsl/*.spv" )
+message(STATUS "aoce_vulkan_glsl: " ${AOCE_SPV_SOURCE})          
+message(STATUS "aoce_vulkan_glsl_dst: " ${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl) 
+file(COPY ${AOCE_SPV_SOURCE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl")     
+# add_custom_command(
+#     TARGET aoce_vulkan POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory ${AOCE_SPV_SOURCE}  ${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl
+# )
+
 
 
