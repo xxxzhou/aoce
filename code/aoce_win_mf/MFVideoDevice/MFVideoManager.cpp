@@ -7,7 +7,12 @@ namespace mf {
 
 MFVideoManager::MFVideoManager(/* args */) {}
 
-MFVideoManager::~MFVideoManager() { videoList.clear(); }
+MFVideoManager::~MFVideoManager() {
+    for (auto& video : videoList) {
+        video.reset();
+    }
+    videoList.clear();
+}
 
 void MFVideoManager::getDevices() {
     // shared 引用清零自动delete

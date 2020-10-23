@@ -16,7 +16,10 @@ find_package(Vulkan)
 message(STATUS "vulkan found = ${Vulkan_FOUND}")  
 message(STATUS "vulkan include = ${Vulkan_INCLUDE_DIR}")  
 message(STATUS "vulkan lib = ${Vulkan_LIBRARY}")
-include_directories(${Vulkan_INCLUDE_DIR} ${AOCE_HEADER_DIR})   
+include_directories(${Vulkan_INCLUDE_DIR} ${AOCE_HEADER_DIR}) 
+if(ANDROID)
+    include_directories(${ANDROID_NDK}/sources/android/native_app_glue) 
+endif()  
 
 include(AoceHelper) 
 file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" )
@@ -25,14 +28,15 @@ file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURC
 add_sub_path(vulkan AOCE_HEADER AOCE_SOURCE)
 add_sub_path(layer AOCE_HEADER AOCE_SOURCE)
 if(WIN32)  
-    add_sub_path(win32 AOCE_HEADER AOCE_SOURCE)   
-elseif(ANDROID)
+    add_sub_path(win32 AOCE_HEADER AOCE_SOURCE) 
+elseif(ANDROID)  
     add_sub_path(android AOCE_HEADER AOCE_SOURCE) 
-endif()  
+endif()
 
 add_library(aoce_vulkan SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
 target_link_libraries(aoce_vulkan ${Vulkan_LIBRARY} aoce)
-aoce_output(aoce_vulkan)
+
+aoce_output(aoce_vulkan)   
 
 # 复制glsl文件到bin目录
 file(GLOB AOCE_SPV_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/glsl/*.spv" )

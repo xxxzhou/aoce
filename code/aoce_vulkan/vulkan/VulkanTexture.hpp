@@ -28,13 +28,13 @@ class AOCE_VULKAN_EXPORT VulkanTexture {
     ~VulkanTexture();
 
    public:
-    void InitResource(class VulkanContext* context, uint32_t width,
+    void InitResource(uint32_t width,
                       uint32_t height, VkFormat format,
                       VkImageUsageFlags usageFlag,
                       VkMemoryPropertyFlags memoryFlag,
                       uint8_t* cpuData = nullptr, uint8_t cpuPitch = 0);
 
-    void AddBarrier(VkCommandBuffer command, VkImageLayout newLayout,
+    void addBarrier(VkCommandBuffer command, VkImageLayout newLayout,
                     VkPipelineStageFlags newStageFlags,
                     VkAccessFlags newAccessFlags = 0);
 };

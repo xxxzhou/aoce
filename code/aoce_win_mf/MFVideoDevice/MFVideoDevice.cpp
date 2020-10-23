@@ -85,7 +85,8 @@ bool MFVideoDevice::init(IMFActivate* pActivate) {
     if (formats.size() < 1) {
         return false;
     }
-    selectFormat = formats[0];
+    // 默认选择第一个输出格式
+    setFormat(0);
     return true;
 }
 
@@ -146,6 +147,9 @@ void MFVideoDevice::setFormat(int32_t index) {
     }
     selectIndex = index;
     selectFormat = formats[index];
+    if (selectFormat.videoType == VideoType::mjpg) {
+        selectFormat.videoType = VideoType::yuv2I;
+    }
     if (tempOpen) {
         open();
     }
@@ -199,7 +203,8 @@ bool MFVideoDevice::open() {
             return false;
         }
         // 重新打开数据读取
-        return setPlay(true);;
+        return setPlay(true);
+        ;
     }
 }
 

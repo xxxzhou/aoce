@@ -24,16 +24,25 @@
 #include <android/asset_manager.h>
 #include <android/log.h>
 #include <android/native_activity.h>
-#include <android_native_app_glue.h>
 #include <sys/system_properties.h>
 
 // Missing from the NDK
-namespace std {
-template <typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args) {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-}  // namespace std
+// namespace std {
+// template <typename T, typename... Args>
+// std::unique_ptr<T> make_unique(Args&&... args) {
+//    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+//}
+//}  // namespace std
+
+#define LOGI(...) \
+    ((void)__android_log_print(ANDROID_LOG_INFO, "aoce", __VA_ARGS__))
+#define LOGW(...) \
+    ((void)__android_log_print(ANDROID_LOG_WARN, "aoce", __VA_ARGS__))
+#define LOGE(...) \
+    ((void)__android_log_print(ANDROID_LOG_ERROR, "aoce", __VA_ARGS__))
+#define LOGD(...) \
+    ((void)__android_log_print(ANDROID_LOG_DEBUG, "aoce", __VA_ARGS__))
+
 #endif
 
 // 后期会考虑使用静态链接
@@ -48,13 +57,15 @@ std::unique_ptr<T> make_unique(Args&&... args) {
     extern "C" DLLEXPORT IModule* NewModule() { return new ModuleClass(); }
 #endif
 
-#ifndef max
-#define max(a, b) (((a) > (b)) ? (a) : (b))
-#endif
+#define NOMINMAX 1
 
-#ifndef min
-#define min(a, b) (((a) < (b)) ? (a) : (b))
-#endif
+// #ifndef max
+// #define max(a, b) (((a) > (b)) ? (a) : (b))
+// #endif
+
+// #ifndef min
+// #define min(a, b) (((a) < (b)) ? (a) : (b))
+// #endif
 
 //回调定义,C++传值改用std::function.
 // typedef C++ function后缀定义 handle,C为action,前缀不要加on

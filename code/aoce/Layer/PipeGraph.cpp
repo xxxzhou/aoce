@@ -1,6 +1,7 @@
-#pragma once
+
 #include "PipeGraph.hpp"
 
+#include <cmath>
 #include <list>
 #include <queue>
 #include <stack>
@@ -92,18 +93,6 @@ void PipeGraph::validNode() {
             }
         }
         // 检查输出结点,要检查输出节点吗?
-        // if (!node->bDisable && !node->layer->bOutput) {
-        //     auto& fns = formLines[node->graphIndex];
-        //     uint32_t fmask = 0;
-        //     for (auto& fn : fns) {
-        //         fmask |= fn->fromOutIndex;
-        //     }
-        //     int32_t outCount = node->layer->outputCount;
-        //     // 输入节点差
-        //     if (fmask != (std::pow(2, outCount) - 1)) {
-        //         node->bDisable = true;
-        //     }
-        // }
     }
     // 检查有效链路
     for (auto& node : nodes) {
@@ -162,23 +151,7 @@ bool PipeGraph::resetGraph() {
     nodeExcs.clear();
     // 1. 得到节点的enable/visable验证过的lines
     validNode();
-    // 2. 检查节点连接的ImageType是否符合
-    for (auto& line : validLines) {
-        if (nodes[line->fromNode]
-                ->layer->outFormats[line->fromOutIndex]
-                .imageType != nodes[line->toNode]
-                                  ->layer->inFormats[line->toInIndex]
-                                  .imageType) {
-            std::string message;
-            string_format(message, "graph error,",
-                          "from node: ", line->fromNode, "-",
-                          line->fromOutIndex + " not match image type in node:",
-                          line->toNode, "-", line->toInIndex);
-            logMessage(LogLevel::error, message);
-            return false;
-        }
-    }
-    // 3. 得到有效节点的前置节点  如:2[1] 3[2] 4[1] 5[3,4] (2需要1),(5需要3,4)
+    // 2. 得到有效节点的前置节点  如:2[1] 3[2] 4[1] 5[3,4] (2需要1),(5需要3,4)
     std::vector<std::vector<int>> reqNodes(nodes.size());
     std::queue<int32_t> tempQueue;
     for (auto& line : validLines) {
@@ -194,7 +167,7 @@ bool PipeGraph::resetGraph() {
             nodeExcs.push_back(i);
         }
     }
-    // 4. 重新构建有序无环图的执行顺序
+    // 3. 重新构建有序无环图的执行顺序
     while (!tempQueue.empty()) {
         int32_t tnode = tempQueue.front();
         tempQueue.pop();
@@ -214,7 +187,7 @@ bool PipeGraph::resetGraph() {
             tempQueue.push(tnode);
         }
     }
-    // 5. onInitLayer,节点得到所需大小
+    // 4. onInitLayer,节点得到所需大小
     for (auto index : nodeExcs) {
         if (!nodes[index]->layer->vaildInLayers()) {
             std::string message;
@@ -223,6 +196,27 @@ bool PipeGraph::resetGraph() {
             return false;
         }
         nodes[index]->layer->initLayer();
+    }
+    // 5. 检查节点连接的ImageType是否符合
+    for (auto& index : nodeExcs) {
+        if (nodes[index]->layer->bInput) {
+            continue;
+        }
+        int size = nodes[index]->layer->inLayers.size();
+        for (int i = 0; i < size; i++) {
+            const auto& fromNode = nodes[index]->layer->inLayers[i];
+            if (nodes[fromNode.nodeIndex]
+                    ->layer->outFormats[fromNode.outputIndex]
+                    .imageType != nodes[index]->layer->inFormats[i].imageType) {
+                std::string message;
+                string_format(message, "graph error,",
+                              "from node: ", fromNode.nodeIndex, "-",
+                              fromNode.outputIndex,
+                              " not match image type in node:", index, "-", i);
+                logMessage(LogLevel::error, message);
+                return false;
+            }
+        }
     }
     onInitLayers();
     for (auto index : nodeExcs) {

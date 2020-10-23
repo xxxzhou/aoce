@@ -23,7 +23,7 @@ void VulkanShader::loadShaderModule(VkDevice device, std::string path,
 #if defined(__ANDROID__)
     AAssetManager* assetManager =
         VulkanManager::Get().androidApp->activity->assetManager;
-    shaderModule = loadShader(assetManager, fileName.c_str(), device);
+    shaderModule = loadShader(assetManager, path.c_str(), device);
 #else
     shaderModule = loadShader(path.c_str(), device);
 #endif

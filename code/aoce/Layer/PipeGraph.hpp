@@ -53,7 +53,7 @@ class ACOE_EXPORT PipeGraph {
     void getImageFormat(int32_t nodeIndex, int32_t outputIndex,
                         ImageFormat& format);
 
-   public:
+   protected:
     virtual bool onInitLayers() { return false; };
     virtual bool onInitBuffers() { return false; }
     // 限定不能直接创建

@@ -5,12 +5,16 @@
 #include "VulkanCommon.hpp"
 #include "VulkanContext.hpp"
 #include "VulkanHelper.hpp"
+#include "VulkanManager.hpp"
+
 namespace aoce {
 namespace vulkan {
-VulkanWindow::VulkanWindow(class VulkanContext* _context) {
-    this->context = _context;
-    this->instance = context->instace;
-    this->physicalDevice = context->physicalDevice.physicalDevice;
+VulkanWindow::VulkanWindow(cmdExecuteHandle preCmd, bool preFram) {
+    this->instance = VulkanManager::Get().instace;
+    this->physicalDevice = VulkanManager::Get().physicalDevice;
+    this->device = VulkanManager::Get().device;
+    this->onCmdExecuteEvent = preCmd;
+    this->bPreCmd = preFram;
 }
 
 VulkanWindow::~VulkanWindow() {
@@ -18,11 +22,11 @@ VulkanWindow::~VulkanWindow() {
         for (uint32_t i = 0; i < imageCount; i++) {
             vkDestroyImageView(device, views[i], nullptr);
             vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
+            vkDestroyFence(device, addCmdFences[i], nullptr);
         }
         vkDestroySwapchainKHR(device, swapChain, nullptr);
         vkDestroySemaphore(device, presentComplete, nullptr);
         vkDestroySemaphore(device, renderComplete, nullptr);
-        vkDestroyFence(device, presentFence, nullptr);
         vkFreeCommandBuffers(device, cmdPool,
                              static_cast<uint32_t>(cmdBuffers.size()),
                              cmdBuffers.data());
@@ -36,33 +40,25 @@ VulkanWindow::~VulkanWindow() {
 }
 
 #if defined(_WIN32)
-void VulkanWindow::InitWindow(HINSTANCE inst, uint32_t _width, uint32_t _height,
+void VulkanWindow::initWindow(HINSTANCE inst, uint32_t _width, uint32_t _height,
                               const char* appName) {
     this->width = _width;
     this->height = _height;
     // 创建窗口
     window = std::make_unique<Win32Window>();
-    HWND hwnd = window->InitWindow(inst, width, height, appName, this);
+    HWND hwnd = window->initWindow(inst, width, height, appName, this);
     // 得到合适的queueIndex
-    this->InitSurface(inst, hwnd);
+    this->initSurface(inst, hwnd);
+    bCreateWindow = true;
 }
 
 LRESULT VulkanWindow::handleMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
     switch (msg) {
         case WM_SIZE: {
-            if (device && swapChain && resizing) {
-                vkDeviceWaitIdle(device);
-                // 得到imagecount
-                this->reSwapChainBefore();
-                this->reSwapChainAfter();
-            }
+            this->width = LOWORD(lparam);
+            this->height = HIWORD(lparam);
+            onSizeChange();
         } break;
-        case WM_ENTERSIZEMOVE:
-            resizing = true;
-            break;
-        case WM_EXITSIZEMOVE:
-            resizing = false;
-            break;
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
@@ -85,8 +81,7 @@ void handleAppCommand(android_app* app, int32_t cmd) {
             LOGI("          The sample ran successfully!!");
             LOGI("=================================================");
             LOGI("\n");
-            window->InitSurface(app->window);
-            window->onInitVulkan();
+            window->initSurface(app->window);
             break;
         case APP_CMD_TERM_WINDOW:
             // The window is being hidden or closed, clean it up.
@@ -104,20 +99,18 @@ void handleAppCommand(android_app* app, int32_t cmd) {
     }
 }
 
-void VulkanWindow::InitWindow(android_app* app,
-                              std::function<void()> onInitVulkanAction) {
-    this->onInitVulkan = onInitVulkanAction;
-    this->androidApp = app;
-    this->androidApp->userData = this;
-    this->androidApp->onAppCmd = handleAppCommand;
+void VulkanWindow::initWindow() {
+    VulkanManager::Get().androidApp->userData = this;
+    VulkanManager::Get().androidApp->onAppCmd = handleAppCommand;
+    bCreateWindow = true;
 }
 
 #endif
 
 #if defined(_WIN32)
-void VulkanWindow::InitSurface(HINSTANCE inst, HWND windowHandle)
+void VulkanWindow::initSurface(HINSTANCE inst, HWND windowHandle)
 #elif defined(__ANDROID__)
-void VulkanWindow::InitSurface(ANativeWindow* window)
+void VulkanWindow::initSurface(ANativeWindow* window)
 #endif
 {
     VkResult ret = VK_SUCCESS;
@@ -137,38 +130,12 @@ void VulkanWindow::InitSurface(ANativeWindow* window)
     ret =
         vkCreateAndroidSurfaceKHR(instance, &surfaceCreateInfo, NULL, &surface);
 #endif
-    uint32_t queueFamilyCount = context->physicalDevice.queueFamilyProps.size();
-    std::vector<VkBool32> supportsPresent(queueFamilyCount);
-    // 检查每个通道的表面是否支持显示
-    for (uint32_t i = 0; i < queueFamilyCount; i++) {
-        vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface,
-                                             &supportsPresent[i]);
+    bool bfind =
+        VulkanManager::Get().findSurfaceQueue(surface, presentQueueIndex);
+    assert(presentQueueIndex >= 0);
+    if (!bfind) {
+        logMessage(LogLevel::warn, "presentIndex not equal graphicsIndex");
     }
-    // 默认选择支持VK_QUEUE_GRAPHICS_BIT,也能呈现渲染画面的
-    for (uint32_t i = 0; i < queueFamilyCount; i++) {
-        if ((context->physicalDevice.queueFamilyProps[i].queueFlags &
-             VK_QUEUE_GRAPHICS_BIT) != 0) {
-            if (graphicsQueueIndex == UINT32_MAX) {
-                graphicsQueueIndex = i;
-            }
-            if (supportsPresent[i] == VK_TRUE) {
-                graphicsQueueIndex = i;
-                presentQueueIndex = i;
-                break;
-            }
-        }
-    }
-    // 如果没找到二者都支持的
-    if (presentQueueIndex == UINT32_MAX) {
-        for (uint32_t i = 0; i < queueFamilyCount; i++) {
-            if (supportsPresent[i] == VK_TRUE) {
-                presentQueueIndex = i;
-                break;
-            }
-        }
-    }
-    assert(graphicsQueueIndex != UINT32_MAX);
-    assert(presentQueueIndex != UINT32_MAX);
     //查找surf支持的显示格式
     uint32_t formatCount;
     VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceFormatsKHR(
@@ -182,12 +149,6 @@ void VulkanWindow::InitSurface(ANativeWindow* window)
         assert(formatCount >= 1);
         format = surfFormats[0].format;
     }
-}
-
-void VulkanWindow::CreateSwipChain(
-    VkDevice _device, std::function<void(uint32_t)> onBuildCmdAction) {
-    this->device = _device;
-    this->onBuildCmd = onBuildCmdAction;
     // 创建semaphore 与 submitInfo,同步渲染与命令执行的顺序
     VkSemaphoreCreateInfo semaphoreInfo = {};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -197,12 +158,6 @@ void VulkanWindow::CreateSwipChain(
     // 确保提交与执行命令后,才能执行显示图像
     VK_CHECK_RESULT(
         vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderComplete));
-    // 创建cpu-gpu通知
-    VkFenceCreateInfo fenceInfo = {};
-    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    // 默认是有信号
-    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-    vkCreateFence(device, &fenceInfo, nullptr, &presentFence);
     // 用于渲染队列里确定等待与发送信号
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pWaitDstStageMask = &submitPipelineStages;
@@ -213,37 +168,66 @@ void VulkanWindow::CreateSwipChain(
     // 用于缓冲命令执行结束后发出信号的信号量对象
     submitInfo.pSignalSemaphores = &renderComplete;
     // 得到当前使用的queue
-    vkGetDeviceQueue(device, graphicsQueueIndex, 0, &graphicsQueue);
-    if (graphicsQueueIndex == presentQueueIndex) {
-        presentQueue = graphicsQueue;
-    } else {
-        vkGetDeviceQueue(device, presentQueueIndex, 0, &presentQueue);
-    }
+    vkGetDeviceQueue(device, presentQueueIndex, 0, &presentQueue);
     // reSwapChain主要是重新生成由widht/height改变的资源 cmdPool
     VkCommandPoolCreateInfo cmdPoolInfo = {};
     cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    cmdPoolInfo.queueFamilyIndex = graphicsQueueIndex;
+    cmdPoolInfo.queueFamilyIndex = presentQueueIndex;
     cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     VK_CHECK_RESULT(
         vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool));
     // 创建窗口用的renderpass
-    this->createRenderPass();
+    createRenderPass();
+    createSwipChain(true);
+    bCreateSurface = true;
+}
+
+void VulkanWindow::createSwipChain(bool bInit) {
+    // std::lock_guard<std::mutex> mtx_locker(sizeMtx);
+    bCanDraw = false;
     // 得到imagecount
     this->reSwapChainBefore();
-    // imageCount一般来说不会变动
-    cmdBuffers.resize(imageCount);
-    VkCommandBufferAllocateInfo cmdBufInfo = {};
-    cmdBufInfo.commandPool = cmdPool;
-    cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    cmdBufInfo.commandBufferCount = (uint32_t)cmdBuffers.size();
-    VK_CHECK_RESULT(
-        vkAllocateCommandBuffers(device, &cmdBufInfo, cmdBuffers.data()));
     // 创建swapchain以及对应的image
     this->reSwapChainAfter();
+    if (bInit) {
+        // imageCount一般来说不会变动
+        cmdBuffers.resize(imageCount);
+        VkCommandBufferAllocateInfo cmdBufInfo = {};
+        cmdBufInfo.commandPool = cmdPool;
+        cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        cmdBufInfo.commandBufferCount = (uint32_t)cmdBuffers.size();
+        VK_CHECK_RESULT(
+            vkAllocateCommandBuffers(device, &cmdBufInfo, cmdBuffers.data()));
+        // 开始组合build
+        if (this->bPreCmd || !onCmdExecuteEvent) {
+            for (uint32_t i = 0; i < imageCount; i++) {
+                vkBeginCommandBuffer(cmdBuffers[i], &cmdBufferBeginInfo);
+                vkCmdSetViewport(cmdBuffers[i], 0, 1, &viewport);
+                vkCmdSetScissor(cmdBuffers[i], 0, 1, &scissor);
+                renderPassBeginInfo.framebuffer = frameBuffers[i];
+                // renderpass关联渲染目标
+                vkCmdBeginRenderPass(cmdBuffers[i], &renderPassBeginInfo,
+                                     VK_SUBPASS_CONTENTS_INLINE);
+                if (onCmdExecuteEvent) {
+                    onCmdExecuteEvent(i);
+                }
+                vkCmdEndRenderPass(cmdBuffers[i]);
+                vkEndCommandBuffer(cmdBuffers[i]);
+            }
+        }
+        addCmdFences.resize(imageCount);
+        for (uint32_t i = 0; i < imageCount; i++) {
+            VkFenceCreateInfo fenceInfo = {};
+            fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+            // 默认是有信号
+            fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+            vkCreateFence(device, &fenceInfo, nullptr, &addCmdFences[i]);
+        }
+    }
+    bCanDraw = true;
 }
 
 void VulkanWindow::reSwapChainBefore() {
-    this->bCanDraw = false;
     VkSwapchainKHR oldSwapchain = swapChain;
     // Get physical device surface properties and formats
     VkSurfaceCapabilitiesKHR surfCapabilities;
@@ -348,13 +332,16 @@ void VulkanWindow::reSwapChainBefore() {
     swapchainInfo.oldSwapchain = swapChain;
     swapchainInfo.clipped = true;
     swapchainInfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-    swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    swapchainInfo.imageUsage =
+        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     swapchainInfo.queueFamilyIndexCount = 0;
     swapchainInfo.pQueueFamilyIndices = nullptr;
-    uint32_t queueFamilyIndices[2] = {graphicsQueueIndex, presentQueueIndex};
     // 如果二个不同队列,我们需要CONCURRENT共享不同队列传输
+    int graphicsQueueIndex = VulkanManager::Get().graphicsIndex;
     if (graphicsQueueIndex != presentQueueIndex) {
+        uint32_t queueFamilyIndices[2] = {(uint32_t)graphicsQueueIndex,
+                                          (uint32_t)presentQueueIndex};
         swapchainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         swapchainInfo.queueFamilyIndexCount = 2;
         swapchainInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -363,7 +350,7 @@ void VulkanWindow::reSwapChainBefore() {
         vkCreateSwapchainKHR(device, &swapchainInfo, nullptr, &swapChain));
     // 自动销毁老的资源,重新生成
     depthTex = std::make_unique<VulkanTexture>();
-    depthTex->InitResource(context, width, height, depthFormat,
+    depthTex->InitResource(width, height, depthFormat,
                            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
     // 销毁老的资源
@@ -379,11 +366,11 @@ void VulkanWindow::reSwapChainBefore() {
     images.resize(imageCount);
     VK_CHECK_RESULT(
         vkGetSwapchainImagesKHR(device, swapChain, &imageCount, images.data()));
+    views.resize(imageCount);
+    frameBuffers.resize(imageCount);
 }
 
 void VulkanWindow::reSwapChainAfter() {
-    views.resize(imageCount);
-    frameBuffers.resize(imageCount);
     // 创建swap image view
     VkImageViewCreateInfo colorAttachmentView = {};
     colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -441,22 +428,6 @@ void VulkanWindow::reSwapChainAfter() {
     // scissor
     scissor.extent = {width, height};
     scissor.offset = {0, 0};
-    // 开始组合build
-    for (uint32_t i = 0; i < imageCount; i++) {
-        vkBeginCommandBuffer(cmdBuffers[i], &cmdBufferBeginInfo);
-        vkCmdSetViewport(cmdBuffers[i], 0, 1, &viewport);
-        vkCmdSetScissor(cmdBuffers[i], 0, 1, &scissor);
-        renderPassBeginInfo.framebuffer = frameBuffers[i];
-        // renderpass关联渲染目标
-        vkCmdBeginRenderPass(cmdBuffers[i], &renderPassBeginInfo,
-                             VK_SUBPASS_CONTENTS_INLINE);
-        if (onBuildCmd) {
-            onBuildCmd(i);
-        }
-        vkCmdEndRenderPass(cmdBuffers[i]);
-        vkEndCommandBuffer(cmdBuffers[i]);
-    }
-    this->bCanDraw = true;
 }
 
 void VulkanWindow::createRenderPass() {
@@ -537,25 +508,35 @@ void VulkanWindow::createRenderPass() {
 }
 
 void VulkanWindow::tick() {
+    // std::lock_guard<std::mutex> mtx_locker(sizeMtx);
     if (bCanDraw) {
-        if (onPreDraw) {
-            onPreDraw();
-        }
-        // // 等待开门,前面设置默认门是开的
-        // VK_CHECK_RESULT(
-        //     vkWaitForFences(device, 1, &presentFence, true, UINT64_MAX));
-        // // 关门 VkFence不同于VkSemaphore,需要手动reset.
-        // VK_CHECK_RESULT(vkResetFences(device, 1, &presentFence));
         // 发送信号给presentComplete
         VkResult result = vkAcquireNextImageKHR(
             device, swapChain, UINT64_MAX, presentComplete, (VkFence) nullptr,
             &currentIndex);
+        // 运行时提交,可能会导致一边在执行,一边在记录
+        if (!this->bPreCmd && onCmdExecuteEvent) {
+            VK_CHECK_RESULT(vkWaitForFences(
+                device, 1, &addCmdFences[currentIndex], true, UINT64_MAX));
+            vkResetFences(device, 1, &addCmdFences[currentIndex]);
+            vkBeginCommandBuffer(cmdBuffers[currentIndex], &cmdBufferBeginInfo);
+            vkCmdSetViewport(cmdBuffers[currentIndex], 0, 1, &viewport);
+            vkCmdSetScissor(cmdBuffers[currentIndex], 0, 1, &scissor);
+            renderPassBeginInfo.framebuffer = frameBuffers[currentIndex];
+            // renderpass关联渲染目标
+            vkCmdBeginRenderPass(cmdBuffers[currentIndex], &renderPassBeginInfo,
+                                 VK_SUBPASS_CONTENTS_INLINE);
+            if (onCmdExecuteEvent) {
+                onCmdExecuteEvent(currentIndex);
+            }
+            vkCmdEndRenderPass(cmdBuffers[currentIndex]);
+            vkEndCommandBuffer(cmdBuffers[currentIndex]);
+        }
         // 提交缓冲区命令,执行完后发送信号给renderComplete
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &cmdBuffers[currentIndex];
         // 等presentComplete收到信号后执行,执行完成后发送信号renderComplete
-        VK_CHECK_RESULT(
-            vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE));
+        VkResult res = vkQueueSubmit(presentQueue, 1, &submitInfo, addCmdFences[currentIndex]);
         // 提交渲染呈现到屏幕
         VkPresentInfoKHR presentInfo = {};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -569,14 +550,17 @@ void VulkanWindow::tick() {
         // 提交渲染呈现到屏幕
         result = vkQueuePresentKHR(presentQueue, &presentInfo);
         assert(result == VK_SUCCESS);
-        // // presentFence开门(发送信号量)
+        // // addCmdFence开门(发送信号量)
         // VK_CHECK_RESULT(
-        //     vkQueueSubmit(presentQueue, 0, nullptr, presentFence));
+        //     vkQueueSubmit(presentQueue, 0, nullptr, addCmdFence));
     }
 }
 
-void VulkanWindow::Run(std::function<void()> onPreDrawAction) {
-    this->onPreDraw = onPreDrawAction;
+void VulkanWindow::run() {
+    // 不是自己的窗口,不瞎BB
+    if (!bCreateWindow) {
+        return;
+    }
 #if defined(_WIN32)
     while (true) {
         bool quit = false;
@@ -594,7 +578,9 @@ void VulkanWindow::Run(std::function<void()> onPreDrawAction) {
         }
         tick();
     }
+
 #elif defined(__ANDROID__)
+    android_app* androidApp = VulkanManager::Get().androidApp;
     while (true) {
         int ident;
         int events;
@@ -624,5 +610,11 @@ void VulkanWindow::Run(std::function<void()> onPreDrawAction) {
 #endif
 }
 
-}  // namespace common
-}  // namespace vulkanx
+void VulkanWindow::onSizeChange() {
+    vkDeviceWaitIdle(device);
+    createSwipChain(false);
+    vkDeviceWaitIdle(device);
+}
+
+}  // namespace vulkan
+}  // namespace aoce

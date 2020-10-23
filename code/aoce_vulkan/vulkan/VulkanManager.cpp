@@ -1,4 +1,7 @@
+
 #include "VulkanManager.hpp"
+
+#include <vulkan/vulkan.h>
 #if __ANDROID__
 #include "../android/vulkan_wrapper.h"
 #endif
@@ -17,9 +20,9 @@ VulkanManager& VulkanManager::Get() {
 }
 
 VulkanManager::~VulkanManager() {
-    if (logicalDevice.device) {
-        vkDestroyDevice(logicalDevice.device, nullptr);
-        logicalDevice.device = nullptr;
+    if (device) {
+        vkDestroyDevice(device, nullptr);
+        device = VK_NULL_HANDLE;
     }
     if (instace) {
         vkDestroyInstance(instace, nullptr);
@@ -28,28 +31,167 @@ VulkanManager::~VulkanManager() {
     // physicalDevice.clear();
 }
 
-void VulkanManager::CreateInstance(const char* appName) {
+bool VulkanManager::createInstance(const char* appName) {
 #if __ANDROID__
     if (!InitVulkan()) {
         logMessage(LogLevel::error, "Failied initializing Vulkan APIs!");
         return false;
     }
 #endif
-    createInstance(instace, appName);
+    aoce::vulkan::createInstance(instace, appName);
     std::vector<PhysicalDevice> physicalDevices;
     enumerateDevice(instace, physicalDevices);
-    // 选择第一个物理设备
-    this->physicalDevice = physicalDevices[0];
+    if (physicalDevices.empty()) {
+        return false;
+    }
+    bool find = false;
+    // 首选独立显卡
+    for (auto& pdevice : physicalDevices) {
+        if (pdevice.properties.deviceType ==
+            VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+            this->physical = pdevice;
+            find = true;
+            break;
+        }
+    }
+    if (!find) {
+        this->physical = physicalDevices[0];
+    }
+    physicalDevice = this->physical.physicalDevice;
+    return true;
 }
 
-void VulkanManager::CreateDevice(uint32_t graphicsIndex, bool bAloneCompute) {
+bool VulkanManager::findAloneCompute(int32_t& familyIndex) {
+    const auto& queueFamilys = physical.queueGraphicsIndexs;
+    for (const auto& cindex : physical.queueComputeIndexs) {
+        if (std::find(queueFamilys.begin(), queueFamilys.end(), cindex) ==
+            queueFamilys.end()) {
+            familyIndex = cindex;
+            return true;
+        }
+    }
+    return false;
+}
+
+void VulkanManager::createDevice(bool bAloneCompute) {
+    assert(physical.queueGraphicsIndexs.size() > 0);
     // 创建虚拟设备
-    createLogicalDevice(logicalDevice, physicalDevice, graphicsIndex,
-                        bAloneCompute);
-    vkGetDeviceQueue(logicalDevice.device, logicalDevice.computeIndex, 0,
-                     &computeQueue);
-    vkGetDeviceQueue(logicalDevice.device, logicalDevice.graphicsIndex, 0,
-                     &graphicsQueue);
+    // 创建一个device,这个device根据条件能否访问graphics/compute
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    graphicsIndex = physical.queueGraphicsIndexs[0];
+    computeIndex = graphicsIndex;
+    if (bAloneCompute) {
+        findAloneCompute(computeIndex);
+    }
+    float queuePriorities[1] = {0.0};
+    VkDeviceQueueCreateInfo queueInfo = {};
+    queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueInfo.queueFamilyIndex = graphicsIndex;
+    queueInfo.queueCount = 1;
+    queueInfo.pQueuePriorities = queuePriorities;
+    queueCreateInfos.push_back(queueInfo);
+    if (computeIndex != graphicsIndex) {
+        queueInfo = {};
+        queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueInfo.queueFamilyIndex = computeIndex;
+        queueInfo.queueCount = 1;
+        queueInfo.pQueuePriorities = queuePriorities;
+        queueCreateInfos.push_back(queueInfo);
+    }
+    VkDeviceCreateInfo deviceCreateInfo = {};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.queueCreateInfoCount =
+        static_cast<uint32_t>(queueCreateInfos.size());
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+    deviceCreateInfo.pEnabledFeatures = nullptr;
+    std::vector<const char*> deviceExtensions;
+    deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+    deviceCreateInfo.enabledExtensionCount = (uint32_t)deviceExtensions.size();
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+    VK_CHECK_RESULT(
+        vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
+    bAloneCompute = computeIndex != graphicsIndex;
+    vkGetDeviceQueue(device, computeIndex, 0, &computeQueue);
+    vkGetDeviceQueue(device, graphicsIndex, 0, &graphicsQueue);
+}
+
+bool VulkanManager::findSurfaceQueue(VkSurfaceKHR surface,
+                                     int32_t& presentIndex) {
+    uint32_t queueFamilyCount = physical.queueFamilyProps.size();
+    std::vector<VkBool32> supportsPresent(queueFamilyCount);
+    // 检查每个通道的表面是否支持显示
+    for (uint32_t i = 0; i < queueFamilyCount; i++) {
+        vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface,
+                                             &supportsPresent[i]);
+    }
+    // 查看是否能呈现渲染画面的
+    if (supportsPresent[graphicsIndex] == VK_TRUE) {
+        presentIndex = graphicsIndex;
+        return true;
+    }
+    for (uint32_t i = 0; i < queueFamilyCount; i++) {
+        if (supportsPresent[i] == VK_TRUE) {
+            presentIndex = i;
+            return false;
+        }
+    }
+    presentIndex = -1;
+    return false;
+}
+
+void VulkanManager::blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
+                                  VkImage dest, int32_t destWidth,
+                                  int32_t destHeight,
+                                  VkImageLayout destLayout) {
+    VkImageBlit region = {};
+    region.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.srcSubresource.mipLevel = 0;
+    region.srcSubresource.baseArrayLayer = 0;
+    region.srcSubresource.layerCount = 1;
+    region.srcOffsets[0].x = 0;
+    region.srcOffsets[0].y = 0;
+    region.srcOffsets[0].z = 0;
+    region.srcOffsets[1].x = src->width;
+    region.srcOffsets[1].y = src->height;
+    region.srcOffsets[1].z = 1;
+    region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.dstSubresource.mipLevel = 0;
+    region.dstSubresource.baseArrayLayer = 0;
+    region.dstSubresource.layerCount = 1;
+    region.dstOffsets[0].x = 0;
+    region.dstOffsets[0].y = 0;
+    region.dstOffsets[0].z = 0;
+    region.dstOffsets[1].x = destWidth;
+    region.dstOffsets[1].y = destHeight;
+    region.dstOffsets[1].z = 1;
+    // 要将源图像的区域复制到目标图像中，并可能执行格式转换，任意缩放和过滤
+    vkCmdBlitImage(cmd, src->image, src->layout, dest, destLayout, 1, &region,
+                   VK_FILTER_LINEAR);
+}
+
+void VulkanManager::copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
+                              const VulkanTexture* dest) {
+    VkImageCopy copyRegion = {};
+
+    copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    copyRegion.srcSubresource.baseArrayLayer = 0;
+    copyRegion.srcSubresource.mipLevel = 0;
+    copyRegion.srcSubresource.layerCount = 1;
+    copyRegion.srcOffset = {0, 0, 0};
+
+    copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    copyRegion.dstSubresource.baseArrayLayer = 0;
+    copyRegion.dstSubresource.mipLevel = 0;
+    copyRegion.dstSubresource.layerCount = 1;
+    copyRegion.dstOffset = {0, 0, 0};
+
+    copyRegion.extent.width = src->width;
+    copyRegion.extent.height = src->height;
+    copyRegion.extent.depth = 1;
+
+    vkCmdCopyImage(cmd, src->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                   dest->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
+                   &copyRegion);
 }
 
 }  // namespace vulkan

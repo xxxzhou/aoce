@@ -2,6 +2,7 @@
 
 #include "VulkanContext.hpp"
 #include "VulkanHelper.hpp"
+#include "VulkanManager.hpp"
 
 namespace aoce {
 namespace vulkan {
@@ -26,12 +27,11 @@ VulkanTexture::~VulkanTexture() {
     }
 }
 
-void VulkanTexture::InitResource(class VulkanContext *context, uint32_t width,
-                                 uint32_t height, VkFormat format,
-                                 VkImageUsageFlags usageFlag,
+void VulkanTexture::InitResource(uint32_t width, uint32_t height,
+                                 VkFormat format, VkImageUsageFlags usageFlag,
                                  VkMemoryPropertyFlags memoryFlag,
                                  uint8_t *cpuData, uint8_t cpuPitch) {
-    this->device = context->logicalDevice.device;
+    this->device = VulkanManager::Get().device;
     bool bGpu = cpuData == nullptr;
     this->width = width;
     this->height = height;
@@ -72,10 +72,9 @@ void VulkanTexture::InitResource(class VulkanContext *context, uint32_t width,
     VkMemoryRequirements requires;
     vkGetImageMemoryRequirements(device, image, &requires);
     uint32_t memoryTypeIndex = 0;
-    bool getIndex =
-        getMemoryTypeIndex(context->physicalDevice, requires.memoryTypeBits,
-                           memoryFlag, memoryTypeIndex);
-    assert(getIndex == true);
+    bool getIndex = getMemoryTypeIndex(requires.memoryTypeBits, memoryFlag,
+                                       memoryTypeIndex);
+    assert(getIndex);
     VkMemoryAllocateInfo memoryInfo = {};
     memoryInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     memoryInfo.pNext = nullptr;
@@ -161,7 +160,7 @@ void VulkanTexture::InitResource(class VulkanContext *context, uint32_t width,
     descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 }
 
-void VulkanTexture::AddBarrier(VkCommandBuffer command, VkImageLayout newLayout,
+void VulkanTexture::addBarrier(VkCommandBuffer command, VkImageLayout newLayout,
                                VkPipelineStageFlags newStageFlags,
                                VkAccessFlags newAccessFlags) {
     VkImageLayout oldLayout = layout;

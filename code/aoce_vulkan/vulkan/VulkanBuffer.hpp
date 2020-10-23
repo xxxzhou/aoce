@@ -40,21 +40,24 @@ class AOCE_VULKAN_EXPORT VulkanBuffer {
     VkDescriptorBufferInfo descInfo = {};
 
    public:
-    void initResoure(class VulkanContext* context, BufferUsage usage,
+    void initResoure(BufferUsage usage,
                      uint32_t dataSize, VkBufferUsageFlags usageFlag,
                      uint8_t* cpuData = nullptr);
     void initView(VkFormat viewFormat);
     void release();
 
-    void upload(uint8_t* cpuData);
+    void upload(const uint8_t* cpuData);
     // 复制pData到cpuData
     void download(uint8_t* cpuData);
+    // 提交
+    void submit();
+
     // 直接返回buffer关联pdata
     inline uint8_t* getCpuData() { return pData; };
 
     // Computer shader后,插入相关barrier,由读变写,由写变读,确保前面操作完成
     // 后续添加渲染管线与计算管线添加barrier的逻辑
-    void AddBarrier(VkCommandBuffer command, VkPipelineStageFlags newStageFlags,
+    void addBarrier(VkCommandBuffer command, VkPipelineStageFlags newStageFlags,
                     VkAccessFlags newAccessFlags);
 };
 }  // namespace vulkan

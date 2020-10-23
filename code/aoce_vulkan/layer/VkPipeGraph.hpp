@@ -31,7 +31,7 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
 
     VulkanTexturePtr getOutTex(int32_t node, int32_t outIndex);
 
-   public:
+   protected:
     // 所有layer调用initbuffer后
     virtual bool onInitBuffers();
     virtual bool onRun();

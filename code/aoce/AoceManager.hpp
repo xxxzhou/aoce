@@ -5,7 +5,10 @@
 #include "Layer/LayerFactory.hpp"
 #include "Layer/PipeGraph.hpp"
 #include "VideoDevice/VideoManager.hpp"
+struct android_app;
 namespace aoce {
+
+    // struct android_app;
 
 #define AOCE_MANAGER_OBJ(OBJTYPE, OBJCLASS)                        \
     typedef std::unique_ptr<OBJCLASS> OBJCLASS##Ptr;               \
@@ -30,6 +33,15 @@ class ACOE_EXPORT AoceManager {
     // 清理资源
     static void clean();
 
+   private:
+#if __ANDROID__
+    android_app* androidApp = nullptr;
+#endif
+   public:
+#if __ANDROID__
+    inline void initAndroid(android_app* app) { androidApp = app; }
+    inline android_app* getApp() { return androidApp; }
+#endif
    private:
     AoceManager(/* args */);
     static AoceManager* instance;

@@ -2,6 +2,8 @@
 
 #include <fstream>
 #include <map>
+
+#include "VulkanManager.hpp"
 namespace aoce {
 namespace vulkan {
 
@@ -282,54 +284,6 @@ VkResult enumerateDevice(VkInstance instance,
     return VK_SUCCESS;
 }
 
-VkResult createLogicalDevice(LogicalDevice& device,
-                             const PhysicalDevice& physicalDevice,
-                             uint32_t queueFamilyIndex, bool bAloneCompute) {
-    // 创建一个device,这个device根据条件能否访问graphics/compute
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-
-    float queuePriorities[1] = {0.0};
-    VkDeviceQueueCreateInfo queueInfo = {};
-    queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueInfo.queueFamilyIndex = queueFamilyIndex;
-    queueInfo.queueCount = 1;
-    queueInfo.pQueuePriorities = queuePriorities;
-    queueCreateInfos.push_back(queueInfo);
-    device.graphicsIndex = queueInfo.queueFamilyIndex;
-    device.computeIndex = device.graphicsIndex;
-    if (bAloneCompute) {
-        // 找一个在通道只有CS,没有GS
-        uint32_t index = queueFamilyIndex;
-        for (auto cindex : physicalDevice.queueComputeIndexs) {
-            if (cindex != index) {
-                index = cindex;
-                break;
-            }
-        }
-        if (index != queueFamilyIndex) {
-            queueInfo = {};
-            queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-            queueInfo.queueFamilyIndex = index;
-            queueInfo.queueCount = 1;
-            queueInfo.pQueuePriorities = queuePriorities;
-            queueCreateInfos.push_back(queueInfo);
-        }
-        device.computeIndex = index;
-    }
-    VkDeviceCreateInfo deviceCreateInfo = {};
-    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceCreateInfo.queueCreateInfoCount =
-        static_cast<uint32_t>(queueCreateInfos.size());
-    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-    deviceCreateInfo.pEnabledFeatures = nullptr;
-    std::vector<const char*> deviceExtensions;
-    deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-    deviceCreateInfo.enabledExtensionCount = (uint32_t)deviceExtensions.size();
-    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
-    return vkCreateDevice(physicalDevice.physicalDevice, &deviceCreateInfo,
-                          nullptr, &device.device);
-}
-
 int32_t getByteSize(VkFormat format) {
     auto item = formatTable.find(format);
     if (item != formatTable.end()) {
@@ -338,13 +292,14 @@ int32_t getByteSize(VkFormat format) {
     return 0;
 }
 
-bool getMemoryTypeIndex(const PhysicalDevice& physicalDevice, uint32_t typeBits,
-                        VkFlags quirementsMaks, uint32_t& index) {
-    for (uint32_t i = 0; i < physicalDevice.mempryProperties.memoryTypeCount;
-         i++) {
+bool getMemoryTypeIndex(uint32_t typeBits, VkFlags quirementsMaks,
+                        uint32_t& index) {
+    const auto& memoryPropertys =
+        VulkanManager::Get().physical.mempryProperties;
+    for (uint32_t i = 0; i < memoryPropertys.memoryTypeCount; i++) {
         if ((typeBits & 1) == 1) {
             // Type is available, does it match user properties?
-            if ((physicalDevice.mempryProperties.memoryTypes[i].propertyFlags &
+            if ((memoryPropertys.memoryTypes[i].propertyFlags &
                  quirementsMaks) == quirementsMaks) {
                 index = i;
                 return true;

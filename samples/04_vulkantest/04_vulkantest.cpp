@@ -6,12 +6,20 @@
 #include <vulkan/VulkanContext.hpp>
 #include <vulkan/VulkanWindow.hpp>
 
+#ifdef __ANDROID__
+#include <android/native_activity.h>
+#include <android_native_app_glue.h>
+
+#include "errno.h"
+#include "../../code/aoce/Aoce.h"
+
+#endif
+
 using namespace aoce;
 using namespace aoce::vulkan;
 
 static int index = 0;
 static int formatIndex = 0;
-static std::unique_ptr<VulkanContext> context = {};
 static std::unique_ptr<VulkanWindow> window = nullptr;
 static PipeGraph* vkGraph;
 static InputLayer* inputLayer;
@@ -34,22 +42,12 @@ void onPreCommand(uint32_t index) {
                  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                  VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
                  VK_PIPELINE_STAGE_TRANSFER_BIT);
-    // context->BlitFillImage(cmd, csDestTex.get(), winImage, window->width,
-    //                        window->height);
+    // outputLayer->outGpuTex(cmd, winImage);
     // 复制完成后,改变渲染图的layout准备呈现
     changeLayout(cmd, winImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
                  VK_PIPELINE_STAGE_TRANSFER_BIT,
                  VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
-}
-
-void onPreDraw() {
-    VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &context->computerCmd;
-
-    vkQueueSubmit(context->graphicsQueue, 1, &submitInfo, nullptr);
 }
 
 #if _WIN32
@@ -59,6 +57,12 @@ void android_main(struct android_app* app)
 #endif
 {
     loadAoce();
+
+#if __ANDROID__
+    AoceManager::Get().initAndroid(app);
+#endif
+
+#if _WIN32
     auto& deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
     std::cout << "deivce count:" << deviceList.size() << std::endl;
@@ -84,26 +88,42 @@ void android_main(struct android_app* app)
     video->open();
     auto& selectFormat = video->getSelectFormat();
     video->setVideoFrameHandle(onDrawFrame);
-
-    // 生成一张执行图
+#elif __ANDROID__
+    VideoFormat selectFormat = {};
+    selectFormat.width = 1920;
+    selectFormat.height = 1080;
+    selectFormat.videoType = VideoType::nv12;
+#endif
+    // 生成一张执行图    
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
+    outputLayer->updateParamet({false, true});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
-    yuv2rgbLayer->updateParamet({VideoType::nv12});
+    VideoType videoType = selectFormat.videoType;
+    if (selectFormat.videoType == VideoType::mjpg) {
+        videoType = VideoType::yuv2I;
+    }
+    if (getYuvIndex(videoType) > 0) {
+        yuv2rgbLayer->updateParamet({videoType});
+    }
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
     // 设定输入格式
     inputLayer->setImage(selectFormat);
 
-    // window窗口
-    context = std::make_unique<VulkanContext>();
-    context->InitContext();
-    window = std::make_unique<VulkanWindow>(context.get());
-    window->InitWindow(hInstance, 1280, 720, "vulkan test");
-    window->CreateSwipChain(context->logicalDevice.device, onPreCommand);
-    window->Run(onPreDraw);
+    // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
+    window = std::make_unique<VulkanWindow>(onPreCommand, false);
+#if _WIN32
+    window->initWindow(hInstance, 1280, 720, "vulkan test");
+#elif __ANDROID__
+    window->initWindow();
+#endif
+    window->run();
 
+#if _WIN32
+    video.reset();
+#endif
     unloadAoce();
 }

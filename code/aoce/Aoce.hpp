@@ -80,7 +80,7 @@ ACOE_EXPORT uint32_t divUp(int32_t x, int32_t y);
 ACOE_EXPORT aoce::ImageType videoType2ImageType(
     const aoce::VideoType& videoType);
 
-ACOE_EXPORT bool bYuv(const aoce::VideoType& videoType);
+ACOE_EXPORT int32_t getYuvIndex(const aoce::VideoType& videoType);
 
 ACOE_EXPORT aoce::ImageFormat videoFormat2ImageFormat(
     const aoce::VideoFormat& videoFormat);

@@ -29,10 +29,13 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     // int32_t groupZ = 1;
     int32_t sizeX = 1;
     int32_t sizeY = 1;
-
+    // 每个子类有必要的话,设定默认上传的第一个UBO大小,这个参数请在初始化时指定
+    int32_t conBufSize = 0;
+    // 一般来说,有二种,一种每桢运行前确定,一种是每桢运行时变化,有可能二种都有
+    std::vector<uint8_t> constBufCpu;
     // 默认提供一个参数buf
-    std::unique_ptr<VulkanBuffer> constBuf;
-    std::unique_ptr<UBOLayout> layout = nullptr;    
+    std::unique_ptr<VulkanBuffer> constBuf = nullptr;
+    std::unique_ptr<UBOLayout> layout = nullptr;
     std::unique_ptr<VulkanShader> shader = nullptr;
 
     GpuType gpu = GpuType::vulkan;
@@ -47,6 +50,9 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
    public:
     VkLayer(/* args */);
     ~VkLayer() override;
+
+   public:
+    void updateUBO();
 
    protected:
     virtual void onInit() final;

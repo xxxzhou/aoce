@@ -1,0 +1,49 @@
+#version 450
+
+layout (local_size_x = 32, local_size_y = 8) in;
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+layout (binding = 2) uniform UBO 
+{
+	int width;
+	int height;
+	int yuvType;
+} ubo;
+
+vec4 yuv2Rgb(float y, float u, float v, float a) {
+	vec4 xrgba = vec4(0.f);
+	xrgba.r = clamp(y + 1.402f * v, 0.f, 1.f);
+	xrgba.g = clamp(y - 0.71414f * v - 0.34414f * u, 0.f, 1.f);
+	xrgba.b = clamp(y + 1.772f * u, 0.f, 1.f);
+	xrgba.a = a;
+	return xrgba;
+}
+
+void main(){
+	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }
+	// yuv2I
+	int bitx = 0;
+	int yoffset = 0;
+	// yvyuI
+	if(ubo.yuvType == 5){
+		bitx= 2;
+	}
+	// uyvyI
+	if(ubo.yuvType == 6){
+		yoffset = 1;
+	}
+
+	vec4 yuyv = imageLoad(inTex,ivec2(uv.x,uv.y)).rgba;
+	float y1 = yuyv[yoffset];
+	float y2 = yuyv[yoffset+2];
+	float u = yuyv[bitx + (1-yoffset)]-0.5f;
+	float v = yuyv[(2-bitx)+(1-yoffset)]-0.5f;
+	vec4 rgba1 =yuv2Rgb(y1,u,v,1.f);
+	vec4 rgba2 =yuv2Rgb(y2,u,v,1.f);
+	imageStore(outTex, ivec2(uv.x*2,uv.y),rgba1); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y),rgba2); 
+}

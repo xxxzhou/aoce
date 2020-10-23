@@ -9,7 +9,7 @@ using namespace cv;
 
 static cv::Mat* show = nullptr;
 static cv::Mat* show2 = nullptr;
-static int index = 0;
+static int index = 1;
 static int formatIndex = 0;
 static PipeGraph* vkGraph;
 static InputLayer* inputLayer;
@@ -32,12 +32,11 @@ static void onImageProcessHandle(uint8_t* data, int32_t width, int32_t height,
 
 int main() {
     loadAoce();
+
+    // 打开摄像机
     auto& deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
     std::cout << "deivce count:" << deviceList.size() << std::endl;
-    if (deviceList.size() > 1) {
-        index = 1;
-    }
     VideoDevicePtr video = deviceList[index];
     std::wstring name((wchar_t*)video->getName().data());
     std::wstring id((wchar_t*)video->getId().data());
@@ -50,9 +49,6 @@ int main() {
                   << " hight:" << vf.height << " fps:" << vf.fps
                   << " format:" << to_string(vf.videoType) << std::endl;
     }
-    if (formats.size() > 355) {
-        formatIndex = 355;
-    }
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();
@@ -64,7 +60,13 @@ int main() {
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
-    yuv2rgbLayer->updateParamet({VideoType::nv12});
+    VideoType videoType = selectFormat.videoType;
+    if (selectFormat.videoType == VideoType::mjpg) {
+        videoType = VideoType::yuv2I;
+    }
+    if (getYuvIndex(videoType) > 0) {
+        yuv2rgbLayer->updateParamet({videoType});
+    }
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
     // vkGraph->addNode(inputLayer)->addNode(outputLayer);
@@ -72,9 +74,11 @@ int main() {
     outputLayer->setImageProcessHandle(onImageProcessHandle);
     // 设定输入格式
     inputLayer->setImage(selectFormat);
+
+    //显示
     show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
     show2 = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
-    while (int key = cv::waitKey(20)) {
+    while (int key = cv::waitKey(30)) {
         cv::cvtColor(*show, *show2, cv::COLOR_RGBA2BGRA);
         cv::imshow("a", *show2);
         if (key == 'q') {
@@ -85,5 +89,6 @@ int main() {
             video->open();
         }
     }
+    video.reset();
     unloadAoce();
 }

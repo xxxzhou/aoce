@@ -14,7 +14,7 @@ class Win32Window {
     HWND hwnd;
 
    public:
-    HWND InitWindow(HINSTANCE inst, int width, int height, const char* name,
+    HWND initWindow(HINSTANCE inst, int width, int height, const char* name,
                     class VulkanWindow* swapChain);
 };
 }  // namespace common

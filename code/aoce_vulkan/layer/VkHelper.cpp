@@ -14,7 +14,7 @@ VkFormat ImageFormat2Vk(ImageType imageType) {
             return VK_FORMAT_R8_UNORM;  // VK_FORMAT_R8_UINT
         case ImageType::rgba8:
             return VK_FORMAT_R8G8B8A8_UNORM;
-        default:
+        default:        
             return VK_FORMAT_UNDEFINED;
     }
 }

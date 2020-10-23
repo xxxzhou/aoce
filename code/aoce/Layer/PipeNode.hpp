@@ -8,7 +8,7 @@
 
 namespace aoce {
 
-typedef std::shared_ptr<PipeNode> PipeNodePtr;
+typedef std::shared_ptr<class PipeNode> PipeNodePtr;
 
 // 对应layer,管理layer的连接
 class ACOE_EXPORT PipeNode {

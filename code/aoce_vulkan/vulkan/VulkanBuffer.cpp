@@ -2,19 +2,20 @@
 
 #include "VulkanContext.hpp"
 #include "VulkanHelper.hpp"
+#include "VulkanManager.hpp"
 namespace aoce {
 namespace vulkan {
 VulkanBuffer::VulkanBuffer() {}
 
 VulkanBuffer::~VulkanBuffer() { release(); }
 
-void VulkanBuffer::initResoure(class VulkanContext* context, BufferUsage usage,
+void VulkanBuffer::initResoure(BufferUsage usage,
                                uint32_t dataSize, VkBufferUsageFlags usageFlag,
                                uint8_t* cpuData) {
     // 先释放可能已经在的资源
     this->release();
     // 重新生成
-    this->device = context->logicalDevice.device;
+    this->device = VulkanManager::Get().device;
     this->bufferSize = dataSize;
     // 生成buffer
     VkBufferCreateInfo bufInfo = {};
@@ -36,9 +37,8 @@ void VulkanBuffer::initResoure(class VulkanContext* context, BufferUsage usage,
     }
     vkGetBufferMemoryRequirements(device, buffer, &requires);
     uint32_t memoryTypeIndex = 0;
-    bool getIndex =
-        getMemoryTypeIndex(context->physicalDevice, requires.memoryTypeBits,
-                           memoryFlag, memoryTypeIndex);
+    bool getIndex = getMemoryTypeIndex(requires.memoryTypeBits, memoryFlag,
+                                       memoryTypeIndex);
     assert(getIndex == true);
     VkMemoryAllocateInfo memoryInfo = {};
     memoryInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -87,12 +87,27 @@ void VulkanBuffer::initView(VkFormat viewFormat) {
     VK_CHECK_RESULT(vkCreateBufferView(device, &viewInfo, nullptr, &view));
 }
 
-void VulkanBuffer::upload(uint8_t* cpuData) {
+void VulkanBuffer::upload(const uint8_t* cpuData) {
+    if (pData == nullptr) {
+        VK_CHECK_RESULT(
+            vkMapMemory(device, memory, 0, bufferSize, 0, (void**)&pData));
+    }
     memcpy(pData, cpuData, bufferSize);
 }
 
 void VulkanBuffer::download(uint8_t* cpuData) {
+    if (pData == nullptr) {
+        VK_CHECK_RESULT(
+            vkMapMemory(device, memory, 0, bufferSize, 0, (void**)&pData));
+    }
     memcpy(cpuData, pData, bufferSize);
+}
+
+void VulkanBuffer::submit() {
+    if (pData) {
+        vkUnmapMemory(device, memory);
+        pData = nullptr;
+    }
 }
 
 void VulkanBuffer::release() {
@@ -114,7 +129,7 @@ void VulkanBuffer::release() {
     }
 }
 
-void VulkanBuffer::AddBarrier(VkCommandBuffer command,
+void VulkanBuffer::addBarrier(VkCommandBuffer command,
                               VkPipelineStageFlags newStageFlags,
                               VkAccessFlags newAccessFlags) {
     VkPipelineStageFlags oldStageFlags = stageFlags;

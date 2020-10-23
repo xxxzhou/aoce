@@ -10,8 +10,7 @@
 #include <android/native_activity.h>
 #endif
 #include <functional>
-
-#include "VulkanContext.hpp"
+#include <mutex>
 
 namespace aoce {
 namespace vulkan {
@@ -26,13 +25,14 @@ template class AOCE_VULKAN_EXPORT std::function<void(uint32_t)>;
 template class AOCE_VULKAN_EXPORT std::function<void()>;
 #endif
 
+typedef std::function<void(uint32_t)> cmdExecuteHandle;
+
 class AOCE_VULKAN_EXPORT VulkanWindow {
    private:
-    class VulkanContext* context;
-    VkSurfaceKHR surface;
-    VkInstance instance;
-    VkPhysicalDevice physicalDevice;
-    VkDevice device;
+    VkSurfaceKHR surface = VK_NULL_HANDLE;
+    VkInstance instance = VK_NULL_HANDLE;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice device = VK_NULL_HANDLE;
     VkSwapchainKHR swapChain = VK_NULL_HANDLE;
     std::unique_ptr<VulkanTexture> depthTex;
     std::vector<VkImageView> views;
@@ -40,11 +40,9 @@ class AOCE_VULKAN_EXPORT VulkanWindow {
     std::vector<VkFramebuffer> frameBuffers;
 #if defined(_WIN32)
     std::unique_ptr<Win32Window> window;
-#elif defined(__ANDROID__)
-    android_app* androidApp;
 #endif
-    // 用于通知CPU,GPU上图像已经呈现出来
-    VkFence presentFence;
+    // 用于动态添加执行列表
+    std::vector<VkFence> addCmdFences;
     // 图像被获取,可以开始渲染
     VkSemaphore presentComplete;
     // 图像已经渲染,可以呈现
@@ -52,9 +50,7 @@ class AOCE_VULKAN_EXPORT VulkanWindow {
     VkSubmitInfo submitInfo = {};
     VkPipelineStageFlags submitPipelineStages =
         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    std::function<void(uint32_t)> onBuildCmd;
-    std::function<void()> onPreDraw;
-    VkQueue graphicsQueue;
+    // VkQueue graphicsQueue;
     VkQueue presentQueue;
     bool bCanDraw = false;
     VkCommandBufferBeginInfo cmdBufferBeginInfo = {};
@@ -62,51 +58,58 @@ class AOCE_VULKAN_EXPORT VulkanWindow {
     VkViewport viewport = {};
     VkRect2D scissor = {};
     VkClearValue clearValues[2];
-    bool resizing = false;
+    // bool resizing = false;
+    cmdExecuteHandle onCmdExecuteEvent;
+    // 是否是自身创建的窗口,否则是用已有的窗口直接初始化surface
+    bool bCreateWindow = false;
+    bool bCreateSurface = false;
+    bool focused = false;
+    bool bPreCmd = false;
+    bool vsync = false;
+    std::mutex sizeMtx;
 
    public:
-    uint32_t graphicsQueueIndex = UINT32_MAX;
-    uint32_t presentQueueIndex = UINT32_MAX;
+    // int32_t graphicsQueueIndex = UINT32_MAX;
+    int32_t presentQueueIndex = UINT32_MAX;
     VkFormat format = VK_FORMAT_B8G8R8A8_UNORM;
     VkFormat depthFormat = VK_FORMAT_D16_UNORM;
     uint32_t width;
     uint32_t height;
-    bool vsync = false;
+
     uint32_t imageCount;
     uint32_t currentIndex;
     VkRenderPass renderPass;
     std::vector<VkCommandBuffer> cmdBuffers;
     std::vector<VkImage> images;
-    bool focused = false;
-#if defined(__ANDROID__)
-    std::function<void()> onInitVulkan;
-#endif
+
    public:
-    VulkanWindow(class VulkanContext* _context);
+    // preFram运行前确定,否则需要在运行后确定
+    VulkanWindow(cmdExecuteHandle preCmd, bool preFram = false);
     ~VulkanWindow();
     // 没有外部窗口,自己创建
-#if defined(_WIN32)
-    void InitWindow(HINSTANCE inst, uint32_t _width, uint32_t height,
+#if _WIN32
+    void initWindow(HINSTANCE inst, uint32_t _width, uint32_t height,
                     const char* appName);
 
     LRESULT handleMessage(UINT msg, WPARAM wparam, LPARAM lparam);
     // 根据窗口创建surface,并返回使用的queueIndex.
-    void InitSurface(HINSTANCE inst, HWND windowHandle);
+    void initSurface(HINSTANCE inst, HWND windowHandle);
 #elif defined(__ANDROID__)
-    void InitWindow(android_app* app, std::function<void()> onInitVulkanAction);
-    void InitSurface(ANativeWindow* window);
+    friend void handleAppCommand(android_app* app, int32_t cmd);
+    void initWindow();
+    void initSurface(ANativeWindow* window);
 #endif
-    void CreateSwipChain(VkDevice _device,
-                         std::function<void(uint32_t)> onBuildCmdAction);
-
-    void Run(std::function<void()> onPreDrawAction = nullptr);
+    // 没有调用initWindow,无效
+    void run();
+    // 没有调用initWindow,直接用已有窗口initSurface,请在窗口的frame事件时调用
+    void tick();
+    void onSizeChange();
 
    private:
+    void createSwipChain(bool bInit = false);
     void reSwapChainBefore();
     void reSwapChainAfter();
     void createRenderPass();
-
-    void tick();
 };
 }  // namespace vulkan
 }  // namespace aoce

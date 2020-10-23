@@ -33,7 +33,12 @@ if(WIN32)
     # Warn about signed/unsigned mismatch.
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34245>")
 endif()
+if(ANDROID)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -DVK_USE_PLATFORM_ANDROID_KHR -DVK_NO_PROTOTYPES")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+endif()
 
+set(CMAKE_BUILD_TYPE "Debug"  CACHE STRING "choose the type of build" FORCE)
 message(STATUS "build type:" ${CMAKE_BUILD_TYPE})
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "choose the type of build" FORCE)
@@ -60,6 +65,8 @@ function(aoce_output targetname)
 endfunction(aoce_output targetname)
 
 add_subdirectory(code)
+
 add_subdirectory(samples)
+
 
 

@@ -3,6 +3,12 @@
 layout (local_size_x = 32, local_size_y = 8) in;
 layout (binding = 0, r8) uniform readonly image2D inTex;
 layout (binding = 1, rgba8) uniform image2D outTex;
+layout (binding = 2) uniform UBO 
+{
+	int width;
+	int height;
+	int yuvType;
+} ubo;
 
 int u22u1(ivec2 uv, int step) {
 	return uv.y * step + uv.x;
@@ -10,8 +16,8 @@ int u22u1(ivec2 uv, int step) {
 
 ivec2 u12u2(int index, int step) {
 	ivec2 uv;
-	uv.x = index % step;
 	uv.y = index / step;
+	uv.x = index - uv.y*step;// % 花费高?
 	return uv;
 }
 
@@ -114,7 +120,12 @@ void yuv422p(){
 	imageStore(outTex, ivec2(uv.x*2+1,uv.y),rgba2); 
 }
 
-
 void main(){
-	nv12();
+	if(ubo.yuvType == 1){
+		nv12();
+	}else if(ubo.yuvType == 2){
+		yuv420p();
+	}else if(ubo.yuvType == 3){
+		yuv422p();
+	}
 }

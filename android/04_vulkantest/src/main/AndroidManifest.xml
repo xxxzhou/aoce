@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="aoce.samples.vulkantest">
+
+    <application android:hasCode="false"
+        android:label="04_vulkantest"
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+        <activity android:name="android.app.NativeActivity">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="04_vulkantest" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

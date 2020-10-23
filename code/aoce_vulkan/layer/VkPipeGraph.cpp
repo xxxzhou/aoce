@@ -5,14 +5,14 @@ namespace layer {
 
 VkPipeGraph::VkPipeGraph(/* args */) {
     context = std::make_unique<VulkanContext>();
-    context->InitContext();
+    context->initContext();
 
     // 创建cpu-gpu通知
     VkFenceCreateInfo fenceInfo = {};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     // 默认是有信号
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-    vkCreateFence(context->logicalDevice.device, &fenceInfo, nullptr,
+    vkCreateFence(context->device, &fenceInfo, nullptr,
                   &computerFence);
 }
 
@@ -55,9 +55,8 @@ bool VkPipeGraph::onRun() {
             return false;
         }
     }
-    auto device = context->logicalDevice.device;
-    vkWaitForFences(device, 1, &computerFence, VK_TRUE, UINT64_MAX);
-    vkResetFences(device, 1, &computerFence);
+    vkWaitForFences(context->device, 1, &computerFence, VK_TRUE, UINT64_MAX);
+    vkResetFences(context->device, 1, &computerFence);
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

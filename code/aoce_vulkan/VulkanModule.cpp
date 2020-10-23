@@ -2,13 +2,11 @@
 
 #include <AoceCore.h>
 
+#include <AoceManager.hpp>
+
 #include "VkLayerFactory.hpp"
 #include "layer/VkPipeGraph.hpp"
 #include "vulkan/VulkanManager.hpp"
-
-#if __ANDROID__
-#include "../android/vulkan_wrapper.h"
-#endif
 
 namespace aoce {
 namespace vulkan {
@@ -18,10 +16,15 @@ VulkanModule::VulkanModule(/* args */) {}
 VulkanModule::~VulkanModule() {}
 
 bool VulkanModule::loadModule() {
-    VulkanManager::Get().CreateInstance("aoce_vulkan");
-    uint32_t graphicIndex =
-        VulkanManager::Get().physicalDevice.queueGraphicsIndexs[0];
-    VulkanManager::Get().CreateDevice(graphicIndex, true);
+    bool bfindGpu = VulkanManager::Get().createInstance("aoce_vulkan");
+    if (!bfindGpu) {
+        logMessage(LogLevel::warn, "vulkan not find gpu.");
+        return false;
+    }
+#if __ANDROID__
+    VulkanManager::Get().androidApp = AoceManager::Get().getApp();
+#endif
+    VulkanManager::Get().createDevice(true);
     AoceManager::Get().addPipeGraphFactory(GpuType::vulkan,
                                            new layer::VkPipeGraphFactory());
     AoceManager::Get().addLayerFactory(GpuType::vulkan,

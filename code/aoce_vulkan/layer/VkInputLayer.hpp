@@ -13,20 +13,26 @@ class VkInputLayer : public InputLayer, public VkLayer {
    private:
     VideoFormat videoFormat;
     std::unique_ptr<VulkanBuffer> inBuffer;
+    // 如果需要GPU计算,需要先把inBuffer copy 到 gpu local
+    std::unique_ptr<VulkanBuffer> inBufferX;
     uint8_t* frameData = nullptr;
+    // 是否需要GPU计算
+    bool bUsePipe = false;
 
    public:
     VkInputLayer(/* args */);
     ~VkInputLayer();
 
     // InputLayer
-   protected:
+   public:
     virtual void onSetImage(VideoFormat videoFormat,
                             int32_t index = 0) override;
     virtual void onInputCpuData(uint8_t* data, int32_t index = 0) override;
     // VkLayer
-   public:
+   protected:
+    virtual void onInitGraph() override;
     virtual void onInitVkBuffer() override;
+    virtual void onInitPipe() override;
     virtual void onPreCmd() override;
     virtual bool onFrame() override;
 };

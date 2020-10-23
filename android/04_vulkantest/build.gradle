@@ -1,0 +1,66 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "aoce.samples.vulkantest"
+        minSdkVersion 24
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++14"
+                arguments "-DANDROID_STL=c++_shared", '-DANDROID_TOOLCHAIN=clang'
+            }
+        }
+    }
+    sourceSets {
+        main {
+            assets.srcDirs = ['assets']
+            jniLibs.srcDirs = ['externalNativeBuild/cmake/debug/armeabi-v7a/lib']
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "../../CMakeLists.txt"
+        }
+    }
+}
+
+task copyTask {
+    copy {
+        from '../../code/aoce_vulkan/glsl'
+        into 'assets'
+        include('**/*.spv', '**/*.ppm')
+    }
+}
+
+//task copyLibs(type: Copy) {
+//    from ('../.externalNativeBuild/cmake/debug/armeabi-v7a/lib') {
+//        include '**/*.so'
+//    }
+//    into 'src/main/jniLibs'
+//}
+//
+//tasks.whenTaskAdded { task ->
+//    if (task.name ==  'bundleDebug') {
+//        task.dependsOn copyLibs
+//    }
+//}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support.constraint:constraint-layout:2.0.1'
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0'
+    implementation 'android.arch.navigation:navigation-ui:1.0.0'
+}

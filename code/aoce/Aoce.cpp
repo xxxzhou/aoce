@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "Aoce.hpp"
 #include "Module/ModuleManager.hpp"
@@ -12,14 +13,6 @@
 #include <iomanip>
 #elif __ANDROID__
 #include <stdlib.h>
-#define LOGI(...) \
-    ((void)__android_log_print(ANDROID_LOG_INFO, "aoce", __VA_ARGS__))
-#define LOGW(...) \
-    ((void)__android_log_print(ANDROID_LOG_WARN, "aoce", __VA_ARGS__))
-#define LOGE(...) \
-    ((void)__android_log_print(ANDROID_LOG_ERROR, "aoce", __VA_ARGS__))
-#define LOGD(...) \
-    ((void)__android_log_print(ANDROID_LOG_DEBUG, "aoce", __VA_ARGS__))
 #endif
 
 using namespace aoce;
@@ -89,18 +82,40 @@ std::wstring utf8TWstring(const std::string& str) {
     if (str.empty()) {
         return std::wstring();
     }
+#if defined WIN32
     size_t len = str.length() + 1;
     std::wstring ret = std::wstring(len, 0);
-#if defined WIN32
     int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &str[0],
                                    str.size(), &ret[0], len);
     ret.resize(size);
 #else
-    size_t size = 0;
-    //_locale_t lc = _create_locale(LC_ALL, "en_US.UTF-8");
-    errno_t retval = _mbstowcs_s(&size, &ret[0], len, &str[0], _TRUNCATE);
-    //_free_locale(lc);
-    ret.resize(size - 1);
+    size_t len = str.length();
+    std::vector<wchar_t> dest(len, 0);
+    int dest_len = 0;
+    for (int i = 0; i < len; i++, dest_len++) {
+        // ansi
+        if (str[i] <= 127) {
+            dest[dest_len] = str[i];
+        }
+        // 2byte
+        else if ((str[i] & 0xF0) == 0xC0) {
+            dest[dest_len] = ((str[i] & 0x1F) << 6) + (str[i + 1] & 0x3F);
+            i += 1;
+        }
+        // 3byte
+        else if ((str[i] & 0xF0) == 0xE0) {
+            dest[dest_len] = ((str[i] & 0x0F) << 12) +
+                             ((str[i + 1] & 0x3F) << 6) + (str[i + 2] & 0x3F);
+            i += 2;
+        }
+        // ignore 4byte
+        else {
+            logMessage(LogLevel::warn, "Can't change utf8 4byte characters");
+            return L"";
+        }
+    }
+    std::wstring ret;
+    ret.assign(dest.data(), dest_len);
 #endif
     return ret;
 }
@@ -109,42 +124,100 @@ std::string utf8TString(const std::wstring& wstr) {
     if (wstr.empty()) {
         return std::string();
     }
-#if defined WIN32
+#if WIN32
     int size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, &wstr[0],
                                    wstr.size(), NULL, 0, NULL, NULL);
     std::string ret = std::string(size, 0);
     WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, &wstr[0], wstr.size(),
                         &ret[0], size, NULL, NULL);
 #else
-    size_t size = 0;
-    //_locale_t lc = _create_locale(LC_ALL, "en_US.UTF-8");
-    errno_t err = _wcstombs_s(&size, NULL, 0, &wstr[0], _TRUNCATE);
-    std::string ret = std::string(size, 0);
-    err = _wcstombs_s(&size, &ret[0], size, &wstr[0], _TRUNCATE);
-    //_free_locale(lc);
-    ret.resize(size - 1);
+    int source_len = wstr.length();
+    std::vector<char> dest(source_len * 3 + 1, 0);
+    const wchar_t* source = wstr.c_str();
+    int dest_len = 0;
+    for (int i = 0; i < source_len; i++) {
+        if (wstr[i] <= 0x7F) {
+            dest[dest_len] = wstr[i];
+            dest_len++;
+        } else if (wstr[i] >= 0x80 && wstr[i] <= 0x7FF) {
+            wchar_t tmp = wstr[i];
+            char first = 0, second = 0, third = 0;
+            for (int j = 0; j < 3; j++) {
+                wchar_t tmp_quota = tmp % 16;
+                switch (j) {
+                    case 0:
+                        third = tmp_quota;
+                        break;
+                    case 1:
+                        second = tmp_quota;
+                        break;
+                    case 2:
+                        first = tmp_quota;
+                        break;
+                }
+                tmp /= 16;
+            }
+
+            dest[dest_len] = 0xC0 + (first << 2) + (second >> 2);
+            dest[dest_len + 1] = 0x80 + (((second % 8) % 4) << 4) + third;
+            dest_len += 2;
+        } else if (wstr[i] >= 0x800 && wstr[i] <= 0xFFFF) {
+            wchar_t tmp = wstr[i];
+            char first = 0, second = 0, third = 0, fourth = 0;
+            for (int j = 0; j < 4; j++) {
+                wchar_t tmp_quota = tmp % 16;
+                switch (j) {
+                    case 0:
+                        fourth = tmp_quota;
+                        break;
+                    case 1:
+                        third = tmp_quota;
+                        break;
+                    case 2:
+                        second = tmp_quota;
+                        break;
+                    case 3:
+                        first = tmp_quota;
+                        break;
+                }
+                tmp /= 16;
+            }
+            dest[dest_len] = 0xE0 + first;
+            dest[dest_len + 1] = 0x80 + second << 2 + third >> 2;
+            dest[dest_len + 2] = 0x80 + (((third % 8) % 4) << 4) + fourth;
+            dest_len += 3;
+        } else {
+        }
+    }
+    dest[dest_len++] = '\0';
+    std::string ret;
+    ret.assign(dest.data(), dest_len);
 #endif
     return ret;
 }
 
 void copywcharstr(wchar_t* dest, const wchar_t* source, int32_t maxlength) {
     int length = sizeof(wchar_t) * (wcslen(source) + 1);
-    memcpy(dest, source, min(length, maxlength));
+    memcpy(dest, source, std::min(length, maxlength));
+
 }
 
 void copycharstr(char* dest, const char* source, int32_t maxlength) {
     int length = sizeof(char) * (strlen(source) + 1);
-    memcpy(dest, source, min(length, maxlength));
+    memcpy(dest, source, std::min(length, maxlength));
+
 }
 
 uint32_t divUp(int32_t x, int32_t y) { return (x + y - 1) / y; }
 
 aoce::ImageType videoType2ImageType(const aoce::VideoType& videoType) {
     switch (videoType) {
+        // 带P的格式全部转成r8
         case VideoType::nv12:
         case VideoType::yuv420P:
         case VideoType::yuy2P:
             return ImageType::r8;
+        // 交叉格式,rgba8
         case VideoType::yuv2I:
         case VideoType::yvyuI:
         case VideoType::uyvyI:
@@ -164,17 +237,22 @@ aoce::ImageType videoType2ImageType(const aoce::VideoType& videoType) {
     }
 }
 
-bool bYuv(const aoce::VideoType& videoType) {
+int32_t getYuvIndex(const aoce::VideoType& videoType) {
     switch (videoType) {
         case VideoType::nv12:
+            return 1;
         case VideoType::yuv420P:
+            return 2;
         case VideoType::yuy2P:
+            return 3;
         case VideoType::yuv2I:
+            return 4;
         case VideoType::yvyuI:
+            return 5;
         case VideoType::uyvyI:
-            return true;
+            return 6;
         default:
-            return false;
+            return -1;
     }
 }
 

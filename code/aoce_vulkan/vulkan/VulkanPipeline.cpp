@@ -4,15 +4,13 @@
 #include <cstdarg>
 
 #include "VulkanContext.hpp"
+#include "VulkanManager.hpp"
 namespace aoce {
 namespace vulkan {
 
-UBOLayout::UBOLayout(class VulkanContext* _context) {
-    this->context = _context;
-}
+UBOLayout::UBOLayout() { device = VulkanManager::Get().device; }
 
 UBOLayout::~UBOLayout() {
-    VkDevice device = context->logicalDevice.device;
     if (device) {
         auto size = items.size();
         for (auto i = 0; i < size; i++) {
@@ -28,17 +26,18 @@ UBOLayout::~UBOLayout() {
         // vkFreeDescriptorSets
         items.clear();
         descripts.clear();
+        device = VK_NULL_HANDLE;
     }
 }
 
-int32_t UBOLayout::AddSetLayout(std::vector<UBOLayoutItem>& layout,
+int32_t UBOLayout::addSetLayout(std::vector<UBOLayoutItem>& layout,
                                 uint32_t count) {
     items.push_back(layout);
     groupSize.push_back(count > 1 ? count : 1);
     return items.size() - 1;
 }
 
-void UBOLayout::GenerateLayout() {
+void UBOLayout::generateLayout() {
     // 最多需要多少个set,一个layout可能有多个set,比如渲染8个相同物体
     uint32_t groupCount = 0;
     auto size = items.size();
@@ -65,9 +64,8 @@ void UBOLayout::GenerateLayout() {
     descriptorPoolInfo.poolSizeCount = (uint32_t)poolSizes.size();
     descriptorPoolInfo.pPoolSizes = poolSizes.data();
     descriptorPoolInfo.maxSets = groupCount;
-    VK_CHECK_RESULT(vkCreateDescriptorPool(context->logicalDevice.device,
-                                           &descriptorPoolInfo, nullptr,
-                                           &descPool));
+    VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo,
+                                           nullptr, &descPool));
     descSetLayouts.resize(size);
     descSets.resize(size);
     // 创建VkDescriptorSetLayout
@@ -92,9 +90,9 @@ void UBOLayout::GenerateLayout() {
         descriptorLayoutInfo.pBindings = layoutBindings.data();
         descriptorLayoutInfo.bindingCount = (uint32_t)layoutBindings.size();
         // 生成VkDescriptorSetLayout
-        VK_CHECK_RESULT(vkCreateDescriptorSetLayout(
-            context->logicalDevice.device, &descriptorLayoutInfo, nullptr,
-            &descSetLayouts[x]));
+        VK_CHECK_RESULT(
+            vkCreateDescriptorSetLayout(device, &descriptorLayoutInfo,
+                                        nullptr, &descSetLayouts[x]));
         // 生成VkDescriptorSet
         descSets[x].resize(groupSize[x]);
         VkDescriptorSetAllocateInfo descAllocInfo = {};
@@ -103,7 +101,7 @@ void UBOLayout::GenerateLayout() {
         descAllocInfo.pSetLayouts = &descSetLayouts[x];
         descAllocInfo.descriptorSetCount = groupSize[x];
         VK_CHECK_RESULT(vkAllocateDescriptorSets(
-            context->logicalDevice.device, &descAllocInfo, descSets[x].data()));
+            device, &descAllocInfo, descSets[x].data()));
     }
     // 生成pipelineLayout
     VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
@@ -111,12 +109,11 @@ void UBOLayout::GenerateLayout() {
         VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutCreateInfo.setLayoutCount = descSetLayouts.size();
     pipelineLayoutCreateInfo.pSetLayouts = descSetLayouts.data();
-    VK_CHECK_RESULT(vkCreatePipelineLayout(context->logicalDevice.device,
-                                           &pipelineLayoutCreateInfo, nullptr,
-                                           &pipelineLayout));
+    VK_CHECK_RESULT(vkCreatePipelineLayout(
+        device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 }
 
-void UBOLayout::UpdateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...) {
+void UBOLayout::updateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...) {
     assert(groupIndex >= 0 && groupIndex < items.size());
     va_list args;
     va_start(args, setIndex);
@@ -155,7 +152,7 @@ void UBOLayout::UpdateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...) {
         writes.push_back(write);
     }
     va_end(args);
-    vkUpdateDescriptorSets(context->logicalDevice.device,
+    vkUpdateDescriptorSets(device,
                            static_cast<uint32_t>(writes.size()), writes.data(),
                            0, nullptr);
 }
@@ -164,7 +161,7 @@ VulkanPipeline::VulkanPipeline(/* args */) {}
 
 VulkanPipeline::~VulkanPipeline() {}
 
-void VulkanPipeline::CreateDefaultFixPipelineState(FixPipelineState& fix) {
+void VulkanPipeline::createDefaultFixPipelineState(FixPipelineState& fix) {
     // ---图元装配
     fix.inputAssemblyState.sType =
         VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -228,7 +225,7 @@ void VulkanPipeline::CreateDefaultFixPipelineState(FixPipelineState& fix) {
     fix.dynamicState.dynamicStateCount =
         (uint32_t)fix.dynamicStateEnables.size();
 }
-VkPipelineShaderStageCreateInfo VulkanPipeline::LoadShader(
+VkPipelineShaderStageCreateInfo VulkanPipeline::loadShader(
 #if __ANDROID__
     AAssetManager* assetManager,
 #endif
@@ -237,15 +234,14 @@ VkPipelineShaderStageCreateInfo VulkanPipeline::LoadShader(
     shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderStage.stage = stage;
 #if defined(__ANDROID__)
-    shaderStage.module = loadShader(assetManager,
-                                    fileName.c_str(), device);
+    shaderStage.module = aoce::vulkan::loadShader(assetManager, fileName.c_str(), device);
 #else
-    shaderStage.module = loadShader(fileName.c_str(), device);
+    shaderStage.module = aoce::vulkan::loadShader(fileName.c_str(), device);
 #endif
     shaderStage.pName = "main";
     return shaderStage;
 }
-VkComputePipelineCreateInfo VulkanPipeline::CreateComputePipelineInfo(
+VkComputePipelineCreateInfo VulkanPipeline::createComputePipelineInfo(
     VkPipelineLayout layout, VkPipelineShaderStageCreateInfo stageInfo) {
     VkComputePipelineCreateInfo computePipelineInfo = {};
     computePipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
@@ -255,5 +251,5 @@ VkComputePipelineCreateInfo VulkanPipeline::CreateComputePipelineInfo(
     return computePipelineInfo;
 }
 
-}  // namespace common
-}  // namespace vulkanx
+}  // namespace vulkan
+}  // namespace aoce

@@ -25,5 +25,8 @@ message("aoce source--" ${AOCE_SOURCE})
 
 add_definitions(-DAOCE_EXPORT_DEFINE)
 add_library(aoce SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
+if(ANDROID)
+    target_link_libraries(aoce android log)
+endif()
 
 aoce_output(aoce) 

@@ -33,7 +33,7 @@ void ModuleManager::registerModule(const std::string& name,
     ModuleInfo* moduleInfo = new ModuleInfo();
     modules[name] = moduleInfo;
 #if __ANDROID__
-    moduleInfo->name = "lib" + name + ".so";
+    moduleInfo->name ="lib"+ name + ".so";
 #endif
     moduleInfo->name = name;
     moduleInfo->onLoadEvent = handle;
@@ -71,7 +71,7 @@ void ModuleManager::loadModule(const std::string& name) {
             dlopen(moduleInfo->name.c_str(), RTLD_NOW | RTLD_LOCAL);
         if (moduleInfo->handle) {
             loadAction =
-                (LoadModuleAction)dlsym(moduleInfo->handle, "NewModule")
+                (loadModuleAction)dlsym(moduleInfo->handle, "NewModule");
         }
 #endif
         if (loadAction) {

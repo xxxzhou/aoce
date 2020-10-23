@@ -2,10 +2,11 @@
 
 #include "VulkanCommon.hpp"
 #include "VulkanHelper.hpp"
-
+#include "VulkanTexture.hpp"
 namespace aoce {
 namespace vulkan {
 
+// 封装physical/logical device
 class AOCE_VULKAN_EXPORT VulkanManager {
    public:
     static VulkanManager& Get();
@@ -18,20 +19,36 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     ~VulkanManager();
 
    public:
-    void CreateInstance(const char* appName);
-    void CreateDevice(uint32_t queueIndex, bool bAloneCompute = false);
+    bool createInstance(const char* appName);
+    // 查找一个不同于渲染通道的计算通道
+    bool findAloneCompute(int32_t& familyIndex);
+    void createDevice(bool bAloneCompute = false);
+    // presentIndex默认会选择graphicsIndex,如果graphicsIndex支持呈现,返回true
+    bool findSurfaceQueue(VkSurfaceKHR surface, int32_t& presentIndex);
 
    public:
+    static void blitFillImage(
+        VkCommandBuffer cmd, const VulkanTexture* src, VkImage dest,
+        int32_t destWidth, int32_t destHeight,
+        VkImageLayout destLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    static void copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
+                          const VulkanTexture* dest);
+    // 选用的渲染通道索引
+    int32_t graphicsIndex = -1;
+    // 选用的计算通道过些
+    int32_t computeIndex = -1;
+    bool bAloneCompute = false;
+
+   public:
+    PhysicalDevice physical = {};
     VkInstance instace = VK_NULL_HANDLE;
-    PhysicalDevice physicalDevice = {};
-    // 一般来说,主机会有1-3个左右queueFamily,手机一般只一个.
-    // 而第0个一般要满足graph/compute/present
-    LogicalDevice logicalDevice = {};
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice device = VK_NULL_HANDLE;
     VkQueue computeQueue = VK_NULL_HANDLE;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
 
 #if defined(__ANDROID__)
-    android_app* androidApp;
+    android_app* androidApp = nullptr;
 #endif
 };
 

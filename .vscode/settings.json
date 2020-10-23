@@ -67,6 +67,7 @@
         "sstream": "cpp",
         "cstdarg": "cpp",
         "stack": "cpp",
-        "concepts": "cpp"
+        "concepts": "cpp",
+        "compare": "cpp"
     }
 }

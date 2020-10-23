@@ -45,8 +45,8 @@ bool BaseLayer::vaildInLayers() {
         if (layer.nodeIndex < 0 || layer.outputIndex < 0) {
             return false;
         }
-        return true;
     }
+    return true;
 }
 
 void BaseLayer::initLayer() {

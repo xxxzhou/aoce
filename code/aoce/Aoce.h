@@ -2,6 +2,7 @@
 
 //导出给外部库使用文件
 #include "AoceDefine.h"
+#include <string>
 
 enum AOCE_LOG_LEVEL {
     AOCE_LOG_INFO,
@@ -39,11 +40,11 @@ enum class GpuType {
 enum class VideoType {
     other,
     // 这几种一般是window平台图像读取设备常用格式
-    nv12,  // 420SP
+    nv12,  // yuv420SP
     yuv2I,
     yvyuI,
     uyvyI,
-    // MF设备,会自动解码成yuv2
+    // MF设备,设定会自动解码成yuv2I
     mjpg,
     rgb8,
     argb8,
@@ -102,7 +103,7 @@ enum class ImageType {
     r8,
     rgba8,
     r16,
-    // 游戏中fbo,rtt常用,在与游戏交互中使用?先暂时不用
+    // 游戏中fbo,rtt使用,输入与输出层使用,经输入层自动转化rgba8
     bgra8,
 };
 

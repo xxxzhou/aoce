@@ -50,11 +50,11 @@ template class AOCE_VULKAN_EXPORT std::vector<std::vector<UBOLayoutItem>>;
 // 对应shader里固定结构的结构以及数据
 class AOCE_VULKAN_EXPORT UBOLayout {
    public:
-    UBOLayout(class VulkanContext* _context);
+    UBOLayout();
     ~UBOLayout();
 
    private:
-    class VulkanContext* context;
+    VkDevice device = VK_NULL_HANDLE;
     // std::vector<UBOLayoutItem> items;
     std::vector<std::vector<UBOLayoutItem>> items;
     std::vector<int32_t> groupSize;
@@ -72,11 +72,11 @@ class AOCE_VULKAN_EXPORT UBOLayout {
    public:
     // 一个layout表示一个VkDescriptorSetLayout,shader上的一个set,layout里面索引对应binding
     // count表示一个group有几个set,主要用于一个UBO结构填充多处不同内容
-    int32_t AddSetLayout(std::vector<UBOLayoutItem>& layout,
+    int32_t addSetLayout(std::vector<UBOLayoutItem>& layout,
                          uint32_t count = 1);
-    void GenerateLayout();
+    void generateLayout();
 
-    void UpdateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...);
+    void updateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...);
 };
 
 class AOCE_VULKAN_EXPORT VulkanPipeline {
@@ -88,16 +88,16 @@ class AOCE_VULKAN_EXPORT VulkanPipeline {
 
    public:
     // 创建一个默认状态的管线
-    static void CreateDefaultFixPipelineState(FixPipelineState& fixState);
+    static void createDefaultFixPipelineState(FixPipelineState& fixState);
 
-    static VkPipelineShaderStageCreateInfo LoadShader(
+    static VkPipelineShaderStageCreateInfo loadShader(
 #if __ANDROID__
         AAssetManager* assetManager,
 #endif
         VkDevice device, const std::string& fileName,
         VkShaderStageFlagBits stage);
 
-    static VkComputePipelineCreateInfo CreateComputePipelineInfo(
+    static VkComputePipelineCreateInfo createComputePipelineInfo(
         VkPipelineLayout layout, VkPipelineShaderStageCreateInfo stageInfo);
 };
 }  // namespace vulkan
