@@ -28,7 +28,7 @@ VulkanManager::~VulkanManager() {
         vkDestroyInstance(instace, nullptr);
         instace = VK_NULL_HANDLE;
     }
-    // physicalDevice.clear();
+    physicalDevice = VK_NULL_HANDLE;
 }
 
 bool VulkanManager::createInstance(const char* appName) {
@@ -39,7 +39,7 @@ bool VulkanManager::createInstance(const char* appName) {
     }
 #endif
     aoce::vulkan::createInstance(instace, appName);
-    std::vector<PhysicalDevice> physicalDevices;
+    std::vector<PhysicalDevicePtr> physicalDevices;
     enumerateDevice(instace, physicalDevices);
     if (physicalDevices.empty()) {
         return false;
@@ -47,7 +47,7 @@ bool VulkanManager::createInstance(const char* appName) {
     bool find = false;
     // 首选独立显卡
     for (auto& pdevice : physicalDevices) {
-        if (pdevice.properties.deviceType ==
+        if (pdevice->properties.deviceType ==
             VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
             this->physical = pdevice;
             find = true;
@@ -55,15 +55,18 @@ bool VulkanManager::createInstance(const char* appName) {
         }
     }
     if (!find) {
-        this->physical = physicalDevices[0];
+        physical = physicalDevices[0];
     }
-    physicalDevice = this->physical.physicalDevice;
+    assert(physical != nullptr);
+    std::string message = physical->properties.deviceName;
+    logMessage(aoce::LogLevel::info, "select gpu: " + message);
+    physicalDevice = this->physical->physicalDevice;
     return true;
 }
 
 bool VulkanManager::findAloneCompute(int32_t& familyIndex) {
-    const auto& queueFamilys = physical.queueGraphicsIndexs;
-    for (const auto& cindex : physical.queueComputeIndexs) {
+    const auto& queueFamilys = physical->queueGraphicsIndexs;
+    for (const auto& cindex : physical->queueComputeIndexs) {
         if (std::find(queueFamilys.begin(), queueFamilys.end(), cindex) ==
             queueFamilys.end()) {
             familyIndex = cindex;
@@ -74,11 +77,11 @@ bool VulkanManager::findAloneCompute(int32_t& familyIndex) {
 }
 
 void VulkanManager::createDevice(bool bAloneCompute) {
-    assert(physical.queueGraphicsIndexs.size() > 0);
+    assert(physical->queueGraphicsIndexs.size() > 0);
     // 创建虚拟设备
     // 创建一个device,这个device根据条件能否访问graphics/compute
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    graphicsIndex = physical.queueGraphicsIndexs[0];
+    graphicsIndex = physical->queueGraphicsIndexs[0];
     computeIndex = graphicsIndex;
     if (bAloneCompute) {
         findAloneCompute(computeIndex);
@@ -117,7 +120,7 @@ void VulkanManager::createDevice(bool bAloneCompute) {
 
 bool VulkanManager::findSurfaceQueue(VkSurfaceKHR surface,
                                      int32_t& presentIndex) {
-    uint32_t queueFamilyCount = physical.queueFamilyProps.size();
+    uint32_t queueFamilyCount = physical->queueFamilyProps.size();
     std::vector<VkBool32> supportsPresent(queueFamilyCount);
     // 检查每个通道的表面是否支持显示
     for (uint32_t i = 0; i < queueFamilyCount; i++) {
@@ -148,22 +151,14 @@ void VulkanManager::blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
     region.srcSubresource.mipLevel = 0;
     region.srcSubresource.baseArrayLayer = 0;
     region.srcSubresource.layerCount = 1;
-    region.srcOffsets[0].x = 0;
-    region.srcOffsets[0].y = 0;
-    region.srcOffsets[0].z = 0;
-    region.srcOffsets[1].x = src->width;
-    region.srcOffsets[1].y = src->height;
-    region.srcOffsets[1].z = 1;
+    region.srcOffsets[0] = {0, 0, 0};
+    region.srcOffsets[1] = {(int32_t)src->width, (int32_t)src->height, 1};
     region.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     region.dstSubresource.mipLevel = 0;
     region.dstSubresource.baseArrayLayer = 0;
     region.dstSubresource.layerCount = 1;
-    region.dstOffsets[0].x = 0;
-    region.dstOffsets[0].y = 0;
-    region.dstOffsets[0].z = 0;
-    region.dstOffsets[1].x = destWidth;
-    region.dstOffsets[1].y = destHeight;
-    region.dstOffsets[1].z = 1;
+    region.dstOffsets[0] = {0, 0, 0};
+    region.dstOffsets[1] = {destWidth, destHeight, 1};
     // 要将源图像的区域复制到目标图像中，并可能执行格式转换，任意缩放和过滤
     vkCmdBlitImage(cmd, src->image, src->layout, dest, destLayout, 1, &region,
                    VK_FILTER_LINEAR);

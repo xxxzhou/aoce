@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include "AoceBuildSettings.h"
 
 #ifdef _MSC_VER
 #if defined(AOCE_EXPORT_DEFINE)
@@ -45,10 +46,7 @@
 
 #endif
 
-// 后期会考虑使用静态链接
-#define AOCE_STATICLINK 0
-
-#if AOCE_STATICLINK
+#if AOCE_USE_STATIC
 #define ADD_MODULE(ModuleClass, ModuleName)                            \
     static aoce::StaticLinkModule<ModuleClass> LinkModule##ModuleName( \
         #ModuleName);

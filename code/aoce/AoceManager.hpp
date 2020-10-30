@@ -1,15 +1,17 @@
 #pragma once
+
 #include <map>
 
 #include "Aoce.hpp"
 #include "Layer/LayerFactory.hpp"
 #include "Layer/PipeGraph.hpp"
+#include "Live/LiveRoom.hpp"
 #include "VideoDevice/VideoManager.hpp"
+
 struct android_app;
+
 namespace aoce {
-
-    // struct android_app;
-
+// struct android_app;
 #define AOCE_MANAGER_OBJ(OBJTYPE, OBJCLASS)                        \
     typedef std::unique_ptr<OBJCLASS> OBJCLASS##Ptr;               \
                                                                    \
@@ -17,43 +19,61 @@ namespace aoce {
     std::map<OBJTYPE, OBJCLASS##Ptr> OBJCLASS##Map;                \
                                                                    \
    public:                                                         \
-    inline void add##OBJCLASS(OBJTYPE s_type, OBJCLASS* manager) { \
+    inline void add##OBJCLASS(OBJTYPE s_type, OBJCLASS *manager) { \
         OBJCLASS##Map[s_type] = OBJCLASS##Ptr(manager);            \
     }                                                              \
     inline void remove##OBJCLASS(OBJTYPE s_type) {                 \
         OBJCLASS##Map[s_type].reset();                             \
     }                                                              \
-    inline OBJCLASS* get##OBJCLASS(OBJTYPE s_type) {               \
+    inline OBJCLASS *get##OBJCLASS(OBJTYPE s_type) {               \
         return OBJCLASS##Map[s_type].get();                        \
     }
 
-class ACOE_EXPORT AoceManager {
-   public:
-    static AoceManager& Get();
-    // 清理资源
-    static void clean();
+    class ACOE_EXPORT AoceManager {
+    public:
+        static AoceManager &Get();
 
-   private:
+        // 清理资源
+        static void clean();
+
+    private:
 #if __ANDROID__
-    android_app* androidApp = nullptr;
+        android_app *androidApp = nullptr;
+        JNIEnv *env = nullptr;
 #endif
-   public:
+    public:
 #if __ANDROID__
-    inline void initAndroid(android_app* app) { androidApp = app; }
-    inline android_app* getApp() { return androidApp; }
+
+        inline void initAndroid(android_app *app) { androidApp = app; }
+
+        inline android_app *getApp() { return androidApp; }
+
+        inline void setJNIEnv(JNIEnv *env) { this->env = env; }
+
+        inline JNIEnv *getJNIEnv() { return env; }
+
+        void *getJNIContext();
+
 #endif
-   private:
-    AoceManager(/* args */);
-    static AoceManager* instance;
-    AoceManager(const AoceManager&) = delete;
-    AoceManager& operator=(const AoceManager&) = delete;
+    private:
+        AoceManager(/* args */);
 
-   public:
-    ~AoceManager();
+        static AoceManager *instance;
 
-    AOCE_MANAGER_OBJ(CameraType, VideoManager)
-    AOCE_MANAGER_OBJ(GpuType, PipeGraphFactory)
-    AOCE_MANAGER_OBJ(GpuType, LayerFactory)
-};
+        AoceManager(const AoceManager &) = delete;
+
+        AoceManager &operator=(const AoceManager &) = delete;
+
+    public:
+        ~AoceManager();
+
+        AOCE_MANAGER_OBJ(CameraType, VideoManager)
+
+        AOCE_MANAGER_OBJ(GpuType, PipeGraphFactory)
+
+        AOCE_MANAGER_OBJ(GpuType, LayerFactory)
+
+        AOCE_MANAGER_OBJ(LiveType, LiveRoom)
+    };
 
 }  // namespace aoce

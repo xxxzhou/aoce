@@ -23,7 +23,7 @@ VulkanContext::~VulkanContext() {
 void VulkanContext::initContext() {
     // 得到全局设置
     this->instace = VulkanManager::Get().instace;
-    this->physicalDevice = VulkanManager::Get().physical;
+    this->physicalDevice = VulkanManager::Get().physicalDevice;
     this->device = VulkanManager::Get().device;
     this->computeQueue = VulkanManager::Get().computeQueue;
     int computeIndex = VulkanManager::Get().computeIndex;
@@ -50,7 +50,7 @@ void VulkanContext::initContext() {
 bool VulkanContext::checkFormat(VkFormat format, VkFormatFeatureFlags feature,
                                 bool bLine) {
     VkFormatProperties props;
-    vkGetPhysicalDeviceFormatProperties(physicalDevice.physicalDevice, format,
+    vkGetPhysicalDeviceFormatProperties(physicalDevice, format,
                                         &props);
     if (bLine) {
         return (props.linearTilingFeatures & feature) == feature;

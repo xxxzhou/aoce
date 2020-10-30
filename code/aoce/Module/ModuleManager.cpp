@@ -1,5 +1,7 @@
 #include "ModuleManager.hpp"
 
+#include "../AoceManager.hpp"
+
 #if WIN32
 #include <Shlwapi.h>
 #include <Windows.h>
@@ -32,10 +34,10 @@ void ModuleManager::registerModule(const std::string& name,
     }
     ModuleInfo* moduleInfo = new ModuleInfo();
     modules[name] = moduleInfo;
-#if __ANDROID__
-    moduleInfo->name ="lib"+ name + ".so";
-#endif
     moduleInfo->name = name;
+#if __ANDROID__
+    moduleInfo->name = "lib" + name + ".so";
+#endif
     moduleInfo->onLoadEvent = handle;
 }
 
@@ -74,17 +76,29 @@ void ModuleManager::loadModule(const std::string& name) {
                 (loadModuleAction)dlsym(moduleInfo->handle, "NewModule");
         }
 #endif
+        // 检查是否找到dll
+        if (!moduleInfo->handle) {
+            logMessage(LogLevel::warn, name + ": dll load failed.");
+        }
+        // 检查是否加载module
         if (loadAction) {
             moduleInfo->module = loadAction();
+        } else {
+            logMessage(LogLevel::warn,
+                       name + "is load,but no find method NewModule.");
         }
     }
-    moduleInfo->load = moduleInfo->module != nullptr;
-    if (!moduleInfo->load) {
-        logMessage(LogLevel::warn, name + ": load failed.");
+    if (!moduleInfo->module) {
+        logMessage(LogLevel::warn, name + ": init module failed.");
     }
     // 调用注册
     if (moduleInfo->module) {
-        moduleInfo->module->loadModule();
+        moduleInfo->load = moduleInfo->module->loadModule();
+        if (moduleInfo->load) {
+            logMessage(LogLevel::info, name + ": regedit module success.");
+        } else {
+            logMessage(LogLevel::warn, name + ": regedit module failed.");
+        }
     }
 }
 
@@ -157,5 +171,31 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
     return TRUE;
 }
 #elif __ANDROID__
+static bool bAttach = false;
+jint JNI_OnLoad(JavaVM* jvm, void*) {
+    JNIEnv* jni_env = nullptr;
+    int ret = jvm->GetEnv((void**)&jni_env, JNI_VERSION_1_6);
+    aoce::AoceManager::Get().setJNIEnv(jni_env);
+    if (ret == JNI_EDETACHED) {
+        if (jvm->AttachCurrentThread(&jni_env, 0) != 0) {
+            logMessage(aoce::LogLevel::warn,
+                       "andorid jni attach thread failed");
+        } else {
+            bAttach = true;
+            logMessage(aoce::LogLevel::info,
+                       "andorid jni attach thread success");
+        }
+    } else {
+        logMessage(aoce::LogLevel::info, "andorid jni have attach.");
+    }
+    return JNI_VERSION_1_6;
+}
 
+void JNI_OnUnload(JavaVM* jvm, void*) {
+    if(bAttach){
+        JNIEnv* jni_env = nullptr;
+        int ret = jvm->GetEnv((void**)&jni_env, JNI_VERSION_1_6);
+        jvm->DetachCurrentThread();
+    }
+}
 #endif

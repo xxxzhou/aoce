@@ -72,18 +72,19 @@ void VkOutputLayer::onPreCmd() {
     }
 }
 
-void VkOutputLayer::outGpuTex(void* contex, void* texture, int32_t outIndex) {
+void VkOutputLayer::outGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
     if (!outTex || !outTex->image) {
         return;
     }
     // GPU输出
-    VkCommandBuffer copyCmd = (VkCommandBuffer)contex;
-    VkImage copyImage = (VkImage)texture;
-    // auto res = vkGetEventStatus(context->device, outEvent);
+    VkCommandBuffer copyCmd = (VkCommandBuffer)outVkTex.commandbuffer;
+    VkImage copyImage = (VkImage)outVkTex.image;
+    auto res = vkGetEventStatus(context->device, outEvent);
     // assert(res != VK_EVENT_RESET);
     outTex->addBarrier(copyCmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                        VK_PIPELINE_STAGE_TRANSFER_BIT);
-    VulkanManager::blitFillImage(copyCmd, outTex.get(), copyImage, 1280, 720);
+    VulkanManager::blitFillImage(copyCmd, outTex.get(), copyImage,
+                                 outVkTex.width, outVkTex.height);
     // vkCmdSetEvent(cmd, outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT);
 }
 

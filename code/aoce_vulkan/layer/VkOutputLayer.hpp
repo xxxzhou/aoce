@@ -26,7 +26,7 @@ class VkOutputLayer : public OutputLayer, public VkLayer {
     virtual bool onFrame() override;
 
    public:
-    virtual void outGpuTex(void* contex, void* texture,
+    virtual void outGpuTex(const VkOutGpuTex& outTex,
                            int32_t outIndex = 0) override;
 };
 

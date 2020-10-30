@@ -1,8 +1,9 @@
 #pragma once
 
 //导出给外部库使用文件
-#include "AoceDefine.h"
 #include <string>
+
+#include "AoceDefine.h"
 
 enum AOCE_LOG_LEVEL {
     AOCE_LOG_INFO,
@@ -115,6 +116,12 @@ enum class VideoCodec {
 enum class AudioCodec {
     other,
     acc,
+};
+
+enum class LiveType {
+    other,
+    aoce,
+    agora,
 };
 
 // 视频设备输出格式

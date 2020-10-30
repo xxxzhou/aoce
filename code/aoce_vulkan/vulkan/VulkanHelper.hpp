@@ -1,5 +1,6 @@
 #pragma once
 #include <Aoce.hpp>
+#include <memory>
 
 #include "VulkanCommon.hpp"
 
@@ -15,6 +16,8 @@
 namespace aoce {
 namespace vulkan {
 
+using PhysicalDevicePtr = std::shared_ptr<PhysicalDevice>;
+
 // errorcode转显示
 AOCE_VULKAN_EXPORT std::string errorString(VkResult errorCode);
 // 物理显卡类型
@@ -25,7 +28,7 @@ AOCE_VULKAN_EXPORT VkResult createInstance(VkInstance& instance,
                                            const char* appName);
 // 得到所有物理显卡
 AOCE_VULKAN_EXPORT VkResult enumerateDevice(
-    VkInstance instance, std::vector<PhysicalDevice>& physicalDevices);
+    VkInstance instance, std::vector<PhysicalDevicePtr>& physicalDevices);
 
 AOCE_VULKAN_EXPORT bool getMemoryTypeIndex(uint32_t typeBits,
                                            VkFlags quirementsMaks,

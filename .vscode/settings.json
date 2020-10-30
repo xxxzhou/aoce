@@ -68,6 +68,8 @@
         "cstdarg": "cpp",
         "stack": "cpp",
         "concepts": "cpp",
-        "compare": "cpp"
+        "compare": "cpp",
+        "*.in": "cpp",
+        "atomic": "cpp"
     }
 }

@@ -1,14 +1,17 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 
 #include "VulkanCommon.hpp"
 #include "VulkanTexture.hpp"
+
 #if WIN32
 #include "../win32/Win32Window.hpp"
 #elif __ANDROID__
 #include <android/native_activity.h>
 #endif
+
 #include <functional>
 #include <mutex>
 
@@ -38,8 +41,12 @@ class AOCE_VULKAN_EXPORT VulkanWindow {
     std::vector<VkImageView> views;
     VkCommandPool cmdPool;
     std::vector<VkFramebuffer> frameBuffers;
-#if defined(_WIN32)
+#if WIN32
     std::unique_ptr<Win32Window> window;
+#elif __ANDROID__
+    // std::mutex winMtx;
+    // std::condition_variable winSignal;
+    std::function<void()> onInitWindow = nullptr;
 #endif
     // 用于动态添加执行列表
     std::vector<VkFence> addCmdFences;
@@ -85,6 +92,7 @@ class AOCE_VULKAN_EXPORT VulkanWindow {
    public:
     // preFram运行前确定,否则需要在运行后确定
     VulkanWindow(cmdExecuteHandle preCmd, bool preFram = false);
+
     ~VulkanWindow();
     // 没有外部窗口,自己创建
 #if _WIN32
@@ -95,20 +103,32 @@ class AOCE_VULKAN_EXPORT VulkanWindow {
     // 根据窗口创建surface,并返回使用的queueIndex.
     void initSurface(HINSTANCE inst, HWND windowHandle);
 #elif defined(__ANDROID__)
-    friend void handleAppCommand(android_app* app, int32_t cmd);
-    void initWindow();
-    void initSurface(ANativeWindow* window);
+
+    friend void handleAppCommand(android_app *app, int32_t cmd);
+    // 一些参数限定只能在窗口主线程中使用
+    void initWindow(std::function<void()> onInitWindow = nullptr);
+
+    void initSurface(ANativeWindow *window);
+
 #endif
+
     // 没有调用initWindow,无效
     void run();
+
     // 没有调用initWindow,直接用已有窗口initSurface,请在窗口的frame事件时调用
     void tick();
+
     void onSizeChange();
+
+    bool windowCreate() { return bCreateSurface; };
 
    private:
     void createSwipChain(bool bInit = false);
+
     void reSwapChainBefore();
+
     void reSwapChainAfter();
+
     void createRenderPass();
 };
 }  // namespace vulkan

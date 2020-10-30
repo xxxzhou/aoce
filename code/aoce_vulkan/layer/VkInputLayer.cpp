@@ -32,7 +32,7 @@ void VkInputLayer::onInputCpuData(uint8_t* data, int32_t index) {
 }
 
 void VkInputLayer::onInitGraph() {
-    std::string path = "./glsl/inputv1.comp.spv";
+    std::string path = "glsl/inputv1.comp.spv";
     shader->loadShaderModule(context->device, path);
     assert(shader->shaderStage.module != VK_NULL_HANDLE);
     std::vector<UBOLayoutItem> items = {

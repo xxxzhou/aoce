@@ -1,5 +1,6 @@
 #include "VulkanWindow.hpp"
 
+#include <AoceManager.hpp>
 #include <array>
 
 #include "VulkanCommon.hpp"
@@ -39,7 +40,7 @@ VulkanWindow::~VulkanWindow() {
     swapChain = VK_NULL_HANDLE;
 }
 
-#if defined(_WIN32)
+#if WIN32
 void VulkanWindow::initWindow(HINSTANCE inst, uint32_t _width, uint32_t _height,
                               const char* appName) {
     this->width = _width;
@@ -82,9 +83,16 @@ void handleAppCommand(android_app* app, int32_t cmd) {
             LOGI("=================================================");
             LOGI("\n");
             window->initSurface(app->window);
+            // window->winSignal.notify_all();
+            if(window->onInitWindow != nullptr){
+                window->onInitWindow();
+            }
             break;
         case APP_CMD_TERM_WINDOW:
             // The window is being hidden or closed, clean it up.
+            break;
+        case APP_CMD_WINDOW_RESIZED:
+            window->onSizeChange();
             break;
         case APP_CMD_LOST_FOCUS:
             LOGI("APP_CMD_LOST_FOCUS");
@@ -94,14 +102,18 @@ void handleAppCommand(android_app* app, int32_t cmd) {
             LOGI("APP_CMD_GAINED_FOCUS");
             window->focused = true;
             break;
+        case APP_CMD_STOP:
+            ANativeActivity_finish(app->activity);
+            break;
         default:
             LOGI("event not handled: %d", cmd);
     }
 }
 
-void VulkanWindow::initWindow() {
-    VulkanManager::Get().androidApp->userData = this;
-    VulkanManager::Get().androidApp->onAppCmd = handleAppCommand;
+void VulkanWindow::initWindow(std::function<void()> onInitWindow) {
+    this->onInitWindow = onInitWindow;
+    AoceManager::Get().getApp()->userData = this;
+    AoceManager::Get().getApp()->onAppCmd = handleAppCommand;
     bCreateWindow = true;
 }
 
@@ -516,8 +528,8 @@ void VulkanWindow::tick() {
             &currentIndex);
         // 运行时提交,可能会导致一边在执行,一边在记录
         if (!this->bPreCmd && onCmdExecuteEvent) {
-            VK_CHECK_RESULT(vkWaitForFences(
-                device, 1, &addCmdFences[currentIndex], true, UINT64_MAX));
+            result = vkWaitForFences(device, 1, &addCmdFences[currentIndex],
+                                     true, UINT64_MAX);
             vkResetFences(device, 1, &addCmdFences[currentIndex]);
             vkBeginCommandBuffer(cmdBuffers[currentIndex], &cmdBufferBeginInfo);
             vkCmdSetViewport(cmdBuffers[currentIndex], 0, 1, &viewport);
@@ -536,7 +548,8 @@ void VulkanWindow::tick() {
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &cmdBuffers[currentIndex];
         // 等presentComplete收到信号后执行,执行完成后发送信号renderComplete
-        VkResult res = vkQueueSubmit(presentQueue, 1, &submitInfo, addCmdFences[currentIndex]);
+        VkResult res = vkQueueSubmit(presentQueue, 1, &submitInfo,
+                                     addCmdFences[currentIndex]);
         // 提交渲染呈现到屏幕
         VkPresentInfoKHR presentInfo = {};
         presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -549,7 +562,11 @@ void VulkanWindow::tick() {
         presentInfo.waitSemaphoreCount = 1;
         // 提交渲染呈现到屏幕
         result = vkQueuePresentKHR(presentQueue, &presentInfo);
-        assert(result == VK_SUCCESS);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            onSizeChange();
+        } else {
+            // assert(!result);
+        }
         // // addCmdFence开门(发送信号量)
         // VK_CHECK_RESULT(
         //     vkQueueSubmit(presentQueue, 0, nullptr, addCmdFence));
@@ -580,7 +597,7 @@ void VulkanWindow::run() {
     }
 
 #elif defined(__ANDROID__)
-    android_app* androidApp = VulkanManager::Get().androidApp;
+    android_app* androidApp = AoceManager::Get().getApp();
     while (true) {
         int ident;
         int events;

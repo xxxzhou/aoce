@@ -21,9 +21,6 @@ bool VulkanModule::loadModule() {
         logMessage(LogLevel::warn, "vulkan not find gpu.");
         return false;
     }
-#if __ANDROID__
-    VulkanManager::Get().androidApp = AoceManager::Get().getApp();
-#endif
     VulkanManager::Get().createDevice(true);
     AoceManager::Get().addPipeGraphFactory(GpuType::vulkan,
                                            new layer::VkPipeGraphFactory());

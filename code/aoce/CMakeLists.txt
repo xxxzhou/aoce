@@ -19,6 +19,7 @@ file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURC
 add_sub_path(Module AOCE_HEADER AOCE_SOURCE)
 add_sub_path(VideoDevice AOCE_HEADER AOCE_SOURCE)
 add_sub_path(Layer AOCE_HEADER AOCE_SOURCE)
+add_sub_path(Live AOCE_HEADER AOCE_SOURCE) 
 
 message("aoce head--" ${AOCE_HEADER})
 message("aoce source--" ${AOCE_SOURCE})   

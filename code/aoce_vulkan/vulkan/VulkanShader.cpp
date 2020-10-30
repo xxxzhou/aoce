@@ -1,7 +1,7 @@
 #include "VulkanShader.hpp"
 
 #include "VulkanHelper.hpp"
-#include "VulkanManager.hpp"
+#include <AoceManager.hpp>
 
 namespace aoce {
 namespace vulkan {
@@ -21,8 +21,9 @@ void VulkanShader::loadShaderModule(VkDevice device, std::string path,
                                     VkShaderStageFlagBits shaderFlag) {
     release();
 #if defined(__ANDROID__)
-    AAssetManager* assetManager =
-        VulkanManager::Get().androidApp->activity->assetManager;
+    auto* activeity = AoceManager::Get().getApp()->activity;
+    assert(activeity != nullptr);
+    AAssetManager* assetManager = activeity->assetManager;
     shaderModule = loadShader(assetManager, path.c_str(), device);
 #else
     shaderModule = loadShader(path.c_str(), device);

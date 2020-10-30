@@ -1,16 +1,18 @@
 #include "Aoce.h"
 
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 #include "Aoce.hpp"
 #include "Module/ModuleManager.hpp"
 #if WIN32
+#include <Shlwapi.h>
 #include <Windows.h>
 
 #include <iomanip>
+#pragma comment(lib, "shlwapi.lib")
 #elif __ANDROID__
 #include <stdlib.h>
 #endif
@@ -199,13 +201,11 @@ std::string utf8TString(const std::wstring& wstr) {
 void copywcharstr(wchar_t* dest, const wchar_t* source, int32_t maxlength) {
     int length = sizeof(wchar_t) * (wcslen(source) + 1);
     memcpy(dest, source, std::min(length, maxlength));
-
 }
 
 void copycharstr(char* dest, const char* source, int32_t maxlength) {
     int length = sizeof(char) * (strlen(source) + 1);
     memcpy(dest, source, std::min(length, maxlength));
-
 }
 
 uint32_t divUp(int32_t x, int32_t y) { return (x + y - 1) / y; }
@@ -258,6 +258,7 @@ int32_t getYuvIndex(const aoce::VideoType& videoType) {
 
 ImageFormat videoFormat2ImageFormat(const VideoFormat& videoFormat) {
     ImageFormat imageFormat = {};
+    // 带SP/P的格式转化成r8,否则转化成rgba8
     imageFormat.imageType = videoType2ImageType(videoFormat.videoType);
     imageFormat.width = videoFormat.width;
     imageFormat.height = videoFormat.height;
@@ -265,7 +266,7 @@ ImageFormat videoFormat2ImageFormat(const VideoFormat& videoFormat) {
         videoFormat.videoType == VideoType::yuv420P) {
         imageFormat.height = videoFormat.height * 3 / 2;
     } else if (videoFormat.videoType == VideoType::yuy2P) {
-        imageFormat.height = videoFormat.height / 2;
+        imageFormat.height = videoFormat.height * 2;
     } else if (videoFormat.videoType == VideoType::uyvyI ||
                videoFormat.videoType == VideoType::yuv2I ||
                videoFormat.videoType == VideoType::yvyuI) {
@@ -289,9 +290,78 @@ int32_t getImageTypeSize(const aoce::ImageType& imageType) {
     }
 }
 
+int32_t getVideoFrame(const aoce::VideoFrame& frame, uint8_t* data) {
+    // 只有这二种有可能内存不连续
+    if (frame.videoType != VideoType::yuv420P &&
+        frame.videoType != VideoType::yuy2P) {
+        return 0;
+    }
+    int32_t ysize = (uint64_t)&frame.data[1][0] - (uint64_t)&frame.data[0][0];
+    int32_t usize = (uint64_t)&frame.data[2][0] - (uint64_t)&frame.data[1][0];
+    int32_t hscale = frame.videoType == VideoType::yuy2P ? 1 : 2;
+    int32_t uweight = frame.width / 2;
+    int32_t uheight = frame.height / hscale;
+    // 按照YUV格式排列
+    if (ysize == frame.width * frame.height && ysize == usize * hscale * 2) {
+        return 0;
+    }
+    // 如果data有数据,紧密排列
+    if (data != nullptr) {
+        // Y可以直接复制
+        if (frame.dataAlign[0] == 0 || frame.dataAlign[0] == frame.width) {
+            memcpy(data, frame.data[0], frame.width * frame.height);
+            data += frame.width * frame.height;
+        } else {
+            for (int i = 0; i < frame.height; i++) {
+                memcpy(data, frame.data[0] + i * frame.dataAlign[0],
+                       frame.width);
+                data += frame.width;
+            }
+        }
+        // U
+        if (frame.dataAlign[1] == 0 || frame.dataAlign[1] == frame.width / 2) {
+            memcpy(data, frame.data[1], uweight * uheight);
+            data += uweight * uheight;
+        } else {
+            for (int i = 0; i < uheight; i++) {
+                memcpy(data, frame.data[1] + i * frame.dataAlign[1], uweight);
+                data += uweight;
+            }
+        }
+        // V
+        if (frame.dataAlign[2] == 0 || frame.dataAlign[2] == frame.width / 2) {
+            memcpy(data, frame.data[2], uweight * uheight);
+            data += uweight * uheight;
+        } else {
+            for (int i = 0; i < uheight; i++) {
+                memcpy(data, frame.data[2] + i * frame.dataAlign[2], uweight);
+                data += uweight;
+            }
+        }
+    }
+    int32_t yuvsize = frame.width * (frame.height + uheight);
+    return yuvsize;
+}
+
+std::string getAocePath() {
+#if WIN32
+    char sz[512] = {0};
+    HMODULE ihdll = GetModuleHandleA("aoce.dll");
+    ::GetModuleFileNameA(ihdll, sz, 512);
+    ::PathRemoveFileSpecA(sz);
+    std::string path = sz;
+    return path;
+#elif __ANDROID__
+    return "";
+#endif
+}
+
 void loadAoce() {
 #if WIN32
     ModuleManager::Get().regAndLoad("aoce_win_mf");
+#endif
+#if defined(AOCE_INSTALL_AGORA)
+    ModuleManager::Get().regAndLoad("aoce_agora");
 #endif
     ModuleManager::Get().regAndLoad("aoce_vulkan");
 }
@@ -299,6 +369,9 @@ void loadAoce() {
 void unloadAoce() {
 #if WIN32
     ModuleManager::Get().unloadModule("aoce_win_mf");
+#endif
+#if defined(AOCE_INSTALL_AGORA)
+    ModuleManager::Get().regAndLoad("aoce_agora");
 #endif
     ModuleManager::Get().unloadModule("aoce_vulkan");
 }

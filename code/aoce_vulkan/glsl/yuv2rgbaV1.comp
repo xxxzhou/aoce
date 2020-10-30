@@ -98,6 +98,37 @@ void yuv420p(){
 	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2+1),rgba4); 
 }
 
+void yuv422ap(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);
+    if(uv.x >= size.x/2 || uv.y >= size.y/2){
+        return;
+    }	
+	ivec2 uindex = uv + ivec2(0,size.y);
+	ivec2 vindex = uv + ivec2(0,size.y*3/2);
+	ivec2 aindex1 = uv + ivec2(size.x/2,size.y);
+	ivec2 aindex2 = uv + ivec2(size.x/2,size.y*3/2);
+
+	float y1 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2)).r;
+	float y2 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2)).r;
+	float y3 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2+1)).r;
+	float y4 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2+1)).r;	
+	float a1 = imageLoad(inTex,aindex1).r;	
+	float a2 = imageLoad(inTex,aindex2).r;	
+	float u = imageLoad(inTex,uindex.xy).r -0.5f;
+    float v = imageLoad(inTex,vindex.xy).r -0.5f;
+
+	vec4 rgba1 = yuv2Rgb(y1,u,v,a1);
+	vec4 rgba2 = yuv2Rgb(y2,u,v,a1);
+	vec4 rgba3 = yuv2Rgb(y3,u,v,a2);
+	vec4 rgba4 = yuv2Rgb(y4,u,v,a2);	
+
+	imageStore(outTex, ivec2(uv.x*2,uv.y*2),rgba1); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2),rgba2); 
+	imageStore(outTex, ivec2(uv.x*2,uv.y*2+1),rgba3); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2+1),rgba4); 
+}
+
 void yuv422p(){
 	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
     ivec2 size = imageSize(outTex);
@@ -126,6 +157,6 @@ void main(){
 	}else if(ubo.yuvType == 2){
 		yuv420p();
 	}else if(ubo.yuvType == 3){
-		yuv422p();
+		yuv422p();// yuv422ap();
 	}
 }

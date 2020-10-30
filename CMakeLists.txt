@@ -8,6 +8,7 @@ project(aoce)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 # 查找第三方库
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_SOURCE_DIR}/thirdparty")
+set(AOCE_THIRDPARTY_PATH ${CMAKE_PREFIX_PATH})
 
 # 设置本项目的安装目录
 include(GNUInstallDirs)
@@ -53,6 +54,15 @@ set(AOCE_VULKAN_HEADER_DIR "${CMAKE_SOURCE_DIR}/code/aoce_vulkan")
 # 设置build的子目录
 set(AOCE_RUNTIME_DIR ${CMAKE_BINARY_DIR}/bin)
 set(AOCE_LIBRARY_DIR ${CMAKE_BINARY_DIR}/lib)
+
+set(AOCE_SET_STATIC 0)
+option(AOCE_INSTALL_AGORA "Install agora module." TRUE) #FALSE
+
+# cmake_dependent_option
+
+# 配置联系cmake/c++
+configure_file(${CMAKE_SOURCE_DIR}/cmake/AoceBuildSettings.h.in ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h @ONLY)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h DESTINATION include)
 
 # 生成目录
 function(aoce_output targetname) 

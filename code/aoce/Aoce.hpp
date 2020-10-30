@@ -2,6 +2,8 @@
 #include <assert.h>
 
 #include <functional>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -53,16 +55,34 @@ void removeItem(std::vector<T>& vect, typename std::vector<T>::iterator iter) {
 };
 
 // https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
+// template <typename... Args>
+// std::string string_format(const std::string& format, Args... args) {
+//     size_t size = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+//     if (size <= 0) {
+//         return "";
+//     }
+//     std::unique_ptr<char[]> buf(new char[size]);
+//     std::snprintf(buf.get(), size, format.c_str(), args...);
+//     return std::string(buf.get(),
+//                        buf.get() + size - 1);  // We don't want the '\0'
+// }
+
+template <typename T>
+void string_format(std::ostream& o, T t) {
+    o << t;
+}
+
+template <typename T, typename... Args>
+void string_format(std::ostream& o, T t, Args... args) {
+    string_format(o, t);
+    string_format(o, args...);
+}
+
 template <typename... Args>
-std::string string_format(const std::string& format, Args... args) {
-    size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1;
-    if (size <= 0) {
-        return "";
-    }
-    std::unique_ptr<char[]> buf(new char[size]);
-    snprintf(buf.get(), size, format.c_str(), args...);
-    return std::string(buf.get(),
-                       buf.get() + size - 1);  // We don't want the '\0' inside
+void string_format(std::string& msg, Args... args) {
+    std::ostringstream oss;
+    string_format(oss, args...);
+    msg = oss.str();
 }
 
 ACOE_EXPORT void logMessage(aoce::LogLevel level, const std::string& message);
@@ -86,3 +106,14 @@ ACOE_EXPORT aoce::ImageFormat videoFormat2ImageFormat(
     const aoce::VideoFormat& videoFormat);
 
 ACOE_EXPORT int32_t getImageTypeSize(const aoce::ImageType& imageType);
+
+// SP/P格式可能非紧密排列,这种情况下返回需要的紧密排列大小,否则返回0
+ACOE_EXPORT int32_t getVideoFrame(const aoce::VideoFrame& frame,
+                                  uint8_t* data = nullptr);
+
+ACOE_EXPORT std::string getAocePath();
+
+#if __ANDROID__
+ACOE_EXPORT jint JNI_OnLoad(JavaVM* jvm, void*);
+ACOE_EXPORT void JNI_OnUnload(JavaVM* jvm, void*);
+#endif

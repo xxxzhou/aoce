@@ -12,9 +12,9 @@ VkYUV2RGBALayer::~VkYUV2RGBALayer() {}
 void VkYUV2RGBALayer::onInitGraph() {
     int32_t yuvType = getYuvIndex(paramet.type);
     assert(yuvType > 0);
-    std::string path = "./glsl/yuv2rgbaV1.comp.spv";
+    std::string path = "glsl/yuv2rgbaV1.comp.spv";
     if (yuvType > 3) {
-        path = "./glsl/yuv2rgbaV2.comp.spv";
+        path = "glsl/yuv2rgbaV2.comp.spv";
     }
     shader->loadShaderModule(context->device, path);
     assert(shader->shaderStage.module != VK_NULL_HANDLE);

@@ -40,16 +40,12 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     bool bAloneCompute = false;
 
    public:
-    PhysicalDevice physical = {};
+    PhysicalDevicePtr physical = nullptr;
     VkInstance instace = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkQueue computeQueue = VK_NULL_HANDLE;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
-
-#if defined(__ANDROID__)
-    android_app* androidApp = nullptr;
-#endif
 };
 
 }  // namespace vulkan

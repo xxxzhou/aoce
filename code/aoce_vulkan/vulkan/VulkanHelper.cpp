@@ -236,7 +236,7 @@ VkResult createInstance(VkInstance& instance, const char* appName) {
 }
 
 VkResult enumerateDevice(VkInstance instance,
-                         std::vector<PhysicalDevice>& pDevices) {
+                         std::vector<PhysicalDevicePtr>& pDevices) {
     VkResult err;
     // Physical device
     uint32_t gpuCount = 0;
@@ -249,35 +249,34 @@ VkResult enumerateDevice(VkInstance instance,
     err =
         vkEnumeratePhysicalDevices(instance, &gpuCount, physicalDevices.data());
     for (uint32_t i = 0; i < gpuCount; i++) {
-        pDevices[i].physicalDevice = physicalDevices[i];
+        pDevices[i] = std::shared_ptr<PhysicalDevice>(new PhysicalDevice());
+        pDevices[i]->physicalDevice = physicalDevices[i];
     }
     if (err != VK_SUCCESS) {
         return err;
     }
     for (uint32_t i = 0; i < gpuCount; i++) {
-        vkGetPhysicalDeviceProperties(pDevices[i].physicalDevice,
-                                      &pDevices[i].properties);
+        vkGetPhysicalDeviceProperties(pDevices[i]->physicalDevice,
+                                      &pDevices[i]->properties);
         uint32_t queueFamilyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(pDevices[i].physicalDevice,
+        vkGetPhysicalDeviceQueueFamilyProperties(pDevices[i]->physicalDevice,
                                                  &queueFamilyCount, nullptr);
+        vkGetPhysicalDeviceMemoryProperties(pDevices[i]->physicalDevice,
+                                            &pDevices[i]->mempryProperties);
         if (queueFamilyCount > 0) {
-            pDevices[i].queueFamilyProps.resize(queueFamilyCount);
+            pDevices[i]->queueFamilyProps.resize(queueFamilyCount);
             vkGetPhysicalDeviceQueueFamilyProperties(
-                pDevices[i].physicalDevice, &queueFamilyCount,
-                pDevices[i].queueFamilyProps.data());
-            vkGetPhysicalDeviceMemoryProperties(pDevices[i].physicalDevice,
-                                                &pDevices[i].mempryProperties);
-            vkGetPhysicalDeviceProperties(pDevices[i].physicalDevice,
-                                          &pDevices[i].properties);
+                pDevices[i]->physicalDevice, &queueFamilyCount,
+                pDevices[i]->queueFamilyProps.data());
         }
-        for (int j = 0; j < pDevices[i].queueFamilyProps.size(); j++) {
-            if ((pDevices[i].queueFamilyProps[j].queueFlags &
+        for (int j = 0; j < pDevices[i]->queueFamilyProps.size(); j++) {
+            if ((pDevices[i]->queueFamilyProps[j].queueFlags &
                  VK_QUEUE_GRAPHICS_BIT) == VK_QUEUE_GRAPHICS_BIT) {
-                pDevices[i].queueGraphicsIndexs.push_back(j);
+                pDevices[i]->queueGraphicsIndexs.push_back(j);
             }
-            if ((pDevices[i].queueFamilyProps[j].queueFlags &
+            if ((pDevices[i]->queueFamilyProps[j].queueFlags &
                  VK_QUEUE_COMPUTE_BIT) == VK_QUEUE_COMPUTE_BIT) {
-                pDevices[i].queueComputeIndexs.push_back(j);
+                pDevices[i]->queueComputeIndexs.push_back(j);
             }
         }
     }
@@ -295,7 +294,7 @@ int32_t getByteSize(VkFormat format) {
 bool getMemoryTypeIndex(uint32_t typeBits, VkFlags quirementsMaks,
                         uint32_t& index) {
     const auto& memoryPropertys =
-        VulkanManager::Get().physical.mempryProperties;
+        VulkanManager::Get().physical->mempryProperties;
     for (uint32_t i = 0; i < memoryPropertys.memoryTypeCount; i++) {
         if ((typeBits & 1) == 1) {
             // Type is available, does it match user properties?

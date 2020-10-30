@@ -11,7 +11,7 @@ namespace vulkan {
 // 把context与swapchain分开,用来Compture Shader做纯GPGPU运行时不需要swapchain
 class AOCE_VULKAN_EXPORT VulkanContext {
    public:
-    PhysicalDevice physicalDevice = {};
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkInstance instace = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkQueue computeQueue = VK_NULL_HANDLE;
