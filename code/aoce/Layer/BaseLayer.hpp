@@ -105,6 +105,32 @@ struct YUVParamet {
     VideoType type = VideoType::nv12;
 };
 
+// YUV 2 RGBA 转换
 class YUV2RGBALayer : public ITLayer<YUVParamet> {};
+
+// RGBA 2 YUV 转换
+class RGBA2YUVLayer : public ITLayer<YUVParamet> {};
+
+// 纹理变换大小以及通道变换
+struct TexOperateParamet {
+    int32_t newWidth = 0;
+    int32_t newHeight = 0;
+    // 通道映射 RGBA 转换新的通道索引
+    int32_t mapChannel[4] = {0, 1, 2, 3};
+};
+
+class TexOperateLayer : public ITLayer<TexOperateParamet> {};
+
+// 纹理混合
+struct BlendParamet {
+    float right = 0.0f;
+    float top = 0.0f;
+    float width = 0.4f;
+    float height = 0.4f;
+    // 显示如上位置图像的透明度
+    float alaph = 0.2f;
+};
+
+class BlendLayer : public ITLayer<BlendParamet> {};
 
 }  // namespace aoce

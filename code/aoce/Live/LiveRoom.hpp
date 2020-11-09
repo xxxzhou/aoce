@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Aoce.hpp"
-#include "LiveCallback.hpp"
+#include "ILiveObserver.hpp"
 namespace aoce {
 
 struct PushSetting {
@@ -56,6 +56,9 @@ struct AgoraContext {
     int32_t bSFEncoder = false;
     // 是否自己采集声卡
     int32_t bLoopback = false;
+#if __ANDROID__
+    void* context = nullptr;
+#endif
 };
 
 class ACOE_EXPORT LiveRoom {
@@ -68,7 +71,7 @@ class ACOE_EXPORT LiveRoom {
     int32_t userId = -1;
     // 子类一定登陆后一定要修改成login状态,只有子类才知道确认时机
     RoomType roomType = RoomType::noInit;
-    LiveCallback* liveBack = nullptr;
+    ILiveObserver* liveBack = nullptr;
     // 默认推一个流
     int32_t pushCount = 1;
     // 如果为true,可以动态添加推流,则不需要在登录时指定推流个数
@@ -102,7 +105,7 @@ class ACOE_EXPORT LiveRoom {
 
    public:
     // 因为每个直播SDK初始化信息不相同,简单使用void*表示
-    bool initRoom(void* liveContext, LiveCallback* liveBack);
+    bool initRoom(void* liveContext, ILiveObserver* liveBack);
     // 登陆房间,房间名,用户id,推流个数(这个会影响一些设置)
     bool loginRoom(const std::string& roomName, int32_t useId,
                    int32_t pushCount);

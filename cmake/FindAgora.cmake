@@ -15,7 +15,7 @@ if(WIN32)
     find_library(Agora_LIBRARYS NAME agora_rtc_sdk HINTS ${Agora_LIB_SEARCH_PATH} PATH_SUFFIXES)
     find_file(Agora_BINARYS NAME "agora_rtc_sdk.dll" HINTS ${Agora_BIN_SEARCH_PATH} PATH_SUFFIXES)
 elseif(ANDROID)
-    find_library(Agora_LIBRARYS NAME agora-rtc-sdk-jni HINTS ${Agora_LIB_SEARCH_PATH} PATH_SUFFIXES)
+    find_library(Agora_LIBRARYS NAME agora-rtc-sdk-jni HINTS ${Agora_LIB_SEARCH_PATH} PATH_SUFFIXES armeabi-v7a arm64-v8a)
 endif()
 
 message(STATUS "agora bin " ${Agora_BIN_SEARCH_PATH})

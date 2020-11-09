@@ -37,7 +37,7 @@ void LiveRoom::resetStreams() {
     pullStreams.clear();
 }
 
-bool LiveRoom::initRoom(void* liveContext, LiveCallback* liveBack) {
+bool LiveRoom::initRoom(void* liveContext, ILiveObserver* liveBack) {
     if (roomType != RoomType::noInit) {
         logMessage(LogLevel::info, "live module is have inited");
         return true;

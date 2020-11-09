@@ -6,9 +6,23 @@
 #include "Layer/LayerFactory.hpp"
 #include "Layer/PipeGraph.hpp"
 #include "Live/LiveRoom.hpp"
+#include "Media/MediaPlayer.hpp"
 #include "VideoDevice/VideoManager.hpp"
 
+#if __ANDROID__
 struct android_app;
+namespace aoce {
+struct AndroidEnv {
+    JavaVM *vm = nullptr;
+    // 在调用initAndroid里线程,注意不同线程这值不同
+    JNIEnv *env = nullptr;
+    jobject activity = nullptr;
+    jobject application = nullptr;
+    int32_t sdkVersion = 0;
+    AAssetManager *assetManager = nullptr;
+};
+}  // namespace aoce
+#endif
 
 namespace aoce {
 // struct android_app;
@@ -29,51 +43,53 @@ namespace aoce {
         return OBJCLASS##Map[s_type].get();                        \
     }
 
-    class ACOE_EXPORT AoceManager {
-    public:
-        static AoceManager &Get();
+class ACOE_EXPORT AoceManager {
+   public:
+    static AoceManager &Get();
+    // 清理资源
+    static void clean();
 
-        // 清理资源
-        static void clean();
-
-    private:
+   private:
 #if __ANDROID__
-        android_app *androidApp = nullptr;
-        JNIEnv *env = nullptr;
+    android_app *app = nullptr;
+    AndroidEnv androidEnv = {};
+    bool bAttach = false;
 #endif
-    public:
+   public:
 #if __ANDROID__
+    // 如果是要用nativewindow,请使用这个
+    void initAndroid(android_app *app);
+    inline android_app *getApp() { return app; };
+    // 如果不是nativewindow,请尽量填充AndroidEnv里的JavaVM等相关
+    void initAndroid(const AndroidEnv &andEnv);
+    const AndroidEnv &getAppEnv() { return androidEnv; }
+    // 要使用jni里的如findcalss/GetStaticMethodID等方法
+    // 必需在主线程或是附加主线程里调用
+    JNIEnv *getEnv(bool &bAttach);
+    // initAndroid里保存了一个env,如果在initAndroid线程里,不需要传入env
+    jobject getActivityApplication(jobject activity,JNIEnv *env = nullptr);
+    std::string getObjClassName(jobject obj,JNIEnv *env = nullptr);
 
-        inline void initAndroid(android_app *app) { androidApp = app; }
+    // 如果在线程拿过JNIEnv,退出时请调用
+    void detachThread();
 
-        inline android_app *getApp() { return androidApp; }
-
-        inline void setJNIEnv(JNIEnv *env) { this->env = env; }
-
-        inline JNIEnv *getJNIEnv() { return env; }
-
-        void *getJNIContext();
 
 #endif
-    private:
-        AoceManager(/* args */);
+   private:
+    AoceManager(/* args */);
+    static AoceManager *instance;
+    AoceManager(const AoceManager &) = delete;
+    AoceManager &operator=(const AoceManager &) = delete;
 
-        static AoceManager *instance;
+   public:
+    ~AoceManager();
 
-        AoceManager(const AoceManager &) = delete;
-
-        AoceManager &operator=(const AoceManager &) = delete;
-
-    public:
-        ~AoceManager();
-
-        AOCE_MANAGER_OBJ(CameraType, VideoManager)
-
-        AOCE_MANAGER_OBJ(GpuType, PipeGraphFactory)
-
-        AOCE_MANAGER_OBJ(GpuType, LayerFactory)
-
-        AOCE_MANAGER_OBJ(LiveType, LiveRoom)
-    };
+   public:
+    AOCE_MANAGER_OBJ(CameraType, VideoManager)
+    AOCE_MANAGER_OBJ(GpuType, PipeGraphFactory)
+    AOCE_MANAGER_OBJ(GpuType, LayerFactory)
+    AOCE_MANAGER_OBJ(LiveType, LiveRoom)
+    AOCE_MANAGER_OBJ(MediaPlayType, MediaPlayer)
+};
 
 }  // namespace aoce

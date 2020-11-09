@@ -34,10 +34,10 @@ if(WIN32)
     # Warn about signed/unsigned mismatch.
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34245>")
 endif()
-if(ANDROID)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -DVK_USE_PLATFORM_ANDROID_KHR -DVK_NO_PROTOTYPES")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
-endif()
+# if(ANDROID)
+#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -DVK_USE_PLATFORM_ANDROID_KHR -DVK_NO_PROTOTYPES")
+#     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+# endif()
 
 set(CMAKE_BUILD_TYPE "Debug"  CACHE STRING "choose the type of build" FORCE)
 message(STATUS "build type:" ${CMAKE_BUILD_TYPE})
@@ -56,7 +56,8 @@ set(AOCE_RUNTIME_DIR ${CMAKE_BINARY_DIR}/bin)
 set(AOCE_LIBRARY_DIR ${CMAKE_BINARY_DIR}/lib)
 
 set(AOCE_SET_STATIC 0)
-option(AOCE_INSTALL_AGORA "Install agora module." TRUE) #FALSE
+option(AOCE_INSTALL_AGORA "install agora module" TRUE) #FALSE
+option(AOCE_INSTALL_FFMPEG "install ffmpeg module" TRUE)
 
 # cmake_dependent_option
 

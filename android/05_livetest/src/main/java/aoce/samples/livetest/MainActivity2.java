@@ -1,6 +1,8 @@
 package aoce.samples.livetest;
 
 import androidx.appcompat.app.AppCompatActivity;
+import aoce.samples.vulkantest.R;
+
 import android.os.Bundle;
 
 public class MainActivity2 extends AppCompatActivity {

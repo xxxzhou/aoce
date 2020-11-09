@@ -3,6 +3,7 @@
 #include "VulkanCommon.hpp"
 #include "VulkanHelper.hpp"
 #include "VulkanTexture.hpp"
+
 namespace aoce {
 namespace vulkan {
 

@@ -69,6 +69,13 @@ void logMessage(aoce::LogLevel level, const std::string& message) {
     logMessage((AOCE_LOG_LEVEL)level, message.c_str());
 }
 
+void logAssert(bool expression, const std::string& message) {
+    if (!expression) {
+        logMessage(LogLevel::error, message);
+        assert(expression);
+    }
+}
+
 long long getNowTimeStamp() {
     auto now = std::chrono::system_clock::now().time_since_epoch();
     auto timeStamp =
@@ -256,7 +263,7 @@ int32_t getYuvIndex(const aoce::VideoType& videoType) {
     }
 }
 
-ImageFormat videoFormat2ImageFormat(const VideoFormat& videoFormat) {
+ImageFormat videoFormat2ImageFormat(const aoce::VideoFormat& videoFormat) {
     ImageFormat imageFormat = {};
     // 带SP/P的格式转化成r8,否则转化成rgba8
     imageFormat.imageType = videoType2ImageType(videoFormat.videoType);
@@ -357,21 +364,28 @@ std::string getAocePath() {
 }
 
 void loadAoce() {
+    ModuleManager::Get().regAndLoad("aoce_vulkan");
+
 #if WIN32
     ModuleManager::Get().regAndLoad("aoce_win_mf");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
     ModuleManager::Get().regAndLoad("aoce_agora");
 #endif
-    ModuleManager::Get().regAndLoad("aoce_vulkan");
+#if defined(AOCE_INSTALL_FFMPEG)
+    ModuleManager::Get().regAndLoad("aoce_ffmpeg");
+#endif
 }
 
 void unloadAoce() {
+    ModuleManager::Get().unloadModule("aoce_vulkan");
 #if WIN32
     ModuleManager::Get().unloadModule("aoce_win_mf");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
-    ModuleManager::Get().regAndLoad("aoce_agora");
+    ModuleManager::Get().unloadModule("aoce_agora");
 #endif
-    ModuleManager::Get().unloadModule("aoce_vulkan");
+#if defined(AOCE_INSTALL_FFMPEG)
+    ModuleManager::Get().unloadModule("aoce_ffmpeg");
+#endif
 }

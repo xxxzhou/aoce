@@ -124,6 +124,11 @@ enum class LiveType {
     agora,
 };
 
+enum class MediaPlayType {
+    other,
+    ffmpeg,
+};
+
 // 视频设备输出格式
 struct VideoFormat {
     int32_t index = -1;
@@ -137,11 +142,13 @@ struct ImageFormat {
     int32_t width = 0;
     int32_t height = 0;
     ImageType imageType = ImageType::other;
-    inline bool operator==(const ImageFormat& right) {
+
+    inline bool operator==(const ImageFormat &right) {
         return this->width == right.width && this->height == right.height &&
                this->imageType == right.imageType;
     }
-    inline ImageFormat& operator=(const ImageFormat& right) {
+
+    inline ImageFormat &operator=(const ImageFormat &right) {
         if (this != &right) {
             width = right.width;
             height = right.height;
@@ -178,7 +185,7 @@ struct VideoFrame {
     int64_t timeStamp;
     VideoType videoType = VideoType::other;
     // 如果videoType非YUV平面格式,则只需填充data[0]里的空间
-    uint8_t* data[4];
+    uint8_t *data[4];
     // 大于等于width,满足整除32/16/8类型的值,同上非YUV平面格式,只有[0]里的值有意义
     int32_t dataAlign[4];
 };
@@ -192,7 +199,7 @@ struct AudioFrame {
     int64_t timeStamp;
     // 先定义为frame里一个通道的byte长度
     int32_t dataSize;
-    uint8_t* data[2];
+    uint8_t *data[2];
 };
 
 }  // namespace aoce
@@ -201,11 +208,16 @@ extern "C" {
 
 ACOE_EXPORT void setLogAction(logEventAction action);
 
-ACOE_EXPORT void logMessage(AOCE_LOG_LEVEL level, const char* message);
+ACOE_EXPORT void logMessage(AOCE_LOG_LEVEL level, const char *message);
 
 ACOE_EXPORT long long getNowTimeStamp();
 
 ACOE_EXPORT void loadAoce();
 
 ACOE_EXPORT void unloadAoce();
+
+#if __ANDROID__
+// ACOE_EXPORT jint JNI_OnLoad(JavaVM *jvm, void *);
+// ACOE_EXPORT void JNI_OnUnload(JavaVM *jvm, void *);
+#endif
 }

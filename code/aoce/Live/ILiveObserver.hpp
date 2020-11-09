@@ -7,12 +7,12 @@ namespace aoce {
 // 请用户继承此类,相应回调会转到此类上
 // 网络交互,所以相应流程 提交->服务器应答->处理
 // 这里的回调是相应提交后返回的服务器应答,在子类应答里填写的实现就是处理
-class ACOE_EXPORT LiveCallback {
+class ACOE_EXPORT ILiveObserver {
    private:
     /* data */
    public:
-    LiveCallback(/* args */);
-    virtual ~LiveCallback();
+    ILiveObserver(/* args */);
+    virtual ~ILiveObserver();
 
    public:
     // 网络发生的各种情况与处理码,如断网,网络情况不好等

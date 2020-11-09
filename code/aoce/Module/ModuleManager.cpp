@@ -170,32 +170,17 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
     }
     return TRUE;
 }
-#elif __ANDROID__
-static bool bAttach = false;
-jint JNI_OnLoad(JavaVM* jvm, void*) {
-    JNIEnv* jni_env = nullptr;
-    int ret = jvm->GetEnv((void**)&jni_env, JNI_VERSION_1_6);
-    aoce::AoceManager::Get().setJNIEnv(jni_env);
-    if (ret == JNI_EDETACHED) {
-        if (jvm->AttachCurrentThread(&jni_env, 0) != 0) {
-            logMessage(aoce::LogLevel::warn,
-                       "andorid jni attach thread failed");
-        } else {
-            bAttach = true;
-            logMessage(aoce::LogLevel::info,
-                       "andorid jni attach thread success");
-        }
-    } else {
-        logMessage(aoce::LogLevel::info, "andorid jni have attach.");
-    }
-    return JNI_VERSION_1_6;
-}
 
-void JNI_OnUnload(JavaVM* jvm, void*) {
-    if(bAttach){
-        JNIEnv* jni_env = nullptr;
-        int ret = jvm->GetEnv((void**)&jni_env, JNI_VERSION_1_6);
-        jvm->DetachCurrentThread();
-    }
-}
+#elif __ANDROID__
+
+//static bool bAttach = false;
+//jint JNI_OnLoad(JavaVM* jvm, void*) {
+//    aoce::AndroidEnv androidEnv = {};
+//    androidEnv.vm = jvm;
+//    // aoce::AoceManager::Get().initAndroid(androidEnv);
+//}
+//
+//void JNI_OnUnload(JavaVM* jvm, void*) {
+//    aoce::AoceManager::Get().detachThread();
+//}
 #endif

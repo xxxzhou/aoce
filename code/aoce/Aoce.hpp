@@ -87,6 +87,8 @@ void string_format(std::string& msg, Args... args) {
 
 ACOE_EXPORT void logMessage(aoce::LogLevel level, const std::string& message);
 
+ACOE_EXPORT void logAssert(bool expression, const std::string& message);
+
 ACOE_EXPORT std::wstring utf8TWstring(const std::string& str);
 ACOE_EXPORT std::string utf8TString(const std::wstring& str);
 
@@ -107,13 +109,8 @@ ACOE_EXPORT aoce::ImageFormat videoFormat2ImageFormat(
 
 ACOE_EXPORT int32_t getImageTypeSize(const aoce::ImageType& imageType);
 
-// SP/P格式可能非紧密排列,这种情况下返回需要的紧密排列大小,否则返回0
+// 平面格式可能非紧密排列,给GPU的紧密排列大小,否则返回0
 ACOE_EXPORT int32_t getVideoFrame(const aoce::VideoFrame& frame,
                                   uint8_t* data = nullptr);
 
 ACOE_EXPORT std::string getAocePath();
-
-#if __ANDROID__
-ACOE_EXPORT jint JNI_OnLoad(JavaVM* jvm, void*);
-ACOE_EXPORT void JNI_OnUnload(JavaVM* jvm, void*);
-#endif

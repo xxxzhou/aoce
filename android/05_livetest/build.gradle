@@ -35,6 +35,11 @@ android {
             path "../../CMakeLists.txt"
         }
     }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+    // ndkVersion '21.1.6352462'
 }
 
 task copyTask {
@@ -45,22 +50,24 @@ task copyTask {
     }
 }
 
-//task copyLibs(type: Copy) {
-//    from ('../.externalNativeBuild/cmake/debug/armeabi-v7a/lib') {
-//        include '**/*.so'
-//    }
-//    into 'src/main/jniLibs'
-//}
-//
-//tasks.whenTaskAdded { task ->
-//    if (task.name ==  'bundleDebug') {
-//        task.dependsOn copyLibs
-//    }
-//}
+task copyAgorg {
+    copy {
+        from '../../thirdparty/agora/android'
+        into 'libs'
+        include('**/*.*')
+    }
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name ==  'bundleDebug') {
+        task.dependsOn copyAgorg
+    }
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support.constraint:constraint-layout:2.0.1'
-    implementation 'android.arch.navigation:navigation-fragment:1.0.0'
-    implementation 'android.arch.navigation:navigation-ui:1.0.0'
+    //for permission
+    implementation 'com.yanzhenjie:permission:2.0.3'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 }

@@ -1,5 +1,5 @@
 /build
-/thirdparty
+/thirdparty/
 code/aoce_agora/
 android/base/CMakeFiles/
 android/base/cmake_install.cmake

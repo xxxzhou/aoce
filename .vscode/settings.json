@@ -70,6 +70,7 @@
         "concepts": "cpp",
         "compare": "cpp",
         "*.in": "cpp",
-        "atomic": "cpp"
+        "atomic": "cpp",
+        "unordered_set": "cpp"
     }
 }

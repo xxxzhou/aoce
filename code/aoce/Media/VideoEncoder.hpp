@@ -18,8 +18,9 @@ enum class VideoRateControl {
 };
 
 struct VideoEncoderParamet {
-    VideoStream stream = {};
+    // 码率控制 
     VideoRateControl rateControl = VideoRateControl::none;
+    VideoStream stream = {};    
 };
 
 class VideoEncoder {
@@ -37,6 +38,6 @@ class VideoEncoder {
 
    public:
     virtual void input(const VideoFrame& frame) = 0;
-    virtual void output(const EncoderOut& packet) = 0;
+    virtual void output(EncoderOut& packet) = 0;
 };
 }  // namespace aoce

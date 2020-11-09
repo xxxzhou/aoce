@@ -19,7 +19,8 @@ file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURC
 add_sub_path(Module AOCE_HEADER AOCE_SOURCE)
 add_sub_path(VideoDevice AOCE_HEADER AOCE_SOURCE)
 add_sub_path(Layer AOCE_HEADER AOCE_SOURCE)
-add_sub_path(Live AOCE_HEADER AOCE_SOURCE) 
+add_sub_path(Live AOCE_HEADER AOCE_SOURCE)  
+add_sub_path(Media AOCE_HEADER AOCE_SOURCE)  
 
 message("aoce head--" ${AOCE_HEADER})
 message("aoce source--" ${AOCE_SOURCE})   
@@ -27,6 +28,7 @@ message("aoce source--" ${AOCE_SOURCE})
 add_definitions(-DAOCE_EXPORT_DEFINE)
 add_library(aoce SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
 if(ANDROID)
+    include_directories(${ANDROID_NDK}/sources/android/native_app_glue) 
     target_link_libraries(aoce android log)
 endif()
 

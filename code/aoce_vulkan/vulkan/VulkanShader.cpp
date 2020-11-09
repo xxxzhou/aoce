@@ -21,9 +21,8 @@ void VulkanShader::loadShaderModule(VkDevice device, std::string path,
                                     VkShaderStageFlagBits shaderFlag) {
     release();
 #if defined(__ANDROID__)
-    auto* activeity = AoceManager::Get().getApp()->activity;
-    assert(activeity != nullptr);
-    AAssetManager* assetManager = activeity->assetManager;
+    AAssetManager* assetManager = AoceManager::Get().getAppEnv().assetManager;
+    assert(assetManager != nullptr);
     shaderModule = loadShader(assetManager, path.c_str(), device);
 #else
     shaderModule = loadShader(path.c_str(), device);

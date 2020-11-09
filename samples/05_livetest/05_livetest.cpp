@@ -1,5 +1,5 @@
 #include <AoceManager.hpp>
-#include <Live/LiveCallback.hpp>
+#include <Live/ILiveObserver.hpp>
 #include <Live/LiveRoom.hpp>
 #include <Module/ModuleManager.hpp>
 #include <iostream>
@@ -35,7 +35,7 @@ static GpuType gpuType = GpuType::vulkan;
 static bool bFill = true;
 static std::vector<uint8_t> data;
 
-class TestLive : public LiveCallback {
+class TestLive : public ILiveObserver {
    private:
     LiveRoom *room = nullptr;
 
@@ -151,24 +151,25 @@ static TestLive *live = nullptr;
 
 #if _WIN32
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
-#else __ANDROID__
-
-void android_main(struct android_app *app)
-#endif
 {
     loadAoce();
 #if __ANDROID__
     app_dummy();
+    // 如果是要用nativewindow,请使用这个
+    bool battach = false;
     AoceManager::Get().initAndroid(app);
-    AoceManager::Get().setJNIEnv(app->activity->env);
-    AoceManager::Get().getJNIContext();
-#endif
+    std::thread test([&](){
+        JNIEnv* env = AoceManager::Get().getEnv(battach);
 
+    });
+    test.join();
+#endif
     // 生成一张执行图
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
+    // 输出GPU数据
     outputLayer->updateParamet({false, true});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     // 生成图
@@ -198,3 +199,21 @@ void android_main(struct android_app *app)
     window->run();
     unloadAoce();
 }
+#endif
+
+#if __ANDROID__
+
+extern "C" JNIEXPORT jint JNICALL
+Java_aoce_samples_livetest_MainActivity_initEngine(JNIEnv *env, jobject thiz, jobject j_context) {
+    loadAoce();
+    void* android_app_context = reinterpret_cast<void*>(env->NewGlobalRef(j_context));
+    LiveRoom *room = AoceManager::Get().getLiveRoom(LiveType::agora);
+    live = new TestLive(room);
+    AgoraContext contex = {};
+    contex.bLoopback = true;
+    contex.context = android_app_context;
+    room->initRoom(&contex, live);
+    room->loginRoom("123", 5, 0);
+    return 0;
+}
+#endif
