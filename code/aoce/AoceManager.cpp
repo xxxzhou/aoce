@@ -30,7 +30,7 @@ void AoceManager::initAndroid(android_app *app) {
     AndroidEnv temp = {};
     temp.vm = app->activity->vm;
     // temp.env = app->activity->env;
-    temp.activity = app->activity->clazz;
+    // temp.activity = app->activity->clazz;
     temp.assetManager = app->activity->assetManager;
     temp.sdkVersion = app->activity->sdkVersion;
     initAndroid(temp);
@@ -42,17 +42,20 @@ void AoceManager::initAndroid(const AndroidEnv &andEnv) {
         androidEnv.sdkVersion = JNI_VERSION_1_6;
     }
     jobject active = androidEnv.activity;
-    JNIEnv *env = getEnv(bAttach);
-    androidEnv.env = env;
+    if(!androidEnv.env) {
+        JNIEnv *env = getEnv(bAttach);
+        androidEnv.env = env;
+    }
+    JNIEnv *env = androidEnv.env;
+    jobject applicationContext = nullptr;
     if (active) {
         jclass contextClass = env->FindClass("android/content/Context");
         jmethodID getApplicationContextMethod =
             env->GetMethodID(contextClass, "getApplicationContext",
                              "()Landroid/content/Context;");
         assert(getApplicationContextMethod != 0);
-        jobject applicationContext =
+        applicationContext =
             env->CallObjectMethod(active, getApplicationContextMethod);
-        androidEnv.application = applicationContext;
     } else {
         //获取Activity Thread的实例对象
         jclass activityThreadCls = env->FindClass("android/app/ActivityThread");
@@ -64,17 +67,18 @@ void AoceManager::initAndroid(const AndroidEnv &andEnv) {
         //获取Application，也就是全局的Context
         jmethodID getApplication = env->GetMethodID(
             activityThreadCls, "getApplication", "()Landroid/app/Application;");
-        androidEnv.application =
+        applicationContext =
             env->CallObjectMethod(activityThread, getApplication);
     }
-    if (androidEnv.application) {
+    androidEnv.application = env->NewGlobalRef(applicationContext);
+    if (androidEnv.application && !androidEnv.assetManager) {
         jmethodID methodGetAssets = env->GetMethodID(
             env->GetObjectClass(androidEnv.application), "getAssets",
             "()Landroid/content/res/AssetManager;");
         jobject localAssetManager =
             env->CallObjectMethod(androidEnv.application, methodGetAssets);
-//        jobject globalAssetManager = env->NewGlobalRef(localAssetManager);
-//        AAssetManager* gAssetManager = AAssetManager_fromJava(env, globalAssetManager);
+        jobject globalAssetManager = env->NewGlobalRef(localAssetManager);
+        androidEnv.assetManager = AAssetManager_fromJava(env, globalAssetManager);
     }
 }
 
@@ -105,6 +109,9 @@ void AoceManager::detachThread() {
     jint ret =
         androidEnv.vm->GetEnv((void **)&threadEnv, androidEnv.sdkVersion);
     if (ret >= 0 && threadEnv != nullptr) {
+        if(androidEnv.application){
+            threadEnv->DeleteGlobalRef(androidEnv.application);
+        }
         androidEnv.vm->DetachCurrentThread();
     }
 }

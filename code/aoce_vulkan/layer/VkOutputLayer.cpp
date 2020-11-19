@@ -1,6 +1,6 @@
 #include "VkOutputLayer.hpp"
-
 #include "../vulkan/VulkanManager.hpp"
+#include "VkPipeGraph.hpp"
 namespace aoce {
 namespace vulkan {
 namespace layer {
@@ -21,6 +21,11 @@ void VkOutputLayer::onInitGraph() {
     eventInfo.flags = 0;
     vkCreateEvent(context->device, &eventInfo, nullptr, &outEvent);
     vkSetEvent(context->device, outEvent);
+
+#if __ANDROID__
+    hardwareImage = std::make_unique<HardwareImage>();
+    // hardwareImage->createAndroidBuffer(format);
+#endif
 }
 
 void VkOutputLayer::onInitVkBuffer() {
@@ -68,6 +73,14 @@ void VkOutputLayer::onPreCmd() {
         outTex->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                            VK_PIPELINE_STAGE_TRANSFER_BIT);
         VulkanManager::copyImage(cmd, inTexs[0].get(), outTex.get());
+#if __ANDROID_API__ >= 26
+        if(hardwareImage->getImage()){
+            changeLayout(cmd, hardwareImage->getImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                         VK_PIPELINE_STAGE_TRANSFER_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+            VulkanManager::blitFillImage(cmd, inTexs[0].get(), hardwareImage->getImage(),
+                                         hardwareImage->getFormat().width, hardwareImage->getFormat().height);
+        }
+#endif
         // vkCmdSetEvent(cmd, outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT);
     }
 }
@@ -79,7 +92,7 @@ void VkOutputLayer::outGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
     // GPU输出
     VkCommandBuffer copyCmd = (VkCommandBuffer)outVkTex.commandbuffer;
     VkImage copyImage = (VkImage)outVkTex.image;
-    auto res = vkGetEventStatus(context->device, outEvent);
+    // auto res = vkGetEventStatus(context->device, outEvent);
     // assert(res != VK_EVENT_RESET);
     outTex->addBarrier(copyCmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                        VK_PIPELINE_STAGE_TRANSFER_BIT);
@@ -87,6 +100,39 @@ void VkOutputLayer::outGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
                                  outVkTex.width, outVkTex.height);
     // vkCmdSetEvent(cmd, outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT);
 }
+
+#if __ANDROID__
+void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, int32_t outIndex) {
+    ImageFormat format = hardwareImage->getFormat();
+    if(format.width !=  outTex.width || format.height != outTex.height) {
+        format.width = outTex.width;
+        format.height = outTex.height;
+        format.imageType == ImageType::rgba8;
+        hardwareImage->createAndroidBuffer(format);
+        hardwareImage->bindGL(outTex.image);
+        // 重新生成cmdbuffer
+        this->getGraph()->reset();
+    }
+    // hardwareImage->bindGL(outTex.image);
+//    //test
+//    AHardwareBuffer* buffer = hardwareImage->getHarderBuffer();
+//    if(buffer){
+//        void* shared_buffer;
+//        int ret = AHardwareBuffer_lock(buffer,
+//                                   AHARDWAREBUFFER_USAGE_CPU_WRITE_MASK,
+//                                   -1, // no fence in demo
+//                                   NULL,
+//                                   &shared_buffer);
+//        uint8_t* data = (uint8_t*)shared_buffer;
+//        uint8_t  xx = *data;
+//        uint8_t  xx1 = *(data+100);
+//        uint8_t  xx2 = *(data+1000);
+//        uint8_t  xx3 = *(data+10000);
+//        uint8_t  xx4 = *(data+2000);
+//        ret = AHardwareBuffer_unlock(buffer, NULL);
+//    }
+}
+#endif
 
 }  // namespace layer
 }  // namespace vulkan

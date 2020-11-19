@@ -1,1 +1,6 @@
-<resources></resources>
+<resources>
+    <string name="btnOpen">打开</string>
+    <string name="label_vulkan">vulkan 显示</string>
+    <string name="label_opengl_es">opengl es 显示</string>
+    <string name="rtmp_text">rtmp://202.69.69.180:443/webcast/bshdlive-pc</string>
+</resources>

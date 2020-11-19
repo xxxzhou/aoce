@@ -12,6 +12,7 @@ VkYUV2RGBALayer::~VkYUV2RGBALayer() {}
 void VkYUV2RGBALayer::onInitGraph() {
     int32_t yuvType = getYuvIndex(paramet.type);
     assert(yuvType > 0);
+    // nv12/yuv420P/yuy2P
     std::string path = "glsl/yuv2rgbaV1.comp.spv";
     if (yuvType > 3) {
         path = "glsl/yuv2rgbaV2.comp.spv";

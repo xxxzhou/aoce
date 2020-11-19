@@ -20,7 +20,7 @@ bool MfModule::loadModule() {
         hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
         hr = MFStartup(MF_VERSION);
     }
-    logHResult(hr, "CoInitialize");
+    logHResult(hr, "coInitialize");
     AoceManager::Get().addVideoManager(CameraType::win_mf,
                                        new MFVideoManager());
     return SUCCEEDED(hr);

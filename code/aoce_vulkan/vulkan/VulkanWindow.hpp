@@ -17,16 +17,17 @@
 
 namespace aoce {
 namespace vulkan {
-#if WIN32
-template class AOCE_VULKAN_EXPORT std::unique_ptr<VulkanTexture>;
-template class AOCE_VULKAN_EXPORT std::vector<VkImage>;
-template class AOCE_VULKAN_EXPORT std::vector<VkImageView>;
-template class AOCE_VULKAN_EXPORT std::vector<VkFramebuffer>;
-template class AOCE_VULKAN_EXPORT std::vector<VkCommandBuffer>;
-template class AOCE_VULKAN_EXPORT std::unique_ptr<Win32Window>;
-template class AOCE_VULKAN_EXPORT std::function<void(uint32_t)>;
-template class AOCE_VULKAN_EXPORT std::function<void()>;
-#endif
+
+// #if WIN32
+// template class AOCE_VULKAN_EXPORT std::unique_ptr<VulkanTexture>;
+// template class AOCE_VULKAN_EXPORT std::vector<VkImage>;
+// template class AOCE_VULKAN_EXPORT std::vector<VkImageView>;
+// template class AOCE_VULKAN_EXPORT std::vector<VkFramebuffer>;
+// template class AOCE_VULKAN_EXPORT std::vector<VkCommandBuffer>;
+// template class AOCE_VULKAN_EXPORT std::unique_ptr<Win32Window>;
+// template class AOCE_VULKAN_EXPORT std::function<void(uint32_t)>;
+// template class AOCE_VULKAN_EXPORT std::function<void()>;
+// #endif
 
 typedef std::function<void(uint32_t)> cmdExecuteHandle;
 
@@ -78,7 +79,8 @@ class AOCE_VULKAN_EXPORT VulkanWindow {
    public:
     // int32_t graphicsQueueIndex = UINT32_MAX;
     int32_t presentQueueIndex = UINT32_MAX;
-    VkFormat format = VK_FORMAT_B8G8R8A8_UNORM;
+    // VkFormat format = VK_FORMAT_B8G8R8A8_UNORM;
+    VkSurfaceFormatKHR format = {};
     VkFormat depthFormat = VK_FORMAT_D16_UNORM;
     uint32_t width;
     uint32_t height;

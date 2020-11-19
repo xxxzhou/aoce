@@ -56,14 +56,17 @@ if(WIN32)
 endif()
 
 if(ANDROID)
-    # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue ${AOCE_HEADER_DIR} ${AOCE_VULKAN_HEADER_DIR} ${Vulkan_INCLUDE_DIR})
     add_library(native-app-glue STATIC ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
-    #generate(04_vulkantest FALSE aoce_vulkan ${Vulkan_LIBRARY})    
+    
     add_library(04_vulkantest SHARED 04_vulkantest/04_vulkantest.cpp)
     target_link_libraries(04_vulkantest android native-app-glue aoce aoce_vulkan)
     
     add_library(05_livetest SHARED 05_livetest/05_livetest.cpp)
-    target_link_libraries(05_livetest android aoce aoce_vulkan)
+    target_link_libraries(05_livetest android native-app-glue aoce aoce_vulkan)
+
+    add_library(06_mediaplayer SHARED 06_mediaplayer/06_mediaplayer.cpp)
+    target_link_libraries(06_mediaplayer android aoce aoce_vulkan aoce_ffmpeg)
 endif()

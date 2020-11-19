@@ -7,6 +7,8 @@
 #include <vulkan/VulkanContext.hpp>
 #include <vulkan/VulkanWindow.hpp>
 
+// #define TEST_FIX_DATA
+
 #ifdef __ANDROID__
 
 #include <android/native_activity.h>
@@ -15,6 +17,11 @@
 #include "../../code/aoce/Aoce.h"
 #include "errno.h"
 
+#define TEST_FIX_DATA
+#endif
+
+#if !defined(TEST_FIX_DATA)
+#define TEST_VIDEO_SHOW 1
 #endif
 
 using namespace aoce;
@@ -67,10 +74,10 @@ void android_main(struct android_app *app)
     AoceManager::Get().initAndroid(app);
 #endif
     loadAoce();
-#if _WIN32
+#if TEST_VIDEO_SHOW
     auto &deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
-    std::cout << "deivce count:" << deviceList.size() << std::endl;    
+    std::cout << "deivce count:" << deviceList.size() << std::endl;
     VideoDevicePtr video = deviceList[index];
     video->setVideoFrameHandle(onDrawFrame);
     std::wstring name((wchar_t *)video->getName().data());
@@ -95,8 +102,8 @@ void android_main(struct android_app *app)
     selectFormat.width = 1920;
     selectFormat.height = 1080;
     selectFormat.videoType = VideoType::nv12;
-    std::vector<uint8_t> tempData(
-        selectFormat.width * selectFormat.height * 3 / 2, 255);
+    std::vector<uint8_t> tempData(selectFormat.width * selectFormat.height * 4,
+                                  255);
     for (int i = 0; i < selectFormat.height; i++) {
         for (int j = 0; j < selectFormat.width; j++) {
             float value = (float)j / selectFormat.width;
@@ -110,7 +117,7 @@ void android_main(struct android_app *app)
     auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
-    outputLayer->updateParamet({false, true});
+    outputLayer->updateParamet({true, true});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     VideoType videoType = selectFormat.videoType;
     if (selectFormat.videoType == VideoType::mjpg) {
@@ -123,21 +130,20 @@ void android_main(struct android_app *app)
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
     // 设定输入格式
     inputLayer->setImage(selectFormat);
-
-#if _WIN32
-    // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
-    window = std::make_unique<VulkanWindow>(onPreCommand, false);
-    window->initWindow(hInstance, 1280, 720, "vulkan test");
-#else  // __ANDROID__
+#if !TEST_VIDEO_SHOW
     inputLayer->inputCpuData(tempData.data());
     vkGraph->run();
+#endif
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
-    window = std::make_unique<VulkanWindow>(onPreCommand, true);
+    window = std::make_unique<VulkanWindow>(onPreCommand, false);
+#if _WIN32
+    window->initWindow(hInstance, 1280, 720, "vulkan test");
+#else
     window->initWindow();
 #endif
     window->run();
 
-#if _WIN32
+#if TEST_VIDEO_SHOW
     video.reset();
 #endif
     unloadAoce();

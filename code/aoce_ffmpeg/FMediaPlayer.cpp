@@ -21,7 +21,7 @@ FMediaPlayer::~FMediaPlayer() { release(); }
 
 void FMediaPlayer::onError(PlayStatus status, const std::string& msg,
                            int32_t ret) {
-    if (ret == 0) {
+    if (ret != 0) {
         logFFmpegRet(ret, msg);
     }
     if (observer) {
@@ -39,12 +39,18 @@ void FMediaPlayer::prepare(bool bAsync) {
               "media play current status is not init");
     status = PlayStatus::preparing;
     int32_t ret = 0;
-    auto& preMedia = [&]() {
+    auto preMedia = [&]() {
         AVFormatContext* temp = avformat_alloc_context();
         temp->interrupt_callback.callback = decode_interrupt_cb;
         temp->interrupt_callback.opaque = this;
-        if ((ret = avformat_open_input(&temp, uri.c_str(), 0, nullptr)) < 0) {
+        AVDictionary* dict = nullptr;
+        av_dict_set(&dict, "rw_timeout", "3000000", 0);
+        av_dict_set(&dict, "max_delay", "3000000", 0);
+        av_dict_set(&dict, "rtsp_transport", "tcp", 0);  //采用tcp传输
+        av_dict_set(&dict, "stimeout", "2000000", 0);
+        if ((ret = avformat_open_input(&temp, uri.c_str(), 0, &dict)) < 0) {
             avformat_free_context(temp);
+            av_dict_free(&dict);
             onError(PlayStatus::preparing,
                     "media play avformat open input error.", ret);
             return;
@@ -66,7 +72,7 @@ void FMediaPlayer::prepare(bool bAsync) {
                     return;
                 }
                 videoCtx = getUniquePtr(temp);
-                //如fmtCtx->streams[videoIndex]->codecpar里包含了AV_PIX_FMT_YUV422P数据
+                // 如fmtCtx->streams[videoIndex]->codecpar里包含了AV_PIX_FMT_YUV422P数据
                 avcodec_parameters_to_context(
                     videoCtx.get(), fmtCtx->streams[videoIndex]->codecpar);
                 if ((ret = avcodec_open2(videoCtx.get(), codec, nullptr)) < 0) {
@@ -97,7 +103,7 @@ void FMediaPlayer::prepare(bool bAsync) {
                     return;
                 }
                 audioCtx = getUniquePtr(temp);
-                //如fmtCtx->streams[videoIndex]->codecpar里包含了AV_PIX_FMT_YUV422P数据
+                // 如fmtCtx->streams[videoIndex]->codecpar里包含了AV_PIX_FMT_YUV422P数据
                 avcodec_parameters_to_context(
                     audioCtx.get(), fmtCtx->streams[audioIndex]->codecpar);
                 if ((ret = avcodec_open2(audioCtx.get(), codec, nullptr)) < 0) {
@@ -105,7 +111,7 @@ void FMediaPlayer::prepare(bool bAsync) {
                             "media play cannot open audio decoder.", ret);
                     return;
                 }
-                //分配音频重采样(原始数据格式如果是平面格式，转化成交叉格式与单通)
+                // 分配音频重采样(原始数据格式如果是平面格式，转化成交叉格式与单通)
                 auto tempSwr = swr_alloc_set_opts(
                     nullptr, outLayout, outSampleFormat, audioCtx->sample_rate,
                     av_get_default_channel_layout(audioCtx->channels),
@@ -165,7 +171,7 @@ void FMediaPlayer::start() {
                 return;
             }
         }
-        int64_t minPts = _I64_MAX;
+        int64_t minPts = INT64_MAX;
         int64_t minNowMs = 0;
         while (status == PlayStatus::started) {
             AVPacket packet;

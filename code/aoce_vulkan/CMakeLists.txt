@@ -34,14 +34,20 @@ elseif(ANDROID)
 endif()
 
 add_library(aoce_vulkan SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
-target_link_libraries(aoce_vulkan ${Vulkan_LIBRARY} aoce)
+if(WIN32)
+    target_link_libraries(aoce_vulkan ${Vulkan_LIBRARY} aoce)
+elseif(ANDROID)
+    find_library(OPENGLES3_LIBRARY GLESv2 "OpenGL ES v3.0 library")
+    find_library(EGL_LIBRARY EGL "EGL 1.4 library" )
+    target_link_libraries(aoce_vulkan ${Vulkan_LIBRARY} android aoce ${OPENGLES3_LIBRARY} ${EGL_LIBRARY})
+endif()
 
 aoce_output(aoce_vulkan)   
 
 # 复制glsl文件到bin目录
 file(GLOB AOCE_SPV_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/glsl/*.spv" )
 message(STATUS "aoce_vulkan_glsl: " ${AOCE_SPV_SOURCE})          
-message(STATUS "aoce_vulkan_glsl_dst: " ${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl) 
+message(STATUS "aoce_vulkan_glsl_dst: " ${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl)  
 file(COPY ${AOCE_SPV_SOURCE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl")     
 # add_custom_command(
 #     TARGET aoce_vulkan POST_BUILD

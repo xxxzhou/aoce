@@ -20,8 +20,8 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
 
    protected:
 #if WIN32
-    int32_t groupX = 32;
-    int32_t groupY = 8;
+    int32_t groupX = 16;
+    int32_t groupY = 16;
 #else
     int32_t groupX = 16;
     int32_t groupY = 16;

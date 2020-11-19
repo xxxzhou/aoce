@@ -18,3 +18,4 @@ android/*/.cxx/
 android/*/libs/
 android/.idea/
 android/.gradle/
+android/android.zip

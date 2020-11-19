@@ -62,16 +62,25 @@ macro(ffmepg_find_component component header)
     endif()
 endmacro()
 
-ffmepg_find_component("avcodec" "avcodec.h")
-ffmepg_find_component("swresample" "swresample.h")
-ffmepg_find_component("avutil" "avutil.h")
-ffmepg_find_component("avformat" "avformat.h")
-
+if(WIN32)
+    ffmepg_find_component("avcodec" "avcodec.h")
+    ffmepg_find_component("swresample" "swresample.h")
+    ffmepg_find_component("avutil" "avutil.h")
+    ffmepg_find_component("avformat" "avformat.h")
+    include(FindPackageHandleStandardArgs)
+    find_package_handle_standard_args(FFmpeg
+        FOUND_VAR FFMPEG_FOUND
+        REQUIRED_VARS FFMPEG_AVCODEC_LIBRARIES FFMPEG_AVCODEC_INCLUDE_DIRS
+        VERSION_VAR FFMPEG_AVCODEC_VERSION_STRING
+        HANDLE_COMPONENTS)
+elseif(ANDROID)
+    find_path(FFMPEG_INCLUDE_DIRS NAME libavcodec/avcodec.h HINTS ${FFmpeg_INC_SEARCH_PATH} PATH_SUFFIXES)
+    find_library(FFMPEG_LIBRARIES NAME ffmpeg HINTS ${FFmpeg_LIB_SEARCH_PATH} PATH_SUFFIXES armeabi-v7a arm64-v8a)
+    message(STATUS "android ffmpeg inc:" ${FFMPEG_INCLUDE_DIRS})
+    message(STATUS "android ffmpeg lib:" ${FFMPEG_LIBRARIES})
+    if(FFMPEG_INCLUDE_DIRS AND FFMPEG_LIBRARIES)
+        set(FFmpeg_FOUND TRUE)        
+    endif()
+endif()
+    
 end_android_find_host()
-
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FFmpeg
-	FOUND_VAR FFMPEG_FOUND
-	REQUIRED_VARS FFMPEG_AVCODEC_LIBRARIES FFMPEG_AVCODEC_INCLUDE_DIRS
-	VERSION_VAR FFMPEG_AVCODEC_VERSION_STRING
-	HANDLE_COMPONENTS)

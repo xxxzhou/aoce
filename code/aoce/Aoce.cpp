@@ -71,8 +71,7 @@ void logMessage(aoce::LogLevel level, const std::string& message) {
 
 void logAssert(bool expression, const std::string& message) {
     if (!expression) {
-        logMessage(LogLevel::error, message);
-        assert(expression);
+        logMessage(LogLevel::error, message);        
     }
 }
 
@@ -91,7 +90,7 @@ std::wstring utf8TWstring(const std::string& str) {
     if (str.empty()) {
         return std::wstring();
     }
-#if defined WIN32
+#if WIN32
     size_t len = str.length() + 1;
     std::wstring ret = std::wstring(len, 0);
     int size = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, &str[0],

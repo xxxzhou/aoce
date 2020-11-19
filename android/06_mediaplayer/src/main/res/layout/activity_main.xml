@@ -4,6 +4,67 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context="aoce.samples.mediaplayer.MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="79dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnJoin"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/btnOpen"></Button>
+
+            <EditText
+                android:id="@+id/roomName"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:text="@string/rtmp_text"
+                android:importantForAutofill="no"></EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_vulkan">
+            </TextView>
+            <SurfaceView
+                android:id="@+id/vk_surface_view"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                app:layout_constraintTop_toBottomOf="@+id/preview">
+            </SurfaceView>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_opengl_es">
+            </TextView>
+            <android.opengl.GLSurfaceView
+                android:id="@+id/es_surface_view"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                app:layout_constraintTop_toBottomOf="@+id/preview" >
+            </android.opengl.GLSurfaceView>
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

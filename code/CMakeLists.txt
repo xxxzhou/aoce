@@ -13,8 +13,7 @@ if(AOCE_INSTALL_AGORA)
     add_subdirectory(aoce_agora)
 endif()
 
-if(NOT ANDROID)
 if(AOCE_INSTALL_FFMPEG)
     add_subdirectory(aoce_ffmpeg)
 endif()
-endif()
+

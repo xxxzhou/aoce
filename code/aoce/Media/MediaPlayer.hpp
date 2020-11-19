@@ -27,7 +27,7 @@ enum class MediaType {
 class ACOE_EXPORT IMediaPlayerObserver {
    public:
     IMediaPlayerObserver(/* args */){};
-    virtual ~IMediaPlayerObserver() {};
+    virtual ~IMediaPlayerObserver(){};
 
    public:
     // prepared后,能拿到MediaPlayer的视频与音频信息
@@ -68,6 +68,15 @@ class ACOE_EXPORT MediaPlayer {
     virtual void pause(){};
     virtual void stop() = 0;
     virtual void release(){};
+};
+
+class ACOE_EXPORT MediaPlayerFactory {
+   public:
+    MediaPlayerFactory(){};
+    virtual ~MediaPlayerFactory(){};
+
+   protected:
+    virtual MediaPlayer* createPlay() = 0;
 };
 
 }  // namespace aoce

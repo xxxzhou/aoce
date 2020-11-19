@@ -58,9 +58,30 @@ bool VulkanManager::createInstance(const char* appName) {
         physical = physicalDevices[0];
     }
     assert(physical != nullptr);
+
     std::string message = physical->properties.deviceName;
     logMessage(aoce::LogLevel::info, "select gpu: " + message);
     physicalDevice = this->physical->physicalDevice;
+#if __ANDROID__
+    uint32_t count = 0;
+    std::vector<VkExtensionProperties> extensions;
+    VkResult result = vkEnumerateDeviceExtensionProperties(
+        physicalDevice, nullptr, &count, nullptr);
+    if (result == VK_SUCCESS) {
+        extensions.resize(count);
+        result = vkEnumerateDeviceExtensionProperties(
+            physicalDevice, nullptr, &count, extensions.data());
+    }
+    for (auto& extPorperty : extensions) {
+        if (strcmp(
+                extPorperty.extensionName,
+                VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME) ==
+            0) {
+            bAndroidHardware = true;
+            break;
+        }
+    }
+#endif
     return true;
 }
 
@@ -109,6 +130,16 @@ void VulkanManager::createDevice(bool bAloneCompute) {
     deviceCreateInfo.pEnabledFeatures = nullptr;
     std::vector<const char*> deviceExtensions;
     deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+#if __ANDROID__
+    // 和android里的AHardwareBuffer交互,没有的话,相关vkGetDeviceProcAddr获取不到对应函数
+    deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME);
+#endif
     deviceCreateInfo.enabledExtensionCount = (uint32_t)deviceExtensions.size();
     deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
     VK_CHECK_RESULT(

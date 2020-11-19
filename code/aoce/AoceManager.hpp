@@ -72,8 +72,6 @@ class ACOE_EXPORT AoceManager {
 
     // 如果在线程拿过JNIEnv,退出时请调用
     void detachThread();
-
-
 #endif
    private:
     AoceManager(/* args */);

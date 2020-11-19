@@ -203,8 +203,7 @@ bool MFVideoDevice::open() {
             return false;
         }
         // 重新打开数据读取
-        return setPlay(true);
-        ;
+        return setPlay(true);       
     }
 }
 

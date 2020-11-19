@@ -41,6 +41,7 @@ class ACOE_EXPORT PipeGraph {
    public:
     // 当前图使用的gpu类型
     inline GpuType getGpuType() { return gpu; }
+    // 引发resetGraphr执行,但是不一定与当前执行同线程
     void reset() { bReset = true; }
 
     PipeNodePtr addNode(BaseLayer* layer);
@@ -48,7 +49,7 @@ class ACOE_EXPORT PipeGraph {
     bool addLine(int32_t from, int32_t to, int32_t formOut = 0,
                  int32_t toIn = 0);
     bool addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut = 0,
-                  int32_t toIn = 0);
+                 int32_t toIn = 0);
 
     void getImageFormat(int32_t nodeIndex, int32_t outputIndex,
                         ImageFormat& format);

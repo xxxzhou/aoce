@@ -84,7 +84,7 @@ void handleAppCommand(android_app* app, int32_t cmd) {
             LOGI("\n");
             window->initSurface(app->window);
             // window->winSignal.notify_all();
-            if(window->onInitWindow != nullptr){
+            if (window->onInitWindow != nullptr) {
                 window->onInitWindow();
             }
             break;
@@ -156,10 +156,22 @@ void VulkanWindow::initSurface(ANativeWindow* window)
     VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceFormatsKHR(
         physicalDevice, surface, &formatCount, surfFormats.data()));
     if (formatCount == 1 && surfFormats[0].format == VK_FORMAT_UNDEFINED) {
-        format = VK_FORMAT_B8G8R8A8_UNORM;
+        format = surfFormats[0];
+        format.format = VK_FORMAT_B8G8R8A8_UNORM;
     } else {
         assert(formatCount >= 1);
-        format = surfFormats[0].format;
+        bool bfind = false;
+        for (auto& surf : surfFormats) {
+            if (surf.format == VK_FORMAT_B8G8R8A8_UNORM ||
+                surf.format == VK_FORMAT_R8G8B8A8_UNORM) {
+                format = surf;
+                bfind = true;
+                break;
+            }
+        }
+        if (!bfind) {
+            format = surfFormats[0];
+        }
     }
     // 创建semaphore 与 submitInfo,同步渲染与命令执行的顺序
     VkSemaphoreCreateInfo semaphoreInfo = {};
@@ -249,12 +261,11 @@ void VulkanWindow::reSwapChainBefore() {
     uint32_t presentModeCount;
     VK_CHECK_RESULT(vkGetPhysicalDeviceSurfacePresentModesKHR(
         physicalDevice, surface, &presentModeCount, nullptr));
-
     std::vector<VkPresentModeKHR> presentModes(presentModeCount);
     VK_CHECK_RESULT(vkGetPhysicalDeviceSurfacePresentModesKHR(
         physicalDevice, surface, &presentModeCount, presentModes.data()));
 
-    VkExtent2D swapchainExtent;
+    VkExtent2D swapchainExtent = {};
     // width and height are either both 0xFFFFFFFF, or both not 0xFFFFFFFF.
     if (surfCapabilities.currentExtent.width == 0xFFFFFFFF) {
         // If the surface size is undefined, the size is set to
@@ -302,7 +313,7 @@ void VulkanWindow::reSwapChainBefore() {
         desiredNumberOfSwapchainImages = surfCapabilities.maxImageCount;
     }
     // Find the transformation of the surface
-    VkSurfaceTransformFlagsKHR preTransform;
+    VkSurfaceTransformFlagsKHR preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     if (surfCapabilities.supportedTransforms &
         VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
         // We prefer a non-rotated transform
@@ -334,18 +345,18 @@ void VulkanWindow::reSwapChainBefore() {
     swapchainInfo.pNext = nullptr;
     swapchainInfo.surface = surface;
     swapchainInfo.minImageCount = desiredNumberOfSwapchainImages;
-    swapchainInfo.imageFormat = format;
-    swapchainInfo.imageExtent.width = swapchainExtent.width;
-    swapchainInfo.imageExtent.height = swapchainExtent.height;
+    swapchainInfo.imageFormat = format.format;
+    swapchainInfo.imageColorSpace = format.colorSpace;
+    swapchainInfo.imageExtent = {swapchainExtent.width, swapchainExtent.height};
     swapchainInfo.preTransform = (VkSurfaceTransformFlagBitsKHR)preTransform;
     swapchainInfo.compositeAlpha = compositeAlpha;
     swapchainInfo.imageArrayLayers = 1;
     swapchainInfo.presentMode = swapchainPresentMode;
-    swapchainInfo.oldSwapchain = swapChain;
-    swapchainInfo.clipped = true;
-    swapchainInfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-    swapchainInfo.imageUsage =
-        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    swapchainInfo.oldSwapchain = oldSwapchain;
+    swapchainInfo.clipped = VK_FALSE;
+    swapchainInfo.imageUsage = VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+                               VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+                               VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
     swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     swapchainInfo.queueFamilyIndexCount = 0;
     swapchainInfo.pQueueFamilyIndices = nullptr;
@@ -372,6 +383,8 @@ void VulkanWindow::reSwapChainBefore() {
             vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
         }
         vkDestroySwapchainKHR(device, oldSwapchain, nullptr);
+        views.clear();
+        frameBuffers.clear();
     }
     VK_CHECK_RESULT(
         vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr));
@@ -387,7 +400,7 @@ void VulkanWindow::reSwapChainAfter() {
     VkImageViewCreateInfo colorAttachmentView = {};
     colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     colorAttachmentView.pNext = nullptr;
-    colorAttachmentView.format = format;
+    colorAttachmentView.format = format.format;
     colorAttachmentView.components = {
         VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B,
         VK_COMPONENT_SWIZZLE_A};
@@ -445,7 +458,7 @@ void VulkanWindow::reSwapChainAfter() {
 void VulkanWindow::createRenderPass() {
     std::array<VkAttachmentDescription, 2> attachments = {};
     // Color attachment
-    attachments[0].format = format;
+    attachments[0].format = format.format;
     attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
     attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;

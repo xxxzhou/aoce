@@ -12,6 +12,8 @@
 #ifdef __ANDROID__
 
 #include <android/native_activity.h>
+#include <android/native_window.h>
+#include <android/native_window_jni.h>
 #include <android_native_app_glue.h>
 
 #include "../../code/aoce/Aoce.h"
@@ -36,15 +38,15 @@ static bool bFill = true;
 static std::vector<uint8_t> data;
 
 class TestLive : public ILiveObserver {
-   private:
+private:
     LiveRoom *room = nullptr;
 
-   public:
+public:
     TestLive(LiveRoom *room) { this->room = room; }
 
-    ~TestLive(){};
+    ~TestLive() {};
 
-   public:
+public:
     // 网络发生的各种情况与处理码,如断网,网络情况不好等
     virtual void onEvent(int32_t operater, int32_t code, LogLevel level,
                          const std::string &msg) {
@@ -54,7 +56,7 @@ class TestLive : public ILiveObserver {
     };
 
     //
-    virtual void onInitRoom(){};
+    virtual void onInitRoom() {};
 
     // loginRoom的网络应答
     virtual void onLoginRoom(bool bReConnect = false) {
@@ -75,7 +77,7 @@ class TestLive : public ILiveObserver {
     };
 
     // 自己pushStream/stopPushStream推流回调,code不为0应该是出错了
-    virtual void onStreamUpdate(int32_t index, bool bAdd, int32_t code){};
+    virtual void onStreamUpdate(int32_t index, bool bAdd, int32_t code) {};
 
     // 别的用户pullStream/stopPullStream拉流回调
     virtual void onStreamUpdate(int32_t userId, int32_t index, bool bAdd,
@@ -108,22 +110,27 @@ class TestLive : public ILiveObserver {
             inputLayer->inputCpuData(data.data(), 0);
         }
         vkGraph->run();
+#if __ANDROID__
+        if(window) {
+            window->tick();
+        }
+#endif
     };
 
     // 用户对应流的音频桢数据
     virtual void onAudioFrame(int32_t userId, int32_t index,
-                              const AudioFrame &audioFrame){};
+                              const AudioFrame &audioFrame) {};
 
     // 推流的质量
     virtual void onPushQuality(int32_t index, int32_t quality, float fps,
-                               float kbs){};
+                               float kbs) {};
 
     // 拉流质量
     virtual void onPullQuality(int32_t userId, int32_t index, int32_t quality,
-                               float fps, float kbs){};
+                               float fps, float kbs) {};
 
     // 拿出房间
-    virtual void onLogoutRoom(){};
+    virtual void onLogoutRoom() {};
 };
 
 void onPreCommand(uint32_t index) {
@@ -151,6 +158,10 @@ static TestLive *live = nullptr;
 
 #if _WIN32
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
+#else __ANDROID__
+
+void android_main(struct android_app *app)
+#endif
 {
     loadAoce();
 #if __ANDROID__
@@ -158,11 +169,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     // 如果是要用nativewindow,请使用这个
     bool battach = false;
     AoceManager::Get().initAndroid(app);
-    std::thread test([&](){
-        JNIEnv* env = AoceManager::Get().getEnv(battach);
 
-    });
-    test.join();
 #endif
     // 生成一张执行图
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
@@ -184,6 +191,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         live = new TestLive(room);
         AgoraContext contex = {};
         contex.bLoopback = true;
+#if __ANDROID__
+        contex.context =
+                nullptr;  // AoceManager::Get().getAppEnv().application;
+#endif
         room->initRoom(&contex, live);
         room->loginRoom("123", 5, 0);
     });
@@ -199,21 +210,71 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     window->run();
     unloadAoce();
 }
-#endif
 
 #if __ANDROID__
 
-extern "C" JNIEXPORT jint JNICALL
-Java_aoce_samples_livetest_MainActivity_initEngine(JNIEnv *env, jobject thiz, jobject j_context) {
-    loadAoce();
-    void* android_app_context = reinterpret_cast<void*>(env->NewGlobalRef(j_context));
-    LiveRoom *room = AoceManager::Get().getLiveRoom(LiveType::agora);
-    live = new TestLive(room);
-    AgoraContext contex = {};
-    contex.bLoopback = true;
-    contex.context = android_app_context;
-    room->initRoom(&contex, live);
-    room->loginRoom("123", 5, 0);
+extern "C" {
+    void initRoom(JNIEnv *env, jobject thiz, jobject j_context){
+        loadAoce();
+        bool battach = false;
+        AndroidEnv andEnv = {};
+        andEnv.env = env;
+        andEnv.activity = thiz;
+        AoceManager::Get().initAndroid(andEnv);
+        // 生成一张执行图
+        vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+        auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
+        inputLayer = layerFactory->crateInput();
+        outputLayer = layerFactory->createOutput();
+        // 输出GPU数据
+        outputLayer->updateParamet({false, true});
+        yuv2rgbLayer = layerFactory->createYUV2RGBA();
+        // 生成图
+        vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
+        // 初始化agora
+        void *android_app_context =
+                reinterpret_cast<void *>(env->NewGlobalRef(j_context));
+        LiveRoom *room = AoceManager::Get().getLiveRoom(LiveType::agora);
+        live = new TestLive(room);
+        AgoraContext contex = {};
+        contex.bLoopback = true;
+        contex.context = android_app_context;
+        room->initRoom(&contex, live);
+        room->loginRoom("123", 5, 0);
+    }
+
+
+JNIEXPORT jint JNICALL Java_aoce_samples_livetest_MainActivity_initEngine(
+        JNIEnv *env, jobject thiz, jobject j_context) {
+    initRoom(env,thiz,j_context);
     return 0;
+}
+
+JNIEXPORT jint JNICALL Java_aoce_samples_livetest_VKVideoRender_initSurface(
+        JNIEnv *env, jobject thiz, jobject surface, jint width, jint height) {
+    ANativeWindow *winSurf =
+            surface ? ANativeWindow_fromSurface(env, surface) : nullptr;
+    window = std::make_unique<VulkanWindow>(onPreCommand, false);
+    window->initSurface(winSurf);
+    return 0;
+}
+
+JNIEXPORT jint JNICALL Java_aoce_samples_livetest_MainActivity3_initRoom(
+        JNIEnv *env, jobject thiz, jobject j_context) {
+    initRoom(env,thiz,j_context);
+    return 0;
+}
+
+JNIEXPORT jint JNICALL
+Java_aoce_samples_livetest_GLVideoRender_copyTex(JNIEnv *env, jobject thiz,
+                                                 jint textureId, jint width, jint height) {
+    VkOutGpuTex outGpuTex = {};
+    outGpuTex.image = textureId;
+    outGpuTex.width = width;
+    outGpuTex.height = height;
+    outputLayer->outGLGpuTex(outGpuTex);
+    return 0;
+}
+
 }
 #endif

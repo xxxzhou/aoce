@@ -9,8 +9,8 @@
 #include <vulkan/VulkanWindow.hpp>
 
 #ifdef __ANDROID__
-
 #include <android/native_activity.h>
+#include <android/native_window_jni.h>
 #include <android_native_app_glue.h>
 
 #include "../../code/aoce/Aoce.h"
@@ -37,6 +37,7 @@ static std::vector<uint8_t> data;
 static MediaPlayer *player = nullptr;
 // test rtmp
 static std::string uri = "rtmp://202.69.69.180:443/webcast/bshdlive-pc";
+// static std::string uri = "D://备份/tnmil3.flv";
 
 class TestMediaPlay : public IMediaPlayerObserver {
    public:
@@ -80,6 +81,11 @@ class TestMediaPlay : public IMediaPlayerObserver {
             inputLayer->inputCpuData(data.data(), 0);
         }
         vkGraph->run();
+#if __ANDROID__
+        if (window) {
+            window->tick();
+        }
+#endif
     };
 
     virtual void onStop() override{};
@@ -111,19 +117,8 @@ void onPreCommand(uint32_t index) {
 static TestMediaPlay *testPlay = nullptr;
 
 #if _WIN32
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
-#else __ANDROID__
-void android_main(struct android_app *app)
-#endif
-{
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
-#if __ANDROID__
-    app_dummy();
-    // 如果是要用nativewindow,请使用这个
-    AoceManager::Get().initAndroid(app);
-    AoceManager::Get().attachThread();
-#endif
-
     // 生成一张执行图
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
@@ -136,25 +131,74 @@ void android_main(struct android_app *app)
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
 
     player = AoceManager::Get().getMediaPlayer(MediaPlayType::ffmpeg);
-    // 这段在android需要窗口创建后才能用
-    std::function<void()> winINit([&]() {
-        while (!window->windowCreate()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-        testPlay = new TestMediaPlay();
-        player->setDataSource(uri);
-        player->setObserver(testPlay);
-        player->prepare(true);
-    });
-
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
     window = std::make_unique<VulkanWindow>(onPreCommand, false);
-#if _WIN32
     window->initWindow(hInstance, 1280, 720, "vulkan test");
-    winINit();
-#else  // __ANDROID__
-    window->initWindow(winINit);
-#endif
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    testPlay = new TestMediaPlay();
+    player->setDataSource(uri);
+    player->setObserver(testPlay);
+    player->prepare(true);
+
     window->run();
     unloadAoce();
 }
+#elif __ANDROID__
+
+extern "C" {
+JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_initEngine(
+    JNIEnv *env, jobject thiz) {
+    loadAoce();
+    AndroidEnv andEnv = {};
+    andEnv.env = env;
+    andEnv.activity = thiz;
+    AoceManager::Get().initAndroid(andEnv);
+    // 生成一张执行图
+    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
+    inputLayer = layerFactory->crateInput();
+    outputLayer = layerFactory->createOutput();
+    // 输出GPU数据
+    outputLayer->updateParamet({false, true});
+    yuv2rgbLayer = layerFactory->createYUV2RGBA();
+    // 生成图
+    vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
+    player = AoceManager::Get().getMediaPlayer(MediaPlayType::ffmpeg);
+    testPlay = new TestMediaPlay();   
+    player->setObserver(testPlay);    
+}
+
+JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_vkInitSurface(
+    JNIEnv *env, jobject thiz, jobject surface, jint width, jint height) {
+    ANativeWindow *winSurf =
+        surface ? ANativeWindow_fromSurface(env, surface) : nullptr;
+    window = std::make_unique<VulkanWindow>(onPreCommand, false);
+    window->initSurface(winSurf);
+}
+
+JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_glCopyTex(
+    JNIEnv *env, jobject thiz, jint textureId, jint width, jint height) {
+    VkOutGpuTex outGpuTex = {};
+    outGpuTex.image = textureId;
+    outGpuTex.width = width;
+    outGpuTex.height = height;
+    outputLayer->outGLGpuTex(outGpuTex);
+}
+
+JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_openUri(
+    JNIEnv *env, jobject thiz, jstring uri) {
+    const char *str = nullptr;
+    jboolean bCopy = false;
+    str = env->GetStringUTFChars(uri, &bCopy);
+    if (str == NULL) {
+        return;
+    }
+    // copy
+    std::string ruri = str;
+    env->ReleaseStringUTFChars(uri, str);
+    player->setDataSource(ruri);
+    player->prepare(true);
+}
+}
+
+#endif

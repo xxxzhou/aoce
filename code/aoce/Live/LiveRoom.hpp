@@ -56,9 +56,8 @@ struct AgoraContext {
     int32_t bSFEncoder = false;
     // 是否自己采集声卡
     int32_t bLoopback = false;
-#if __ANDROID__
+    // andrid下需要提供context
     void* context = nullptr;
-#endif
 };
 
 class ACOE_EXPORT LiveRoom {
