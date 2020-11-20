@@ -44,10 +44,10 @@ void FMediaPlayer::prepare(bool bAsync) {
         temp->interrupt_callback.callback = decode_interrupt_cb;
         temp->interrupt_callback.opaque = this;
         AVDictionary* dict = nullptr;
-        av_dict_set(&dict, "rw_timeout", "3000000", 0);
-        av_dict_set(&dict, "max_delay", "3000000", 0);
-        av_dict_set(&dict, "rtsp_transport", "tcp", 0);  //采用tcp传输
-        av_dict_set(&dict, "stimeout", "2000000", 0);
+        // av_dict_set(&dict, "rw_timeout", "3000000", 0);
+        // av_dict_set(&dict, "max_delay", "3000000", 0);
+        // av_dict_set(&dict, "rtsp_transport", "tcp", 0);  //采用tcp传输
+        // av_dict_set(&dict, "stimeout", "2000000", 0);
         if ((ret = avformat_open_input(&temp, uri.c_str(), 0, &dict)) < 0) {
             avformat_free_context(temp);
             av_dict_free(&dict);

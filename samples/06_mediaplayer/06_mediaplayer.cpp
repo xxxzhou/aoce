@@ -36,7 +36,9 @@ static std::vector<uint8_t> data;
 
 static MediaPlayer *player = nullptr;
 // test rtmp
-static std::string uri = "rtmp://202.69.69.180:443/webcast/bshdlive-pc";
+// static std::string uri = "rtmp://202.69.69.180:443/webcast/bshdlive-pc";
+static std::string uri = "rtmp://58.200.131.2:1935/livetv/hunantv";
+// rtmp://58.200.131.2:1935/livetv/hunantv
 // static std::string uri = "D://备份/tnmil3.flv";
 
 class TestMediaPlay : public IMediaPlayerObserver {

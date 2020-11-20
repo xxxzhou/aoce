@@ -3,6 +3,9 @@
 #include "../vulkan/VulkanManager.hpp"
 #include "vulkan_wrapper.h"
 
+// https://source.android.com/devices/graphics/implement-vulkan?hl=zh-cn
+// vkQueueSignalReleaseImageANDROID
+
 #define LOAD_PROC(NAME, TYPE) \
     NAME = reinterpret_cast<TYPE>(eglGetProcAddress(#NAME))
 

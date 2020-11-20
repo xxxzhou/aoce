@@ -61,6 +61,4 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture,IVK
     public native void glCopyTex(int textureId, int width, int height);
     public native void vkInitSurface(Surface surface,int width,int height);
     public native void openUri(String uri);
-
-
 }
