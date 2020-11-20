@@ -21,15 +21,16 @@ class HardwareImage {
    private:
     /* data */
     AHardwareBuffer *buffer = nullptr;
-//    PFN_vkGetAndroidHardwareBufferPropertiesANDROID
-//        vkGetAndroidHardwareBufferPropertiesANDROID = nullptr;
-//    PFN_vkBindImageMemory2KHR vkBindImageMemory2KHR = nullptr;
+    //    PFN_vkGetAndroidHardwareBufferPropertiesANDROID
+    //        vkGetAndroidHardwareBufferPropertiesANDROID = nullptr;
+    //    PFN_vkBindImageMemory2KHR vkBindImageMemory2KHR = nullptr;
     VkDevice vkDevice = VK_NULL_HANDLE;
     VkImage vkImage = VK_NULL_HANDLE;
     VkDeviceMemory memory = VK_NULL_HANDLE;
     EGLImageKHR image = nullptr;
     EGLDisplay display = nullptr;
     ImageFormat format = {};
+    uint32_t textureId = -1;
 
    public:
     HardwareImage(/* args */);
@@ -40,7 +41,9 @@ class HardwareImage {
    public:
     inline VkImage getImage() { return vkImage; }
     inline AHardwareBuffer *getHarderBuffer() { return buffer; }
-    inline const ImageFormat& getFormat(){return format;}
+    inline const ImageFormat &getFormat() { return format; }
+    inline const uint32_t getTextureId() { return textureId; }
+
    private:
     // https://android.googlesource.com/platform/cts/+/master/tests/tests/graphics/jni/VulkanTestHelpers.cpp
     void bindVK(AHardwareBuffer *buffer, bool useExternalFormat = false);

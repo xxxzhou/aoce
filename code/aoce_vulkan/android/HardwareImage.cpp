@@ -209,6 +209,7 @@ void HardwareImage::bindGL(uint32_t textureId) {
     if(!image){
         return;
     }
+    this->textureId = textureId;
     // AHardwareBuffer_lock(AHARDWAREBUFFER_USAGE_CPU_READ_NEVER)
     glBindTexture(GL_TEXTURE_2D,
                   textureId);  // GL_TEXTURE_EXTERNAL_OES GL_TEXTURE_2D

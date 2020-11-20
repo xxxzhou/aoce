@@ -104,7 +104,8 @@ void VkOutputLayer::outGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
 #if __ANDROID__
 void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, int32_t outIndex) {
     ImageFormat format = hardwareImage->getFormat();
-    if(format.width !=  outTex.width || format.height != outTex.height) {
+    uint32_t oldIndex = hardwareImage->getTextureId();
+    if(format.width !=  outTex.width || format.height != outTex.height || oldIndex != outTex.image) {
         format.width = outTex.width;
         format.height = outTex.height;
         format.imageType == ImageType::rgba8;
