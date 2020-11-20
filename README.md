@@ -2,7 +2,7 @@
 
 android/window 多媒体与游戏交互
 
-## 06_mediaplayer <https://zhuanlan.zhihu.com/p/302285687>
+## [06_mediaplayer](https://zhuanlan.zhihu.com/p/302285687)
 
 用ffmpeg打开rtmp流。
 使用vulkan Compute shader处理yuv420P/yuv422P数据格式成rgba.
