@@ -61,7 +61,7 @@ class ACOE_EXPORT MediaPlayer {
    public:
     void setObserver(IMediaPlayerObserver* observer);
     // 文件路径,URL(RTMP这些)
-    void setDataSource(const std::string& path);
+    void setDataSource(const char* path);
     virtual void prepare(bool bAsync) = 0;
     // 同步prepare可以在下面直接调用start,否则需要在observer里的prepare调用
     virtual void start() = 0;

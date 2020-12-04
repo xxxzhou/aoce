@@ -10,3 +10,4 @@ add_library(aoce_win SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
 target_link_libraries(aoce_win aoce)
 
 aoce_output(aoce_win)
+install_aoce_module(aoce_win FLASE)  

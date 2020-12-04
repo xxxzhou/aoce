@@ -1,6 +1,8 @@
-# aoce
+# aoce([oeip](https://github.com/xxxzhou/oeip)的android平台扩展版)
 
 android/window 多媒体与游戏交互
+----
+oeip护展android平台基础不太行,所以新建立一个项目,完善原来oeip一些设定,并使用cmake编译链接多平台.
 
 ## [06_mediaplayer](https://zhuanlan.zhihu.com/p/302285687)
 

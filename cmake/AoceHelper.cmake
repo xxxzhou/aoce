@@ -9,7 +9,38 @@ function(add_sub_path relativePath HEADER_FILES SOURCE_FILELIST)
     set(${HEADER_FILES} ${${HEADER_FILES}} ${TEMP_HEADER} PARENT_SCOPE)
     set(${SOURCE_FILELIST} ${${SOURCE_FILELIST}} ${TEMP_SOURCE} PARENT_SCOPE)
     source_group(${filterPart} FILES ${TEMP_HEADER} ${TEMP_SOURCE})   
+
 endfunction()
+
+# 生成目录
+function(aoce_output targetname) 
+    # message(STATUS "output" ${targetname})
+    set_target_properties(${targetname} PROPERTIES 
+    RUNTIME_OUTPUT_DIRECTORY ${AOCE_RUNTIME_DIR}
+    LIBRARY_OUTPUT_DIRECTORY ${AOCE_LIBRARY_DIR}     
+    ARCHIVE_OUTPUT_DIRECTORY ${AOCE_LIBRARY_DIR}
+    )
+endfunction(aoce_output targetname)
+
+# 输出文件到install目录
+function(install_aoce_module module contain_include)
+  install(TARGETS ${module}
+          EXPORT ${module}EXPORT
+          # CONFIGURATIONS Release
+          LIBRARY DESTINATION lib  # 动态库安装路径
+          ARCHIVE DESTINATION lib  # 静态库安装路径
+          RUNTIME DESTINATION bin  # 可执行文件安装路径
+          # PUBLIC_HEADER DESTINATION include/${module}  # 头文件安装路径
+          )   
+   # 复制头文件        
+  if(contain_include)     
+    message(STATUS "copy ${module} include")
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include 
+            FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
+            )
+  endif()      
+endfunction(install_aoce_module)
+
 
 # Construct search paths for includes and libraries from a PREFIX_PATH
 macro(create_search_paths PREFIX)

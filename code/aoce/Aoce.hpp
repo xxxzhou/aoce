@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 
+#include <algorithm>
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -31,6 +32,8 @@ void removeItem(std::vector<T>& vect, const T& t) {
     }
 };
 
+// UE4 std::find_if not find
+#if WIN32
 template <typename T>
 void removeItem(std::vector<T>& vect, std::function<bool(T t)> pred) {
     if (vect.empty()) {
@@ -42,6 +45,7 @@ void removeItem(std::vector<T>& vect, std::function<bool(T t)> pred) {
         vect.pop_back();
     }
 };
+#endif
 
 template <typename T>
 void removeItem(std::vector<T>& vect, typename std::vector<T>::iterator iter) {

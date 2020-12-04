@@ -157,6 +157,6 @@ void main(){
 	}else if(ubo.yuvType == 2){
 		yuv420p();
 	}else if(ubo.yuvType == 3){
-		yuv422p();// yuv422ap();
+		yuv422ap();// yuv422p yuv422ap();
 	}
 }

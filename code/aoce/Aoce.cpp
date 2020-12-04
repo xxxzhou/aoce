@@ -22,6 +22,7 @@ using namespace aoce;
 static logEventHandle logHandle = nullptr;
 
 void setLogAction(logEventAction action) { logHandle = action; }
+void setLogHandle(logEventHandle action) { logHandle = action; }
 
 void logMessage(AOCE_LOG_LEVEL level, const char* message) {
 #if !DEBUG
@@ -71,7 +72,7 @@ void logMessage(aoce::LogLevel level, const std::string& message) {
 
 void logAssert(bool expression, const std::string& message) {
     if (!expression) {
-        logMessage(LogLevel::error, message);        
+        logMessage(LogLevel::error, message);
     }
 }
 
@@ -362,7 +363,13 @@ std::string getAocePath() {
 #endif
 }
 
+static bool bLoad = false;
+
 void loadAoce() {
+    if (bLoad) {
+        return;
+    }
+    bLoad = true;
     ModuleManager::Get().regAndLoad("aoce_vulkan");
 
 #if WIN32
@@ -377,6 +384,10 @@ void loadAoce() {
 }
 
 void unloadAoce() {
+    if (!bLoad) {
+        return;
+    }
+    bLoad = false;
     ModuleManager::Get().unloadModule("aoce_vulkan");
 #if WIN32
     ModuleManager::Get().unloadModule("aoce_win_mf");

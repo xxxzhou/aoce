@@ -172,7 +172,7 @@ void android_main(struct android_app *app)
 #endif
     // 生成一张执行图
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
-    auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
+    auto layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
     // 输出GPU数据
@@ -216,14 +216,23 @@ extern "C" {
 static LiveRoom *room = nullptr;
 JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_initEngine(
     JNIEnv *env, jobject thiz, jobject j_context) {
+    setLogHandle(nullptr);
     loadAoce();
     bool battach = false;
     AndroidEnv andEnv = {};
     andEnv.env = env;
     andEnv.activity = thiz;
     AoceManager::Get().initAndroid(andEnv);
+//    // 生成一张执行图
+//    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     // 生成一张执行图
-    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    auto graphFactory = AoceManager::Get().getPipeGraphFactory(gpuType);
+    if (graphFactory == nullptr) {
+        logMessage(LogLevel::error, "no graph factory");
+        return;
+    }
+    logMessage(LogLevel::info, "have graph factory");
+    vkGraph = graphFactory->createGraph();
     auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
@@ -235,16 +244,18 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_initEngine(
     // 初始化agora
     void *android_app_context =
         reinterpret_cast<void *>(env->NewGlobalRef(j_context));
-    room = AoceManager::Get().getLiveRoom(LiveType::agora);
-    live = new TestLive(room);
-    AgoraContext contex = {};
-    contex.bLoopback = true;
-    contex.context = android_app_context;
-    room->initRoom(&contex, live);
+
 }
 
 JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_vkInitSurface(
     JNIEnv *env, jobject thiz, jobject surface, jint width, jint height) {
+    room = AoceManager::Get().getLiveRoom(LiveType::agora);
+    live = new TestLive(room);
+    AgoraContext contex = {};
+    contex.bLoopback = true;
+    // contex.context = android_app_context;
+    room->initRoom(&contex, live);
+
     ANativeWindow *winSurf =
         surface ? ANativeWindow_fromSurface(env, surface) : nullptr;
     window = std::make_unique<VulkanWindow>(onPreCommand, false);
@@ -271,7 +282,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_joinRoom(
     // copy
     std::string roomname = str;
     env->ReleaseStringUTFChars(uri, str);
-    room->loginRoom(roomname, 123, 0);
+    room->loginRoom(roomname.c_str(), 123, 0);
 }
 }
 #endif

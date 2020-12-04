@@ -15,3 +15,4 @@ include_directories(${AOCE_HEADER_DIR} ${AOCE_WIN_HEADER_DIR})
 target_link_libraries(aoce_win_mf aoce aoce_win mf mfplat mfreadwrite mfuuid shlwapi)
 
 aoce_output(aoce_win_mf)
+install_aoce_module(aoce_win_mf FLASE)  

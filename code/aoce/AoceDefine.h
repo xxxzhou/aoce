@@ -2,36 +2,40 @@
 #include <functional>
 #include "AoceBuildSettings.h"
 
-#ifdef _MSC_VER
-#if defined(AOCE_EXPORT_DEFINE)
-#define ACOE_EXPORT __declspec(dllexport)
-#else
-#define ACOE_EXPORT __declspec(dllimport)
-#endif
-#else
-#define ACOE_EXPORT
+#ifdef _WIN32
+    #if defined(AOCE_EXPORT_DEFINE)
+        #define ACOE_EXPORT __declspec(dllexport)
+    #else
+        #define ACOE_EXPORT __declspec(dllimport)
+    #endif
+#elif __ANDROID__
+    #if defined(AOCE_EXPORT_DEFINE)
+        #define ACOE_EXPORT __attribute__ ((visibility("default")))
+    #else
+        #define ACOE_EXPORT 
+    #endif    
 #endif
 
 #ifdef _WIN32
-#define DLLEXPORT __declspec(dllexport)
+    #define AOCE_DLL_EXPORT __declspec(dllexport)
 #elif __ANDROID__
-#define DLLEXPORT __attribute__((visibility("default")))
+    #define AOCE_DLL_EXPORT __attribute__ ((visibility("default")))
 #else
-#define DLLEXPORT
+    #define AOCE_DLL_EXPORT
 #endif
 
-#if defined(__ANDROID__)
+#if __ANDROID__
 
 #include <android/asset_manager.h>
 #include <android/log.h>
 #include <android/native_activity.h>
 #include <sys/system_properties.h>
 
-// Missing from the NDK
-// namespace std {
-// template <typename T, typename... Args>
-// std::unique_ptr<T> make_unique(Args&&... args) {
-//    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+//// Missing from the NDK
+//namespace std {
+//template <typename T, typename... Args>
+//std::unique_ptr<T> make_unique(Args&&... args) {
+//   return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 //}
 //}  // namespace std
 
@@ -52,7 +56,7 @@
         #ModuleName);
 #else
 #define ADD_MODULE(ModuleClass, ModuleName) \
-    extern "C" DLLEXPORT IModule* NewModule() { return new ModuleClass(); }
+    extern "C" AOCE_DLL_EXPORT IModule* NewModule() { return new ModuleClass(); }
 #endif
 
 #define NOMINMAX 1

@@ -195,7 +195,7 @@ void HardwareImage::bindVK(AHardwareBuffer *buffer, bool useExternalFormat) {
     bindImageInfo.memoryOffset = 0;
     VK_CHECK_RESULT(vkBindImageMemory2KHR(vkDevice, 1, &bindImageInfo));
 
-    // android生成一个EGLImageKHR对象,用于gl复制
+    // android绑定AHardwareBuffer与egl image
     EGLClientBuffer native_buffer = eglGetNativeClientBufferANDROID(buffer);
     assert(native_buffer);
     EGLint attrs[] = {EGL_NONE};

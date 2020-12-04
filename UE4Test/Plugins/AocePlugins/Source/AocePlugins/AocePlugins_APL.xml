@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--AdBox plugin additions-->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+  <init>
+    <log text="Android Aoce init"/>
+  </init>
+  <androidManifestUpdates>
+    <addElements tag="manifest">
+      <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+      <uses-permission android:name="android.permission.INTERNET" />
+      <uses-permission android:name="android.permission.RECORD_AUDIO" />
+      <uses-permission android:name="android.permission.CAMERA" />
+      <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+      <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+      <uses-permission android:name="android.permission.BLUETOOTH" />
+      <uses-permission android:name="android.permission.READ_LOGS" />
+      <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+      <uses-permission android:name="android.permission.WAKE_LOCK" />
+    </addElements>
+  </androidManifestUpdates>
+  <resourceCopies>
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/agora-rtc-sdk.jar" dst="$S(BuildDir)/libs/agora-rtc-sdk.jar"/>
+    <!--<copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libagora-rtc-sdk-jni.so" dst="$S(BuildDir)/libs/armeabi-v7a/libagora-rtc-sdk-jni.so"/>-->
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce.so"/>
+    <!--<copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_agora.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_agora.so"/>-->
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_vulkan.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_vulkan.so"/>
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_ffmpeg.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_ffmpeg.so"/>
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libffmpeg.so" dst="$S(BuildDir)/libs/armeabi-v7a/libffmpeg.so"/>
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libmp3lame.so" dst="$S(BuildDir)/libs/armeabi-v7a/libmp3lame.so"/>
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libnative-app-glue.a" dst="$S(BuildDir)/libs/armeabi-v7a/libnative-app-glue.a"/>
+    <!-- <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libc++_shared.so" dst="$S(BuildDir)/libs/armeabi-v7a/libc++_shared.so"/>-->
+    <copyDir src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/glsl" dst="$S(BuildDir)/assets/glsl"/>
+  </resourceCopies>
+  <soLoadLibrary>
+    <loadLibrary name="agora-rtc-sdk-jni" failmsg="agora-rtc-sdk-jni loaded failed" />    
+  </soLoadLibrary>
+</root>

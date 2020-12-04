@@ -9,7 +9,7 @@ using namespace cv;
 
 static cv::Mat* show = nullptr;
 static cv::Mat* show2 = nullptr;
-static int index = 1;
+static int index = 0;
 static int formatIndex = 0;
 static PipeGraph* vkGraph;
 static InputLayer* inputLayer;
@@ -32,7 +32,6 @@ static void onImageProcessHandle(uint8_t* data, int32_t width, int32_t height,
 
 int main() {
     loadAoce();
-
     // 打开摄像机
     auto& deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();

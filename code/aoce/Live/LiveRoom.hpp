@@ -106,7 +106,7 @@ class ACOE_EXPORT LiveRoom {
     // 因为每个直播SDK初始化信息不相同,简单使用void*表示
     bool initRoom(void* liveContext, ILiveObserver* liveBack);
     // 登陆房间,房间名,用户id,推流个数(这个会影响一些设置)
-    bool loginRoom(const std::string& roomName, int32_t useId,
+    bool loginRoom(const char* roomName, int32_t useId,
                    int32_t pushCount);
 
     bool pushStream(int32_t index, const PushSetting& setting);

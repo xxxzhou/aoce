@@ -10,6 +10,7 @@
 namespace aoce {
 namespace win {
 namespace mf {
+    
 MfModule::MfModule(/* args */) {}
 
 MfModule::~MfModule() {}

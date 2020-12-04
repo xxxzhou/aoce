@@ -54,7 +54,7 @@ bool LiveRoom::initRoom(void* liveContext, ILiveObserver* liveBack) {
     return bInit;
 }
 
-bool LiveRoom::loginRoom(const std::string& roomName, int32_t useId,
+bool LiveRoom::loginRoom(const char* roomName, int32_t useId,
                          int32_t pushCount) {
     CHECK_AOCE_LIVE_INIT
     if (roomType == RoomType::logining) {

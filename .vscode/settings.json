@@ -72,5 +72,10 @@
         "*.in": "cpp",
         "atomic": "cpp",
         "unordered_set": "cpp"
-    }
+    },
+    "C_Cpp.dimInactiveRegions": false,
+    "C_Cpp.errorSquiggles": "Enabled",
+    "cmake.configureSettings": {
+        "CMAKE_BUILD_TYPE": "${buildType}"
+     }
 }

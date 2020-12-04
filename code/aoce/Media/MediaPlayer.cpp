@@ -33,7 +33,7 @@ void MediaPlayer::setObserver(IMediaPlayerObserver* observer) {
     onSetObserver();
 }
 
-void MediaPlayer::setDataSource(const std::string& path) {
+void MediaPlayer::setDataSource(const char* path) {
     logAssert(status == PlayStatus::idle,
               "media play current status is not idle");
     uri = path;

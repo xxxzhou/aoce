@@ -6,7 +6,7 @@
 #include "AoceDefine.h"
 
 enum AOCE_LOG_LEVEL {
-    AOCE_LOG_INFO,
+    AOCE_LOG_INFO = 0,
     AOCE_LOG_WARN,
     AOCE_LOG_ERROR,
     // 在这定义只在debug下才会输出
@@ -14,7 +14,7 @@ enum AOCE_LOG_LEVEL {
 };
 
 enum AOCE_GPU_SDK {
-    AOCE_GPU_OTHER,
+    AOCE_GPU_OTHER = 0,
     AOCE_GPU_CUDA,
     AOCE_GPU_DX11,
     AOCE_GPU_VULKAN,
@@ -39,7 +39,7 @@ enum class GpuType {
 // 视频设备与游戏内部纹理使用,YUV格式是Interleaved/Semi-Planar,没想到android设备直接读出p格式
 // 难道android图像设备直接输出的是编码过的数据?还需要解码?等以后验证
 enum class VideoType {
-    other,
+    other = 0,
     // 这几种一般是window平台图像读取设备常用格式
     nv12,  // yuv420SP
     yuv2I,
@@ -93,14 +93,14 @@ inline std::string to_string(VideoType value) {
 }
 
 enum class CameraType {
-    other,
+    other = 0,
     win_mf,
     and_camera2,
 };
 
 // aoce外部接收图像暂时就包含这几种
 enum class ImageType {
-    other,
+    other = 0,
     r8,
     rgba8,
     r16,
@@ -109,23 +109,23 @@ enum class ImageType {
 };
 
 enum class VideoCodec {
-    other,
+    other = 0,
     h264,
 };
 
 enum class AudioCodec {
-    other,
+    other = 0,
     acc,
 };
 
 enum class LiveType {
-    other,
+    other = 0,
     aoce,
     agora,
 };
 
 enum class MediaPlayType {
-    other,
+    other = 0,
     ffmpeg,
 };
 
@@ -207,6 +207,7 @@ struct AudioFrame {
 extern "C" {
 
 ACOE_EXPORT void setLogAction(logEventAction action);
+ACOE_EXPORT void setLogHandle(logEventHandle action);
 
 ACOE_EXPORT void logMessage(AOCE_LOG_LEVEL level, const char *message);
 

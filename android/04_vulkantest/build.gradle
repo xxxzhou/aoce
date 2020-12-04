@@ -13,8 +13,8 @@ android {
         }
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++14"
-                arguments "-DANDROID_STL=c++_shared", '-DANDROID_TOOLCHAIN=clang'
+                cppFlags "-std=c++14 -frtti -fexceptions"
+                arguments "-DANDROID_STL=c++_shared","-DANDROID_TOOLCHAIN=clang"
             }
         }
     }

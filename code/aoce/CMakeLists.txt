@@ -23,7 +23,7 @@ add_sub_path(Live AOCE_HEADER AOCE_SOURCE)
 add_sub_path(Media AOCE_HEADER AOCE_SOURCE)  
 
 message("aoce head--" ${AOCE_HEADER})
-message("aoce source--" ${AOCE_SOURCE})   
+message("aoce source--" ${AOCE_SOURCE}) 
 
 add_definitions(-DAOCE_EXPORT_DEFINE)
 add_library(aoce SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
@@ -31,5 +31,8 @@ if(ANDROID)
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue) 
     target_link_libraries(aoce android log)
 endif()
+# install的头文件
+set_target_properties(aoce PROPERTIES PUBLIC_HEADER "${AOCE_HEADER}")
 
-aoce_output(aoce) 
+aoce_output(aoce AOCE_HEADER) 
+install_aoce_module(aoce TRUE)  

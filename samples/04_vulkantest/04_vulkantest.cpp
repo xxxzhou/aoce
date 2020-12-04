@@ -114,7 +114,7 @@ void android_main(struct android_app *app)
 #endif
     // 生成一张执行图
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
-    auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
+    auto layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
     outputLayer->updateParamet({true, true});

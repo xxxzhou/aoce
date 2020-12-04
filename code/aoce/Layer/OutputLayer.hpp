@@ -22,6 +22,9 @@ struct VkOutGpuTex {
 };
 
 class ACOE_EXPORT OutputLayer : public ITLayer<OutputParamet> {
+   public:
+    virtual ~OutputLayer(){};
+
    protected:
     imageProcessHandle onImageProcessEvent;
 

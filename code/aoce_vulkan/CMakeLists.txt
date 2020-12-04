@@ -20,7 +20,7 @@ if(WIN32)
     message(STATUS "vulkan lib = ${Vulkan_LIBRARY}")    
 elseif(ANDROID)
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue) 
-endif()  
+endif()    
 
 file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" )  
 file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
@@ -42,13 +42,17 @@ elseif(ANDROID)
     target_link_libraries(aoce_vulkan ${Vulkan_LIBRARY} android aoce ${OPENGLES3_LIBRARY} ${EGL_LIBRARY})
 endif()
 
-aoce_output(aoce_vulkan)    
+aoce_output(aoce_vulkan)  
+install_aoce_module(aoce_vulkan FLASE)  
 
 # 复制glsl文件到bin目录
 file(GLOB AOCE_SPV_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/glsl/*.spv" )
 message(STATUS "aoce_vulkan_glsl: " ${AOCE_SPV_SOURCE})           
 message(STATUS "aoce_vulkan_glsl_dst: " ${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl)   
-file(COPY ${AOCE_SPV_SOURCE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl")     
+file(COPY ${AOCE_SPV_SOURCE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl")  
+if(WIN32)
+    file(COPY ${AOCE_SPV_SOURCE} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/glsl")  
+endif()
 # add_custom_command(
 #     TARGET aoce_vulkan POST_BUILD
 #     COMMAND ${CMAKE_COMMAND} -E copy_directory ${AOCE_SPV_SOURCE}  ${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl

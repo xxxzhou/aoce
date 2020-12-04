@@ -27,7 +27,7 @@ ModuleManager::ModuleManager(/* args */) {}
 
 ModuleManager::~ModuleManager() {}
 
-void ModuleManager::registerModule(const std::string& name,
+void ModuleManager::registerModule(const char* name,
                                    loadModuleHandle handle) {
     if (modules.find(name) != modules.end()) {
         return;
@@ -36,12 +36,12 @@ void ModuleManager::registerModule(const std::string& name,
     modules[name] = moduleInfo;
     moduleInfo->name = name;
 #if __ANDROID__
-    moduleInfo->name = "lib" + name + ".so";
+    moduleInfo->name = "lib" + moduleInfo->name + ".so";
 #endif
     moduleInfo->onLoadEvent = handle;
 }
 
-void ModuleManager::loadModule(const std::string& name) {
+void ModuleManager::loadModule(const char* name) {
     if (modules.find(name) == modules.end()) {
         return;
     }
@@ -78,36 +78,38 @@ void ModuleManager::loadModule(const std::string& name) {
 #endif
         // 检查是否找到dll
         if (!moduleInfo->handle) {
-            logMessage(LogLevel::warn, name + ": dll load failed.");
+            logMessage(LogLevel::warn, moduleInfo->name + ": dll load failed.");
+            return;
         }
         // 检查是否加载module
         if (loadAction) {
             moduleInfo->module = loadAction();
         } else {
             logMessage(LogLevel::warn,
-                       name + "is load,but no find method NewModule.");
+                       moduleInfo->name + " is load,but no find method NewModule.");
+            return;
         }
     }
     if (!moduleInfo->module) {
-        logMessage(LogLevel::warn, name + ": init module failed.");
+        logMessage(LogLevel::warn, moduleInfo->name + ": init module failed.");
     }
     // 调用注册
     if (moduleInfo->module) {
         moduleInfo->load = moduleInfo->module->loadModule();
         if (moduleInfo->load) {
-            logMessage(LogLevel::info, name + ": regedit module success.");
+            logMessage(LogLevel::info, moduleInfo->name + ": regedit module success.");
         } else {
-            logMessage(LogLevel::warn, name + ": regedit module failed.");
+            logMessage(LogLevel::warn, moduleInfo->name + ": regedit module failed.");
         }
     }
 }
 
-void ModuleManager::regAndLoad(const std::string& name) {
+void ModuleManager::regAndLoad(const char* name) {
     registerModule(name);
     loadModule(name);
 }
 
-void ModuleManager::unloadModule(const std::string& name) {
+void ModuleManager::unloadModule(const char* name) {
     if (modules.find(name) == modules.end()) {
         return;
     }
@@ -173,14 +175,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved) {
 
 #elif __ANDROID__
 
-//static bool bAttach = false;
-//jint JNI_OnLoad(JavaVM* jvm, void*) {
+// static bool bAttach = false;
+// jint JNI_OnLoad(JavaVM* jvm, void*) {
 //    aoce::AndroidEnv androidEnv = {};
 //    androidEnv.vm = jvm;
 //    // aoce::AoceManager::Get().initAndroid(androidEnv);
 //}
 //
-//void JNI_OnUnload(JavaVM* jvm, void*) {
+// void JNI_OnUnload(JavaVM* jvm, void*) {
 //    aoce::AoceManager::Get().detachThread();
 //}
 #endif

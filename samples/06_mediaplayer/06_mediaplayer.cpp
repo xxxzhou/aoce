@@ -121,6 +121,7 @@ static TestMediaPlay *testPlay = nullptr;
 #if _WIN32
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
+    
     // 生成一张执行图
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
@@ -138,7 +139,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     window->initWindow(hInstance, 1280, 720, "vulkan test");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     testPlay = new TestMediaPlay();
-    player->setDataSource(uri);
+    player->setDataSource(uri.c_str());
     player->setObserver(testPlay);
     player->prepare(true);
 
@@ -198,7 +199,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_openUri(
     // copy
     std::string ruri = str;
     env->ReleaseStringUTFChars(uri, str);
-    player->setDataSource(ruri);
+    player->setDataSource(ruri.c_str());
     player->prepare(true);
 }
 }

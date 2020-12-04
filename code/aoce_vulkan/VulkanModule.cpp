@@ -21,6 +21,7 @@ bool VulkanModule::loadModule() {
         logMessage(LogLevel::warn, "vulkan not find gpu.");
         return false;
     }
+    logMessage(LogLevel::info, "add vulkan factory.");
     VulkanManager::Get().createDevice(true);
     AoceManager::Get().addPipeGraphFactory(GpuType::vulkan,
                                            new layer::VkPipeGraphFactory());
@@ -30,6 +31,7 @@ bool VulkanModule::loadModule() {
 }
 
 void VulkanModule::unloadModule() {
+    logMessage(LogLevel::info, "remove vulkan factory.");
     AoceManager::Get().removePipeGraphFactory(GpuType::vulkan);
     AoceManager::Get().removeLayerFactory(GpuType::vulkan);
 }

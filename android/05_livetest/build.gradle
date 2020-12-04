@@ -14,7 +14,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++14"
-                arguments "-DANDROID_STL=c++_shared", '-DANDROID_TOOLCHAIN=clang'
+                arguments "-DANDROID_STL=c++_shared","-DANDROID_TOOLCHAIN=clang"
             }
         }
     }
@@ -39,7 +39,7 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
-    // ndkVersion '21.1.6352462'
+    // ndkVersion '18.1.5063045'
 }
 
 task copyTask {

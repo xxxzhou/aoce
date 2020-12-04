@@ -3,6 +3,7 @@
 code/aoce_agora/
 android/base/CMakeFiles/
 android/base/cmake_install.cmake
+android/build
 android/.idea/
 android/.gradle/
 android/*/.cxx/
@@ -19,3 +20,15 @@ android/*/libs/
 android/.idea/
 android/.gradle/
 android/android.zip
+UE4Test/.vs
+UE4Test/Build
+UE4Test/Binaries
+UE4Test/Intermediate
+UE4Test/DerivedDataCache
+UE4Test/Saved
+UE4Test/UE4Test.sln
+UE4Test/Plugins/AocePlugins/Binaries
+UE4Test/Plugins/AocePlugins/Intermediate
+UE4Test/Plugins/AocePlugins/Saved
+UE4Test/Plugins/AocePlugins/ThirdParty/Aoce
+
