@@ -30,10 +30,12 @@ private:
 	std::vector<std::uint8_t> data;
 
 	AAoceDisplayActor* display = nullptr;
+
+	bool stop = false;
 public:
 	aoce::MediaPlayer* getPlay();
 public:
-	UTexture2D * sourceTex = nullptr;
+	UTexture2D* sourceTex = nullptr;
 public:
 	void initPlay(AAoceDisplayActor* display);
 	void updateTexture(UTexture2D** texture, int width, int height, EPixelFormat format = PF_R8G8B8A8);

@@ -51,7 +51,7 @@ class HardwareImage {
    public:
     // gpu输出资源创建
     void createAndroidBuffer(const ImageFormat &format);
-    void bindGL(uint32_t textureId);
+    void bindGL(uint32_t textureId, uint32_t texType = 0);
 };
 
 }  // namespace vulkan

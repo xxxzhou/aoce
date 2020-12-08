@@ -34,7 +34,7 @@ PFNGLBUFFERSTORAGEEXTERNALEXTPROC glBufferStorageExternalEXT;
 PFNGLMAPBUFFERRANGEPROC glMapBufferRange;
 PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 PFN_vkGetAndroidHardwareBufferPropertiesANDROID
-        vkGetAndroidHardwareBufferPropertiesANDROID;
+    vkGetAndroidHardwareBufferPropertiesANDROID;
 PFN_vkBindImageMemory2KHR vkBindImageMemory2KHR;
 namespace aoce {
 namespace vulkan {
@@ -42,10 +42,11 @@ namespace vulkan {
 HardwareImage::HardwareImage(/* args */) {
     vkDevice = VulkanManager::Get().device;
     vkGetAndroidHardwareBufferPropertiesANDROID =
-            reinterpret_cast<PFN_vkGetAndroidHardwareBufferPropertiesANDROID>(vkGetDeviceProcAddr(
-            vkDevice, "vkGetAndroidHardwareBufferPropertiesANDROID"));
-    vkBindImageMemory2KHR = reinterpret_cast<PFN_vkBindImageMemory2KHR>(vkGetDeviceProcAddr(
-        vkDevice, "vkBindImageMemory2KHR"));
+        reinterpret_cast<PFN_vkGetAndroidHardwareBufferPropertiesANDROID>(
+            vkGetDeviceProcAddr(vkDevice,
+                                "vkGetAndroidHardwareBufferPropertiesANDROID"));
+    vkBindImageMemory2KHR = reinterpret_cast<PFN_vkBindImageMemory2KHR>(
+        vkGetDeviceProcAddr(vkDevice, "vkBindImageMemory2KHR"));
     // assert(vkGetAndroidHardwareBufferPropertiesANDROID);
     // assert(vkBindImageMemory2KHR);
 
@@ -202,19 +203,27 @@ void HardwareImage::bindVK(AHardwareBuffer *buffer, bool useExternalFormat) {
     display = eglGetCurrentDisplay();  // eglGetDisplay(EGL_DEFAULT_DISPLAY);
     image = eglCreateImageKHR(display, EGL_NO_CONTEXT,
                               EGL_NATIVE_BUFFER_ANDROID, native_buffer, attrs);
-    assert(image != EGL_NO_IMAGE_KHR);
+    // assert(image != EGL_NO_IMAGE_KHR);
+    if (image == EGL_NO_IMAGE_KHR) {
+        int32_t errorId = eglGetError();
+        logMessage(LogLevel::error, "not create image,error id" + errorId);
+    }
 }
 
-void HardwareImage::bindGL(uint32_t textureId) {
-    if(!image){
+void HardwareImage::bindGL(uint32_t textureId, uint32_t texType) {
+    if (!image) {
         return;
+    }
+    int bindType = GL_TEXTURE_2D;
+    if (texType > 0) {
+        bindType = texType;
     }
     this->textureId = textureId;
     // AHardwareBuffer_lock(AHARDWAREBUFFER_USAGE_CPU_READ_NEVER)
-    glBindTexture(GL_TEXTURE_2D,
+    glBindTexture(bindType,
                   textureId);  // GL_TEXTURE_EXTERNAL_OES GL_TEXTURE_2D
-    glEGLImageTargetTexture2DOES(GL_TEXTURE_2D, image);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glEGLImageTargetTexture2DOES(bindType, image);
+    glBindTexture(bindType, 0);
 }
 
 }  // namespace vulkan

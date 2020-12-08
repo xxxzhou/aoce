@@ -10,15 +10,13 @@
 using namespace aoce;
 
 // Sets default values
-AAoceLiveActor::AAoceLiveActor()
-{
+AAoceLiveActor::AAoceLiveActor() {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 }
 
 // Called when the game starts or when spawned
-void AAoceLiveActor::BeginPlay()
-{
+void AAoceLiveActor::BeginPlay() {
 	Super::BeginPlay();
 	loadAoce();
 #if __ANDROID__ // PLATFORM_ANDROID
@@ -43,7 +41,11 @@ void AAoceLiveActor::BeginPlay()
 	mediaPlayer = std::make_unique< AoceMediaPlayer>();
 	mediaPlayer->initPlay(dispActor);
 	mediaPlayer->getPlay()->setDataSource(uri.c_str());
+#if WIN32
+	mediaPlayer->getPlay()->prepare(true);
+#elif __ANDROID__
 	mediaPlayer->getPlay()->prepare(false);
+#endif
 }
 
 void AAoceLiveActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
@@ -53,8 +55,7 @@ void AAoceLiveActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 }
 
 // Called every frame
-void AAoceLiveActor::Tick(float DeltaTime)
-{
+void AAoceLiveActor::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
 }

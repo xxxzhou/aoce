@@ -1,6 +1,5 @@
 {
     "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 4}",
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
         "cmath": "cpp",
         "cstddef": "cpp",

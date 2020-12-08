@@ -1,4 +1,5 @@
 #include "VkOutputLayer.hpp"
+
 #include "../vulkan/VulkanManager.hpp"
 #include "VkPipeGraph.hpp"
 namespace aoce {
@@ -40,16 +41,16 @@ void VkOutputLayer::onInitVkBuffer() {
     // GPU输出
     const ImageFormat& format = outFormats[0];
     VkFormat vkft = ImageFormat2Vk(format.imageType);
-    outTex = std::make_unique<VulkanTexture>();
-    outTex->InitResource(outFormats[0].width, outFormats[0].height, vkft,
-                         VK_IMAGE_USAGE_STORAGE_BIT |
-                             VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-                             VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-                         0);
+    // outTex = std::make_unique<VulkanTexture>();
+    // outTex->InitResource(outFormats[0].width, outFormats[0].height, vkft,
+    //                      VK_IMAGE_USAGE_STORAGE_BIT |
+    //                          VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+    //                          VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+    //                      0);
 }
 
 bool VkOutputLayer::onFrame() {
-    // outBuffer->upload(cpuData.data());
+    outBuffer->download(cpuData.data());
     onImageProcessHandle(outBuffer->getCpuData(), outFormats[0].width,
                          outFormats[0].height, 0);
     return true;
@@ -62,7 +63,7 @@ void VkOutputLayer::onPreCmd() {
                               VK_ACCESS_SHADER_READ_BIT);
         context->imageToBuffer(cmd, inTexs[0].get(), outBuffer.get());
     }
-    if (paramet.bGpu) {
+    if (paramet.bGpu && outTex.image) {
         // vkCmdWaitEvents(cmd, 1, &outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT,
         //                 VK_PIPELINE_STAGE_TRANSFER_BIT, 0, nullptr, 0,
         //                 nullptr, 0, nullptr);
@@ -70,68 +71,121 @@ void VkOutputLayer::onPreCmd() {
         inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                               VK_PIPELINE_STAGE_TRANSFER_BIT,
                               VK_ACCESS_SHADER_READ_BIT);
-        outTex->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                           VK_PIPELINE_STAGE_TRANSFER_BIT);
-        VulkanManager::copyImage(cmd, inTexs[0].get(), outTex.get());
-#if __ANDROID_API__ >= 26
-        if(hardwareImage->getImage()){
-            changeLayout(cmd, hardwareImage->getImage(), VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                         VK_PIPELINE_STAGE_TRANSFER_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-            VulkanManager::blitFillImage(cmd, inTexs[0].get(), hardwareImage->getImage(),
-                                         hardwareImage->getFormat().width, hardwareImage->getFormat().height);
-        }
-#endif
+        VkImage outImage = (VkImage)outTex.image;
+        changeLayout(cmd, outImage, VK_IMAGE_LAYOUT_UNDEFINED,
+                     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                     VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                     VK_PIPELINE_STAGE_TRANSFER_BIT);
+        VulkanManager::blitFillImage(cmd, inTexs[0].get(), outImage,
+                                     outTex.width, outTex.height);
         // vkCmdSetEvent(cmd, outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT);
     }
+#if __ANDROID_API__ >= 26
+    if (paramet.bGpu && hardwareImage->getImage()) {
+        changeLayout(cmd, hardwareImage->getImage(), VK_IMAGE_LAYOUT_UNDEFINED,
+                     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                     VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                     VK_PIPELINE_STAGE_TRANSFER_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+        VulkanManager::blitFillImage(cmd, inTexs[0].get(),
+                                     hardwareImage->getImage(),
+                                     hardwareImage->getFormat().width,
+                                     hardwareImage->getFormat().height);
+    }
+#endif
 }
 
 void VkOutputLayer::outGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
-    if (!outTex || !outTex->image) {
-        return;
-    }
-    // GPU输出
-    VkCommandBuffer copyCmd = (VkCommandBuffer)outVkTex.commandbuffer;
-    VkImage copyImage = (VkImage)outVkTex.image;
-    // auto res = vkGetEventStatus(context->device, outEvent);
-    // assert(res != VK_EVENT_RESET);
-    outTex->addBarrier(copyCmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                       VK_PIPELINE_STAGE_TRANSFER_BIT);
-    VulkanManager::blitFillImage(copyCmd, outTex.get(), copyImage,
-                                 outVkTex.width, outVkTex.height);
-    // vkCmdSetEvent(cmd, outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT);
-}
-
-#if __ANDROID__
-void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, int32_t outIndex) {
-    ImageFormat format = hardwareImage->getFormat();
-    uint32_t oldIndex = hardwareImage->getTextureId();
-    if(format.width !=  outTex.width || format.height != outTex.height || oldIndex != outTex.image) {
-        format.width = outTex.width;
-        format.height = outTex.height;
-        format.imageType == ImageType::rgba8;
-        hardwareImage->createAndroidBuffer(format);
-        hardwareImage->bindGL(outTex.image);
+    // outVkTex.commandbuffer外面执行
+    if (outVkTex.commandbuffer != nullptr) {
+        if (!inTexs[0] || !inTexs[0]->image) {
+            return;
+        }
+        // GPU输出
+        VkCommandBuffer copyCmd = (VkCommandBuffer)outVkTex.commandbuffer;
+        VkImage copyImage = (VkImage)outVkTex.image;
+        // auto res = vkGetEventStatus(context->device, outEvent);
+        // assert(res != VK_EVENT_RESET);
+        inTexs[0]->addBarrier(copyCmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                              VK_PIPELINE_STAGE_TRANSFER_BIT);
+        VulkanManager::blitFillImage(copyCmd, inTexs[0].get(), copyImage,
+                                     outVkTex.width, outVkTex.height);
+    } else {
+        outTex = outVkTex;
         // 重新生成cmdbuffer
         this->getGraph()->reset();
     }
-    // hardwareImage->bindGL(outTex.image);
-//    //test
-//    AHardwareBuffer* buffer = hardwareImage->getHarderBuffer();
-//    if(buffer){
-//        void* shared_buffer;
-//        int ret = AHardwareBuffer_lock(buffer,
-//                                   AHARDWAREBUFFER_USAGE_CPU_WRITE_MASK,
-//                                   -1, // no fence in demo
-//                                   NULL,
-//                                   &shared_buffer);
-//        uint8_t* data = (uint8_t*)shared_buffer;
-//        uint8_t  xx = *data;
-//        uint8_t  xx1 = *(data+100);
-//        uint8_t  xx2 = *(data+1000);
-//        uint8_t  xx3 = *(data+10000);
-//        uint8_t  xx4 = *(data+2000);
-//        ret = AHardwareBuffer_unlock(buffer, NULL);
-//    }
+}
+
+#if __ANDROID__
+void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
+                                int32_t outIndex) {
+    if (!outBuffer || !outBuffer->getCpuData()) {
+        return;
+    }
+    int bindType = GL_TEXTURE_2D;
+    if (texType > 0) {
+        bindType = texType;
+    }
+    if (cpuData.size() > 0) {
+        uint8_t* data = cpuData.data();
+        uint8_t xx = *data;
+        uint8_t xx1 = *(data + 100);
+        uint8_t xx2 = *(data + 1000);
+        uint8_t xx3 = *(data + 10000);
+        uint8_t xx4 = *(data + 2000);
+        glBindTexture(bindType, outTex.image);
+        // glTexImage2D(bindType, 0, GL_RGBA, outTex.width, outTex.height, 0,
+        //              GL_RGBA, GL_UNSIGNED_BYTE, cpuData.data());
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, outFormats[0].width,
+                        outFormats[0].height, GL_RGBA, GL_UNSIGNED_BYTE,
+                        cpuData.data());
+        glBindTexture(bindType, 0);
+    }
+
+    //     ImageFormat format = hardwareImage->getFormat();
+    //     uint32_t oldIndex = hardwareImage->getTextureId();
+    //     if (format.width != outTex.width || format.height !=
+    //     outTex.height ||
+    //         oldIndex != outTex.image) {
+    //         format.width = outTex.width;
+    //         format.height = outTex.height;
+    //         format.imageType == ImageType::rgba8;
+    //         hardwareImage->createAndroidBuffer(format);
+    //         hardwareImage->bindGL(outTex.image);
+    //         // 重新生成cmdbuffer
+    //         this->getGraph()->reset();
+    //     }
+    //     // test
+    // #if __ANDROID_API__ >= 26
+    //     AHardwareBuffer* buffer = hardwareImage->getHarderBuffer();
+    //     if (buffer) {
+    //         void* shared_buffer;
+    //         int ret =
+    //             AHardwareBuffer_lock(buffer,
+    //             AHARDWAREBUFFER_USAGE_CPU_WRITE_MASK,
+    //                                  -1,  // no fence in demo
+    //                                  NULL, &shared_buffer);
+    //         uint8_t* data = (uint8_t*)shared_buffer;
+    //         uint8_t xx = *data;
+    //         uint8_t xx1 = *(data + 100);
+    //         uint8_t xx2 = *(data + 1000);
+    //         uint8_t xx3 = *(data + 10000);
+    //         uint8_t xx4 = *(data + 2000);
+    //         for (int i = 0; i < outTex.height; i++) {
+    //             for (int j = 0; j < outTex.width; j++) {
+    //                 float value = (float)j / outTex.width;
+    //                 value = value * i / outTex.height;
+    //                 data[i * outTex.width + j] = (int)(value * 255);
+    //             }
+    //         }
+    //         glBindTexture(GL_TEXTURE_2D, outTex.image);
+    //         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, outTex.width,
+    //         outTex.height, 0,
+    //                      GL_RGBA, GL_UNSIGNED_BYTE, shared_buffer);
+    //         glBindTexture(GL_TEXTURE_2D, 0);
+    //         ret = AHardwareBuffer_unlock(buffer, NULL);
+    //     }
+    // #endif
 }
 #endif
 

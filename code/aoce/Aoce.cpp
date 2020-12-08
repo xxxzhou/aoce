@@ -38,7 +38,7 @@ void logMessage(AOCE_LOG_LEVEL level, const char* message) {
             std::chrono::system_clock::now());
         struct tm t;
         localtime_s(&t, &now);
-        // 用std::coute有可能会导致UE4烘陪失败,记录下
+        // 用std::cout有可能会导致UE4烘陪失败,记录下
         std::wcout << std::put_time(&t, L"%Y-%m-%d %X") << " Level: " << level
                    << L" " << message << std::endl;
         // << "\" in " << __FILE__ << " at line " << __LINE__

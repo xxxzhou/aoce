@@ -46,7 +46,8 @@ class ACOE_EXPORT OutputLayer : public ITLayer<OutputParamet> {
     virtual void outGpuTex(const VkOutGpuTex& outTex, int32_t outIndex = 0){};
 
 #if __ANDROID__
-    virtual void outGLGpuTex(const VkOutGpuTex& outTex, int32_t outIndex = 0){};
+    virtual void outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType = 0,
+                             int32_t outIndex = 0){};
 #endif
 };
 }  // namespace aoce

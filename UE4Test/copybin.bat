@@ -36,7 +36,7 @@ echo end copy bin
 
 timeout 1
 echo start copy android
-set androidDir=05_livetest
+set androidDir=06_mediaplayer
 xcopy /s /e /y /c /i "..\android\%androidDir%\build\intermediates\cmake\debug\obj\armeabi-v7a" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a"
 xcopy /s /e /y /c /i "..\code\aoce_vulkan\glsl" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a\glsl"
 copy "..\thirdparty\agora\android\agora-rtc-sdk.jar" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\agora-rtc-sdk.jar"

@@ -19,6 +19,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     friend class VkPipeGraph;
 
    protected:
+    // groupX/groupY 一定要与CS里的线程组划分对应,否则出现奇怪的问题
 #if WIN32
     int32_t groupX = 16;
     int32_t groupY = 16;

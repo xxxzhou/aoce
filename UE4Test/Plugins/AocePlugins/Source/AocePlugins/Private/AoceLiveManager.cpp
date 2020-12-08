@@ -2,8 +2,8 @@
 
 
 #include "AoceLiveManager.h"
-#include "Engine/Engine.h"
 #include <functional>
+#include "Engine/Engine.h"
 #if PLATFORM_ANDROID
 #include "Runtime/Launch/Public/Android/AndroidJNI.h"
 #include "Runtime/ApplicationCore/Public/Android/AndroidApplication.h"

@@ -54,6 +54,10 @@ class ACOE_EXPORT MediaPlayer {
     MediaPlayer(/* args */){};
     virtual ~MediaPlayer(){};
 
+   public:
+    AudioStream getAudioStream() { return audioStream; };
+    VideoStream getVideoStream() { return videoStream; };
+
    protected:
     virtual void onSetObserver(){};
     virtual void onSetDataSource(){};

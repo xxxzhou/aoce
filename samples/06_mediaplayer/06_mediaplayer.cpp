@@ -162,7 +162,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_initEngine(
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
     // 输出GPU数据
-    outputLayer->updateParamet({false, true});
+    outputLayer->updateParamet({true, false});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);

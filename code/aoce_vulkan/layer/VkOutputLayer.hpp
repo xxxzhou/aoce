@@ -14,7 +14,8 @@ class VkOutputLayer : public OutputLayer, public VkLayer {
     // CPU输出使用
     std::unique_ptr<VulkanBuffer> outBuffer = nullptr;
     std::vector<uint8_t> cpuData;
-    std::unique_ptr<VulkanTexture> outTex = nullptr;
+    VkOutGpuTex outTex = {};
+    // std::unique_ptr<VulkanTexture> outTex = nullptr;
 #if __ANDROID__
     std::unique_ptr<HardwareImage> hardwareImage = nullptr;
 #endif
@@ -35,7 +36,7 @@ class VkOutputLayer : public OutputLayer, public VkLayer {
                            int32_t outIndex = 0) override;
 
 #if __ANDROID__
-    virtual void outGLGpuTex(const VkOutGpuTex& outTex,
+    virtual void outGLGpuTex(const VkOutGpuTex& outTex,uint32_t texType = 0,
                              int32_t outIndex = 0) override;
 #endif
 };
