@@ -4,7 +4,7 @@
 enable_language(CUDA)
 find_package(CUDAToolkit REQUIRED)
 # 在使用CUDA_COMPILE cmake宏构建cuda之前使用cmake中的命令清除所有编译器标志
-set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "" )
+# set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "" )
 
 if(NOT DEFINED CMAKE_CUDA_STANDARD)
     set(CMAKE_CUDA_STANDARD 11)
@@ -18,7 +18,7 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-O3; -G; -g;-std=c++14")
 # SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-gencode arch=compute_61,code=sm_61")
 # set(CUDA_NVCC_FLAGS "-gencode arch=compute_50,code=sm_50;-rdc=true;-use_fast_math")
 
-file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.cu")
+file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/cuda/*.cu")
 file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 add_sub_path(layer AOCE_HEADER AOCE_SOURCE) 
 add_sub_path(cuda AOCE_HEADER AOCE_SOURCE) 
@@ -45,7 +45,9 @@ target_compile_options(aoce_cuda PRIVATE
   -gencode arch=compute_60,code=sm_60 
   -gencode arch=compute_70,code=sm_70 
   -gencode arch=compute_75,code=sm_75
-  >"
-  )
+  >")
+
+  aoce_output(aoce_cuda)  
+  install_aoce_module(aoce_cuda FLASE)   
 
 # set_property(aoce_cuda tgt PROPERTY CUDA_ARCHITECTURES 50 60 70 75 80)

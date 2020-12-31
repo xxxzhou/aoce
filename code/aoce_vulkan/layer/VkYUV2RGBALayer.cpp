@@ -49,7 +49,7 @@ void VkYUV2RGBALayer::onInitLayer() {
         sizeY = divUp(outFormats[0].height, groupY);
     } else if (paramet.type == VideoType::yuv2I ||
                paramet.type == VideoType::yvyuI ||
-               paramet.type == VideoType::yvyuI) {
+               paramet.type == VideoType::uyvyI) {
         inFormats[0].imageType = ImageType::rgba8;
         // 一个线程处理二个点,yuyv四点组合成一个元素,和rgba类似
         outFormats[0].width = inFormats[0].width * 2;

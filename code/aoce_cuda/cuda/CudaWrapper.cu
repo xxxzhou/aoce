@@ -1,13 +1,16 @@
 #include "fastguidedfilter.h"
 #include "colorconvert.h"
+#include "imageprocess.h"
 
 // nvcc与C++编译的转接文件
 #define BLOCK_X 32
 #define BLOCK_Y 8
 
 // 这几个文件只用于nvcc编译,不会污染别的头文件
-using namespace aoce;
-using namespace aoce::cuda;
+// using namespace aoce;
+// using namespace aoce::cuda;
+namespace aoce {
+namespace cuda {
 
 const dim3 block = dim3(BLOCK_X, BLOCK_Y);
 
@@ -120,9 +123,9 @@ void uchar2float_gpu(PtrStepSz<uchar4> source, PtrStepSz<float4> dest, cudaStrea
 
 template <typename T>
 void resize_gpu(PtrStepSz<T> source, PtrStepSz<T> dest, bool bLinear, cudaStream_t stream) {
-	float fx = static_cast<float>(source.cols) / dest.cols;
-	float fy = static_cast<float>(source.rows) / dest.rows;
-	dim3 grid(divUp(dest.cols, block.x), divUp(dest.rows, block.y));
+	float fx = static_cast<float>(source.width) / dest.width;
+	float fy = static_cast<float>(source.height) / dest.height;
+	dim3 grid(divUp(dest.width, block.x), divUp(dest.height, block.y));
 	if (bLinear) {
 		resize_linear<T> << <grid, block, 0, stream >> > (source, dest, fx, fy);
 	}
@@ -136,6 +139,6 @@ template void resize_gpu<uchar4>(PtrStepSz<uchar4> source, PtrStepSz<uchar4> des
 template void resize_gpu<uchar>(PtrStepSz<uchar> source, PtrStepSz<uchar> dest, bool bLinear, cudaStream_t stream);
 template void resize_gpu<float4>(PtrStepSz<float4> source, PtrStepSz<float4> dest, bool bLinear, cudaStream_t stream);
 
-
-
+	}
+}
 

@@ -23,9 +23,23 @@ CudaMatRef CuPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
     return cuLayer->outTexs[outIndex];
 }
 
-bool CuPipeGraph::onInitBuffers() { return true; }
+bool CuPipeGraph::onInitBuffers() {
+    cuLayers.clear();
+    for (auto index : nodeExcs) {
+        CuLayer* cuLayer = static_cast<CuLayer*>(nodes[index]->getLayer());
+        cuLayers.push_back(cuLayer);
+    }
+    return true;
+}
 
-bool CuPipeGraph::onRun() { return true; }
+bool CuPipeGraph::onRun() {
+    for (auto* layer : cuLayers) {
+        if (!layer->onFrame()) {
+            return false;
+        }
+    }
+    return true;
+}
 
 }  // namespace cuda
 }  // namespace aoce

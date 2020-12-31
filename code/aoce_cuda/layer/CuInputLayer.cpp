@@ -5,10 +5,10 @@ namespace cuda {
 
 extern void rgb2rgba_gpu(PtrStepSz<uchar3> source, PtrStepSz<uchar4> dest,
                          cudaStream_t stream);
-extern void argb2rgba_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
-                          cudaStream_t stream);
+void argb2rgba_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
+                   cudaStream_t stream);
 
-CuInputLayer::CuInputLayer(/* args */) {}
+CuInputLayer::CuInputLayer(/* args */) { bInput = true; }
 
 CuInputLayer::~CuInputLayer() {}
 
@@ -31,12 +31,14 @@ void CuInputLayer::onInitCuBufffer() {
 bool CuInputLayer::onFrame() {
     if (this->videoFormat.videoType == VideoType::rgb8) {
         tempMat->upload(frameData, 0, stream);
-        rgb2rgba_gpu(tempMat.get(), outTexs[0].get(), stream);
+        rgb2rgba_gpu(*tempMat, *outTexs[0], stream);
 
     } else if (videoFormat.videoType == VideoType::bgra8) {
         tempMat->upload(frameData, 0, stream);
+        argb2rgba_gpu(*tempMat, *outTexs[0], stream);
+    } else {
+        outTexs[0]->upload(frameData, 0, stream);
     }
-
     return true;
 }
 

@@ -371,9 +371,9 @@ void loadAoce() {
     }
     bLoad = true;
     ModuleManager::Get().regAndLoad("aoce_vulkan");
-
 #if WIN32
     ModuleManager::Get().regAndLoad("aoce_win_mf");
+    ModuleManager::Get().regAndLoad("aoce_cuda");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
     ModuleManager::Get().regAndLoad("aoce_agora");
@@ -391,6 +391,7 @@ void unloadAoce() {
     ModuleManager::Get().unloadModule("aoce_vulkan");
 #if WIN32
     ModuleManager::Get().unloadModule("aoce_win_mf");
+    ModuleManager::Get().unloadModule("aoce_cuda");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
     ModuleManager::Get().unloadModule("aoce_agora");

@@ -2,7 +2,7 @@
 #include <Aoce.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include <device_functions.h>
+//#include <device_functions.h>
 
 #include "CudaTypes.hpp"
 #include "cuda_common.h"
@@ -16,7 +16,7 @@ template <int32_t yuvpType>
 __global__ void yuv2rgb(PtrStepSz<uchar> source, PtrStepSz<uchar4> dest) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-    if (yuvpType == 1 || yuvpType == 6) {
+    if (yuvpType == 1 || yuvpType == 2) {
         if (idx < dest.width && idy < dest.height) {
             uchar y = source(idy, idx);
             uchar u = 0;
@@ -40,7 +40,7 @@ __global__ void yuv2rgb(PtrStepSz<uchar> source, PtrStepSz<uchar4> dest) {
             dest(idy, idx) = rgbafloat42uchar4(make_float4(yuv2Rgb(yuv), 1.f));
         }
     }
-    if (yuvpType == 5) {
+    if (yuvpType == 3) {
         if (idx < dest.width / 2 && idy < dest.height) {
             uchar y1 = source(idy, idx * 2);
             uchar y2 = source(idy, idx * 2 + 1);
@@ -82,7 +82,7 @@ template <int32_t yuvpType>
 __global__ void rgb2yuv(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-    if (yuvpType == 5) {
+    if (yuvpType == 3) {
         if (idx < source.width / 2 && idy < source.height) {
             int2 uvt = make_int2(idx * 2, idy);
             int2 uvb = make_int2(idx * 2 + 1, idy);
@@ -105,7 +105,7 @@ __global__ void rgb2yuv(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest) {
                 rgbafloat2ucha1((yuvt.z + yuvb.z) / 2.0f);
         }
     }
-    if (yuvpType == 1 || yuvpType == 6) {
+    if (yuvpType == 1 || yuvpType == 2) {
         if (idx < source.width / 2 && idy < source.height / 2) {
             int2 uvlt = make_int2(idx * 2, idy * 2);
             int2 uvlb = make_int2(idx * 2, idy * 2 + 1);
@@ -126,7 +126,7 @@ __global__ void rgb2yuv(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest) {
                 dest(uindex.y, uindex.x) = rgbafloat2ucha1(ayuv.y / 4.0f);
                 dest(vindex.y, vindex.x) = rgbafloat2ucha1(ayuv.z / 4.0f);
             }
-            if (yuvpType == 6) {
+            if (yuvpType == 2) {
                 int2 nuv = u12u2(u22u1(make_int2(idx, idy), source.width / 2),
                                  source.width);
                 dest(source.height + nuv.y, nuv.x) =
@@ -140,28 +140,6 @@ __global__ void rgb2yuv(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest) {
             dest(uvrb.y, uvrb.x) = rgbafloat2ucha1(yuvrb.x);
         }
     }
-    // if (idx < source.width / 2 && idy < source.height / 2) {
-    //	float3 rgb = make_float3(rgbauchar42float4(source(idy, idx)));
-    //	float3 yuv = rgb2Yuv(rgb);
-    //	dest(idy, idx) = rgbafloat2ucha1(yuv.x);
-    //	if (yuvpType == 1) {
-    //		int halfidx = idx >> 1;
-    //		int halfidy = idy >> 1;
-    //		dest(halfidy + source.height, halfidx * 2) =
-    // rgbafloat2ucha1(yuv.y); 		dest(halfidy + source.height, halfidx * 2 + 1)
-    // = rgbafloat2ucha1(yuv.z);
-    //	}
-    //	if (yuvpType == 5) {
-    //		dest(idy / 2 + source.height, idx) = rgbafloat2ucha1(yuv.y);
-    //		dest(idy / 2 + source.height * 3 / 2, idx) =
-    // rgbafloat2ucha1(yuv.z);
-    //	}
-    //	if (yuvpType == 6) {
-    //		dest(idy / 4 + source.height, idx) = rgbafloat2ucha1(yuv.y);
-    //		dest(idy / 4 + source.height * 5 / 4, idx) =
-    // rgbafloat2ucha1(yuv.z);
-    //	}
-    //}
 }
 
 // dest 一点分二点

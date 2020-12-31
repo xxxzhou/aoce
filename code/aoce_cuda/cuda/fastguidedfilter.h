@@ -4,7 +4,7 @@
 #include "cuda_common.h"
 #include "helper_math.h"
 #include "CudaTypes.hpp"
-#include <device_functions.h>
+//#include <device_functions.h>
 
 // 这几个文件只用于nvcc编译,不会污染别的头文件
 using namespace aoce::cuda;

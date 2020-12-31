@@ -12,7 +12,7 @@ class AOCE_CUDA_EXPORT CuPipeGraph : public PipeGraph {
    private:
     /* data */
     cudaStream_t stream = nullptr;
-    std::vector<CuLayer> cuLayers;
+    std::vector<CuLayer*> cuLayers;
 
    public:
     CuPipeGraph(/* args */);
@@ -26,6 +26,17 @@ class AOCE_CUDA_EXPORT CuPipeGraph : public PipeGraph {
     // 所有layer调用initbuffer后
     virtual bool onInitBuffers();
     virtual bool onRun();
+};
+
+class CuPipeGraphFactory : public PipeGraphFactory {
+   public:
+    CuPipeGraphFactory(){};
+    virtual ~CuPipeGraphFactory(){};
+
+   public:
+    inline virtual PipeGraph* createGraph() override {
+        return new CuPipeGraph();
+    };
 };
 
 }  // namespace cuda

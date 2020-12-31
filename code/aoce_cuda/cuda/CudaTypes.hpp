@@ -18,6 +18,8 @@
 #define AOCE_CUDA_EXPORT
 #endif
 
+typedef unsigned char uchar;
+
 // opencv相应代码
 namespace aoce {
 namespace cuda {
