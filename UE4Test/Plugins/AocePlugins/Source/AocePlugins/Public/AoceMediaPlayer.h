@@ -17,29 +17,16 @@ public:
 	virtual ~AoceMediaPlayer() override;
 
 private:
+	int index = 0;
 	aoce::MediaPlayer* player = nullptr;
-
-	aoce::PipeGraph* vkGraph = nullptr;
-	aoce::InputLayer* inputLayer = nullptr;
-	aoce::OutputLayer* outputLayer = nullptr;
-	aoce::YUV2RGBALayer* yuv2rgbLayer = nullptr;
-	aoce::VideoFormat format = {};
-
-	aoce::GpuType gpuType = aoce::GpuType::vulkan;
-	bool bFill = true;
-	std::vector<std::uint8_t> data;
-
 	AAoceDisplayActor* display = nullptr;
-
-	bool stop = false;
+	bool bStart = false;
 public:
 	aoce::MediaPlayer* getPlay();
 public:
 	UTexture2D* sourceTex = nullptr;
 public:
-	void initPlay(AAoceDisplayActor* display);
-	void updateTexture(UTexture2D** texture, int width, int height, EPixelFormat format = PF_R8G8B8A8);
-
+	void initPlay(AAoceDisplayActor* display);	
 public:
 	virtual void onPrepared() override;
 	virtual void onError(aoce::PlayStatus staus, int32_t code,

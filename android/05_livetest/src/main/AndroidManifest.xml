@@ -11,10 +11,10 @@
             android:name="aoce.samples.livetest.MainActivity2"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="landscape">
-<!--             <intent-filter>-->
-<!--             <action android:name="android.intent.action.MAIN" />-->
-<!--             <category android:name="android.intent.category.LAUNCHER" />-->
-<!--             </intent-filter>-->
+             <intent-filter>
+             <action android:name="android.intent.action.MAIN" />
+             <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="05_livetest" />
@@ -22,10 +22,10 @@
         <activity
             android:name="aoce.samples.livetest.MainActivity"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
         </activity>
     </application>
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />

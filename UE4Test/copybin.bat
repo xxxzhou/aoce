@@ -49,5 +49,5 @@ set copyffmpeg = 1
 :if %copyffmpeg%== 1
 xcopy /s /e /y /c /i "..\thirdparty\ffmpeg\x64\dll" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\bin"
 xcopy /s /e /y /c /i "..\thirdparty\ffmpeg\android\armeabi-v7a" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a"
-echo start copy ffmpeg
+echo end copy ffmpeg
 

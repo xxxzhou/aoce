@@ -11,6 +11,7 @@
 #pragma comment(lib, "shlwapi.lib")
 #elif __ANDROID__
 #include <dlfcn.h>
+//#include <libunwind.h>
 #endif
 
 namespace aoce {

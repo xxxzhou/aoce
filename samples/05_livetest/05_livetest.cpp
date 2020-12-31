@@ -33,10 +33,6 @@ static VideoFormat format = {};
 
 static GpuType gpuType = GpuType::vulkan;
 
-// YUV数据是否紧密
-static bool bFill = true;
-static std::vector<uint8_t> data;
-
 class TestLive : public ILiveObserver {
    private:
     LiveRoom *room = nullptr;
@@ -97,23 +93,10 @@ class TestLive : public ILiveObserver {
             format.videoType = videoFrame.videoType;
             inputLayer->setImage(format);
             yuv2rgbLayer->updateParamet({format.videoType});
-            int32_t size = getVideoFrame(videoFrame, nullptr);
-            bFill = size == 0;
-            if (!bFill) {
-                data.resize(size);
-            }
         }
-        if (bFill) {
-            inputLayer->inputCpuData(videoFrame.data[0], 0);
-        } else {
-            getVideoFrame(videoFrame, data.data());
-            inputLayer->inputCpuData(data.data(), 0);
-        }
+        inputLayer->inputCpuData(videoFrame,0);
+#if WIN32
         vkGraph->run();
-#if __ANDROID__
-        if (window) {
-            window->tick();
-        }
 #endif
     };
 
@@ -134,6 +117,10 @@ class TestLive : public ILiveObserver {
 };
 
 void onPreCommand(uint32_t index) {
+#if __ANDROID__
+    vkGraph->run();
+#endif
+
     VkImage winImage = window->images[index];
     VkCommandBuffer cmd = window->cmdBuffers[index];
     // 我们要把cs生成的图复制到正在渲染的图上,先改变渲染图的layout
@@ -180,7 +167,6 @@ void android_main(struct android_app *app)
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
-
     // 这段在android需要窗口创建后才能用
     std::function<void()> winINit([&]() {
         while (!window->windowCreate()) {
@@ -197,9 +183,8 @@ void android_main(struct android_app *app)
         room->initRoom(&contex, live);
         room->loginRoom("123", 5, 0);
     });
-
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
-    window = std::make_unique<VulkanWindow>(onPreCommand, false);
+    window = std::make_unique<VulkanWindow>(onPreCommand, false); // onPreCommand
 #if _WIN32
     window->initWindow(hInstance, 1280, 720, "vulkan test");
     winINit();

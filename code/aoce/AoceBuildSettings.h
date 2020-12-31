@@ -4,3 +4,4 @@
 #define AOCE_INSTALL_FFMPEG
 
 #define AOCE_USE_STATIC 0
+#define AOCE_DEBUG_TYPE 1

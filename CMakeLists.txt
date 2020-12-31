@@ -22,19 +22,22 @@ message(STATUS "install:" ${CMAKE_INSTALL_PREFIX})
 
 # 添加win32平台下的编译符号
 if(WIN32)
-    # Treat warnings as errors
-    #add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/WX>")
-    # Disable RTTI
-    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/GR->")
-    # Warn about nested declarations
-    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34456>")
-    # Warn about potentially uninitialized variables
-    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34701>")
-    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34703>")
-    # Warn about different indirection types.
-    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34057>")
-    # Warn about signed/unsigned mismatch.
-    add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34245>")
+    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    # # Treat warnings as errors
+    # #add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/WX>")
+    # # Disable RTTI
+    # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/GR->")
+    # # Warn about nested declarations
+    # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34456>")
+    # # Warn about potentially uninitialized variables
+    # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34701>")
+    # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34703>")
+    # # Warn about different indirection types.
+    # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34057>")
+    # # Warn about signed/unsigned mismatch.
+    # add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/w34245>")
 endif()
 if(ANDROID)
     set(CMAKE_CXX_VISIBILITY_PRESET default)
@@ -46,8 +49,9 @@ message(STATUS "build type:" ${CMAKE_BUILD_TYPE})
 if(NOT CMAKE_BUILD_TYPE) 
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "choose the type of build" FORCE)
 endif() 
+set(AOCE_DEBUG_TYPE 0)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug") 
-    add_definitions(-DDEBUG) 
+    set(AOCE_DEBUG_TYPE 1)
 endif ()
 
 set(AOCE_HEADER_DIR "${CMAKE_SOURCE_DIR}/code/aoce")

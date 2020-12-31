@@ -16,7 +16,6 @@
 
 #include "../../code/aoce/Aoce.h"
 #include "errno.h"
-
 #define TEST_FIX_DATA
 #endif
 

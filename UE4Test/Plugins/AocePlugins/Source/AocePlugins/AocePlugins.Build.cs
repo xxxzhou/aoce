@@ -27,7 +27,7 @@ public class AocePlugins : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "Core","CoreUObject","Projects","Engine","RHI", "RenderCore", "UMG", "SlateCore", "Json","JsonUtilities",
+                "Core","CoreUObject","Projects","Engine","RHI", "RenderCore", "UMG", "SlateCore", "OpenGLDrv","Json","JsonUtilities",
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -62,26 +62,27 @@ public class AocePlugins : ModuleRules
             string libPath = Path.Combine(aocePath, "lib");
             string binPath = Path.Combine(aocePath, "bin");
             // 链接库
-            PublicLibraryPaths.Add(libPath);            
-            PublicAdditionalLibraries.Add("aoce.lib");           
+            PublicLibraryPaths.Add(libPath);
+            PublicAdditionalLibraries.Add("aoce.lib");
             // 需要延迟加载的dll,不加的话,需把相应dll拷贝到工程的Binaries,否则编辑器到75%就因加载不了dll crash.     
             PublicDelayLoadDLLs.Add("aoce.dll");
             // PublicDelayLoadDLLs.Add("aoce_agora.dll");
             // PublicDelayLoadDLLs.Add("agora_rtc_sdk.dll");
             // RuntimeDependencies.Add(Path.Combine(binPath, "aoce.dll"));
-            foreach (string path in Directory.GetFiles(binPath,"*.*",SearchOption.AllDirectories))
+            foreach (string path in Directory.GetFiles(binPath, "*.*", SearchOption.AllDirectories))
             {
                 RuntimeDependencies.Add(path);
-            }            
+            }
         }
         else if (Target.Platform == UnrealTargetPlatform.Android)
         {
+            // PublicDependencyModuleNames.Add("OpenGLDrv");
             suffix = ".so";
             Definitions.Add("__ANDROID__=1");
             Definitions.Add("WIN32=0");
-            AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(ModuleDirectory, "AocePlugins_APL.xml"));            
+            AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(ModuleDirectory, "AocePlugins_APL.xml"));
             string aocePath = Path.Combine(ThirdPartyPath, "Aoce/android");
-            string libPath = Path.Combine(aocePath, "armeabi-v7a");          
+            string libPath = Path.Combine(aocePath, "armeabi-v7a");
             // 链接库
             PublicAdditionalLibraries.Add(Path.Combine(libPath, "libaoce.so"));
             PublicAdditionalLibraries.Add(Path.Combine(libPath, "libffmpeg.so"));

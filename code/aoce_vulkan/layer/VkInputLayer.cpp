@@ -11,7 +11,6 @@ void VkInputLayer::onSetImage(VideoFormat videoFormat, int32_t index) {
     assert(index < inCount);
     // 根据各种格式调整
     inFormats[0] = videoFormat2ImageFormat(videoFormat);
-    this->videoFormat = videoFormat;
     // 更新constBufCpu
     int imageIndex = -1;
     if (videoFormat.videoType == VideoType::rgb8) {
@@ -28,7 +27,10 @@ void VkInputLayer::onSetImage(VideoFormat videoFormat, int32_t index) {
 
 void VkInputLayer::onInputCpuData(uint8_t* data, int32_t index) {
     assert(index < inCount);
-    frameData = data;
+}
+
+void VkInputLayer::onInputCpuData(const VideoFrame& videoFrame, int32_t index) {
+    assert(index < inCount);
 }
 
 void VkInputLayer::onInitGraph() {

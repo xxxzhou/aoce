@@ -202,6 +202,21 @@ struct AudioFrame {
     uint8_t *data[2];
 };
 
+// ARGB<->BGRA<->RGBA<->RRRR
+struct MapChannelParamet {
+    uint32_t red = 0;
+    uint32_t green = 1;
+    uint32_t blue = 2;
+    uint32_t alpha = 3;
+};
+
+//方便C#交互不做额外设置，以及GPU参数结构对应,bool全用int表示
+struct OperateParamet {
+    int32_t bFlipX = false;
+    int32_t bFlipY = false;
+    float gamma = 1.f;
+};
+
 }  // namespace aoce
 
 extern "C" {
@@ -211,10 +226,10 @@ ACOE_EXPORT void setLogHandle(logEventHandle action);
 
 ACOE_EXPORT void logMessage(AOCE_LOG_LEVEL level, const char *message);
 
+ACOE_EXPORT uint32_t divUp(int32_t x, int32_t y);
 ACOE_EXPORT long long getNowTimeStamp();
 
 ACOE_EXPORT void loadAoce();
-
 ACOE_EXPORT void unloadAoce();
 
 #if __ANDROID__

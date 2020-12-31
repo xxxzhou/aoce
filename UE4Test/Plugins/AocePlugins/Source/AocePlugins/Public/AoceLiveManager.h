@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "aoce/AoceCore.h"
+#include "Engine/Texture2D.h"
+#include "AoceDisplayActor.h"
 #include <string>
 #include <memory>
 /**
@@ -16,22 +18,14 @@ public:
 	virtual ~AoceLiveManager() override;
 private:
 	aoce::LiveRoom* room = nullptr;
-
-	aoce::PipeGraph* vkGraph = nullptr;
-	aoce::InputLayer* inputLayer = nullptr;
-	aoce::OutputLayer* outputLayer = nullptr;
-	aoce::YUV2RGBALayer* yuv2rgbLayer = nullptr;
-	aoce::VideoFormat format = {};
-
-	aoce::GpuType gpuType = aoce::GpuType::vulkan;
-	bool bFill = true;
-	std::vector<std::uint8_t> data;
+	AAoceDisplayActor* display = nullptr;
 
 private:
 	void aoceMsg(int32_t level, const char* message);
 public:
-	void initRoom(aoce::LiveType liveType);
 	aoce::LiveRoom* getRoom();
+	void initRoom(aoce::LiveType liveType, AAoceDisplayActor* display);
+	//void updateTexture();
 public:
 	virtual void onEvent(int32_t operater, int32_t code, aoce::LogLevel level,
 		const std::string& msg) override;

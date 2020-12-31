@@ -14,9 +14,24 @@
 # DirectX11_INCLUDE_DIRS
 # DirectX11_LIBRARIES
 
+macro(dx11_search_paths PREFIX)
+  foreach(dir ${${PREFIX}_PREFIX_PATH})
+    set(${PREFIX}_INC_SEARCH_PATH ${${PREFIX}_INC_SEARCH_PATH}
+      ${dir}/include ${dir}/Include ${dir}/include/${PREFIX} ${dir}/Headers)
+    set(${PREFIX}_LIB_SEARCH_PATH ${${PREFIX}_LIB_SEARCH_PATH}
+      ${dir}/lib ${dir}/Lib ${dir}/lib/${PREFIX} ${dir}/Libs)
+    set(${PREFIX}_BIN_SEARCH_PATH ${${PREFIX}_BIN_SEARCH_PATH}
+      ${dir}/bin)
+  endforeach(dir)
+  if(ANDROID)
+	set(${PREFIX}_LIB_SEARCH_PATH ${${PREFIX}_LIB_SEARCH_PATH} ${OGRE_DEPENDENCIES_DIR}/lib/${ANDROID_ABI})
+  endif()
+  set(${PREFIX}_FRAMEWORK_SEARCH_PATH ${${PREFIX}_PREFIX_PATH})
+endmacro(dx11_search_paths)
+
 if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
-	include(FindPkgMacros)
-	findpkg_begin(DirectX11)
+	# include(FindPkgMacros)
+	# findpkg_begin(DirectX11)
 	set(USING_WINDOWS_SDK TRUE)
 
 	# Windows Phone
@@ -88,7 +103,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 		"$ENV{ProgramFiles}/Microsoft DirectX SDK*"
 		)
 
-		create_search_paths(DirectX11)
+		dx11_search_paths(DirectX11)
 		# redo search if prefix path changed
 		clear_if_changed(DirectX11_PREFIX_PATH
 			DirectX11_LIBRARY
@@ -139,7 +154,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 						 DirectX11_D3DCOMPILER_LIBRARY)
 	endif () # Legacy Direct X SDK
 
-	findpkg_finish(DirectX11)
+	#findpkg_finish(DirectX11)
 	
 	if(DirectX11_FOUND AND USING_WINDOWS_SDK)
 		#if Dx11 is found at this point then we will be using the Windows SDK version. 

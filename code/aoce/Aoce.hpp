@@ -7,7 +7,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
+#include <memory>
 #include "Aoce.h"
 
 // #include "Module/IModule.hpp"
@@ -100,8 +100,6 @@ ACOE_EXPORT void copywcharstr(wchar_t* dest, const wchar_t* source,
                               int32_t maxlength);
 
 ACOE_EXPORT void copycharstr(char* dest, const char* source, int32_t maxlength);
-
-ACOE_EXPORT uint32_t divUp(int32_t x, int32_t y);
 
 ACOE_EXPORT aoce::ImageType videoType2ImageType(
     const aoce::VideoType& videoType);

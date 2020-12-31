@@ -10,8 +10,6 @@ else()
     message(FATAL_ERROR "unsupported platform.")
 endif() 
 
-# 查找vulkan库引用
-include_directories(${Vulkan_INCLUDE_DIR} ${AOCE_HEADER_DIR}) 
 if(WIN32)
     message(STATUS "using find_package to locate vulkan")
     find_package(Vulkan)
@@ -20,7 +18,9 @@ if(WIN32)
     message(STATUS "vulkan lib = ${Vulkan_LIBRARY}")    
 elseif(ANDROID)
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue) 
-endif()    
+endif() 
+# 查找vulkan库引用  
+include_directories(${Vulkan_INCLUDE_DIR} ${AOCE_HEADER_DIR})  
 
 file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" )  
 file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")

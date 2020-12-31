@@ -2,6 +2,7 @@
 
 #include "AocePlugins.h"
 #include "Core.h"
+#include "aoce/AoceCore.h"
 #include "Modules/ModuleManager.h"
 
 #define LOCTEXT_NAMESPACE "FAocePluginsModule"
@@ -10,14 +11,28 @@ void FAocePluginsModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	LoadDllEx(FString("AocePlugins/ThirdParty/Aoce/win/bin/aoce.dll"), false);	
-	// loadAoce();
+	loadAoce();
+#if __ANDROID__ // PLATFORM_ANDROID
+	JNIEnv* jni_env = FAndroidApplication::GetJavaEnv(true);
+	jobject at = FAndroidApplication::GetGameActivityThis();
+	jmethodID getApplication = jni_env->GetMethodID(FJavaWrapper::GameActivityClassID, "getApplication", "()Landroid/app/Application;");
+	jobject jcontext = jni_env->CallObjectMethod(at, getApplication);
+	AndroidEnv andEnv = {};
+	andEnv.env = jni_env;
+	andEnv.activity = at;
+	//// 从https://blog.csdn.net/hust_liuX/article/details/1460486 得到的修改方案
+	//JavaVM* g_jvm = nullptr;
+	//jni_env->GetJavaVM(&g_jvm);
+	//g_jvm->AttachCurrentThread(&jni_env, 0);
+	AoceManager::Get().initAndroid(andEnv);
+#endif	
 }
 
 void FAocePluginsModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
-	// unloadAoce();
+	unloadAoce();
 }
 
 void FAocePluginsModule::LoadDllEx(FString relativePath, bool bSeacher) {

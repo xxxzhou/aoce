@@ -70,18 +70,8 @@ class TestMediaPlay : public IMediaPlayerObserver {
             format.videoType = frame.videoType;
             inputLayer->setImage(format);
             yuv2rgbLayer->updateParamet({format.videoType});
-            int32_t size = getVideoFrame(frame, nullptr);
-            bFill = size == 0;
-            if (!bFill) {
-                data.resize(size);
-            }
         }
-        if (bFill) {
-            inputLayer->inputCpuData(frame.data[0], 0);
-        } else {
-            getVideoFrame(frame, data.data());
-            inputLayer->inputCpuData(data.data(), 0);
-        }
+        inputLayer->inputCpuData(frame, 0);
         vkGraph->run();
 #if __ANDROID__
         if (window) {
@@ -162,7 +152,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_initEngine(
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
     // 输出GPU数据
-    outputLayer->updateParamet({true, false});
+    outputLayer->updateParamet({false, true});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);

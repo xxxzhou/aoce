@@ -4,7 +4,11 @@
 #include "AoceLiveManager.h"
 #include <functional>
 #include "Engine/Engine.h"
+#include "Async/Async.h"
+// #include "OpenGLDrv.h"
 #if PLATFORM_ANDROID
+#include <GLES2/gl2.h>
+#include "OpenGLUtil.h"
 #include "Runtime/Launch/Public/Android/AndroidJNI.h"
 #include "Runtime/ApplicationCore/Public/Android/AndroidApplication.h"
 #endif
@@ -20,34 +24,19 @@ AoceLiveManager::~AoceLiveManager()
 }
 
 void AoceLiveManager::aoceMsg(int32_t level, const char* message) {
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, message);
-	}
+	AsyncTask(ENamedThreads::GameThread, [&]() {
+		if (GEngine) {
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, message);
+		}
+	});
 }
 
-void AoceLiveManager::initRoom(aoce::LiveType liveType)
+void AoceLiveManager::initRoom(aoce::LiveType liveType, AAoceDisplayActor* pdisplay)
 {
-	// setLogHandle(std::bind(&AoceLiveManager::aoceMsg, this, _1, _2));	
-	logMessage(AOCE_LOG_INFO, "xxxxxxx1");
-	// 生成一张执行图
-	auto graphFactory = AoceManager::Get().getPipeGraphFactory(gpuType);	
-	if (graphFactory == nullptr) {
-		logMessage(AOCE_LOG_INFO, "no graph factory");
-		return;
-	}
-	logMessage(AOCE_LOG_INFO, "have graph factory");
-	vkGraph = graphFactory->createGraph();
-	auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
-	inputLayer = layerFactory->crateInput();
-	outputLayer = layerFactory->createOutput();
-	// 输出GPU数据
-	outputLayer->updateParamet({ false, true });
-	yuv2rgbLayer = layerFactory->createYUV2RGBA();
-	// 生成图
-	vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
+	this->display = pdisplay;
 	room = AoceManager::Get().getLiveRoom(liveType);
 	AgoraContext contex = {};
-	contex.bLoopback = false;
+	contex.bLoopback = true;
 #if __ANDROID__ // PLATFORM_ANDROID
 	// contex.context = jcontext;
 #endif	
@@ -86,17 +75,20 @@ void AoceLiveManager::onUserChange(int32_t userId, bool bAdd)
 
 void AoceLiveManager::onStreamUpdate(int32_t index, bool bAdd, int32_t code)
 {
-	logMessage(AOCE_LOG_INFO, "xxxxxxx4");
+	//logMessage(AOCE_LOG_INFO, "xxxxxxx4");
 }
 
 void AoceLiveManager::onStreamUpdate(int32_t userId, int32_t index, bool bAdd, int32_t code)
 {
-	logMessage(AOCE_LOG_INFO, "xxxxxxx5");
+	//logMessage(AOCE_LOG_INFO, "xxxxxxx5");
 }
 
 void AoceLiveManager::onVideoFrame(int32_t userId, int32_t index, const aoce::VideoFrame& videoFrame)
 {
-	logMessage(AOCE_LOG_INFO, "xxxxxxx6");
+	// logMessage(AOCE_LOG_INFO, "xxxxxxx6");
+	AsyncTask(ENamedThreads::GameThread, [=]() {
+		display->UpdateFrame(videoFrame);
+	});
 }
 
 void AoceLiveManager::onAudioFrame(int32_t userId, int32_t index, const aoce::AudioFrame& audioFrame)

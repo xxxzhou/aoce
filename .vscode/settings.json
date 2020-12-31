@@ -72,6 +72,7 @@
         "atomic": "cpp",
         "unordered_set": "cpp"
     },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,
     "C_Cpp.errorSquiggles": "Enabled",
     "cmake.configureSettings": {

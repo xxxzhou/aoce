@@ -200,7 +200,7 @@ void HardwareImage::bindVK(AHardwareBuffer *buffer, bool useExternalFormat) {
     EGLClientBuffer native_buffer = eglGetNativeClientBufferANDROID(buffer);
     assert(native_buffer);
     EGLint attrs[] = {EGL_NONE};
-    display = eglGetCurrentDisplay();  // eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);  // eglGetCurrentDisplay(); //
     image = eglCreateImageKHR(display, EGL_NO_CONTEXT,
                               EGL_NATIVE_BUFFER_ANDROID, native_buffer, attrs);
     // assert(image != EGL_NO_IMAGE_KHR);
@@ -220,9 +220,12 @@ void HardwareImage::bindGL(uint32_t textureId, uint32_t texType) {
     }
     this->textureId = textureId;
     // AHardwareBuffer_lock(AHARDWAREBUFFER_USAGE_CPU_READ_NEVER)
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(bindType,
                   textureId);  // GL_TEXTURE_EXTERNAL_OES GL_TEXTURE_2D
     glEGLImageTargetTexture2DOES(bindType, image);
+    // glTexParameteri(bindType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // glTexParameteri(bindType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(bindType, 0);
 }
 
