@@ -1,7 +1,10 @@
 #pragma once
 
 #include <device_types.h>
+
 #include <Layer/BaseLayer.hpp>
+
+#include "../CudaHelper.hpp"
 #include "../CudaMat.hpp"
 
 namespace aoce {

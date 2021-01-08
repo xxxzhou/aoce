@@ -15,7 +15,7 @@ CudaModule::CudaModule(/* args */) {}
 CudaModule::~CudaModule() {}
 
 bool CudaModule::loadModule() {
-    int count;
+    int count = 0;
     cudaError_t error = cudaGetDeviceCount(&count);
     if (count <= 0) {
         logMessage(LogLevel::warn, "cuda not find gpu device.");
@@ -23,7 +23,7 @@ bool CudaModule::loadModule() {
     }
     int i = 0;
     for (i = 0; i < count; ++i) {
-        cudaDeviceProp prop;
+        cudaDeviceProp prop = {};
         if (cudaGetDeviceProperties(&prop, i) == cudaSuccess) {
             // 选用第一个独立显卡,没有就不管了
             if (prop.integrated == 0) {

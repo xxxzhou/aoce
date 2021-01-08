@@ -96,7 +96,7 @@ void VkOutputLayer::onPreCmd() {
 #endif
 }
 
-void VkOutputLayer::outGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
+void VkOutputLayer::outVkGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
     // outVkTex.commandbuffer外面执行
     if (outVkTex.commandbuffer != nullptr) {
         if (!inTexs[0] || !inTexs[0]->image) {

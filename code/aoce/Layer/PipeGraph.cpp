@@ -232,9 +232,8 @@ bool PipeGraph::run() {
         if (!resetGraph()) {
             return false;
         }
-    }
-    onRun();
-    return true;
+    }    
+    return onRun();
 }
 
 }  // namespace aoce

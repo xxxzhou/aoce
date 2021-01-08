@@ -8,6 +8,8 @@ if(WIN32)
     add_subdirectory(aoce_win) 
     add_subdirectory(aoce_win_mf)
     add_subdirectory(aoce_cuda)
+elseif(ANDROID)
+    add_subdirectory(aoce_android)
 endif()
 
 if(AOCE_INSTALL_AGORA)

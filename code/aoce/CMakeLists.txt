@@ -21,6 +21,7 @@ add_sub_path(VideoDevice AOCE_HEADER AOCE_SOURCE)
 add_sub_path(Layer AOCE_HEADER AOCE_SOURCE)
 add_sub_path(Live AOCE_HEADER AOCE_SOURCE)  
 add_sub_path(Media AOCE_HEADER AOCE_SOURCE)  
+add_sub_path(FixGraph AOCE_HEADER AOCE_SOURCE)  
 
 message("aoce head--" ${AOCE_HEADER})
 message("aoce source--" ${AOCE_SOURCE}) 

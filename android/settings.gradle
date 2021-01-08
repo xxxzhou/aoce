@@ -7,3 +7,6 @@ project(":05_livetest").projectDir = new File("05_livetest")
 
 include ":06_mediaplayer"
 project(":06_mediaplayer").projectDir = new File("06_mediaplayer")
+
+include ":07_androidtest"
+project(":07_androidtest").projectDir = new File("07_androidtest")

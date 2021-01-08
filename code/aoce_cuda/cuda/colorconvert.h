@@ -11,33 +11,44 @@
 using namespace aoce;
 using namespace aoce::cuda;
 
+// 1(nv12) 2(yuv420P) 3(yuv422P) 4(yuv422ap)
+
 //长宽用目标的(20.05.29 记录下后续改进YUV420P/SP,长度全一半处理,现在读重复)
 template <int32_t yuvpType>
 __global__ void yuv2rgb(PtrStepSz<uchar> source, PtrStepSz<uchar4> dest) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
     if (yuvpType == 1 || yuvpType == 2) {
-        if (idx < dest.width && idy < dest.height) {
-            uchar y = source(idy, idx);
+        if (idx < dest.width / 2 && idy < dest.height / 2) {
+            uchar y1 = source(idy * 2, idx * 2);
+            uchar y2 = source(idy * 2, idx * 2 + 1);
+            uchar y3 = source(idy * 2 + 1, idx * 2);
+            uchar y4 = source(idy * 2 + 1, idx * 2 + 1);
             uchar u = 0;
             uchar v = 0;
-            float3 yuv = make_float3(0.f, 0.f, 0.f);
             //编译时优化掉选择
             if (yuvpType == 1) {
-                int halfidx = idx >> 1;
-                int halfidy = idy >> 1;
-                u = source(halfidy + dest.height, halfidx * 2);
-                v = source(halfidy + dest.height, halfidx * 2 + 1);
+                u = source(idy + dest.height, idx * 2);
+                v = source(idy + dest.height, idx * 2 + 1);
             }
-            if (yuvpType == 6) {
-                int2 nuv =
-                    u12u2(u22u1(make_int2(idx / 2, idy / 2), dest.width / 2),
-                          dest.width);
+            if (yuvpType == 2) {
+                int2 nuv = u12u2(u22u1(make_int2(idx, idy), dest.width / 2),
+                                 dest.width);
                 u = source(nuv.y + dest.height, nuv.x);
                 v = source(nuv.y + dest.height * 5 / 4, nuv.x);
             }
-            yuv = rgbauchar32float3(make_uchar3(y, u, v));
-            dest(idy, idx) = rgbafloat42uchar4(make_float4(yuv2Rgb(yuv), 1.f));
+            float3 yuv1 = rgbauchar32float3(make_uchar3(y1, u, v));
+            float3 yuv2 = rgbauchar32float3(make_uchar3(y2, u, v));
+            float3 yuv3 = rgbauchar32float3(make_uchar3(y3, u, v));
+            float3 yuv4 = rgbauchar32float3(make_uchar3(y4, u, v));
+            dest(idy * 2, idx * 2) =
+                rgbafloat42uchar4(make_float4(yuv2Rgb(yuv1), 1.f));
+            dest(idy * 2, idx * 2 + 1) =
+                rgbafloat42uchar4(make_float4(yuv2Rgb(yuv2), 1.f));
+            dest(idy * 2 + 1, idx * 2) =
+                rgbafloat42uchar4(make_float4(yuv2Rgb(yuv3), 1.f));
+            dest(idy * 2 + 1, idx * 2 + 1) =
+                rgbafloat42uchar4(make_float4(yuv2Rgb(yuv4), 1.f));
         }
     }
     if (yuvpType == 3) {
@@ -75,6 +86,40 @@ inline __global__ void yuv2rgb(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
         yuv = rgbauchar32float3(make_uchar3(y2, u, v));
         dest(idy, idx * 2 + 1) =
             rgbafloat42uchar4(make_float4(yuv2Rgb(yuv), 1.f));
+    }
+}
+
+inline __global__ void yuva2rgb(PtrStepSz<uchar> source,
+                                PtrStepSz<uchar4> dest) {
+    const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+    if (idx < dest.width / 2 && idy < dest.height / 2) {
+        uchar y1 = source(idy * 2, idx * 2);
+        uchar y2 = source(idy * 2, idx * 2 + 1);
+        uchar y3 = source(idy * 2 + 1, idx * 2);
+        uchar y4 = source(idy * 2 + 1, idx * 2 + 1);
+
+        uchar u = source(idy + dest.height, idx);
+        uchar v = source(idy + dest.height * 3 / 2, idx);
+        uchar a1 = source(idy + dest.height, idx + dest.width / 2);
+        uchar a2 = source(idy + dest.height * 3 / 2, idx + dest.width / 2);
+
+        float3 yuv1 = rgbauchar32float3(make_uchar3(y1, u, v));
+        float3 yuv2 = rgbauchar32float3(make_uchar3(y2, u, v));
+        float3 yuv3 = rgbauchar32float3(make_uchar3(y3, u, v));
+        float3 yuv4 = rgbauchar32float3(make_uchar3(y4, u, v));
+
+        float fa1 = a1 * 0.003921568627f;
+        float fa2 = a2 * 0.003921568627f;
+
+        dest(idy * 2, idx * 2) =
+            rgbafloat42uchar4(make_float4(yuv2Rgb(yuv1), fa1));
+        dest(idy * 2, idx * 2 + 1) =
+            rgbafloat42uchar4(make_float4(yuv2Rgb(yuv2), fa1));
+        dest(idy * 2 + 1, idx * 2) =
+            rgbafloat42uchar4(make_float4(yuv2Rgb(yuv3), fa2));
+        dest(idy * 2 + 1, idx * 2 + 1) =
+            rgbafloat42uchar4(make_float4(yuv2Rgb(yuv4), fa2));
     }
 }
 
@@ -159,6 +204,46 @@ inline __global__ void rgb2yuv(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
             make_float4(yuyv[yoffset], yuyv[bitx + (1 - yoffset)],
                         yuyv[yoffset + 2], yuyv[(2 - bitx) + (1 - yoffset)]);
         dest(idy, idx) = rgbafloat42uchar4(syuyv);
+    }
+}
+
+__global__ void rgba2yuv(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest) {
+    const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+    if (idx < source.width / 2 && idy < source.height / 2) {
+        int2 uvlt = make_int2(idx * 2, idy * 2);
+        int2 uvlb = make_int2(idx * 2, idy * 2 + 1);
+        int2 uvrt = make_int2(idx * 2 + 1, idy * 2);
+        int2 uvrb = make_int2(idx * 2 + 1, idy * 2 + 1);
+
+        float4 rgbalt = rgbauchar42float4(source(uvlt.y, uvlt.x));
+        float4 rgbalb = rgbauchar42float4(source(uvlb.y, uvlb.x));
+        float4 rgbart = rgbauchar42float4(source(uvrt.y, uvrt.x));
+        float4 rgbarb = rgbauchar42float4(source(uvrb.y, uvrb.x));
+
+        float3 yuvlt = rgb2Yuv(make_float3(rgbalt));
+        float3 yuvlb = rgb2Yuv(make_float3(rgbalb));
+        float3 yuvrt = rgb2Yuv(make_float3(rgbart));
+        float3 yuvrb = rgb2Yuv(make_float3(rgbarb));
+        float3 ayuv = yuvlt + yuvlb + yuvrt + yuvrb;
+ 
+        int2 uindex = make_int2(idx, source.height + idy);
+        int2 vindex = make_int2(idx, source.height * 3 / 2 + idy);
+        int2 aindex1 = make_int2(idx + source.width / 2, source.height + idy);
+        int2 aindex2 =
+            make_int2(idx + source.width / 2, source.height * 3 / 2 + idy);
+
+        dest(uindex.y, uindex.x) = rgbafloat2ucha1(ayuv.y / 4.0f);
+        dest(vindex.y, vindex.x) = rgbafloat2ucha1(ayuv.z / 4.0f);
+
+        dest(aindex1.y, aindex1.x) =
+            rgbafloat2ucha1((rgbalt.w + rgbart.w) / 2.0f);
+        dest(aindex2.y, aindex2.x) =
+            rgbafloat2ucha1((rgbalb.w + rgbarb.w) / 2.0f);
+        dest(uvlt.y, uvlt.x) = rgbafloat2ucha1(yuvlt.x);
+        dest(uvlb.y, uvlb.x) = rgbafloat2ucha1(yuvlb.x);
+        dest(uvrt.y, uvrt.x) = rgbafloat2ucha1(yuvrt.x);
+        dest(uvrb.y, uvrb.x) = rgbafloat2ucha1(yuvrb.x);
     }
 }
 

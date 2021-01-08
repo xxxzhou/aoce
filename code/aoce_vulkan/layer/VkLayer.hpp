@@ -65,7 +65,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     // vulkan层在onInit后,shader 编译
     virtual void onInitGraph(){};
     // onInitBuffer后,onInitBuffer已经关联后上层的输出当做本层的输入
-    virtual void onInitVkBuffer(){};
+    virtual void onInitVkBuffer(){};    
     virtual void onInitPipe(){};
     virtual void onPreCmd(){};
 };

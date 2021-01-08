@@ -32,7 +32,7 @@ class VkOutputLayer : public OutputLayer, public VkLayer {
     virtual bool onFrame() override;
 
    public:
-    virtual void outGpuTex(const VkOutGpuTex& outTex,
+    virtual void outVkGpuTex(const VkOutGpuTex& outTex,
                            int32_t outIndex = 0) override;
 
 #if __ANDROID__

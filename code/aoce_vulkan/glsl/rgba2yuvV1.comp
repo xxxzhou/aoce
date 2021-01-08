@@ -1,0 +1,170 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, r8) uniform image2D outTex;
+layout (binding = 2) uniform UBO 
+{
+	int width;
+	int height;
+	int yuvType;
+} ubo;
+
+int u22u1(ivec2 uv, int step) {
+	return uv.y * step + uv.x;
+}
+
+ivec2 u12u2(int index, int step) {
+	ivec2 uv;
+	uv.y = index / step;
+	uv.x = index - uv.y*step;// % 花费高?
+	return uv;
+}
+
+vec4 rgb2Yuv(vec4 rgba) {
+	vec4 yuva;
+	//xyz -> yuv
+	yuva.x = clamp(0.299 * rgba.r + 0.587 * rgba.g + 0.114 * rgba.b, 0, 1);
+	//uv (-0.5,0.5)
+	yuva.y = clamp(-0.1687 * rgba.r - 0.3313 * rgba.g + 0.5 * rgba.b + 0.5f, 0, 1);
+	yuva.z = clamp(0.5 * rgba.r - 0.4187 * rgba.g - 0.0813 * rgba.b + 0.5f, 0, 1);
+	yuva.a = clamp(rgba.w, 0, 1);
+	return yuva; 
+}
+
+vec4 make_vec4(float r){
+    return vec4(r,0.f,0.f,0.f);
+}
+
+// yuv420sp
+void nv12(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x/2 || uv.y >= size.y/2){
+        return;
+    }
+	ivec2 nuv = ivec2(0,size.y);
+	ivec2 uindex = ivec2(uv.x*2,uv.y)+nuv;
+	ivec2 vindex = ivec2(uv.x*2+1,uv.y)+nuv;
+
+	vec4 rgba1 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2));
+	vec4 rgba2 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2));
+	vec4 rgba3 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2+1));
+	vec4 rgba4 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2+1));	
+
+    vec4 yuv1 = rgb2Yuv(rgba1);
+	vec4 yuv2 = rgb2Yuv(rgba2);
+	vec4 yuv3 = rgb2Yuv(rgba3);
+	vec4 yuv4 = rgb2Yuv(rgba4);	
+
+    vec4 yuv = (yuv1 + yuv2 + yuv3 + yuv4)/4.0f;
+    // uv
+    imageStore(outTex, uindex.xy, make_vec4(yuv.g)); 
+    imageStore(outTex, vindex.xy, make_vec4(yuv.b)); 
+    // y
+	imageStore(outTex, ivec2(uv.x*2,uv.y*2),make_vec4(yuv1.r)); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2),make_vec4(yuv2.r)); 
+	imageStore(outTex, ivec2(uv.x*2,uv.y*2+1),make_vec4(yuv3.r)); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2+1),make_vec4(yuv4.r)); 
+}
+
+void yuv420p(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x/2 || uv.y >= size.y/2){
+        return;
+    }
+	ivec2 nuv = u12u2(u22u1(uv.xy, size.x/2), size.x);
+	ivec2 uindex = ivec2(uv.x,uv.y)+nuv;
+	ivec2 vindex = ivec2(uv.x,uv.y*5/4)+nuv;
+
+	vec4 rgba1 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2));
+	vec4 rgba2 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2));
+	vec4 rgba3 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2+1));
+	vec4 rgba4 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2+1));	
+
+    vec4 yuv1 = rgb2Yuv(rgba1);
+	vec4 yuv2 = rgb2Yuv(rgba2);
+	vec4 yuv3 = rgb2Yuv(rgba3);
+	vec4 yuv4 = rgb2Yuv(rgba4);	
+
+    vec4 yuv = (yuv1 + yuv2 + yuv3 + yuv4)/4.0f;
+    // uv
+    imageStore(outTex, uindex,make_vec4(yuv.g)); 
+    imageStore(outTex, vindex,make_vec4(yuv.b)); 
+    // y
+	imageStore(outTex, ivec2(uv.x*2,uv.y*2),make_vec4(yuv1.r)); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2),make_vec4(yuv2.r)); 
+	imageStore(outTex, ivec2(uv.x*2,uv.y*2+1),make_vec4(yuv3.r)); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2+1),make_vec4(yuv4.r)); 
+}
+
+void yuv422ap(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x/2 || uv.y >= size.y/2){
+        return;
+    }
+	ivec2 uindex = uv + ivec2(0,size.y);
+	ivec2 vindex = uv + ivec2(0,size.y*3/2);
+	ivec2 aindex1 = uv + ivec2(size.x/2,size.y);
+	ivec2 aindex2 = uv + ivec2(size.x/2,size.y*3/2);
+
+	vec4 rgba1 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2));
+	vec4 rgba2 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2));
+	vec4 rgba3 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2+1));
+	vec4 rgba4 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2+1));	
+
+    vec4 yuv1 = rgb2Yuv(rgba1);
+	vec4 yuv2 = rgb2Yuv(rgba2);
+	vec4 yuv3 = rgb2Yuv(rgba3);
+	vec4 yuv4 = rgb2Yuv(rgba4);	
+
+    vec4 yuv = (yuv1 + yuv2 + yuv3 + yuv4)/4.0f;
+    // uv
+    imageStore(outTex, uindex,make_vec4(yuv.g)); 
+    imageStore(outTex, vindex,make_vec4(yuv.b)); 
+    // a
+    imageStore(outTex, aindex1,make_vec4((rgba1.a+rgba2.a)/2.0f)); 
+    imageStore(outTex, aindex2,make_vec4((rgba3.a+rgba4.a)/2.0f)); 
+    // y
+	imageStore(outTex, ivec2(uv.x*2,uv.y*2),make_vec4(yuv1.r)); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2),make_vec4(yuv2.r)); 
+	imageStore(outTex, ivec2(uv.x*2,uv.y*2+1),make_vec4(yuv3.r)); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y*2+1),make_vec4(yuv4.r)); 
+}
+
+void yuv422p(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x/2 || uv.y >= size.y){
+        return;
+    }
+	ivec2 nuv = u12u2(u22u1(uv.xy, size.x/2), size.x);
+	ivec2 uindex = ivec2(uv.x,uv.y)+nuv;
+	ivec2 vindex = ivec2(uv.x,uv.y*3/2)+nuv;
+
+	vec4 rgba1 = imageLoad(inTex,ivec2(uv.x*2,uv.y));
+	vec4 rgba2 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y));
+
+    vec4 yuv1 = rgb2Yuv(rgba1);
+	vec4 yuv2 = rgb2Yuv(rgba2);
+
+    vec4 yuv = (yuv1 + yuv2)/2.0f;
+    // uv
+    imageStore(outTex, uindex,make_vec4(yuv.g)); 
+    imageStore(outTex, uindex,make_vec4(yuv.b)); 
+    // y
+	imageStore(outTex, ivec2(uv.x*2,uv.y),make_vec4(yuv1.r)); 
+	imageStore(outTex, ivec2(uv.x*2+1,uv.y),make_vec4(yuv2.r)); 
+}
+
+void main(){
+	if(ubo.yuvType == 1){
+		nv12();
+	}else if(ubo.yuvType == 2){
+		yuv420p();
+	}else if(ubo.yuvType == 3){
+		yuv422ap();// yuv422p yuv422ap();
+	}
+}

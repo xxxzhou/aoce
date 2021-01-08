@@ -1,5 +1,5 @@
 #pragma once
-#include <Layer/InputLayer.hpp>
+#include <Layer/BaseLayer.hpp>
 
 #include "CuLayer.hpp"
 

@@ -30,10 +30,6 @@ static VideoFormat format = {};
 
 static GpuType gpuType = GpuType::vulkan;
 
-// YUV数据是否紧密
-static bool bFill = true;
-static std::vector<uint8_t> data;
-
 static MediaPlayer *player = nullptr;
 // test rtmp
 // static std::string uri = "rtmp://202.69.69.180:443/webcast/bshdlive-pc";
@@ -98,7 +94,7 @@ void onPreCommand(uint32_t index) {
     outTex.image = winImage;
     outTex.width = window->width;
     outTex.height = window->height;
-    outputLayer->outGpuTex(outTex);
+    outputLayer->outVkGpuTex(outTex);
     // 复制完成后,改变渲染图的layout准备呈现
     changeLayout(cmd, winImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
@@ -193,5 +189,4 @@ JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_openUri(
     player->prepare(true);
 }
 }
-
 #endif

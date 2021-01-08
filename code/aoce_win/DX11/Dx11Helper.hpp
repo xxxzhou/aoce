@@ -10,6 +10,8 @@
 namespace aoce {
 namespace win {
 
+ACOE_WIN_EXPORT DXGI_FORMAT getImageDXFormt(ImageType imageType);
+
 // 创建一个Dx11环境
 ACOE_WIN_EXPORT bool createDevice11(ID3D11Device** deviceDx11,
                                     ID3D11DeviceContext** ctxDx11);

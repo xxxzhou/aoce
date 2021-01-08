@@ -8,6 +8,8 @@
 
 namespace aoce {
 
+#define AOCE_VIDEO_MAX_NAME 512
+
 enum class VideoHandleId : int32_t {
     none = 0,
     open = 1,
@@ -32,8 +34,10 @@ class ACOE_EXPORT VideoDevice {
     videoFrameHandle onVideoFrameEvent = nullptr;
 
     std::vector<VideoFormat> formats;
-    VideoFormat selectFormat;
+    VideoFormat selectFormat = {};
     bool isOpen = false;
+    // 是否后置摄像头
+    bool isBack = false;
 
    public:
     VideoDevice(/* args */);
@@ -52,6 +56,10 @@ class ACOE_EXPORT VideoDevice {
     const std::vector<char>& getId() { return id; };
     const VideoFormat& getSelectFormat() { return selectFormat; }
 
+    bool back() { return isBack; }
+
+    int32_t findFormatIndex(int32_t width, int32_t height, int32_t fps = 30);
+    
    public:
     virtual void setVideoFrameHandle(videoFrameHandle handle);
     virtual void setDeviceHandle(deviceHandle handle);
@@ -66,6 +74,7 @@ class ACOE_EXPORT VideoDevice {
     virtual bool close() { return false; };
     // 是否打开中
     virtual bool bOpen() { return isOpen; }
+
 };
 
 }  // namespace aoce

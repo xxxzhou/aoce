@@ -1,6 +1,6 @@
 #pragma once
 
-// 仿opencv里的GpuMat
+// CudaMat的实现仿opencv里的GpuMat
 #include <vector_functions.h>
 
 #include <Aoce.hpp>

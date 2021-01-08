@@ -35,7 +35,7 @@ bool CuYUV2RGBALayer::onFrame() {
     if (paramet.type == VideoType::nv12 || paramet.type == VideoType::yuv420P ||
         paramet.type == VideoType::yuy2P) {
         int32_t yuvType = getYuvIndex(paramet.type);
-        yuv2rgb_gpu(*inTexs[0], *outTexs[0], yuvType, stream);
+        yuv2rgb_gpu(*inTexs[0], *outTexs[0], yuvType, stream);        
     } else if (paramet.type == VideoType::yuv2I ||
                paramet.type == VideoType::yvyuI ||
                paramet.type == VideoType::uyvyI) {

@@ -55,7 +55,7 @@ void onPreCommand(uint32_t index) {
     outTex.image = winImage;
     outTex.width = window->width;
     outTex.height = window->height;
-    outputLayer->outGpuTex(outTex);
+    outputLayer->outVkGpuTex(outTex);
     // 复制完成后,改变渲染图的layout准备呈现
     changeLayout(cmd, winImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,

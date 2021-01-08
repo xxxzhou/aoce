@@ -2,6 +2,7 @@
 set(targets 01_findmodule)
 set(targetopencvs 02_showdevice 03_findvulkan) 
 set(targetvulkans 04_vulkantest 05_livetest 06_mediaplayer)
+set(targetdx11 07_wintest)
 
 SET(OpenCV_DIR D:/WorkSpace/C++/opencv/opencv41/build/install)
 find_package(OpenCV)   
@@ -49,7 +50,10 @@ function(sample)
 #            add_library(${target} SHARED ${target}/${target}.cpp)
 #            target_link_libraries(${target} android native-app-glue aoce aoce_vulkan)
 #        endif()
-    endforeach()  
+    endforeach() 
+    foreach(target ${targetdx11})
+        generate(${target} FALSE aoce_win aoce)
+    endforeach()
 endfunction(sample) 
 
 if(WIN32)
@@ -72,4 +76,7 @@ if(ANDROID)
 
     add_library(06_mediaplayer SHARED 06_mediaplayer/06_mediaplayer.cpp)
     target_link_libraries(06_mediaplayer android aoce aoce_vulkan aoce_ffmpeg)
+
+    add_library(07_androidtest SHARED 07_androidtest/07_androidtest.cpp)
+    target_link_libraries(07_androidtest android native-app-glue aoce aoce_vulkan aoce_android)
 endif()

@@ -298,56 +298,98 @@ int32_t getImageTypeSize(const aoce::ImageType& imageType) {
 }
 
 int32_t getVideoFrame(const aoce::VideoFrame& frame, uint8_t* data) {
-    // 只有这二种有可能内存不连续
-    if (frame.videoType != VideoType::yuv420P &&
-        frame.videoType != VideoType::yuy2P) {
-        return 0;
-    }
-    int32_t ysize = (uint64_t)&frame.data[1][0] - (uint64_t)&frame.data[0][0];
-    int32_t usize = (uint64_t)&frame.data[2][0] - (uint64_t)&frame.data[1][0];
-    int32_t hscale = frame.videoType == VideoType::yuy2P ? 1 : 2;
-    int32_t uweight = frame.width / 2;
-    int32_t uheight = frame.height / hscale;
-    // 按照YUV格式排列
-    if (ysize == frame.width * frame.height && ysize == usize * hscale * 2) {
-        return 0;
-    }
-    // 如果data有数据,紧密排列
-    if (data != nullptr) {
-        // Y可以直接复制
-        if (frame.dataAlign[0] == 0 || frame.dataAlign[0] == frame.width) {
-            memcpy(data, frame.data[0], frame.width * frame.height);
-            data += frame.width * frame.height;
-        } else {
-            for (int i = 0; i < frame.height; i++) {
-                memcpy(data, frame.data[0] + i * frame.dataAlign[0],
-                       frame.width);
-                data += frame.width;
+    if (frame.videoType == VideoType::yuv420P ||
+        frame.videoType == VideoType::yuy2P) {
+        int32_t ysize =
+            (uint64_t)&frame.data[1][0] - (uint64_t)&frame.data[0][0];
+        int32_t usize =
+            (uint64_t)&frame.data[2][0] - (uint64_t)&frame.data[1][0];
+        int32_t hscale = frame.videoType == VideoType::yuy2P ? 1 : 2;
+        int32_t uweight = frame.width / 2;
+        int32_t uheight = frame.height / hscale;
+        // 按照YUV格式排列
+        if (ysize == frame.width * frame.height &&
+            ysize == usize * hscale * 2) {
+            return 0;
+        }
+        // 如果data有数据,紧密排列
+        if (data != nullptr) {
+            // Y可以直接复制
+            if (frame.dataAlign[0] == 0 || frame.dataAlign[0] == frame.width) {
+                memcpy(data, frame.data[0], frame.width * frame.height);
+                data += frame.width * frame.height;
+            } else {
+                for (int i = 0; i < frame.height; i++) {
+                    memcpy(data, frame.data[0] + i * frame.dataAlign[0],
+                           frame.width);
+                    data += frame.width;
+                }
+            }
+            // U
+            if (frame.dataAlign[1] == 0 ||
+                frame.dataAlign[1] == frame.width / 2) {
+                memcpy(data, frame.data[1], uweight * uheight);
+                data += uweight * uheight;
+            } else {
+                for (int i = 0; i < uheight; i++) {
+                    memcpy(data, frame.data[1] + i * frame.dataAlign[1],
+                           uweight);
+                    data += uweight;
+                }
+            }
+            // V
+            if (frame.dataAlign[2] == 0 ||
+                frame.dataAlign[2] == frame.width / 2) {
+                memcpy(data, frame.data[2], uweight * uheight);
+                data += uweight * uheight;
+            } else {
+                for (int i = 0; i < uheight; i++) {
+                    memcpy(data, frame.data[2] + i * frame.dataAlign[2],
+                           uweight);
+                    data += uweight;
+                }
             }
         }
-        // U
-        if (frame.dataAlign[1] == 0 || frame.dataAlign[1] == frame.width / 2) {
-            memcpy(data, frame.data[1], uweight * uheight);
-            data += uweight * uheight;
-        } else {
-            for (int i = 0; i < uheight; i++) {
-                memcpy(data, frame.data[1] + i * frame.dataAlign[1], uweight);
-                data += uweight;
+        int32_t yuvsize = frame.width * (frame.height + uheight);
+        return yuvsize;
+    } else if (frame.videoType == VideoType::nv12) {
+        if (frame.data[1] == nullptr) {
+            return 0;
+        }
+        // anroid的摄像头的YUV_420_888可能是nv12,并且Y/UV不连续
+        int32_t ysize =
+            (uint64_t)&frame.data[1][0] - (uint64_t)&frame.data[0][0];
+        // Y plan与uv plan按要求紧密排列
+        if (ysize == frame.width * frame.height) {
+            return 0;
+        }
+        if (data != nullptr) {
+            // Y可以直接复制
+            if (frame.dataAlign[0] == 0 || frame.dataAlign[0] == frame.width) {
+                memcpy(data, frame.data[0], frame.width * frame.height);
+                data += frame.width * frame.height;
+            } else {
+                for (int i = 0; i < frame.height; i++) {
+                    memcpy(data, frame.data[0] + i * frame.dataAlign[0],
+                           frame.width);
+                    data += frame.width;
+                }
+            }
+            // uv复制
+            if (frame.dataAlign[1] == 0 || frame.dataAlign[1] == frame.width) {
+                memcpy(data, frame.data[1], frame.width * frame.height / 2);
+                data += frame.width * frame.height / 2;
+            } else {
+                for (int i = 0; i < frame.height / 2; i++) {
+                    memcpy(data, frame.data[1] + i * frame.dataAlign[1],
+                           frame.width);
+                    data += frame.width;
+                }
             }
         }
-        // V
-        if (frame.dataAlign[2] == 0 || frame.dataAlign[2] == frame.width / 2) {
-            memcpy(data, frame.data[2], uweight * uheight);
-            data += uweight * uheight;
-        } else {
-            for (int i = 0; i < uheight; i++) {
-                memcpy(data, frame.data[2] + i * frame.dataAlign[2], uweight);
-                data += uweight;
-            }
-        }
+        return frame.width * frame.height * 3 / 2;
     }
-    int32_t yuvsize = frame.width * (frame.height + uheight);
-    return yuvsize;
+    return 0;
 }
 
 std::string getAocePath() {
@@ -374,6 +416,8 @@ void loadAoce() {
 #if WIN32
     ModuleManager::Get().regAndLoad("aoce_win_mf");
     ModuleManager::Get().regAndLoad("aoce_cuda");
+#elif __ANDROID__
+    ModuleManager::Get().regAndLoad("aoce_android");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
     ModuleManager::Get().regAndLoad("aoce_agora");
@@ -392,6 +436,8 @@ void unloadAoce() {
 #if WIN32
     ModuleManager::Get().unloadModule("aoce_win_mf");
     ModuleManager::Get().unloadModule("aoce_cuda");
+#elif __ANDROID__
+    ModuleManager::Get().unloadModule("aoce_android");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
     ModuleManager::Get().unloadModule("aoce_agora");

@@ -5,6 +5,28 @@
 namespace aoce {
 namespace win {
 
+DXGI_FORMAT getImageDXFormt(ImageType imageType) {
+    DXGI_FORMAT dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+    switch (imageType) {
+        case ImageType::r8:
+            dxFormat = DXGI_FORMAT_R8_UNORM;
+            break;
+        case ImageType::rgba8:
+            dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+            break;
+        case ImageType::r16:
+            dxFormat = DXGI_FORMAT_R16_UINT;
+            break;
+        case ImageType::bgra8:
+            dxFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+            break;
+        default:
+            dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+            break;
+    }
+    return dxFormat;
+}
+
 bool createDevice11(ID3D11Device** deviceDx11, ID3D11DeviceContext** ctxDx11) {
     *deviceDx11 = nullptr;
     *ctxDx11 = nullptr;

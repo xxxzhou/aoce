@@ -202,19 +202,39 @@ struct AudioFrame {
     uint8_t *data[2];
 };
 
+// 图片大小变化的操作
+struct ResizeParamet {
+    int32_t bLinear = true;
+    // 旋转90度
+    int32_t bRotation = false;
+	int32_t width = 1920;
+	int32_t height = 1080;    
+};
+
+struct YUVParamet {
+    VideoType type = VideoType::nv12;
+};
+
 // ARGB<->BGRA<->RGBA<->RRRR
-struct MapChannelParamet {
+struct MapChannel {
     uint32_t red = 0;
     uint32_t green = 1;
     uint32_t blue = 2;
     uint32_t alpha = 3;
 };
 
-//方便C#交互不做额外设置，以及GPU参数结构对应,bool全用int表示
-struct OperateParamet {
+// 方便C#交互不做额外设置，以及GPU参数结构对应,bool全用int表示
+struct Operate {
     int32_t bFlipX = false;
     int32_t bFlipY = false;
+    // 调整亮度
     float gamma = 1.f;
+};
+
+// 纹理些基本操作
+struct TexOperateParamet {
+    MapChannel mapChannel = {};
+    Operate operate = {};
 };
 
 }  // namespace aoce

@@ -43,7 +43,9 @@ class ACOE_EXPORT OutputLayer : public ITLayer<OutputParamet> {
 
     // vk: contex表示vkcommandbuffer,texture表示vktexture
     // dx11: contex表示ID3D11Device,texture表示ID3D11Texture2D
-    virtual void outGpuTex(const VkOutGpuTex& outTex, int32_t outIndex = 0){};
+    virtual void outVkGpuTex(const VkOutGpuTex& outTex, int32_t outIndex = 0){};
+
+    virtual void outDx11GpuTex(void* device, void* tex){};
 
 #if __ANDROID__
     virtual void outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType = 0,
