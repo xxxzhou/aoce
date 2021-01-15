@@ -44,26 +44,26 @@ struct Dx11CudaResource {
     }
 };
 
-void setNppStream(cudaStream_t& stream);
+void AOCE_CUDA_EXPORT setNppStream(cudaStream_t& stream);
 
 // 把CUDA资源复制给DX11纹理(这里有个算是我遇到最奇怪的BUG之一,有行中文注释会导致这函数不能运行?)
-void gpuMat2D3dTexture(CudaMatRef frame, Dx11CudaResource& cudaResource,
+void AOCE_CUDA_EXPORT gpuMat2D3dTexture(CudaMatRef frame, Dx11CudaResource& cudaResource,
                        cudaStream_t stream);
 
 // 把与DX11资源绑定显存复制出来
-void d3dTexture2GpuMat(CudaMatRef frame, Dx11CudaResource& cudaResource,
+void AOCE_CUDA_EXPORT d3dTexture2GpuMat(CudaMatRef frame, Dx11CudaResource& cudaResource,
                        cudaStream_t stream);
 
 // 绑定一个DX11共享资源与CUDA资源,分别在DX11与CUDA都有相关引用,二边分别可读可写
-bool registerCudaResource(Dx11CudaResource& cudaDx11,
+bool AOCE_CUDA_EXPORT registerCudaResource(Dx11CudaResource& cudaDx11,
                           std::shared_ptr<win::Dx11SharedTex> sharedResource,
                           ID3D11Device* device, int32_t width, int32_t height,
                           DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
 #endif
 
-void reCudaAllocCpu(void** data, int32_t length);
+void AOCE_CUDA_EXPORT reCudaAllocCpu(void** data, int32_t length);
 
-void reCudaAllocGpu(void** data, int32_t length);
+void AOCE_CUDA_EXPORT reCudaAllocGpu(void** data, int32_t length);
 
 }  // namespace cuda
 }  // namespace aoce

@@ -14,6 +14,8 @@ VkPipeGraph::VkPipeGraph(/* args */) {
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
     vkCreateFence(context->device, &fenceInfo, nullptr,
                   &computerFence);
+
+    gpu = GpuType::vulkan;
 }
 
 VkPipeGraph::~VkPipeGraph() {}

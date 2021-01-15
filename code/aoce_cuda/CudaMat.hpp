@@ -3,20 +3,13 @@
 // CudaMat的实现仿opencv里的GpuMat
 #include <vector_functions.h>
 
-#include <Aoce.hpp>
+#include "aoce/Aoce.hpp"
 #include <memory>
 
 #include "cuda/CudaTypes.hpp"
 
-__host__ __forceinline__ void checkCudaError(cudaError_t err, const char* file,
-                                             const int line, const char* func) {
-    if (cudaSuccess != err) {
-        std::string msg;
-        string_format(msg, "cuda error: ", cudaGetErrorString(err),
-                      " file: ", file, " line: ", line, " in function: ", func);
-        logMessage(aoce::LogLevel::error, msg);
-    }
-}
+void checkCudaError(cudaError_t err, const char* file,
+                                             const int line, const char* func);
 
 #define AOCE_CUDEV_SAFE_CALL(expr) \
     checkCudaError((expr), __FILE__, __LINE__, AOCE_Func)

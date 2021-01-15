@@ -10,6 +10,7 @@ class VkRGBA2YUVLayer : public VkLayer, public RGBA2YUVLayer {
     AOCE_LAYER_QUERYINTERFACE(VkRGBA2YUVLayer)
    private:
     /* data */
+    std::unique_ptr<VulkanBuffer> kernelBuffer;
    public:
     VkRGBA2YUVLayer(/* args */);
     ~VkRGBA2YUVLayer();
@@ -18,8 +19,7 @@ class VkRGBA2YUVLayer : public VkLayer, public RGBA2YUVLayer {
     virtual void onInitGraph() override;
     virtual void onUpdateParamet() override;
     virtual void onInitLayer() override;
-    virtual void onInitPipe() override;
-    virtual void onPreCmd() override;
+
 };
 
 }  // namespace layer

@@ -47,7 +47,18 @@ void VkLayer::onInit() {
     onInitGraph();
 }
 
-// void VkLayer::onInitLayer() { }
+void VkLayer::onInitLayer() {
+    for(int i =0;i<inCount;i++){
+        inFormats[i].imageType = ImageType::rgba8;
+    }
+    for(int i =0;i<outCount;i++){
+        outFormats[i].imageType = ImageType::rgba8;
+    }
+    if(inCount> 0){
+        sizeX = divUp(inFormats[0].width, groupX);
+        sizeY = divUp(inFormats[0].height, groupY);
+    }
+}
 
 void VkLayer::onInitBuffer() {
     if (!bInput) {
@@ -69,13 +80,39 @@ void VkLayer::onInitBuffer() {
             outTexs.push_back(texPtr);
         }
     }
-    // 默认更新一次UBO
-    updateUBO();
     onInitVkBuffer();
     onInitPipe();
+    // 默认更新一次UBO
+    updateUBO();
 }
 
 bool VkLayer::onFrame() { return true; }
+
+void VkLayer::onInitPipe() {
+    inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    layout->updateSetLayout(0, 0, &inTexs[0]->descInfo, &outTexs[0]->descInfo,
+                            &constBuf->descInfo);
+    auto computePipelineInfo = VulkanPipeline::createComputePipelineInfo(
+        layout->pipelineLayout, shader->shaderStage);
+    VK_CHECK_RESULT(vkCreateComputePipelines(
+        context->device, context->pipelineCache, 1, &computePipelineInfo,
+        nullptr, &computerPipeline));
+}
+
+void VkLayer::onPreCmd() {
+    inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
+                          VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                          VK_ACCESS_SHADER_READ_BIT);
+    outTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
+                           VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                           VK_ACCESS_SHADER_WRITE_BIT);
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, computerPipeline);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE,
+                            layout->pipelineLayout, 0, 1,
+                            layout->descSets[0].data(), 0, 0);
+    vkCmdDispatch(cmd, sizeX, sizeY, 1);
+}
 
 }  // namespace layer
 }  // namespace vulkan

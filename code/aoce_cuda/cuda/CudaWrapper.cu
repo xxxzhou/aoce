@@ -1,4 +1,3 @@
-#include "fastguidedfilter.h"
 #include "colorconvert.h"
 #include "imageprocess.h"
 
@@ -70,39 +69,9 @@ void rgb2yuv_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool ufront, 
 	rgb2yuv << <grid, block, 0, stream >> > (source, dest, bitx, yoffset);
 }
 
-void textureMap_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, MapChannelParamet paramt, cudaStream_t stream) {
+void textureMap_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, MapChannel paramt, cudaStream_t stream) {
 	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
 	textureMap << <grid, block, 0, stream >> > (source, dest, paramt);
-}
-
-void findMatrix_gpu(PtrStepSz<float4> source, PtrStepSz<float3> dest, PtrStepSz<float3> dest1, PtrStepSz<float3> dest2, cudaStream_t stream){
-	//dim3 block(32, 4);//(16, 16)
-	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
-	findMatrix << <grid, block, 0, stream >> > (source, dest, dest1, dest2);
-}
-
-void guidedFilter_gpu(PtrStepSz<float4> source, PtrStepSz<float3> col1, PtrStepSz<float3> col2, PtrStepSz<float3> col3, PtrStepSz<float4> dest, float eps, cudaStream_t stream){
-	//dim3 block(32, 4);//(16, 16)
-	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
-	guidedFilter << <grid, block, 0, stream >> > (source, col1, col2, col3, dest, eps);
-}
-
-void guidedFilterResult_gpu(PtrStepSz<uchar4> source, PtrStepSz<float4> guid, PtrStepSz<uchar4> dest,
-	float intensity, cudaStream_t stream) {
-	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
-	guidedFilterResult << <grid, block, 0, stream >> > (source, guid, dest, intensity);
-}
-
-void mainAlign_gpu(PtrStepSz<uint16_t> source, PtrStepSz<uint16_t> dest, Intrinsics alignParam, cudaStream_t stream) {
-
-	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
-	mainAlign << <grid, block, 0, stream >> > (source, dest, alignParam);
-}
-
-void distortion_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, PtrStepSz<float2> map, cudaStream_t stream) {
-	//dim3 block(32, 4);//(16, 16)
-	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
-	distortion << <grid, block, 0, stream >> > (source, dest, map);
 }
 
 void blend_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> blendTex, PtrStepSz<uchar4> dest,
@@ -111,7 +80,7 @@ void blend_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> blendTex, PtrStepSz<u
 	blend << <grid, block, 0, stream >> > (source, blendTex, dest, left, top, opacity);
 }
 
-void operate_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, OperateParamet paramt, cudaStream_t stream) {
+void operate_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, Operate paramt, cudaStream_t stream) {
 	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
 	operate << <grid, block, 0, stream >> > (source, dest, paramt);
 }

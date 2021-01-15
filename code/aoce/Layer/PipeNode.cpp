@@ -25,7 +25,7 @@ void PipeNode::setEnable(bool benable) {
 PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
     if (this->layer->gpu != layer->gpu) {
         logMessage(LogLevel::error, "layer gpu not equal node");
-        return nullptr;
+        // return nullptr;
     }
     PipeNodePtr ptr = this->layer->pipeGraph->addNode(layer);
     return addLine(ptr, 0, 0);

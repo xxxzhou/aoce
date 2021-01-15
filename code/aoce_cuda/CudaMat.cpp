@@ -1,4 +1,15 @@
 #include "CudaMat.hpp"
+
+void checkCudaError(cudaError_t err, const char* file, const int line,
+                    const char* func) {
+    if (cudaSuccess != err) {
+        std::string msg;
+        string_format(msg, "cuda error: ", cudaGetErrorString(err),
+                      " file: ", file, " line: ", line, " in function: ", func);
+        logMessage(aoce::LogLevel::error, msg);
+    }
+}
+
 namespace aoce {
 namespace cuda {
 
@@ -83,17 +94,11 @@ uint8_t* CudaMat::ptr(int32_t y) {
     return data + step * y;
 }
 
-int32_t CudaMat::getWidth(){
-    return width;
-}
+int32_t CudaMat::getWidth() { return width; }
 
-int32_t CudaMat::getHeight(){
-    return height;
-}
+int32_t CudaMat::getHeight() { return height; }
 
-size_t CudaMat::getStep(){
-    return step;
-}
+size_t CudaMat::getStep() { return step; }
 
 }  // namespace cuda
 }  // namespace aoce

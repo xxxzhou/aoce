@@ -63,6 +63,7 @@ int main() {
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
+
     VideoType videoType = selectFormat.videoType;
     if (selectFormat.videoType == VideoType::mjpg) {
         videoType = VideoType::yuv2I;

@@ -322,5 +322,14 @@ void FMediaPlayer::release() {
     status = PlayStatus::end;
 }
 
+
+FMediaPlayerFactory::FMediaPlayerFactory(/* args */) {}
+
+FMediaPlayerFactory::~FMediaPlayerFactory() {}
+
+MediaPlayer* FMediaPlayerFactory::createPlay(){
+    return new FMediaPlayer();
+}
+
 }  // namespace ffmpeg
 }  // namespace aoce

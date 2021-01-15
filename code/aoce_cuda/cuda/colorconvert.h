@@ -279,7 +279,7 @@ inline __global__ void argb2rgba(PtrStepSz<uchar4> source,
 
 inline __global__ void textureMap(PtrStepSz<uchar4> source,
                                   PtrStepSz<uchar4> dest,
-                                  MapChannelParamet paramt) {
+                                  MapChannel paramt) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
     if (idx < dest.width && idy < dest.height) {
@@ -307,7 +307,7 @@ inline __global__ void blend(PtrStepSz<uchar4> source,
 }
 
 inline __global__ void operate(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
-                               OperateParamet paramt) {
+                               Operate paramt) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
     if (idx < dest.width && idy < dest.height) {

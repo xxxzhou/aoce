@@ -6,7 +6,9 @@
 namespace aoce {
 namespace cuda {
 
-CuLayer::CuLayer(/* args */) {}
+CuLayer::CuLayer(/* args */) {
+    gpu = GpuType::cuda;
+}
 
 CuLayer::~CuLayer() {}
 

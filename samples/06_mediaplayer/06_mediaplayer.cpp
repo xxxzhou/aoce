@@ -119,7 +119,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
 
-    player = AoceManager::Get().getMediaPlayer(MediaPlayType::ffmpeg);
+    player = AoceManager::Get().getMediaPlayerFactory(MediaPlayType::ffmpeg)->createPlay();
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
     window = std::make_unique<VulkanWindow>(onPreCommand, false);
     window->initWindow(hInstance, 1280, 720, "vulkan test");

@@ -8,7 +8,7 @@
 #include "../aoce_win/DX11/Dx11Window.hpp"
 
 // 是用摄像机还是用ffmpeg拉流
-#define USE_CAMERA 0
+#define USE_CAMERA 1
 
 using namespace aoce;
 using namespace aoce::win;
@@ -107,7 +107,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     }
 #else
     instance = hInstance;
-    player = AoceManager::Get().getMediaPlayer(MediaPlayType::ffmpeg);
+    player = AoceManager::Get().getMediaPlayerFactory(MediaPlayType::ffmpeg)->createPlay();
     testPlay = new TestMediaPlay();
     player->setDataSource(uri.c_str());
     player->setObserver(testPlay);

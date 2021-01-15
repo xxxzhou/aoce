@@ -10,6 +10,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_SOURCE_DIR}/thirdparty")
 set(AOCE_THIRDPARTY_PATH ${CMAKE_PREFIX_PATH})
 
+# cmake option(cmake_dependent_option)
+include(CMakeDependentOption)
+
 # 设置本项目的安装目录
 include(GNUInstallDirs)
 # 如果CMAKE_INSTALL_PREFIX没设置值,用于默认初始化 CMAKE_BINARY_DIR为build目录 CACHE序列化
@@ -62,11 +65,23 @@ set(AOCE_VULKAN_HEADER_DIR "${CMAKE_SOURCE_DIR}/code/aoce_vulkan")
 set(AOCE_RUNTIME_DIR ${CMAKE_BINARY_DIR}/bin)
 set(AOCE_LIBRARY_DIR ${CMAKE_BINARY_DIR}/lib)
 
-set(AOCE_SET_STATIC 0)
-option(AOCE_INSTALL_AGORA "install agora module" TRUE) #FALSE
-option(AOCE_INSTALL_FFMPEG "install ffmpeg module" TRUE)
+# 检查是否有aoce_agora实现
+set(AOCE_AGORA_EXIST FALSE)
+if(EXISTS "${CMAKE_SOURCE_DIR}/code/aoce_agora")
+    message(STATUS "find aoce_agora")
+    set(AOCE_AGORA_EXIST TRUE)
+endif()
+# 检查是否有aoce_talkto实现
+set(AOCE_TALKTO_EXIST FALSE)
+if(EXISTS "${CMAKE_SOURCE_DIR}/code/aoce_talkto")
+    message(STATUS "find aoce_talkto")
+    set(AOCE_TALKTO_EXIST TRUE)
+endif()
 
-# cmake_dependent_option
+set(AOCE_SET_STATIC 0)
+option(AOCE_INSTALL_FFMPEG "install ffmpeg module" TRUE)
+cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGORA_EXIST" FALSE) #FALSE
+cmake_dependent_option(AOCE_INSTALL_TALKTO "install talkto module" TRUE "WIN32;AOCE_TALKTO_EXIST" FALSE)
 
 # 配置联系cmake/c++
 configure_file(${CMAKE_SOURCE_DIR}/cmake/AoceBuildSettings.h.in ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h @ONLY)

@@ -106,7 +106,7 @@ class ACOE_EXPORT AoceManager {
     AOCE_MANAGER_OBJ(GpuType, PipeGraphFactory)
     AOCE_MANAGER_OBJ(GpuType, LayerFactory)
     AOCE_MANAGER_OBJ(LiveType, LiveRoom)
-    AOCE_MANAGER_OBJ(MediaPlayType, MediaPlayer)
+    AOCE_MANAGER_OBJ(MediaPlayType, MediaPlayerFactory)
 };
 
 }  // namespace aoce

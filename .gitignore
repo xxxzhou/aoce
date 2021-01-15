@@ -1,7 +1,7 @@
 /build
 /thirdparty/
 code/aoce_agora/
-code/aoce_talkto
+code/aoce_talkto/
 android/base/CMakeFiles/
 android/base/cmake_install.cmake
 android/build

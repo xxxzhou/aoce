@@ -14,6 +14,13 @@ void VideoDevice::onVideoFrameAction(VideoFrame frame) {
     }
 }
 
+void VideoDevice::onDepthFrameAction(VideoFrame colorFrame,
+                                     VideoFrame depthFrame, void* alignParamt) {
+    if (onDepthFrameEvent) {
+        onDepthFrameEvent(colorFrame, depthFrame, alignParamt);
+    }
+}
+
 void VideoDevice::onDeviceAction(VideoHandleId id, int32_t codeId) {
     if (onDeviceEvent) {
         onDeviceEvent(id, codeId);
@@ -22,6 +29,10 @@ void VideoDevice::onDeviceAction(VideoHandleId id, int32_t codeId) {
 
 void VideoDevice::setVideoFrameHandle(videoFrameHandle handle) {
     onVideoFrameEvent = handle;
+}
+
+void VideoDevice::setDepthFrameHandle(depthFrameHandle handle) {
+    onDepthFrameEvent = handle;
 }
 
 void VideoDevice::setDeviceHandle(deviceHandle handle) {

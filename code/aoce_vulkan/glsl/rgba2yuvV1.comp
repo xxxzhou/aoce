@@ -33,7 +33,7 @@ vec4 rgb2Yuv(vec4 rgba) {
 }
 
 vec4 make_vec4(float r){
-    return vec4(r,0.f,0.f,0.f);
+    return vec4(r,r,r,r);
 }
 
 // yuv420sp

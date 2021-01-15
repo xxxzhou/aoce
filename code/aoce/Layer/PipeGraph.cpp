@@ -15,10 +15,11 @@ PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
     if (layer == nullptr) {
         logMessage(LogLevel::error, "node layer can not be empty");
     }
-    assert(layer != nullptr);
+    assert(layer != nullptr);    
     if (this->gpu != layer->gpu) {
-        return nullptr;
+        logMessage(LogLevel::error, "node layer gpu type no equal graph");
     }
+    assert(this->gpu == layer->gpu);
     layer->pipeGraph = this;
     layer->onInit();
     PipeNodePtr ptr(new PipeNode(layer));

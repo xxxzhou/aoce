@@ -79,7 +79,7 @@ class ACOE_EXPORT MediaPlayerFactory {
     MediaPlayerFactory(){};
     virtual ~MediaPlayerFactory(){};
 
-   protected:
+   public:
     virtual MediaPlayer* createPlay() = 0;
 };
 

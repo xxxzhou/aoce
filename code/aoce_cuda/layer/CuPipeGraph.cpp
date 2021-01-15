@@ -4,6 +4,7 @@ namespace aoce {
 namespace cuda {
 
 CuPipeGraph::CuPipeGraph(/* args */) {
+    gpu = GpuType::cuda;
     AOCE_CUDEV_SAFE_CALL(cudaStreamCreate(&stream));
 }
 

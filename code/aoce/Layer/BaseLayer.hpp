@@ -86,7 +86,7 @@ class ILayer {
     virtual BaseLayer* getLayer() = 0;
 };
 
-// 分离导致层不同参数的差异
+// 分离导致层不同参数的差异(AOCE_LAYER_QUERYINTERFACE)
 template <typename T>
 class ITLayer : public ILayer {
    protected:

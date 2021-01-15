@@ -18,8 +18,6 @@ class VkYUV2RGBALayer : public VkLayer, public YUV2RGBALayer {
     virtual void onInitGraph() override;
     virtual void onUpdateParamet() override;
     virtual void onInitLayer() override;
-    virtual void onInitPipe() override;
-    virtual void onPreCmd() override;
 };
 
 }  // namespace layer

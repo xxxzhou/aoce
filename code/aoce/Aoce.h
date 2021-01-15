@@ -96,6 +96,7 @@ enum class CameraType {
     other = 0,
     win_mf,
     and_camera2,
+    realsense,
 };
 
 // aoce外部接收图像暂时就包含这几种

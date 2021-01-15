@@ -62,32 +62,6 @@ void VkRGBA2YUVLayer::onInitLayer() {
     memcpy(constBufCpu.data(), ubo.data(), conBufSize);
 }
 
-void VkRGBA2YUVLayer::onInitPipe() {
-    inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    layout->updateSetLayout(0, 0, &inTexs[0]->descInfo, &outTexs[0]->descInfo,
-                            &constBuf->descInfo);
-    auto computePipelineInfo = VulkanPipeline::createComputePipelineInfo(
-        layout->pipelineLayout, shader->shaderStage);
-    VK_CHECK_RESULT(vkCreateComputePipelines(
-        context->device, context->pipelineCache, 1,
-        &computePipelineInfo, nullptr, &computerPipeline));
-}
-
-void VkRGBA2YUVLayer::onPreCmd() {
-    inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
-                          VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-                          VK_ACCESS_SHADER_READ_BIT);
-    outTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
-                           VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-                           VK_ACCESS_SHADER_WRITE_BIT);
-    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, computerPipeline);
-    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE,
-                            layout->pipelineLayout, 0, 1,
-                            layout->descSets[0].data(), 0, 0);
-    vkCmdDispatch(cmd, sizeX, sizeY, 1);
-}
-
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

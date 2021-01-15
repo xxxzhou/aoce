@@ -27,7 +27,9 @@ class VkOutputLayer : public OutputLayer, public VkLayer {
 
    protected:
     virtual void onInitGraph() override;
+    
     virtual void onInitVkBuffer() override;
+    virtual void onInitPipe() override {};
     virtual void onPreCmd() override;
     virtual bool onFrame() override;
 

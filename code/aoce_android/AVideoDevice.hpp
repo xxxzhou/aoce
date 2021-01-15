@@ -12,7 +12,6 @@ namespace android {
 VideoType getVideoType(int32_t imageFormat);
 int32_t getImageFormat(VideoType videoType);
 
-
 class AVideoDevice : public VideoDevice {
    private:
     /* data */

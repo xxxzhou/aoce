@@ -12,15 +12,15 @@ FFmpegModule::~FFmpegModule() {}
 bool FFmpegModule::loadModule() {
     auto version = avformat_version();
     if (version > 0) {
-        AoceManager::Get().addMediaPlayer(MediaPlayType::ffmpeg,
-                                          new ffmpeg::FMediaPlayer());
+        AoceManager::Get().addMediaPlayerFactory(MediaPlayType::ffmpeg,
+                                          new ffmpeg::FMediaPlayerFactory());
         return true;
     }
     return false;
 }
 
 void FFmpegModule::unloadModule() {
-    AoceManager::Get().removeMediaPlayer(MediaPlayType::ffmpeg);
+    AoceManager::Get().removeMediaPlayerFactory(MediaPlayType::ffmpeg);
 }
 
 ADD_MODULE(FFmpegModule, aoce_ffmpeg)

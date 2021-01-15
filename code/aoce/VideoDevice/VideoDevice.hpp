@@ -21,6 +21,9 @@ enum class VideoHandleId : int32_t {
 
 typedef std::function<void(VideoHandleId id, int32_t codeId)> deviceHandle;
 typedef std::function<void(VideoFrame frame)> videoFrameHandle;
+typedef std::function<void(VideoFrame colorFrame, VideoFrame depthFrame,
+                           void* alignParamt)>
+    depthFrameHandle;
 
 class ACOE_EXPORT VideoDevice {
    protected:
@@ -32,6 +35,7 @@ class ACOE_EXPORT VideoDevice {
 
     deviceHandle onDeviceEvent = nullptr;
     videoFrameHandle onVideoFrameEvent = nullptr;
+    depthFrameHandle onDepthFrameEvent = nullptr;
 
     std::vector<VideoFormat> formats;
     VideoFormat selectFormat = {};
@@ -45,6 +49,8 @@ class ACOE_EXPORT VideoDevice {
 
    protected:
     void onVideoFrameAction(VideoFrame frame);
+    void onDepthFrameAction(VideoFrame colorFrame, VideoFrame depthFrame,
+                           void* alignParamt);
     void onDeviceAction(VideoHandleId id, int32_t codeId);
 
    public:
@@ -59,9 +65,11 @@ class ACOE_EXPORT VideoDevice {
     bool back() { return isBack; }
 
     int32_t findFormatIndex(int32_t width, int32_t height, int32_t fps = 30);
-    
+
    public:
     virtual void setVideoFrameHandle(videoFrameHandle handle);
+    // 如果是深度摄像头
+    virtual void setDepthFrameHandle(depthFrameHandle handle);
     virtual void setDeviceHandle(deviceHandle handle);
 
     // 摄像机有自己特定输出格式
@@ -74,7 +82,6 @@ class ACOE_EXPORT VideoDevice {
     virtual bool close() { return false; };
     // 是否打开中
     virtual bool bOpen() { return isOpen; }
-
 };
 
 }  // namespace aoce

@@ -43,6 +43,20 @@ class FMediaPlayer : public MediaPlayer {
     virtual void stop() override;
     virtual void release() override;
 };
+
+class FMediaPlayerFactory : public MediaPlayerFactory {
+   private:
+    /* data */
+   public:
+    FMediaPlayerFactory(/* args */);
+    virtual ~FMediaPlayerFactory() override;
+
+   public:
+    virtual MediaPlayer* createPlay() override;
+};
+
+
+
 }  // namespace ffmpeg
 
 }  // namespace aoce

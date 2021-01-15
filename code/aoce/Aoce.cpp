@@ -425,6 +425,9 @@ void loadAoce() {
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().regAndLoad("aoce_ffmpeg");
 #endif
+#if defined(AOCE_INSTALL_TALKTO)
+    ModuleManager::Get().regAndLoad("aoce_talkto");
+#endif
 }
 
 void unloadAoce() {
@@ -444,5 +447,8 @@ void unloadAoce() {
 #endif
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().unloadModule("aoce_ffmpeg");
+#endif
+#if defined(AOCE_INSTALL_TALKTO)
+    ModuleManager::Get().unloadModule("aoce_talkto");
 #endif
 }

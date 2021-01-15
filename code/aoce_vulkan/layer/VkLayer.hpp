@@ -38,8 +38,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     std::unique_ptr<VulkanBuffer> constBuf = nullptr;
     std::unique_ptr<UBOLayout> layout = nullptr;
     std::unique_ptr<VulkanShader> shader = nullptr;
-
-    GpuType gpu = GpuType::vulkan;
+    
     class VkPipeGraph* vkPipeGraph = nullptr;
     VulkanContext* context = nullptr;
     VkPipeline computerPipeline = VK_NULL_HANDLE;
@@ -57,7 +56,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
 
    protected:
     virtual void onInit() final;
-    // virtual void onInitLayer() override;
+    virtual void onInitLayer() override;
     virtual void onInitBuffer() final;
     virtual bool onFrame() override;
 
@@ -66,8 +65,8 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     virtual void onInitGraph(){};
     // onInitBuffer后,onInitBuffer已经关联后上层的输出当做本层的输入
     virtual void onInitVkBuffer(){};    
-    virtual void onInitPipe(){};
-    virtual void onPreCmd(){};
+    virtual void onInitPipe();
+    virtual void onPreCmd();
 };
 
 }  // namespace layer

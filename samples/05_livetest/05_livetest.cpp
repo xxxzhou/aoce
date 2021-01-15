@@ -1,3 +1,4 @@
+// 需要实现特定的直播模块,如果没有,这个模块不能运行
 #include <AoceManager.hpp>
 #include <Live/ILiveObserver.hpp>
 #include <Live/LiveRoom.hpp>

@@ -1,7 +1,4 @@
 #pragma once
-
-#include <device_types.h>
-
 #include <Layer/BaseLayer.hpp>
 
 #include "../CudaHelper.hpp"
@@ -18,8 +15,7 @@ class AOCE_CUDA_EXPORT CuLayer : public BaseLayer {
 
    protected:
     int32_t groupX = 32;
-    int32_t groupY = 8;
-    GpuType gpu = GpuType::cuda;
+    int32_t groupY = 8;    
     class CuPipeGraph* cuPipeGraph = nullptr;
     cudaStream_t stream = nullptr;
     std::vector<CudaMatRef> inTexs;
