@@ -6,7 +6,7 @@ if(WIN32)
     add_executable(vulkanextratest WIN32 ${AOCE_SOURCE} ${AOCE_HEADER})
 else()
     add_library(vulkanextratest SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
-endif()
+endif() 
 
 target_link_libraries(vulkanextratest aoce aoce_vulkan aoce_vulkan_extra)
 

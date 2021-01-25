@@ -46,4 +46,4 @@ message(STATUS "aoce_vulkan_extra_glsl_dst: " ${CMAKE_BINARY_DIR}/bin/${CMAKE_BU
 file(COPY ${AOCE_EXTRA_SPV_SOURCE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/glsl")  
 if(WIN32)
     file(COPY ${AOCE_EXTRA_SPV_SOURCE} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/glsl")  
-endif()         
+endif()          

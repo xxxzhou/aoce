@@ -8,7 +8,7 @@ VkChromKeyLayer::VkChromKeyLayer(/* args */) {
     setUBOSize(sizeof(ChromKeyParamet), true);
 }
 
-VkChromKeyLayer::~VkChromKeyLayer() {}
+VkChromKeyLayer::~VkChromKeyLayer() {} 
 
 void VkChromKeyLayer::onInitGraph() {
     std::string path = "glsl/chromaKey.comp.spv";

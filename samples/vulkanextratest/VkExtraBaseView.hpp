@@ -30,7 +30,7 @@ class VkExtraBaseView {
     VkExtraBaseView();
     ~VkExtraBaseView();
 
-   private:
+   private: 
     void onFrame(VideoFrame frame);
 
     void onPreCommand(uint32_t index);

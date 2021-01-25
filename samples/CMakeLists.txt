@@ -66,7 +66,7 @@ if(WIN32)
 endif()
 
 if(ANDROID)
-    include_directories("../code")
+    include_directories("../code") 
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue ${AOCE_HEADER_DIR} ${AOCE_VULKAN_HEADER_DIR} ${Vulkan_INCLUDE_DIR})

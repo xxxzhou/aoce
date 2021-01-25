@@ -19,7 +19,7 @@ void VkExtraBaseView::initGraph(ILayer* layer, void* hinst) {
         ->addNode(outputLayer);
     window = std::make_unique<VulkanWindow>(
         std::bind(&VkExtraBaseView::onPreCommand, this, _1), false);
-#if _WIN32
+#if _WIN32  
     window->initWindow((HINSTANCE)hinst, 1280, 720, "vulkan extra test");
 #elif __ANDROID__
     window->initSurface((ANativeWindow*)hinst);

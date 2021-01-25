@@ -38,7 +38,7 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     chromKeyLayer->updateParamet(keyParamet);    
 }
 
-extern "C" JNIEXPORT void JNICALL
+extern "C" JNIEXPORT void JNICALL 
 Java_aoce_samples_vulkanextratest_MainActivity_vkInitSurface(
     JNIEnv* env, jobject thiz, jobject surface, jint width, jint height) {
     ANativeWindow* winSurf =

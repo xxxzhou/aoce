@@ -22,7 +22,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
     keyParamet.ambientColor = {0.6f, 0.1f, 0.6f};
     keyParamet.alphaCutoffMin = 0.001f;
-    chromKeyLayer->updateParamet(keyParamet);
+    chromKeyLayer->updateParamet(keyParamet); 
 
     view->initGraph(chromKeyLayer, hInstance);
     view->openDevice();
