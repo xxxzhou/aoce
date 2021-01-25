@@ -17,6 +17,12 @@ VkLayer::VkLayer(/* args */) { gpu = GpuType::vulkan; }
 
 VkLayer::~VkLayer() {}
 
+void VkLayer::setUBOSize(int size, bool bMatchParamet) {
+    conBufSize = size;
+    constBufCpu.resize(conBufSize);
+    bParametMatch = bMatchParamet;
+}
+
 void VkLayer::updateUBO() {
     if (constBuf) {
         constBuf->upload(constBufCpu.data());
@@ -25,6 +31,7 @@ void VkLayer::updateUBO() {
 }
 
 void VkLayer::onInit() {
+    BaseLayer::onInit();
     vkPipeGraph =
         static_cast<VkPipeGraph*>(pipeGraph);  // dynamic_cast android open rtti
     context = vkPipeGraph->getContext();
@@ -39,7 +46,6 @@ void VkLayer::onInit() {
     // 是否需要UBO
     if (conBufSize > 0) {
         constBuf = std::make_unique<VulkanBuffer>();
-        constBufCpu.resize(conBufSize);
         constBuf->initResoure(BufferUsage::store, conBufSize,
                               VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                               constBufCpu.data());
@@ -48,13 +54,13 @@ void VkLayer::onInit() {
 }
 
 void VkLayer::onInitLayer() {
-    for(int i =0;i<inCount;i++){
-        inFormats[i].imageType = ImageType::rgba8;
-    }
-    for(int i =0;i<outCount;i++){
-        outFormats[i].imageType = ImageType::rgba8;
-    }
-    if(inCount> 0){
+    // for(int i =0;i<inCount;i++){
+    //     inFormats[i].imageType = ImageType::rgba8;
+    // }
+    // for(int i =0;i<outCount;i++){
+    //     outFormats[i].imageType = ImageType::rgba8;
+    // }
+    if (inCount > 0) {
         sizeX = divUp(inFormats[0].width, groupX);
         sizeY = divUp(inFormats[0].height, groupY);
     }

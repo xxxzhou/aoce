@@ -12,8 +12,7 @@ VkPipeGraph::VkPipeGraph(/* args */) {
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     // 默认是有信号
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-    vkCreateFence(context->device, &fenceInfo, nullptr,
-                  &computerFence);
+    vkCreateFence(context->device, &fenceInfo, nullptr, &computerFence);
 
     gpu = GpuType::vulkan;
 }
@@ -51,6 +50,13 @@ bool VkPipeGraph::onInitBuffers() {
 }
 
 bool VkPipeGraph::onRun() {
+    // 更新所有层的参数
+    for (auto* layer : vkLayers) {
+        if (layer->bParametChange) {
+            layer->updateUBO();
+            layer->bParametChange = false;
+        }
+    }
     // 除开输出层,运行所有层
     for (auto* layer : vkLayers) {
         if (!layer->onFrame()) {

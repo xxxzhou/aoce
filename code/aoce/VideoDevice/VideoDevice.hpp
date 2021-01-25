@@ -24,6 +24,7 @@ typedef std::function<void(VideoFrame frame)> videoFrameHandle;
 typedef std::function<void(VideoFrame colorFrame, VideoFrame depthFrame,
                            void* alignParamt)>
     depthFrameHandle;
+typedef std::shared_ptr<class VideoDevice> VideoDevicePtr;
 
 class ACOE_EXPORT VideoDevice {
    protected:
@@ -42,6 +43,8 @@ class ACOE_EXPORT VideoDevice {
     bool isOpen = false;
     // 是否后置摄像头
     bool isBack = false;
+    // 是否包含深度摄像头
+    bool isDepth = false;
 
    public:
     VideoDevice(/* args */);
@@ -50,7 +53,7 @@ class ACOE_EXPORT VideoDevice {
    protected:
     void onVideoFrameAction(VideoFrame frame);
     void onDepthFrameAction(VideoFrame colorFrame, VideoFrame depthFrame,
-                           void* alignParamt);
+                            void* alignParamt);
     void onDeviceAction(VideoHandleId id, int32_t codeId);
 
    public:
@@ -63,8 +66,12 @@ class ACOE_EXPORT VideoDevice {
     const VideoFormat& getSelectFormat() { return selectFormat; }
 
     bool back() { return isBack; }
+    bool bDepth() { return isDepth; }
 
+    // 选择一个最优解
     int32_t findFormatIndex(int32_t width, int32_t height, int32_t fps = 30);
+    // 选择第一个满足width/height/filter的索引,否则为-1
+    int32_t findFormatIndex(int32_t width, int32_t height,std::function<bool(VideoFormat)> filter);
 
    public:
     virtual void setVideoFrameHandle(videoFrameHandle handle);

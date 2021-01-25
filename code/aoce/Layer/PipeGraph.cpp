@@ -15,7 +15,7 @@ PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
     if (layer == nullptr) {
         logMessage(LogLevel::error, "node layer can not be empty");
     }
-    assert(layer != nullptr);    
+    assert(layer != nullptr);
     if (this->gpu != layer->gpu) {
         logMessage(LogLevel::error, "node layer gpu type no equal graph");
     }
@@ -59,12 +59,25 @@ bool PipeGraph::addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut,
     return addLine(from->graphIndex, to->graphIndex, formOut, toIn);
 }
 
-void PipeGraph::getImageFormat(int32_t nodeIndex, int32_t outputIndex,
-                               ImageFormat& format) {
+void PipeGraph::getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
+                                  ImageFormat& format) {
     if (nodeIndex < nodes.size() &&
         outputIndex < nodes[nodeIndex]->layer->outFormats.size()) {
         format = nodes[nodeIndex]->layer->outFormats[outputIndex];
     }
+}
+
+void PipeGraph::clearLines() {
+    lines.clear();
+    validLines.clear();
+    bReset = true;
+}
+
+void PipeGraph::clear() {
+    clearLines();
+    nodes.clear();
+    nodeExcs.clear();
+    bReset = true;
 }
 
 void PipeGraph::validNode() {
@@ -154,10 +167,16 @@ bool PipeGraph::resetGraph() {
     validNode();
     // 2. 得到有效节点的前置节点  如:2[1] 3[2] 4[1] 5[3,4] (2需要1),(5需要3,4)
     std::vector<std::vector<int>> reqNodes(nodes.size());
+    // 需要确定顺序的节点
     std::queue<int32_t> tempQueue;
+    std::vector<int> checkRepeat;
     for (auto& line : validLines) {
         reqNodes[line->toNode].push_back(line->fromNode);
-        tempQueue.push(line->toNode);
+        if (std::find(checkRepeat.begin(), checkRepeat.end(), line->toNode) ==
+            checkRepeat.end()) {
+            checkRepeat.push_back(line->toNode);
+            tempQueue.push(line->toNode);
+        }
         // 填充layer的,此时经过enable/visable过滤后,每个输入节点应该是一一对应的
         nodes[line->toNode]->layer->addInLayer(line->toInIndex, line->fromNode,
                                                line->fromOutIndex);
@@ -233,7 +252,7 @@ bool PipeGraph::run() {
         if (!resetGraph()) {
             return false;
         }
-    }    
+    }
     return onRun();
 }
 

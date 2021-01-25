@@ -51,8 +51,14 @@ class ACOE_EXPORT PipeGraph {
     bool addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut = 0,
                  int32_t toIn = 0);
 
-    void getImageFormat(int32_t nodeIndex, int32_t outputIndex,
+    void getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
                         ImageFormat& format);
+
+    // 清除连线(当逻辑变更导致执行列表重组)
+    void clearLines();
+
+    // 清除节点(需要重新变更整个逻辑)
+    void clear();
 
    protected:
     virtual bool onInitLayers() { return false; };

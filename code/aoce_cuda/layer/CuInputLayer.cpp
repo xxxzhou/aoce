@@ -17,12 +17,6 @@ CuInputLayer::CuInputLayer(/* args */) { bInput = true; }
 
 CuInputLayer::~CuInputLayer() {}
 
-void CuInputLayer::onSetImage(VideoFormat videoFormat, int32_t index) {
-    assert(index < inCount);
-    // 根据各种格式调整(比如YUV格式,长宽要变成YUV本身的长度)
-    inFormats[0] = videoFormat2ImageFormat(videoFormat);
-}
-
 void CuInputLayer::onUpdateParamet() { pipeGraph->reset(); }
 
 void CuInputLayer::onInitCuBufffer() {

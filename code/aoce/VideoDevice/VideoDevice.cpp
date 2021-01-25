@@ -74,4 +74,21 @@ int32_t VideoDevice::findFormatIndex(int32_t width, int32_t height,
     return 0;
 }
 
+int32_t VideoDevice::findFormatIndex(int32_t width, int32_t height,
+                                     std::function<bool(VideoFormat)> filter) {
+    int32_t index = 0;
+    if (formats.size() < 0) {
+        return -1;
+    }
+    for (const VideoFormat& format : formats) {
+        if (format.width == width && format.height == height) {
+            if(filter(format)){
+                return index;
+            }
+        }
+        index++;
+    }
+    return -1;
+}
+
 }  // namespace aoce

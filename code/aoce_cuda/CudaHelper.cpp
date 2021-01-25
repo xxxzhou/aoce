@@ -13,6 +13,8 @@ int32_t ImageFormat2Cuda(ImageType imageType) {
                                   // VK_FORMAT_R8_UNORM
         case ImageType::rgba8:
             return AOCE_CV_8UC4;
+        case ImageType::rgbaf32:
+            return AOCE_CV_32FC4;
         default:
             return AOCE_CV_8UC1;
     }

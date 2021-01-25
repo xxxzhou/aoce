@@ -25,3 +25,9 @@ opencv cudafilters的boxBlur方法,就采用先计算水平卷积,然后计算�
 其中边框模式暂时先固定为REPLICATE.
 [调整图像边缘](https://blog.csdn.net/shuiyixin/article/details/106472722)
 ![Alt text](https://img-blog.csdnimg.cn/20200602093115149.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NodWl5aXhpbg==,size_16,color_47FFFF,t_70 "REPLICATE image")
+
+### chromKey
+
+[UE4 Matting](https://www.unrealengine.com/en-US/tech-blog/setting-up-a-chroma-key-material-in-ue4)
+
+主要注意一点,UBO,我特意把一个float,vec3放一起,想当然的认为是按照vec4排列,这里注意,vec3不管前后接什么,按照vec4排的.

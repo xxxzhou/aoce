@@ -33,8 +33,7 @@ bool CuOutputLayer::onFrame() {
     if (paramet.bCpu) {
         inTexs[0]->download(cpuData.data(), 0, stream);
         cudaStreamSynchronize(stream);
-        onImageProcessHandle(cpuData.data(), inFormats[0].width,
-                             inFormats[0].height, 0);
+        onImageProcessHandle(cpuData.data(), inFormats[0], 0);
     }
     // 把最新结果写入与DX11共享资源的CUDA资源
     if (paramet.bGpu) {

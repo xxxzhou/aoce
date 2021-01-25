@@ -87,14 +87,6 @@ class TestLive : public ILiveObserver {
     // 用户对应流的视频桢数据
     virtual void onVideoFrame(int32_t userId, int32_t index,
                               const VideoFrame &videoFrame) {
-        if (format.width != videoFrame.width ||
-            format.height != videoFrame.height) {
-            format.width = videoFrame.width;
-            format.height = videoFrame.height;
-            format.videoType = videoFrame.videoType;
-            inputLayer->setImage(format);
-            yuv2rgbLayer->updateParamet({format.videoType});
-        }
         inputLayer->inputCpuData(videoFrame,0);
 #if WIN32
         vkGraph->run();

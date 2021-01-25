@@ -50,10 +50,8 @@ void VkOutputLayer::onInitVkBuffer() {
 }
 
 bool VkOutputLayer::onFrame() {
-    if (paramet.bCpu) {
-        onImageProcessHandle(outBuffer->getCpuData(), outFormats[0].width,
-                             outFormats[0].height, 0);
-        // outBuffer->download(cpuData.data());
+    if (paramet.bCpu) {  
+        onImageProcessHandle(outBuffer->getCpuData(), outFormats[0], 0);
     }
     return true;
 }
@@ -132,7 +130,7 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
                 uint8_t* tempPtr = (uint8_t*)outTex.commandbuffer;
                 outBuffer->download(tempPtr);
                 // memcpy(outTex.commandbuffer,cpuData.data(),cpuData.size());
-            } else if(outBuffer->getCpuData()){
+            } else if (outBuffer->getCpuData()) {
                 // outBuffer->download(cpuData.data());
                 // UE4(Unbind different texture target on the same stage, to
                 // avoid OpenGL keeping its data, and potential driver
@@ -165,7 +163,7 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
             // 重新生成cmdbuffer
             this->getGraph()->reset();
         }
-        hardwareImage->bindGL(outTex.image, bindType);        
+        hardwareImage->bindGL(outTex.image, bindType);
     }
 }
 #endif

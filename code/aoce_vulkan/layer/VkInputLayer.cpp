@@ -7,32 +7,6 @@ VkInputLayer::VkInputLayer(/* args */) { bInput = true; }
 
 VkInputLayer::~VkInputLayer() {}
 
-void VkInputLayer::onSetImage(VideoFormat videoFormat, int32_t index) {
-    assert(index < inCount);
-    // 根据各种格式调整
-    inFormats[0] = videoFormat2ImageFormat(videoFormat);
-    // 更新constBufCpu
-    int imageIndex = -1;
-    if (videoFormat.videoType == VideoType::rgb8) {
-        imageIndex = 1;
-    } else if (videoFormat.videoType == VideoType::bgra8) {
-        imageIndex = 2;
-    } else if (videoFormat.videoType == VideoType::argb8) {
-        imageIndex = 3;
-    }
-    std::vector<int> ubo = {outFormats[0].width, outFormats[0].height,
-                            imageIndex};
-    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
-}
-
-void VkInputLayer::onInputCpuData(uint8_t* data, int32_t index) {
-    assert(index < inCount);
-}
-
-void VkInputLayer::onInputCpuData(const VideoFrame& videoFrame, int32_t index) {
-    assert(index < inCount);
-}
-
 void VkInputLayer::onInitGraph() {
     std::string path = "glsl/inputv1.comp.spv";
     shader->loadShaderModule(context->device, path);
@@ -52,6 +26,18 @@ void VkInputLayer::onInitVkBuffer() {
     inBuffer = std::make_unique<VulkanBuffer>();
     inBuffer->initResoure(BufferUsage::store, size,
                           VK_BUFFER_USAGE_TRANSFER_SRC_BIT, frameData);
+    // 更新constBufCpu
+    int imageIndex = -1;
+    if (videoFormat.videoType == VideoType::rgb8) {
+        imageIndex = 1;
+    } else if (videoFormat.videoType == VideoType::bgra8) {
+        imageIndex = 2;
+    } else if (videoFormat.videoType == VideoType::argb8) {
+        imageIndex = 3;
+    }
+    std::vector<int> ubo = {outFormats[0].width, outFormats[0].height,
+                            imageIndex};
+    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
 }
 
 void VkInputLayer::onInitPipe() {

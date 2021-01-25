@@ -55,7 +55,9 @@ class ACOE_EXPORT MediaPlayer {
     virtual ~MediaPlayer(){};
 
    public:
+    // 同步的prepare需要之后才能拿到,异步在回调里的onPrepared
     AudioStream getAudioStream() { return audioStream; };
+    // 同步的prepare需要之后才能拿到,异步在回调里的onPrepared
     VideoStream getVideoStream() { return videoStream; };
 
    protected:

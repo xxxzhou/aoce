@@ -5,6 +5,11 @@ namespace aoce {
 BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
     inCount = inSize;
     outCount = outSize;
+}
+
+BaseLayer::~BaseLayer() {}
+
+void BaseLayer::onInit() {
     inFormats.resize(inCount);
     outFormats.resize(outCount);
     inLayers.resize(inCount);
@@ -16,8 +21,6 @@ BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
         format.imageType = ImageType::rgba8;
     }
 }
-
-BaseLayer::~BaseLayer() {}
 
 PipeGraph* BaseLayer::getGraph() { return pipeGraph; }
 
@@ -53,7 +56,7 @@ void BaseLayer::initLayer() {
     int32_t size = inLayers.size();
     if (!bInput) {
         for (int32_t i = 0; i < size; i++) {
-            pipeGraph->getImageFormat(inLayers[i].nodeIndex,
+            pipeGraph->getLayerOutFormat(inLayers[i].nodeIndex,
                                       inLayers[i].outputIndex, inFormats[i]);
         }
     }

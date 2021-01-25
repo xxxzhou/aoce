@@ -116,3 +116,12 @@ ACOE_EXPORT int32_t getVideoFrame(const aoce::VideoFrame& frame,
                                   uint8_t* data = nullptr);
 
 ACOE_EXPORT std::string getAocePath();
+
+#if WIN32
+ACOE_EXPORT bool existsFile(const wchar_t* filePath);
+
+ACOE_EXPORT bool loadFileBinary(const wchar_t* filePath,std::vector<uint8_t>& data,int32_t& lenght);
+
+// 默认文件不存在 则建立新文件 文件存在则直接清空文件内容
+ACOE_EXPORT bool saveFileBinary(const wchar_t* filePath,void* data,int32_t lenght);
+#endif

@@ -3,8 +3,6 @@
 #include "VideoDevice.hpp"
 namespace aoce {
 
-typedef std::shared_ptr<VideoDevice> VideoDevicePtr;
-
 class ACOE_EXPORT VideoManager {
    protected:
     /* data */

@@ -5,20 +5,11 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkYUV2RGBALayer::VkYUV2RGBALayer(/* args */) { conBufSize = 12; }
+VkYUV2RGBALayer::VkYUV2RGBALayer(/* args */) { setUBOSize(12); }
 
 VkYUV2RGBALayer::~VkYUV2RGBALayer() {}
 
 void VkYUV2RGBALayer::onInitGraph() {
-    int32_t yuvType = getYuvIndex(paramet.type);
-    assert(yuvType > 0);
-    // nv12/yuv420P/yuy2P
-    std::string path = "glsl/yuv2rgbaV1.comp.spv";
-    if (yuvType > 3) {
-        path = "glsl/yuv2rgbaV2.comp.spv";
-    }
-    shader->loadShaderModule(context->device, path);
-    assert(shader->shaderStage.module != VK_NULL_HANDLE);
     std::vector<UBOLayoutItem> items = {
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
@@ -33,7 +24,15 @@ void VkYUV2RGBALayer::onUpdateParamet() {
 }
 
 void VkYUV2RGBALayer::onInitLayer() {
-    assert(getYuvIndex(paramet.type) > 0);
+    int32_t yuvType = getYuvIndex(paramet.type);
+    assert(yuvType > 0);
+    // nv12/yuv420P/yuy2P
+    std::string path = "glsl/yuv2rgbaV1.comp.spv";
+    if (yuvType > 3) {
+        path = "glsl/yuv2rgbaV2.comp.spv";
+    }
+    shader->loadShaderModule(context->device, path);
+    assert(shader->shaderStage.module != VK_NULL_HANDLE);
     // 带P/SP的格式由r8转rgba8
     inFormats[0].imageType = ImageType::r8;
     outFormats[0].imageType = ImageType::rgba8;

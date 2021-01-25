@@ -6,7 +6,7 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkLinearFilterLayer::VkLinearFilterLayer(/* args */) { conBufSize = 16; }
+VkLinearFilterLayer::VkLinearFilterLayer(/* args */) { setUBOSize(16); }
 
 VkLinearFilterLayer::~VkLinearFilterLayer() {}
 

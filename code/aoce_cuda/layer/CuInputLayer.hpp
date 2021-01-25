@@ -23,11 +23,7 @@ class CuInputLayer : public InputLayer, public CuLayer {
 
     // InputLayer
    public:
-    virtual void onSetImage(VideoFormat videoFormat,
-                            int32_t index = 0) override;
-    virtual void onInputCpuData(uint8_t* data, int32_t index = 0) override{};
-    virtual void onInputCpuData(const VideoFrame& videoFrame,
-                                int32_t index = 0) override{};
+    virtual void onDataReady() override {};
     void onInputGpuDx11(void* device, void* tex);
 
    public:

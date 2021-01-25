@@ -13,6 +13,7 @@ CuLayer::CuLayer(/* args */) {
 CuLayer::~CuLayer() {}
 
 void CuLayer::onInit() {
+    BaseLayer::onInit();
     cuPipeGraph = static_cast<CuPipeGraph*>(pipeGraph);
     stream = cuPipeGraph->getStream();
 }

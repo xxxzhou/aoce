@@ -70,7 +70,14 @@
         "compare": "cpp",
         "*.in": "cpp",
         "atomic": "cpp",
-        "unordered_set": "cpp"
+        "unordered_set": "cpp",
+        "string_view": "cpp",
+        "filesystem": "cpp",
+        "codecvt": "cpp",
+        "locale": "cpp",
+        "xlocbuf": "cpp",
+        "xlocmes": "cpp",
+        "*.cuh": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,

@@ -164,8 +164,3 @@
 typedef void (*logEventAction)(int32_t level, const char* message);
 typedef std::function<void(int32_t level, const char* message)> logEventHandle;
 
-typedef void (*imageProcessAction)(uint8_t* data, int32_t width, int32_t height,
-                                   int32_t outIndex);
-typedef std::function<void(uint8_t* data, int32_t width, int32_t height,
-                           int32_t outIndex)>
-    imageProcessHandle;

@@ -152,7 +152,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_initEngine(
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
-    player = AoceManager::Get().getMediaPlayer(MediaPlayType::ffmpeg);
+    player = AoceManager::Get().getMediaPlayerFactory(MediaPlayType::ffmpeg)->createPlay();
     testPlay = new TestMediaPlay();   
     player->setObserver(testPlay);    
 }

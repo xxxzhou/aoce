@@ -15,7 +15,7 @@ using namespace aoce::win;
 
 #if USE_CAMERA
 static int index = 0;
-static int formatIndex = 29;
+static int formatIndex = 0;// 29;
 #else
 static HINSTANCE instance = nullptr;
 static MediaPlayer *player = nullptr;
@@ -95,9 +95,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
                   << " hight:" << vf.height << " fps:" << vf.fps
                   << " format:" << to_string(vf.videoType) << std::endl;
     }
-    if (formats.size() > 355) {
-        formatIndex = 355;
-    }
+    formatIndex = video->findFormatIndex(1920,1080);
     video->setFormat(formatIndex);
     auto &selectFormat = video->getSelectFormat();
     VideoType videoType = selectFormat.videoType;

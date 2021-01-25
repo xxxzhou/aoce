@@ -107,6 +107,7 @@ enum class ImageType {
     r16,
     // 游戏中fbo,rtt使用,输入与输出层使用,经输入层自动转化rgba8
     bgra8,
+    rgbaf32,
 };
 
 enum class VideoCodec {
@@ -236,6 +237,12 @@ struct Operate {
 struct TexOperateParamet {
     MapChannel mapChannel = {};
     Operate operate = {};
+};
+
+struct vec3 {
+    float x = 0;
+    float y = 0;
+    float z = 0;
 };
 
 }  // namespace aoce

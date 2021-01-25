@@ -27,7 +27,7 @@ enum class GpuBit {
 // 其二是外部插件提供new obj,需要自己设定gpu类型
 class ACOE_EXPORT BaseLayer {
    protected:
-    struct InputLayer {
+    struct NodeIndex {
         int32_t nodeIndex = -1;
         int32_t outputIndex = -1;
     };
@@ -35,6 +35,7 @@ class ACOE_EXPORT BaseLayer {
    protected:
     friend class PipeNode;
     friend class PipeGraph;
+    friend class InputLayer;
 
     GpuType gpu = GpuType::other;
     // 定义当前层需要的输入数量
@@ -49,7 +50,7 @@ class ACOE_EXPORT BaseLayer {
     bool bInput = false;
     bool bOutput = false;
 
-    std::vector<InputLayer> inLayers;
+    std::vector<NodeIndex> inLayers;
 
    public:
     BaseLayer(/* args */) : BaseLayer(1, 1){};
@@ -66,8 +67,8 @@ class ACOE_EXPORT BaseLayer {
     void initLayer();
 
    protected:
-    // 添加进pipeGraph
-    virtual void onInit() = 0;
+    // 添加进pipeGraph时调用
+    virtual void onInit();
     // 已经添加进pipeGraph,pipeGraph把所有层连接起来,此时知道inputFormats的长宽
     // 并根据当前层的需求,设定对应outFormats,也就是下一层的inputFormats
     // 可分配线程组的大小了
@@ -79,7 +80,7 @@ class ACOE_EXPORT BaseLayer {
     virtual bool onFrame() = 0;
 };
 
-// 层不会单独从ILayer继承,还一个继承路径应该从BaseLayer来
+// 实现层(非抽像层)不会单独从ILayer继承,还一个继承路径应该从BaseLayer来
 class ILayer {
    public:
     // 请看上面宏AOCE_LAYER_QUERYINTERFACE提供的默认实现
@@ -99,6 +100,10 @@ class ITLayer : public ILayer {
         this->paramet = t;
         getLayer()->onParametChange();
     };
+
+    inline T getParamet(){
+        return paramet;
+    }
 };
 
 // YUV 2 RGBA 转换

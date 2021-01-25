@@ -18,8 +18,9 @@ static PipeGraph* vkGraph;
 static InputLayer* inputLayer;
 static OutputLayer* outputLayer;
 static YUV2RGBALayer* yuv2rgbLayer;
-
+// box模糊
 static ITLayer<FilterParamet>* boxFilterLayer;
+static ITLayer<ChromKeyParamet>* chromKeyLayer;
 
 static GpuType gpuType = GpuType::vulkan;
 
@@ -29,10 +30,12 @@ static void onDrawFrame(VideoFrame frame) {
     vkGraph->run();
 }
 
-static void onImageProcessHandle(uint8_t* data, int32_t width, int32_t height,
+static void onImageProcessHandle(uint8_t* data, ImageFormat format,
                                  int32_t outIndex) {
     // std::cout << "data:" << (int)data[10000] << std::endl;
-    memcpy(show->ptr<char>(0), data, width * height * 4);
+    // std::vector<float> vecf(width*height * 4);
+    // memcpy(vecf.data(), data, width * height * elementSize);
+    memcpy(show->ptr<char>(0), data, format.width * format.height * getImageTypeSize(format.imageType));
 }
 
 int main() {
@@ -65,6 +68,16 @@ int main() {
     outputLayer = layerFactory->createOutput();
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     boxFilterLayer = createBoxFilterLayer();
+    boxFilterLayer->updateParamet({10,10});
+
+    chromKeyLayer = createChromKeyLayer();
+    ChromKeyParamet keyParamet = {};
+    keyParamet.ambientScale = 0.1f;
+    keyParamet.chromaColor = {0.15f,0.6f,0.0f};
+    keyParamet.ambientColor = {0.6f,0.1f,0.6f};
+    keyParamet.alphaCutoffMin = 0.001f;
+
+    chromKeyLayer->updateParamet(keyParamet);
 
     VideoType videoType = selectFormat.videoType;
     if (selectFormat.videoType == VideoType::mjpg) {
@@ -72,10 +85,9 @@ int main() {
     }
     if (getYuvIndex(videoType) > 0) {
         yuv2rgbLayer->updateParamet({videoType});
-    }
-    boxFilterLayer->updateParamet({10,10});
+    }    
     // 生成图
-    vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(boxFilterLayer)->addNode(outputLayer);
+    vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(chromKeyLayer)->addNode(outputLayer);
     // vkGraph->addNode(inputLayer)->addNode(outputLayer);
     // 设定输出函数回调
     outputLayer->setImageProcessHandle(onImageProcessHandle);

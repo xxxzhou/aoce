@@ -10,3 +10,6 @@ project(":06_mediaplayer").projectDir = new File("06_mediaplayer")
 
 include ":07_androidtest"
 project(":07_androidtest").projectDir = new File("07_androidtest")
+
+include ":vulkanextratest"
+project(":vulkanextratest").projectDir = new File("vulkanextratest")

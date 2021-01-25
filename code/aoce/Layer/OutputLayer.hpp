@@ -21,6 +21,12 @@ struct VkOutGpuTex {
     int height = 1080;
 };
 
+typedef void (*imageProcessAction)(uint8_t* data, ImageFormat imageFormat,
+                                   int32_t outIndex);
+typedef std::function<void(uint8_t* data, ImageFormat imageFormat,
+                           int32_t outIndex)>
+    imageProcessHandle;
+
 class ACOE_EXPORT OutputLayer : public ITLayer<OutputParamet> {
    public:
     virtual ~OutputLayer(){};
@@ -29,10 +35,10 @@ class ACOE_EXPORT OutputLayer : public ITLayer<OutputParamet> {
     imageProcessHandle onImageProcessEvent;
 
    protected:
-    inline void onImageProcessHandle(uint8_t* data, int32_t width,
-                                     int32_t height, int32_t outIndex = 0) {
+    inline void onImageProcessHandle(uint8_t* data, ImageFormat imageFormat,
+                                     int32_t outIndex = 0) {
         if (onImageProcessEvent) {
-            onImageProcessEvent(data, width, height, outIndex);
+            onImageProcessEvent(data,imageFormat, outIndex);
         }
     }
 

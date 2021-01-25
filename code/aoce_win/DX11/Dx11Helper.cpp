@@ -20,6 +20,9 @@ DXGI_FORMAT getImageDXFormt(ImageType imageType) {
         case ImageType::bgra8:
             dxFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
             break;
+        case ImageType::rgbaf32:
+            dxFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
+            break;
         default:
             dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
             break;

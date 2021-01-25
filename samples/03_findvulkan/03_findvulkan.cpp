@@ -27,11 +27,12 @@ static void onDrawFrame(VideoFrame frame) {
     inputLayer->inputCpuData(frame.data[0]);
     vkGraph->run();
 }
-
-static void onImageProcessHandle(uint8_t* data, int32_t width, int32_t height,
+static void onImageProcessHandle(uint8_t* data, ImageFormat format,
                                  int32_t outIndex) {
     // std::cout << "data:" << (int)data[10000] << std::endl;
-    memcpy(show->ptr<char>(0), data, width * height * 4);
+    // std::vector<float> vecf(width*height * 4);
+    // memcpy(vecf.data(), data, width * height * elementSize);
+    memcpy(show->ptr<char>(0), data, format.width * format.height * getImageTypeSize(format.imageType));
 }
 
 int main() {

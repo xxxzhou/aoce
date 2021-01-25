@@ -33,13 +33,10 @@ void VideoViewGraph::updateParamet(YUVParamet yparamet, InputParamet iparamet,
 }
 
 void VideoViewGraph::runFrame(const VideoFrame &frame) {
-    if (format.width != frame.width || format.height != frame.height ||
-        format.videoType != frame.videoType) {
-        format.width = frame.width;
-        format.height = frame.height;
-        format.videoType = frame.videoType;
-        inputLayer->setImage(format);
-        yuv2rgbLayer->updateParamet({format.videoType});
+    if (getYuvIndex(frame.videoType) >= 0) {        
+        if (yuv2rgbLayer->getParamet().type != frame.videoType) {
+            yuv2rgbLayer->updateParamet({frame.videoType});
+        }  
     }
     inputLayer->inputCpuData(frame, 0);
     graph->run();

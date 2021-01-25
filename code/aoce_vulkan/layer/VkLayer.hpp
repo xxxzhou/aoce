@@ -14,6 +14,22 @@ namespace layer {
 typedef std::shared_ptr<VulkanBuffer> VulkanBufferPtr;
 typedef std::shared_ptr<VulkanTexture> VulkanTexturePtr;
 
+// 如果CPU/GPU参数对应,并且不会导致graph重启
+#define AOCE_VULKAN_PARAMETUPDATE()                                    \
+   protected:                                                          \
+    virtual inline void onParametChange() override {                   \
+        if (bParametMatch) {                                           \
+            if (constBufCpu.size() == sizeof(paramet)) {               \
+                memcpy(constBufCpu.data(), &paramet, sizeof(paramet)); \
+            }                                                          \
+            bParametChange = true;                                     \
+        }                                                              \
+    }
+// 如果参数变动,导致graph重启
+#define AOCE_VULKAN_PARAMETRESET() \
+   protected:                      \
+    virtual inline void onParametChange() override { pipeGraph->reset(); }
+
 // 外部Vulkan层实现请继承这个类,提供对应计算图上的VulkanContext
 class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     friend class VkPipeGraph;
@@ -38,7 +54,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     std::unique_ptr<VulkanBuffer> constBuf = nullptr;
     std::unique_ptr<UBOLayout> layout = nullptr;
     std::unique_ptr<VulkanShader> shader = nullptr;
-    
+
     class VkPipeGraph* vkPipeGraph = nullptr;
     VulkanContext* context = nullptr;
     VkPipeline computerPipeline = VK_NULL_HANDLE;
@@ -46,26 +62,38 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     std::vector<VulkanTexturePtr> outTexs;
 
     VkCommandBuffer cmd;
+    // 如果CPU与GPU参数对应
+    bool bParametMatch = false;
+    bool bParametChange = false;
 
    public:
     VkLayer(/* args */);
     ~VkLayer() override;
 
+   protected:
+    // 初始化时请指定
+    void setUBOSize(int size, bool bMatchParamet= false);
+
    public:
     void updateUBO();
 
    protected:
+    // 只发生在附加PipeGraph时,特定VK一些实现,如果要特定实现onInitGraph
     virtual void onInit() final;
+    // 每次PipeGraph调用Reset时发生,此时知道输入层
     virtual void onInitLayer() override;
+    // VK自动根据输入初始化相应的信息,如果要修改,请在PipeGraph实现
     virtual void onInitBuffer() final;
     virtual bool onFrame() override;
 
    protected:
-    // vulkan层在onInit后,shader 编译
+    // vulkan层在onInit后,shader可以放这编译,如果参数影响shader编译,需要放入onInitPipe
     virtual void onInitGraph(){};
     // onInitBuffer后,onInitBuffer已经关联后上层的输出当做本层的输入
-    virtual void onInitVkBuffer(){};    
+    virtual void onInitVkBuffer(){};
+    // 根据上面shader/buffer,组建计算管线
     virtual void onInitPipe();
+    // CommandBuffer
     virtual void onPreCmd();
 };
 

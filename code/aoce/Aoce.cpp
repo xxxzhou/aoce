@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -11,6 +12,7 @@
 #include <Shlwapi.h>
 #include <Windows.h>
 
+#include <filesystem>
 #include <iomanip>
 #pragma comment(lib, "shlwapi.lib")
 #elif __ANDROID__
@@ -292,6 +294,8 @@ int32_t getImageTypeSize(const aoce::ImageType& imageType) {
             return 1;
         case ImageType::rgba8:
             return 4;
+        case ImageType::rgbaf32:
+            return 16;
         default:
             return 0;
     }
@@ -404,6 +408,62 @@ std::string getAocePath() {
     return "";
 #endif
 }
+
+#if WIN32
+bool existsFile(const wchar_t* filePath) {
+    return std::tr2::sys::exists(filePath);
+}
+
+bool loadFileBinary(const wchar_t* filePath, std::vector<uint8_t>& data,
+                    int32_t& lenght) {
+    lenght = 0;
+    if (!existsFile(filePath)) {
+        std::string message;
+        string_format(message, "no file path: ", filePath);
+        logMessage(LogLevel::warn, message);
+        return false;
+    }
+    try {
+        std::ifstream is(filePath,
+                         std::ios::binary | std::ios::in | std::ios::ate);
+        if (is.is_open()) {
+            lenght = is.tellg();
+            is.seekg(0, std::ios::beg);
+            data.resize(lenght);
+            is.read((char*)data.data(), lenght);
+            is.close();
+            return true;
+        } else {
+            std::string message;
+            string_format(message, "could not open path: ", filePath);
+            logMessage(LogLevel::warn, message);
+            return false;
+        }
+    } catch (const std::exception& ex) {
+        std::string message;
+        string_format(message, "could write path: ", filePath,
+                      " error:", ex.what());
+        logMessage(LogLevel::warn, message);
+    }
+    return false;
+}
+
+bool saveFileBinary(const wchar_t* filePath, void* data, int32_t lenght) {
+    // ios::out 写 文件不存在 则建立新文件 文件存在则直接清空文件内容。
+    try {
+        std::ofstream fileStream(filePath, std::ios::binary | std::ios::out);
+        fileStream.write((char*)data, lenght);
+        fileStream.close();
+        return true;
+    } catch (const std::exception& ex) {
+        std::string message;
+        string_format(message, "could write path: ", filePath,
+                      " error:", ex.what());
+        logMessage(LogLevel::warn, message);
+    }
+    return false;
+}
+#endif
 
 static bool bLoad = false;
 
