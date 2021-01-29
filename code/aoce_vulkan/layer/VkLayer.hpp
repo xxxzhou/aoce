@@ -17,7 +17,7 @@ typedef std::shared_ptr<VulkanTexture> VulkanTexturePtr;
 // 如果CPU/GPU参数对应,并且不会导致graph重启
 #define AOCE_VULKAN_PARAMETUPDATE()                                    \
    protected:                                                          \
-    virtual inline void onParametChange() override {                   \
+    virtual inline void onUpdateParamet() override {                   \
         if (bParametMatch) {                                           \
             if (constBufCpu.size() == sizeof(paramet)) {               \
                 memcpy(constBufCpu.data(), &paramet, sizeof(paramet)); \
@@ -25,10 +25,6 @@ typedef std::shared_ptr<VulkanTexture> VulkanTexturePtr;
             bParametChange = true;                                     \
         }                                                              \
     }
-// 如果参数变动,导致graph重启
-#define AOCE_VULKAN_PARAMETRESET() \
-   protected:                      \
-    virtual inline void onParametChange() override { pipeGraph->reset(); }
 
 // 外部Vulkan层实现请继承这个类,提供对应计算图上的VulkanContext
 class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
@@ -64,6 +60,8 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     VkCommandBuffer cmd;
     // 如果CPU与GPU参数对应
     bool bParametMatch = false;
+    // 非线程更新告诉更新数据线程需要更新UBO
+    // 保证一个PipeGraph里都在更新数据线程里更新
     bool bParametChange = false;
 
    public:
@@ -73,6 +71,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
    protected:
     // 初始化时请指定
     void setUBOSize(int size, bool bMatchParamet= false);
+    void createOutTexs();
 
    public:
     void updateUBO();

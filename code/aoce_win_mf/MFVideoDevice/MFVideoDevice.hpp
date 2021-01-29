@@ -29,6 +29,8 @@ class MFVideoDevice : public VideoDevice, public IMFSourceReaderCallback {
     std::condition_variable flushSignal;
 
     int32_t videoIndex = MF_SOURCE_READER_FIRST_VIDEO_STREAM;
+    // 是否异步
+    bool bMFAsync = true;
 
    public:
     MFVideoDevice(/* args */);

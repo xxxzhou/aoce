@@ -20,17 +20,26 @@ class VkExtraBaseView {
     InputLayer* inputLayer = nullptr;
     OutputLayer* outputLayer = nullptr;
     YUV2RGBALayer* yuv2rgbLayer = nullptr;
+    TransposeLayer* transposeLayer = nullptr;
+    TexOperateLayer* operateLayer = nullptr;
+    ReSizeLayer* resizeLayer = nullptr;
     ILayer* extraLayer = nullptr;
+
+    PipeNodePtr yuvNode = nullptr;
+    PipeNodePtr layerNode = nullptr;
+    VideoDevicePtr video = nullptr;
 
     GpuType gpuType = GpuType::vulkan;
 
     std::unique_ptr<VulkanWindow> window = nullptr;
 
+    std::mutex mtx;
+
    public:
     VkExtraBaseView();
     ~VkExtraBaseView();
 
-   private: 
+   private:
     void onFrame(VideoFrame frame);
 
     void onPreCommand(uint32_t index);
@@ -38,9 +47,12 @@ class VkExtraBaseView {
    public:
     void initGraph(ILayer* layer, void* hinst);
 
-    void openDevice();
+    void openDevice(int32_t id = 0);
+    void closeDevice();
 
-    inline OutputLayer* getOutputLayer() {return outputLayer;}
+    inline OutputLayer* getOutputLayer() { return outputLayer; }
+
+    void enableLayer(bool bEnable);
 
 #if WIN32
     void run();

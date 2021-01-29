@@ -6,6 +6,14 @@ namespace vulkan {
 VulkanContext::VulkanContext(/* args */) {}
 
 VulkanContext::~VulkanContext() {
+    if (linearSampler) {
+        vkDestroySampler(device, linearSampler, nullptr);
+        linearSampler = VK_NULL_HANDLE;
+    }
+    if (nearestSampler) {
+        vkDestroySampler(device, nearestSampler, nullptr);
+        nearestSampler = VK_NULL_HANDLE;
+    }
     if (pipelineCache) {
         vkDestroyPipelineCache(device, pipelineCache, nullptr);
         pipelineCache = VK_NULL_HANDLE;
@@ -45,13 +53,39 @@ void VulkanContext::initContext() {
     cmdBufInfo.commandBufferCount = 1;
     VK_CHECK_RESULT(
         vkAllocateCommandBuffers(device, &cmdBufInfo, &computerCmd));
+
+    createSampler(true,linearSampler);
+    createSampler(false,nearestSampler);    
+}
+
+void VulkanContext::createSampler(bool bLinear,VkSampler& sampler) {
+    // 创建sampler
+    VkSamplerCreateInfo samplerCreateInfo = {};
+    samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerCreateInfo.magFilter =
+        bLinear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
+    samplerCreateInfo.minFilter =
+        bLinear ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
+    samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerCreateInfo.mipLodBias = 0.0;
+    samplerCreateInfo.anisotropyEnable = VK_FALSE;
+    samplerCreateInfo.maxAnisotropy = 1;
+    samplerCreateInfo.compareEnable = VK_FALSE;
+    samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
+    samplerCreateInfo.minLod = 0.0;
+    samplerCreateInfo.maxLod = 0.0;
+    samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+    VK_CHECK_RESULT(
+        vkCreateSampler(device, &samplerCreateInfo, nullptr, &sampler));
 }
 
 bool VulkanContext::checkFormat(VkFormat format, VkFormatFeatureFlags feature,
                                 bool bLine) {
     VkFormatProperties props;
-    vkGetPhysicalDeviceFormatProperties(physicalDevice, format,
-                                        &props);
+    vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
     if (bLine) {
         return (props.linearTilingFeatures & feature) == feature;
     } else {

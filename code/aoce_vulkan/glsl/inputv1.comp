@@ -10,6 +10,7 @@ layout (binding = 2) uniform UBO
 {
 	int width;
 	int height;
+    int imageIndex;
 } ubo;
 
 uvec4 uint32Unzip(uint data) {
@@ -86,6 +87,12 @@ void bgra2rgba(int index,ivec2 size){
 void main(){
     ivec2 size = imageSize(outTex);
 	int index = int(gl_GlobalInvocationID.x);
-    rgb2rgba(index,size);
+    if(ubo.imageIndex == 1){
+        rgb2rgba(index,size);
+    }else if(ubo.imageIndex == 2){
+        bgra2rgba(index,size);
+    }else if(ubo.imageIndex == 3){
+        argb2rgba(index,size);
+    }
 }
 

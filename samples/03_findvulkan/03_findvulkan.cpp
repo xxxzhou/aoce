@@ -19,7 +19,7 @@ static YUV2RGBALayer* yuv2rgbLayer;
 #if __ANDORID__
 static GpuType gpuType = GpuType::vulkan;
 #else
-static GpuType gpuType = GpuType::cuda;
+static GpuType gpuType = GpuType::vulkan;
 #endif
 
 static void onDrawFrame(VideoFrame frame) {
@@ -92,6 +92,8 @@ int main() {
             video->close();
         } else if (key == 'o') {
             video->open();
+        }else if(key == 'p'){
+            vkGraph->reset();
         }
     }
     video.reset();

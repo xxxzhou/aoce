@@ -28,11 +28,12 @@ class AOCE_VULKAN_EXPORT VulkanTexture {
     ~VulkanTexture();
 
    public:
-    void InitResource(uint32_t width,
-                      uint32_t height, VkFormat format,
+    void InitResource(uint32_t width, uint32_t height, VkFormat format,
                       VkImageUsageFlags usageFlag,
                       VkMemoryPropertyFlags memoryFlag,
                       uint8_t* cpuData = nullptr, uint8_t cpuPitch = 0);
+
+    void createSampler(bool bLinear);
 
     void addBarrier(VkCommandBuffer command, VkImageLayout newLayout,
                     VkPipelineStageFlags newStageFlags,

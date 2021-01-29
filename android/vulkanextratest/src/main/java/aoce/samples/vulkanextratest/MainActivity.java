@@ -10,19 +10,20 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Surface;
 import android.view.SurfaceView;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.*;
 import android.view.View;
 
+// import com.android.colorpicker;
 
-public class MainActivity extends FragmentActivity implements IGLCopyTexture,IVKInitSurface, View.OnClickListener {
+public class MainActivity extends FragmentActivity implements IGLCopyTexture, View.OnClickListener {
     static {
         System.loadLibrary("vulkanextratest");
     }
-    private VKVideoRender vkVideoRender = null;
     private GLVideoRender glVideoRender = null;
     private Button btnOpen = null;
     private EditText uri = null;
+    private RadioButton radioButton = null;
+    private Switch openLayer = null;
 
     private static final int PERMISSION_REQUEST_CODE_CAMERA = 1;
 
@@ -33,7 +34,8 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture,IVK
 
         btnOpen = findViewById(R.id.btnJoin);
         btnOpen.setOnClickListener(this);
-        uri = findViewById(R.id.roomName);
+        radioButton = findViewById(R.id.radioButton3);
+        openLayer = findViewById(R.id.switch1);
 
         if (checkSelfPermission( Manifest.permission.CAMERA) !=
                 PackageManager.PERMISSION_GRANTED) {
@@ -44,10 +46,6 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture,IVK
         }
 
         initEngine();
-
-        SurfaceView surfaceView = findViewById(R.id.vk_surface_view);
-        // vkVideoRender = new VKVideoRender();
-        // vkVideoRender.init(surfaceView,this);
 
         glVideoRender = new GLVideoRender();
         GLSurfaceView glSurfaceView = findViewById(R.id.es_surface_view);
@@ -60,21 +58,15 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture,IVK
     }
 
     @Override
-    public void initSurface(Surface surface, int width, int height) {
-        vkInitSurface(surface,width,height);
-    }
-
-    @Override
     public void onClick(View view) {
-        String uid = uri.getText().toString();
+        int uid = radioButton.isChecked()? 0 : 1;
         try {
-            openCamera(Integer.parseInt(uid));
+            openCamera(uid);
         } catch (NumberFormatException e) {
         }
     }
 
     public native void initEngine();
     public native void glCopyTex(int textureId, int width, int height);
-    public native void vkInitSurface(Surface surface,int width,int height);
     public native void openCamera(int index);
 }

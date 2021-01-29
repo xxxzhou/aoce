@@ -8,25 +8,15 @@ namespace layer {
 
 VkOutputLayer::VkOutputLayer(/* args */) { bOutput = true; }
 
-VkOutputLayer::~VkOutputLayer() {
-    if (outEvent) {
-        vkDestroyEvent(context->device, outEvent, VK_NULL_HANDLE);
-        outEvent = VK_NULL_HANDLE;
-    }
+VkOutputLayer::~VkOutputLayer() {   
 }
 
 void VkOutputLayer::onInitGraph() {
-    VkEventCreateInfo eventInfo = {};
-    eventInfo.sType = VK_STRUCTURE_TYPE_EVENT_CREATE_INFO;
-    eventInfo.pNext = nullptr;
-    eventInfo.flags = 0;
-    vkCreateEvent(context->device, &eventInfo, nullptr, &outEvent);
-    vkSetEvent(context->device, outEvent);
-
+    
 #if __ANDROID__
     hardwareImage = std::make_unique<HardwareImage>();
     // hardwareImage->createAndroidBuffer(format);
-#endif
+#endif    
 }
 
 void VkOutputLayer::onInitVkBuffer() {
@@ -39,18 +29,16 @@ void VkOutputLayer::onInitVkBuffer() {
                            VK_BUFFER_USAGE_TRANSFER_DST_BIT);
     cpuData.resize(size);
     // GPU输出
+    // swapTex = std::make_unique<VulkanTexture>();
     // const ImageFormat& format = outFormats[0];
     // VkFormat vkft = ImageFormat2Vk(format.imageType);
-    // outTex = std::make_unique<VulkanTexture>();
-    // outTex->InitResource(outFormats[0].width, outFormats[0].height, vkft,
-    //                      VK_IMAGE_USAGE_STORAGE_BIT |
-    //                          VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
-    //                          VK_IMAGE_USAGE_TRANSFER_DST_BIT,
-    //                      0);
+    // swapTex->InitResource(
+    //     outFormats[0].width, outFormats[0].height, vkft,
+    //     VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, 0);
 }
 
 bool VkOutputLayer::onFrame() {
-    if (paramet.bCpu) {  
+    if (paramet.bCpu) {
         onImageProcessHandle(outBuffer->getCpuData(), outFormats[0], 0);
     }
     return true;
@@ -63,22 +51,15 @@ void VkOutputLayer::onPreCmd() {
                               VK_ACCESS_SHADER_READ_BIT);
         context->imageToBuffer(cmd, inTexs[0].get(), outBuffer.get());
     }
-    if (paramet.bGpu && outTex.image) {
-        // vkCmdWaitEvents(cmd, 1, &outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT,
-        //                 VK_PIPELINE_STAGE_TRANSFER_BIT, 0, nullptr, 0,
-        //                 nullptr, 0, nullptr);
-        // vkCmdResetEvent(cmd, outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT);
-        inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                              VK_PIPELINE_STAGE_TRANSFER_BIT,
-                              VK_ACCESS_SHADER_READ_BIT);
-        VkImage outImage = (VkImage)outTex.image;
-        changeLayout(cmd, outImage, VK_IMAGE_LAYOUT_UNDEFINED,
-                     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                     VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                     VK_PIPELINE_STAGE_TRANSFER_BIT);
-        VulkanManager::blitFillImage(cmd, inTexs[0].get(), outImage,
-                                     outTex.width, outTex.height);
-        // vkCmdSetEvent(cmd, outEvent, VK_PIPELINE_STAGE_TRANSFER_BIT);
+    if (paramet.bGpu && swapTex && swapTex->image) {
+        // inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        //                       VK_PIPELINE_STAGE_TRANSFER_BIT,
+        //                       VK_ACCESS_SHADER_READ_BIT);
+        // changeLayout(cmd, swapTex->image, VK_IMAGE_LAYOUT_UNDEFINED,
+        //              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        //              VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        //              VK_PIPELINE_STAGE_TRANSFER_BIT);
+        // VulkanManager::copyImage(cmd, inTexs[0].get(), swapTex.get());
     }
 #if __ANDROID_API__ >= 26
     if (paramet.bGpu && hardwareImage->getImage()) {
@@ -96,23 +77,25 @@ void VkOutputLayer::onPreCmd() {
 
 void VkOutputLayer::outVkGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
     // outVkTex.commandbuffer外面执行
-    if (outVkTex.commandbuffer != nullptr) {
+    // if (outTex.width != outVkTex.width || outTex.height != outVkTex.height) {
+    //     outTex = outVkTex;
+    //     // 重新生成cmdbuffer
+    //     this->getGraph()->reset();
+    // }
+    if(!vkPipeGraph->resourceReady()){
+        return;
+    }
+    if (outVkTex.commandbuffer != nullptr) {                
         if (inTexs.empty() || !inTexs[0] || !inTexs[0]->image) {
             return;
-        }
+        }        
         // GPU输出
         VkCommandBuffer copyCmd = (VkCommandBuffer)outVkTex.commandbuffer;
-        VkImage copyImage = (VkImage)outVkTex.image;
-        // auto res = vkGetEventStatus(context->device, outEvent);
-        // assert(res != VK_EVENT_RESET);
+        VkImage copyImage = (VkImage)outVkTex.image;       
         inTexs[0]->addBarrier(copyCmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                               VK_PIPELINE_STAGE_TRANSFER_BIT);
         VulkanManager::blitFillImage(copyCmd, inTexs[0].get(), copyImage,
                                      outVkTex.width, outVkTex.height);
-    } else {
-        outTex = outVkTex;
-        // 重新生成cmdbuffer
-        this->getGraph()->reset();
     }
 }
 

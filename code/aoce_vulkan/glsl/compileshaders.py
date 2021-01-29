@@ -2,6 +2,7 @@ import sys
 import os
 import glob
 import subprocess
+import shutil
 
 path = os.path.dirname(os.path.realpath(__file__))
 path = path.replace('\\', '/')
@@ -25,6 +26,14 @@ print("\n-------- Compilation result --------\n")
 
 if len(failedshaders) == 0:
 	print("SUCCESS: All shaders compiled to SPIR-V")
+	dest = path + "/../../../build/bin/Debug/glsl/"
+	risvfiles = []
+	risvfiles.extend(glob.glob(os.path.join(path, '*.spv'))) 
+	for risvfile in risvfiles:
+		shutil.copy(risvfile,dest+os.path.basename(risvfile))
+	dest = path + "/../../../build/bin/Release/glsl/"
+	for risvfile in risvfiles:
+		shutil.copy(risvfile,dest+os.path.basename(risvfile))
 else:
 	print("ERROR: %d shader(s) could not be compiled:\n" % len(failedshaders))
 	for failedshader in failedshaders:

@@ -9,6 +9,8 @@ android/window 多媒体与游戏引擎交互.
 第三方库引用[aoce_thirdparty](https://github.com/xxxzhou/aoce_thirdparty)
 在code平级创建一个目录thirdparty,把aoce_thirdparty里的内容放入这个目录.
 
+vulkan项目使用glsl,请安装Vulkan SDK,通过工具glslangValidator把glsl编译成SPIR-V.
+
 ## 做什么
 
 主要想实现一个能在win/andorid方便组合,扩展的GPU图像处理框架.
@@ -80,5 +82,11 @@ cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/
 ### vulkanextratest 用于android测试各种vulkanextra里的效果
 
 ## UE4集成
+
+### 配置
+
+请先编译运行好aoce,然后运行UE4Test/copybin.bat会把aoce运行好的dll放入本UE4项目下的插件目录中.
+
+### 功能
 
 在UE4Test下查看Plugins/AocePlugins里的相关实现。

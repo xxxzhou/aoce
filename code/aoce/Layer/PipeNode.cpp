@@ -13,13 +13,17 @@ PipeNode::PipeNode(BaseLayer* _layer) {
 PipeNode::~PipeNode() {}
 
 void PipeNode::setVisable(bool bvisable) {
-    bInvisible = !bvisable;
-    layer->pipeGraph->reset();
+    if (bInvisible == bvisable) {
+        bInvisible = !bvisable;
+        layer->pipeGraph->reset();
+    }
 }
 
 void PipeNode::setEnable(bool benable) {
-    bDisable = !benable;
-    layer->pipeGraph->reset();
+    if (bDisable == benable) {
+        bDisable = !benable;
+        layer->pipeGraph->reset();
+    }
 }
 
 PipeNodePtr PipeNode::addNode(BaseLayer* layer) {

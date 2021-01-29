@@ -18,14 +18,23 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     chromKeyLayer = createChromKeyLayer();
     ChromKeyParamet keyParamet = {};
-    keyParamet.ambientScale = 0.1f;
+    keyParamet.despillCuttofMax = 0.8f;
+    keyParamet.despillExponent = 0.5f;
+    keyParamet.ambientScale = 1.0f;
     keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
-    keyParamet.ambientColor = {0.6f, 0.1f, 0.6f};
+    keyParamet.ambientColor = {0.1f, 0.6f, 0.1f};
     keyParamet.alphaCutoffMin = 0.001f;
     chromKeyLayer->updateParamet(keyParamet); 
 
     view->initGraph(chromKeyLayer, hInstance);
     view->openDevice();
+
+    std::thread trd([&](){
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));        
+        view->enableLayer(false);
+    });
+    trd.detach();
+
     view->run();
 
     unloadAoce();

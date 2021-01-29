@@ -66,5 +66,8 @@ void main(){
     // 去除扣像背景
     dcolor -= inputColor*chromaColor*despillAlpha;
     dcolor += inputColor;    
-    imageStore(outTex,uv,vec4(dcolor,alpha)); 
+    if(alpha < 0.1f){
+        dcolor = ambientColor;
+    }
+    imageStore(outTex,uv,vec4(alpha)); 
 }

@@ -7,6 +7,7 @@
 #include "../Aoce.hpp"
 #include "InputLayer.hpp"
 #include "PipeNode.hpp"
+#include <mutex>
 
 namespace aoce {
 
@@ -14,13 +15,13 @@ namespace aoce {
 // 设计为有向无环图,node包含layer.
 // node承担图像流程功能
 // layer包含图像本身处理
-
 class ACOE_EXPORT PipeGraph {
    public:
     PipeGraph(/* args */);
     virtual ~PipeGraph();
 
    private:
+    bool checkHaveValid(PipeLinePtr ptr);
     // friend class BaseLayer;
     void validNode();
 
@@ -30,9 +31,10 @@ class ACOE_EXPORT PipeGraph {
     std::vector<PipeLinePtr> validLines;
     std::vector<PipeNodePtr> nodes;
     // 需要重新reset.
-    bool bReset = false;
+    bool bReset = false;    
     // 图表的执行顺序
     std::vector<int32_t> nodeExcs;
+    std::mutex mtx;
 
    protected:
     // 重新构建有序无环图的执行顺序
@@ -52,7 +54,7 @@ class ACOE_EXPORT PipeGraph {
                  int32_t toIn = 0);
 
     void getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
-                        ImageFormat& format);
+                           ImageFormat& format);
 
     // 清除连线(当逻辑变更导致执行列表重组)
     void clearLines();
@@ -61,6 +63,8 @@ class ACOE_EXPORT PipeGraph {
     void clear();
 
    protected:
+    // 如vulkan,需要同步资源
+    virtual void onReset(){};
     virtual bool onInitLayers() { return false; };
     virtual bool onInitBuffers() { return false; }
     // 限定不能直接创建

@@ -36,6 +36,8 @@ class ACOE_EXPORT BaseLayer {
     friend class PipeNode;
     friend class PipeGraph;
     friend class InputLayer;
+    //ITLayer类的所有实例化, 都为BaseLayer的友元
+    template <typename T> friend class ITLayer;
 
     GpuType gpu = GpuType::other;
     // 定义当前层需要的输入数量
@@ -58,7 +60,7 @@ class ACOE_EXPORT BaseLayer {
     virtual ~BaseLayer();
 
    public:
-    virtual void onParametChange(){};
+    // virtual void onParametChange(){};
     class PipeGraph* getGraph();
 
    protected:
@@ -90,6 +92,7 @@ class ILayer {
 // 分离导致层不同参数的差异(AOCE_LAYER_QUERYINTERFACE)
 template <typename T>
 class ITLayer : public ILayer {
+
    protected:
     T oldParamet = {};
     T paramet = {};
@@ -98,12 +101,10 @@ class ITLayer : public ILayer {
     inline void updateParamet(const T& t) {
         oldParamet = this->paramet;
         this->paramet = t;
-        getLayer()->onParametChange();
+        getLayer()->onUpdateParamet();
     };
 
-    inline T getParamet(){
-        return paramet;
-    }
+    inline T getParamet() { return paramet; }
 };
 
 // YUV 2 RGBA 转换
@@ -114,15 +115,9 @@ class RGBA2YUVLayer : public ITLayer<YUVParamet> {};
 
 class TexOperateLayer : public ITLayer<TexOperateParamet> {};
 
-// 纹理混合
-struct BlendParamet {
-    float right = 0.0f;
-    float top = 0.0f;
-    float width = 0.4f;
-    float height = 0.4f;
-    // 显示如上位置图像的透明度
-    float alaph = 0.2f;
-};
+class TransposeLayer : public ITLayer<TransposeParamet> {};
+
+class ReSizeLayer : public ITLayer<ReSizeParamet> {};
 
 class BlendLayer : public ITLayer<BlendParamet> {};
 

@@ -1,0 +1,43 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1) uniform sampler2D inSampler2;
+layout (binding = 2, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 3) uniform UBO {
+    // 0
+    float fx;
+    float fy;
+    // 0
+	float centerX;
+	float centerY;
+	float width;
+	float height;
+    // 不透明
+    float opacity;
+} ubo;
+
+void main(){
+    ivec2 id = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex); 
+    ivec2 blendSize = imageSize(outTex); 
+    if(id.x >= size.x || id.y >= size.y){
+        return;
+    } 
+    // id 转化成 uv,加0.5为了[0,size)转成[0-1]范围
+    float x = (id.x+0.5)/size.x;
+    float y = (id.y+0.5)/size.y; 
+    vec2 uv = vec2(x,y);
+    vec4 rect = vec4(ubo.centerX - ubo.width / 2.f, ubo.centerY - ubo.height / 2.f, ubo.centerX + ubo.width / 2.f, ubo.centerY + ubo.height / 2.f);
+	vec4 color = imageLoad(inTex,id);
+    if (uv.x >= rect.x && uv.x < rect.z && uv.y >= rect.y && uv.y < rect.w) {
+		vec2 uv2 = vec2((uv.x - rect.x), (uv.y - rect.y));
+        // 转成inSampler2 id,用的texelFetch,边缘根据设定处理
+        int ix = int(uv2.x*ubo.fx);
+        int iy = int(uv2.y*ubo.fy);
+        vec4 color2 = texelFetch(inSampler2, ivec2(ix,iy),0);		
+		color = color2 * (1.f - ubo.opacity) + color * ubo.opacity;
+	}
+    imageStore(outTex, id, color); 
+}

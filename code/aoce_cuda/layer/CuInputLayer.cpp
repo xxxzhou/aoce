@@ -17,7 +17,11 @@ CuInputLayer::CuInputLayer(/* args */) { bInput = true; }
 
 CuInputLayer::~CuInputLayer() {}
 
-void CuInputLayer::onUpdateParamet() { pipeGraph->reset(); }
+void CuInputLayer::onUpdateParamet() {
+    if (pipeGraph) {
+        pipeGraph->reset();
+    }
+}
 
 void CuInputLayer::onInitCuBufffer() {
     if (videoFormat.videoType == VideoType::rgb8) {

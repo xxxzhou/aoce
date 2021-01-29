@@ -10,7 +10,11 @@ VkLinearFilterLayer::VkLinearFilterLayer(/* args */) { setUBOSize(16); }
 
 VkLinearFilterLayer::~VkLinearFilterLayer() {}
 
-void VkLinearFilterLayer::onUpdateParamet() { pipeGraph->reset(); }
+void VkLinearFilterLayer::onUpdateParamet() {
+    if (pipeGraph) {
+        pipeGraph->reset();
+    }
+}
 
 void VkLinearFilterLayer::onInitGraph() {
     std::string path = "glsl/filter2D.comp.spv";
@@ -39,7 +43,7 @@ void VkLinearFilterLayer::onInitVkBuffer() {
     kernelBuffer->initResoure(
         BufferUsage::onestore,
         paramet.kernelSizeX * paramet.kernelSizeY * sizeof(float),
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());  
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());
 }
 
 void VkLinearFilterLayer::onInitPipe() {

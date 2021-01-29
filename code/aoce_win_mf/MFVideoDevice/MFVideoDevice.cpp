@@ -29,8 +29,10 @@ MFVideoDevice::MFVideoDevice(/* args */) {
     if (SUCCEEDED(hr)) {
         //开户格式转换，如mgjp 转yuv2
         pAttributes->SetUINT32(MF_READWRITE_DISABLE_CONVERTERS, TRUE);
-        // 异步采集方案
-        pAttributes->SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK, this);
+        if (bMFAsync) {
+            // 异步采集方案
+            pAttributes->SetUnknown(MF_SOURCE_READER_ASYNC_CALLBACK, this);
+        }
     }
     videoIndex = MF_SOURCE_READER_FIRST_VIDEO_STREAM;
 }
@@ -50,8 +52,8 @@ bool MFVideoDevice::init(IMFActivate* pActivate) {
                                            &wpname, nullptr);
     hr = activate->GetAllocatedString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, &wid, nullptr);
-    copywcharstr((wchar_t*)name.data(), wpname, AOCE_VIDEO_MAX_NAME/2);
-    copywcharstr((wchar_t*)id.data(), wid, AOCE_VIDEO_MAX_NAME/2);
+    copywcharstr((wchar_t*)name.data(), wpname, AOCE_VIDEO_MAX_NAME / 2);
+    copywcharstr((wchar_t*)id.data(), wid, AOCE_VIDEO_MAX_NAME / 2);
     CoTaskMemFree(wpname);
     CoTaskMemFree(wid);
     //很多采集设备可以进这步，但是MF读不了，不需要给出错误信息
@@ -203,7 +205,7 @@ bool MFVideoDevice::open() {
             return false;
         }
         // 重新打开数据读取
-        return setPlay(true);       
+        return setPlay(true);
     }
 }
 

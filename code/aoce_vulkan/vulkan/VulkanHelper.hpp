@@ -4,13 +4,14 @@
 
 #include "VulkanCommon.hpp"
 
-#define VK_CHECK_RESULT(f)                                        \
-    {                                                             \
-        VkResult res = (f);                                       \
-        if (res != VK_SUCCESS) {                                  \
-            logMessage(AOCE_LOG_ERROR, errorString(res).c_str()); \
-            assert(res == VK_SUCCESS);                            \
-        }                                                         \
+#define VK_CHECK_RESULT(f)                                              \
+    {                                                                   \
+        VkResult res = (f);                                             \
+        if (res != VK_SUCCESS) {                                        \
+            std::string str = "aoce vulkan error: " + errorString(res); \
+            logMessage(AOCE_LOG_ERROR, str.c_str());                    \
+            assert(res == VK_SUCCESS);                                  \
+        }                                                               \
     }
 
 namespace aoce {

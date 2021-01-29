@@ -117,25 +117,7 @@ void VulkanTexture::InitResource(uint32_t width, uint32_t height,
         }
         vkUnmapMemory(device, memory);
     }
-    // 创建sampler
-    VkSamplerCreateInfo samplerCreateInfo = {};
-    samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerCreateInfo.magFilter = VK_FILTER_NEAREST;
-    samplerCreateInfo.minFilter = VK_FILTER_NEAREST;
-    samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
-    samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    samplerCreateInfo.mipLodBias = 0.0;
-    samplerCreateInfo.anisotropyEnable = VK_FALSE;
-    samplerCreateInfo.maxAnisotropy = 1;
-    samplerCreateInfo.compareEnable = VK_FALSE;
-    samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
-    samplerCreateInfo.minLod = 0.0;
-    samplerCreateInfo.maxLod = 0.0;
-    samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-    VK_CHECK_RESULT(
-        vkCreateSampler(device, &samplerCreateInfo, nullptr, &sampler));
+
     // 创建view
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -155,9 +137,32 @@ void VulkanTexture::InitResource(uint32_t width, uint32_t height,
     VK_CHECK_RESULT(vkCreateImageView(device, &viewInfo, nullptr, &view));
     // 填充VkDescriptorImageInfo
     descInfo.imageView = view;
-    descInfo.sampler = sampler;
+    descInfo.sampler = VK_NULL_HANDLE;
     // 渲染管线一般用VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,计算管线用general
     descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+}
+
+void VulkanTexture::createSampler(bool bLinear){
+    // 创建sampler
+    VkSamplerCreateInfo samplerCreateInfo = {};
+    samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerCreateInfo.magFilter = VK_FILTER_NEAREST;
+    samplerCreateInfo.minFilter = VK_FILTER_NEAREST;
+    samplerCreateInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    samplerCreateInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerCreateInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerCreateInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerCreateInfo.mipLodBias = 0.0;
+    samplerCreateInfo.anisotropyEnable = VK_FALSE;
+    samplerCreateInfo.maxAnisotropy = 1;
+    samplerCreateInfo.compareEnable = VK_FALSE;
+    samplerCreateInfo.compareOp = VK_COMPARE_OP_NEVER;
+    samplerCreateInfo.minLod = 0.0;
+    samplerCreateInfo.maxLod = 0.0;
+    samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+    VK_CHECK_RESULT(
+        vkCreateSampler(device, &samplerCreateInfo, nullptr, &sampler)); 
+    descInfo.sampler = sampler;   
 }
 
 void VulkanTexture::addBarrier(VkCommandBuffer command, VkImageLayout newLayout,

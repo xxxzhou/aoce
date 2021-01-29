@@ -20,10 +20,15 @@ class AOCE_VULKAN_EXPORT VulkanContext {
     VkPipelineCache pipelineCache = VK_NULL_HANDLE;
     VkCommandBuffer computerCmd = VK_NULL_HANDLE;
     VkCommandPool cmdPool = VK_NULL_HANDLE;
+    VkSampler linearSampler = VK_NULL_HANDLE;
+    VkSampler nearestSampler = VK_NULL_HANDLE;
 
    public:
     VulkanContext(/* args */);
     ~VulkanContext();
+
+   private:
+    void createSampler(bool bLinear,VkSampler& sampler);
 
    public:
     void initContext();

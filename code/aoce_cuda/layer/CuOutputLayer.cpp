@@ -22,7 +22,7 @@ void CuOutputLayer::onInitLayer() {
             createDevice11(&device, &ctx);
             shardTex = std::make_shared<Dx11SharedTex>();
         }
-        DXGI_FORMAT dxFormat = getImageDXFormt(inFormats[0].imageType);        
+        DXGI_FORMAT dxFormat = getImageDXFormt(inFormats[0].imageType);
         // 绑定一个DX11共享资源与CUDA资源
         registerCudaResource(cudaResoure, shardTex, device, inFormats[0].width,
                              inFormats[0].height, dxFormat);
@@ -56,7 +56,11 @@ bool CuOutputLayer::onFrame() {
 
 void CuOutputLayer::onInitCuBufffer() {}
 
-void CuOutputLayer::onUpdateParamet() { pipeGraph->reset(); }
+void CuOutputLayer::onUpdateParamet() {
+    if (pipeGraph) {
+        pipeGraph->reset();
+    }
+}
 
 void CuOutputLayer::outDx11GpuTex(void* device, void* tex) {
     ID3D11Device* dxdevice = (ID3D11Device*)device;

@@ -30,10 +30,10 @@ bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,
         logMessage(LogLevel::warn, "layer add in layer error inindex.");
         return false;
     }
-    if (inLayers[inIndex].nodeIndex >= 0) {
-        logMessage(LogLevel::warn, "layer add in layer error have add.");
-        return false;
-    }
+    // if (inLayers[inIndex].nodeIndex >= 0) {
+    //     logMessage(LogLevel::warn, "layer add in layer error have add.");
+    //     return false;
+    // }
     inLayers[inIndex].nodeIndex = nodeIndex;
     inLayers[inIndex].outputIndex = outputIndex;
     return true;

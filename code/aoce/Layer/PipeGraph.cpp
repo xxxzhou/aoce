@@ -80,6 +80,14 @@ void PipeGraph::clear() {
     bReset = true;
 }
 
+bool PipeGraph::checkHaveValid(PipeLinePtr nline) {
+    // 检查是否已经有值,注意,这里nline可能在validLines没有,检查值相等
+    auto find =
+        std::find_if(validLines.begin(), validLines.end(),
+                     [&nline](PipeLinePtr ptr) { return *ptr == *nline; });
+    return find != validLines.end();
+}
+
 void PipeGraph::validNode() {
     // 本节点的输入线
     std::vector<std::vector<PipeLinePtr>> toLines(nodes.size());
@@ -110,7 +118,7 @@ void PipeGraph::validNode() {
     }
     // 检查有效链路
     for (auto& node : nodes) {
-        if (!node->bDisable && node->layer->bInput) {
+        if (!node->bDisable && !node->bInvisible && node->layer->bInput) {
             std::stack<int32_t> inputNodes;
             inputNodes.push(node->graphIndex);
             // 查找所有有效链路
@@ -122,29 +130,38 @@ void PipeGraph::validNode() {
                     if (nodes[line->toNode]->bDisable) {
                         continue;
                     }
-                    // 不可见的话,尝试自动去掉当前节点链接下一节点
-                    if (nodes[line->toNode]->bInvisible) {
-                        if (toLines[line->toNode].size() == 1 &&
-                            formLines[line->toNode].size() == 1) {
-                            PipeLinePtr nline(new PipeLine());
-                            // 新线取当前节点的输入线
-                            nline->fromNode = toLines[nline->toNode][0]->toNode;
-                            nline->fromOutIndex =
-                                toLines[nline->toNode][0]->toInIndex;
-                            nline->toNode =
-                                formLines[nline->toNode][0]->fromNode;
-                            nline->toInIndex =
-                                formLines[nline->toNode][0]->fromOutIndex;
-                            // 检查是否已经有值,注意,这里nline在validLines没有,检查值相等
-                            auto find = std::find_if(validLines.begin(),
-                                                     validLines.end(),
-                                                     [&nline](PipeLinePtr ptr) {
-                                                         return *ptr == *nline;
-                                                     });
-                            if (find == validLines.end()) {
+                    // 当前连接节点不可见的话,尝试自动去掉当前节点链接下一节点
+                    // 需要注意,下一节点/下下节点也可能没有启用
+                    int toNode = line->toNode;
+                    if (nodes[toNode]->bInvisible) {                        
+                        int32_t toSize = toLines[toNode].size();
+                        int32_t formSize = formLines[toNode].size();
+                        if (toSize != 1 || formSize != 1) {
+                            continue;
+                        }
+                        PipeLinePtr nline(new PipeLine());
+                        // 新线取当前节点的输入线
+                        nline->fromNode = toLines[toNode][0]->fromNode;
+                        nline->fromOutIndex = toLines[toNode][0]->fromOutIndex;
+                        bool bfind = true;
+                        // 取下一个可见节点
+                        toNode = formLines[line->toNode][0]->toNode;
+                        while (nodes[toNode]->bInvisible) {
+                            int32_t toSize = toLines[toNode].size();
+                            int32_t formSize = formLines[toNode].size();
+                            // 只支持一对一的
+                            if (toSize != 1 || formSize != 1) {
+                                bfind = false;
+                                break;
+                            }
+                            toNode = formLines[toNode][0]->toNode;
+                        }
+                        nline->toNode = toNode;
+                        nline->toInIndex = formLines[toNode][0]->toInIndex;
+                        if (bfind) {
+                            if (!checkHaveValid(nline)) {
                                 validLines.push_back(nline);
-                                inputNodes.push(
-                                    toLines[nline->toNode][0]->toNode);
+                                inputNodes.push(toNode);
                             }
                         }
                         continue;
@@ -162,7 +179,6 @@ void PipeGraph::validNode() {
 }
 
 bool PipeGraph::resetGraph() {
-    nodeExcs.clear();
     // 1. 得到节点的enable/visable验证过的lines
     validNode();
     // 2. 得到有效节点的前置节点  如:2[1] 3[2] 4[1] 5[3,4] (2需要1),(5需要3,4)
@@ -181,9 +197,10 @@ bool PipeGraph::resetGraph() {
         nodes[line->toNode]->layer->addInLayer(line->toInIndex, line->fromNode,
                                                line->fromOutIndex);
     }
+    nodeExcs.clear();
     for (int32_t i = 0; i < nodes.size(); i++) {
         const auto& reqNode = reqNodes[i];
-        if (reqNode.size() == 0 || nodes[i]->layer->bInput) {
+        if (nodes[i]->layer->bInput) {
             nodeExcs.push_back(i);
         }
     }
@@ -247,9 +264,14 @@ bool PipeGraph::resetGraph() {
 }
 
 bool PipeGraph::run() {
+    // 保证一次只处理一桢(MF 异步模式每次读取的数据可能并不在同一线程上)
+    // std::lock_guard<std::mutex> mtx_locker(mtx);
     if (bReset) {
+        logMessage(LogLevel::info, "start build graph.");
         bReset = false;
+        onReset();
         if (!resetGraph()) {
+            logMessage(LogLevel::warn, "build graph failed.");
             return false;
         }
     }

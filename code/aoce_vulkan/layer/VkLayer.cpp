@@ -66,6 +66,18 @@ void VkLayer::onInitLayer() {
     }
 }
 
+void VkLayer::createOutTexs() {
+    outTexs.clear();
+    for (int32_t i = 0; i < outCount; i++) {
+        const ImageFormat& format = outFormats[i];
+        VkFormat vkft = ImageFormat2Vk(format.imageType);
+        VulkanTexturePtr texPtr(new VulkanTexture());
+        texPtr->InitResource(format.width, format.height, vkft,
+                             VK_IMAGE_USAGE_STORAGE_BIT, 0);
+        outTexs.push_back(texPtr);
+    }
+}
+
 void VkLayer::onInitBuffer() {
     if (!bInput) {
         inTexs.clear();
@@ -76,15 +88,7 @@ void VkLayer::onInitBuffer() {
         }
     }
     if (!bOutput) {
-        outTexs.clear();
-        for (int32_t i = 0; i < outCount; i++) {
-            const ImageFormat& format = outFormats[i];
-            VkFormat vkft = ImageFormat2Vk(format.imageType);
-            VulkanTexturePtr texPtr(new VulkanTexture());
-            texPtr->InitResource(format.width, format.height, vkft,
-                                 VK_IMAGE_USAGE_STORAGE_BIT, 0);
-            outTexs.push_back(texPtr);
-        }
+        createOutTexs();
     }
     onInitVkBuffer();
     onInitPipe();

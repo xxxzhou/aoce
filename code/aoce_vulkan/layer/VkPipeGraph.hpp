@@ -20,7 +20,13 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
     std::vector<VkLayer*> vkOutputLayers;
     // 余下层
     std::vector<VkLayer*> vkLayers;
+    // GPU是否执行完成
     VkFence computerFence;
+
+    bool delayGpu = false;
+    // 确定是否在重置生成资源与commandbuffer中
+    VkEvent outEvent = VK_NULL_HANDLE;
+    VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
 
    public:
     VkPipeGraph(/* args */);
@@ -28,13 +34,14 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
 
    public:
     inline VulkanContext* getContext() { return context.get(); };
-
     VulkanTexturePtr getOutTex(int32_t node, int32_t outIndex);
 
+    bool resourceReady();
    protected:
     // 所有layer调用initbuffer后
-    virtual bool onInitBuffers();
-    virtual bool onRun();
+    virtual void onReset() override;
+    virtual bool onInitBuffers() override;
+    virtual bool onRun() override;
 };
 
 class VkPipeGraphFactory : public PipeGraphFactory {

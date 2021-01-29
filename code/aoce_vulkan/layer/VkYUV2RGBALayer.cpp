@@ -20,7 +20,9 @@ void VkYUV2RGBALayer::onInitGraph() {
 
 void VkYUV2RGBALayer::onUpdateParamet() {
     assert(getYuvIndex(paramet.type) > 0);
-    pipeGraph->reset();
+    if (pipeGraph) {
+        pipeGraph->reset();
+    }
 }
 
 void VkYUV2RGBALayer::onInitLayer() {

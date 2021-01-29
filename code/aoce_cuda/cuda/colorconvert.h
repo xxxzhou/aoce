@@ -314,10 +314,10 @@ inline __global__ void operate(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
         int ix = idx;
         int iy = idy;
         if (paramt.bFlipX) {
-            ix = source.width - idx;
+            ix = source.width - 1 - idx;
         }
         if (paramt.bFlipY) {
-            iy = source.height - idy;
+            iy = source.height - 1 - idy;
         }
         float4 rgba = rgbauchar42float4(source(iy, ix));
         float4 grgba =

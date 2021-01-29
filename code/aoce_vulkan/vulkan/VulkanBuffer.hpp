@@ -55,6 +55,8 @@ class AOCE_VULKAN_EXPORT VulkanBuffer {
     // 直接返回buffer关联pdata
     inline uint8_t* getCpuData() { return pData; };
 
+    inline int32_t getBufferSize() { return bufferSize;};
+
     // Computer shader后,插入相关barrier,由读变写,由写变读,确保前面操作完成
     // 后续添加渲染管线与计算管线添加barrier的逻辑
     void addBarrier(VkCommandBuffer command, VkPipelineStageFlags newStageFlags,

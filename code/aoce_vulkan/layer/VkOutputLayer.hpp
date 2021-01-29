@@ -15,11 +15,10 @@ class VkOutputLayer : public OutputLayer, public VkLayer {
     std::unique_ptr<VulkanBuffer> outBuffer = nullptr;
     std::vector<uint8_t> cpuData;
     VkOutGpuTex outTex = {};
-    // std::unique_ptr<VulkanTexture> outTex = nullptr;
+    std::unique_ptr<VulkanTexture> swapTex = nullptr;
 #if __ANDROID__
     std::unique_ptr<HardwareImage> hardwareImage = nullptr;
-#endif
-    VkEvent outEvent = VK_NULL_HANDLE;
+#endif    
 
    public:
     VkOutputLayer(/* args */);

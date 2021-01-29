@@ -3,7 +3,9 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkInputLayer::VkInputLayer(/* args */) { bInput = true; }
+VkInputLayer::VkInputLayer(/* args */) { bInput = true;
+    setUBOSize(12);
+ }
 
 VkInputLayer::~VkInputLayer() {}
 
@@ -20,9 +22,35 @@ void VkInputLayer::onInitGraph() {
 }
 
 void VkInputLayer::onInitVkBuffer() {
+    bUsePipe = true;
+    sizeY = 1;
+    int imageSize = inFormats[0].width * inFormats[0].height;
+    // 如果是rgb-rgba,则先buffer转cs buffer,然后cs shader转rgba.
+    // 不直接在cs shader用buf->tex,兼容性考虑cpu map/cs read权限.
+    if (videoFormat.videoType == VideoType::rgb8) {
+        // 每个线程组处理240个数据,一个线程拿buffer三个数据生成四个点
+        sizeX = divUp(imageSize / 4, 240);
+        inBufferX = std::make_unique<VulkanBuffer>();
+        inBufferX->initResoure(BufferUsage::program, imageSize * 3,
+                               VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
+    } else if (videoFormat.videoType == VideoType::argb8 ||
+               videoFormat.videoType == VideoType::bgra8) {
+        sizeX = divUp(imageSize, 240);
+        inBufferX = std::make_unique<VulkanBuffer>();
+        inBufferX->initResoure(BufferUsage::program, imageSize * 4,
+                               VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
+    } else {
+        bUsePipe = false;
+    }
     int32_t size = inFormats[0].width * inFormats[0].height *
                    getImageTypeSize(inFormats[0].imageType);
+    if (bUsePipe) {
+        size = inBufferX->getBufferSize();
+    }
     assert(size > 0);
+
     inBuffer = std::make_unique<VulkanBuffer>();
     inBuffer->initResoure(BufferUsage::store, size,
                           VK_BUFFER_USAGE_TRANSFER_SRC_BIT, frameData);
@@ -37,34 +65,10 @@ void VkInputLayer::onInitVkBuffer() {
     }
     std::vector<int> ubo = {outFormats[0].width, outFormats[0].height,
                             imageIndex};
-    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
+    memcpy(constBufCpu.data(), ubo.data(), conBufSize);    
 }
 
 void VkInputLayer::onInitPipe() {
-    bUsePipe = true;
-    sizeY = 1;
-    int imageSize = inFormats[0].width * inFormats[0].height;
-    // 如果是rgb-rgba,则先buffer转cs buffer,然后cs shader转rgba.
-    // 不直接在cs shader用buf->tex,兼容性考虑cpu map/cs read权限.
-    if (videoFormat.videoType == VideoType::rgb8) {
-        // 每个线程组处理240个数据,一个线程处理四个点,每四个点拿buffer三个数据
-        sizeX = divUp(imageSize / 4, 240);
-        inBufferX = std::make_unique<VulkanBuffer>();
-        inBufferX->initResoure(BufferUsage::program, imageSize * 3,
-                               VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                               frameData);
-    } else if (videoFormat.videoType == VideoType::argb8 ||
-               videoFormat.videoType == VideoType::bgra8) {
-        sizeX = divUp(imageSize, 240);
-        inBufferX = std::make_unique<VulkanBuffer>();
-        inBufferX->initResoure(BufferUsage::program, imageSize * 4,
-                               VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-                                   VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-                               frameData);
-    } else {
-        bUsePipe = false;
-    }
     if (bUsePipe) {
         outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
         layout->updateSetLayout(0, 0, &inBufferX->descInfo,

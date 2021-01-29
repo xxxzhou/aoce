@@ -19,6 +19,7 @@ namespace aoce {
 
 		void VulkanShader::loadShaderModule(VkDevice device, std::string path,
 			VkShaderStageFlagBits shaderFlag) {
+			this->device = device;	
 			release();
 #if defined(__ANDROID__)
 			AAssetManager* assetManager = AoceManager::Get().getAppEnv().assetManager;

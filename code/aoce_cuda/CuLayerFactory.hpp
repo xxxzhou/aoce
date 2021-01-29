@@ -16,6 +16,11 @@ class CuLayerFactory : public LayerFactory {
     virtual InputLayer* crateInput() override;
     virtual OutputLayer* createOutput() override;
     virtual YUV2RGBALayer* createYUV2RGBA() override;
+    virtual RGBA2YUVLayer* createRGBA2YUV() override;
+    virtual TexOperateLayer* createTexOperate() override;
+    virtual TransposeLayer* createTranspose() override;
+    virtual ReSizeLayer* createSize() override;
+    virtual BlendLayer* createBlend() override;
 };
 
 }  // namespace cuda
