@@ -7,7 +7,7 @@ namespace vulkan {
 namespace layer {
 
 VkPipeGraph::VkPipeGraph(/* args */) {
-    delayGpu = true;
+    // delayGpu = true;
 
     context = std::make_unique<VulkanContext>();
     context->initContext();
@@ -51,6 +51,7 @@ VulkanTexturePtr VkPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
 }
 
 bool VkPipeGraph::resourceReady(){
+    // 资源是否已经重新生成
     auto res = vkGetEventStatus(context->device, outEvent);
     return res == VK_EVENT_SET;
 }

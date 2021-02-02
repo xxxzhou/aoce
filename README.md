@@ -79,7 +79,7 @@ cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/
 
 ### 08_vulkanextra gpuimage各种图像效果验证
 
-### vulkanextratest 用于android测试各种vulkanextra里的效果
+### [vulkanextratest](https://zhuanlan.zhihu.com/p/348824878) 用于android测试各种vulkanextra里的效果
 
 ## UE4集成
 

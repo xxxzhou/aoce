@@ -23,15 +23,15 @@ struct FilterParamet {
 
 struct ChromKeyParamet {
     // 0.2 控制亮度的强度系数
-    float lumaMask = 0.2f;
+    float lumaMask = 2.0f;
     vec3 chromaColor;
     // 用环境光补受蓝绿幕影响的像素(简单理解扣像结果要放入的环境光的颜色)
     float ambientScale = 1.f;
     vec3 ambientColor;
     // 0.4
-    float alphaCutoffMin = 0.4f;
+    float alphaCutoffMin = 0.1f;
     // 0.41
-    float alphaCutoffMax = 0.5f;
+    float alphaCutoffMax = 0.2f;
     float alphaExponent = 1.f;
     // 0.8
     float despillCuttofMax = 0.8f;

@@ -11,7 +11,7 @@ void VkExtraBaseView::initGraph(ILayer* layer, void* hinst) {
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
-    outputLayer->updateParamet({true, true});
+    outputLayer->updateParamet({false, true});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     transposeLayer = layerFactory->createTranspose();
     operateLayer = layerFactory->createTexOperate();
@@ -93,6 +93,7 @@ void VkExtraBaseView::onFrame(VideoFrame frame) {
     if (getYuvIndex(frame.videoType) < 0) {
         yuvNode->setVisable(false);
     } else if (yuv2rgbLayer->getParamet().type != frame.videoType) {
+        yuvNode->setVisable(true);
         yuv2rgbLayer->updateParamet({frame.videoType});
     }
     inputLayer->inputCpuData(frame, 0);
@@ -104,7 +105,7 @@ void VkExtraBaseView::onFrame(VideoFrame frame) {
 #endif
 }
 
-void VkExtraBaseView::onPreCommand(uint32_t index) {   
+void VkExtraBaseView::onPreCommand(uint32_t index) {
     if (!window) {
         return;
     }

@@ -60,17 +60,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <Switch
-                        android:id="@+id/switch1"
-                        android:layout_width="0dp"
+                    <CheckBox
+                        android:id="@+id/checkBox"
+                        android:layout_width="46dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:checked="true"
                         android:text="是否扣像" />
 
                     <RadioGroup
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="2"
+                        android:layout_weight="3"
                         android:orientation="horizontal">
 
                         <RadioButton
@@ -133,7 +134,7 @@
                         android:layout_weight="5"
                         android:indeterminate="false"
                         android:max="100"
-                        android:progress="40"
+                        android:progress="10"
                         android:progressTint="#FFFFFF" />
                 </TableRow>
 
@@ -156,7 +157,7 @@
                         android:layout_weight="5"
                         android:indeterminate="false"
                         android:max="100"
-                        android:progress="50"
+                        android:progress="20"
                         android:progressTint="#FFFFFF" />
                 </TableRow>
                 <TableRow
