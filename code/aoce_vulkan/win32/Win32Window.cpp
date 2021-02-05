@@ -1,7 +1,5 @@
 #include "Win32Window.hpp"
-
 #include <iostream>
-
 #include "../vulkan/VulkanWindow.hpp"
 
 namespace aoce {

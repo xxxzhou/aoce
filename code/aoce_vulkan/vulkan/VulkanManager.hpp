@@ -33,12 +33,13 @@ class AOCE_VULKAN_EXPORT VulkanManager {
         int32_t destWidth, int32_t destHeight,
         VkImageLayout destLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     static void copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
-                          const VulkanTexture* dest);
+                          VkImage dest);
     // 选用的渲染通道索引
     int32_t graphicsIndex = -1;
     // 选用的计算通道过些
     int32_t computeIndex = -1;
     bool bAloneCompute = false;
+    bool bInterpDx11 = false;
 
    public:
     PhysicalDevicePtr physical = nullptr;

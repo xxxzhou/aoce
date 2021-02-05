@@ -18,5 +18,5 @@ void main(){
     }
     vec4 rgba = imageLoad(inTex,uv);
     float luminance = dot(rgba.rgb, W);
-    imageStore(outTex, uv,make_vec4(luminance)); 
+    imageStore(outTex, uv,vec4(luminance)); 
 }

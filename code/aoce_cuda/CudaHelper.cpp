@@ -28,7 +28,7 @@ void setNppStream(cudaStream_t& stream) {
     }
 };
 
-//把CUDA资源复制给DX11纹理(这里有个算是我遇到最奇怪的BUG之一,有行中文注释会导致这函数不能运行?)
+// 把CUDA资源复制给DX11纹理(这里有个算是我遇到最奇怪的BUG之一,有行中文注释会导致这函数不能运行?)
 void gpuMat2D3dTexture(CudaMatRef frame, Dx11CudaResource& cudaResource,
                        cudaStream_t stream) {
     if (cudaResource.texture != nullptr) {
@@ -48,7 +48,7 @@ void gpuMat2D3dTexture(CudaMatRef frame, Dx11CudaResource& cudaResource,
     }
 };
 
-//把与DX11资源绑定显存复制出来
+// 把与DX11资源绑定显存复制出来
 void d3dTexture2GpuMat(CudaMatRef frame, Dx11CudaResource& cudaResource,
                        cudaStream_t stream) {
     if (cudaResource.texture != nullptr) {
@@ -82,6 +82,14 @@ bool registerCudaResource(Dx11CudaResource& cudaDx11,
             logMessage(LogLevel::error,
                        "cudaGraphicsD3D11RegisterResource fails.");
         }
+        // cudaExternalMemory_t extMem = NULL;
+        // cudaExternalMemoryHandleDesc desc = {};
+        // memset(&desc, 0, sizeof(desc));
+        // desc.type = cudaExternalMemoryHandleTypeD3D11Resource;
+        // desc.handle.win32.handle = sharedResource->sharedHandle;
+        // desc.size = size;
+        // desc.flags |= cudaExternalMemoryDedicated;
+        // cudaImportExternalMemory(&extMem, &desc);
     }
     return bInit;
 }

@@ -42,6 +42,12 @@ class ACOE_EXPORT PipeNode {
     PipeNodePtr addLine(PipeNodePtr to, int32_t formOut = 0, int32_t toIn = 0);
 };
 
+template <typename T>
+struct TNodeLayer {
+    ITLayer<T>* layer = nullptr;
+    PipeNode* node = nullptr;
+};
+
 class PipeLine {
    public:
     PipeLine(){};

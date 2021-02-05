@@ -48,11 +48,12 @@ void Dx11CSResource::releaseResource() {
 Dx11Texture::~Dx11Texture() {}
 
 void Dx11Texture::setTextureSize(int32_t width, int32_t height,
-                                 DXGI_FORMAT format) {
+                                 DXGI_FORMAT format, bool bNT) {
     Reset();
     this->width = width;
     this->height = height;
     this->format = format;
+    this->bNTHandle = bNT;
 }
 
 bool Dx11Texture::createResource(ID3D11Device* deviceDx11) {
@@ -73,7 +74,12 @@ bool Dx11Texture::createResource(ID3D11Device* deviceDx11) {
         textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     }
     if (bShared) {
-        textureDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX;
+        textureDesc.MiscFlags =
+            D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX;  // D3D11_RESOURCE_MISC_SHARED_NTHANDLE
+        if (bNTHandle) {
+            textureDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED |
+                                    D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
+        }
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
     }
     textureDesc.SampleDesc.Count = 1;
@@ -222,19 +228,26 @@ void Dx11Constant::releaseResource() { buffer.Release(); }
 Dx11SharedTex::~Dx11SharedTex() { release(); }
 
 bool Dx11SharedTex::restart(ID3D11Device* deviceDx11, int32_t width,
-                            int32_t height, DXGI_FORMAT format) {
+                            int32_t height, DXGI_FORMAT format, bool bNT) {
+    release();
+    bNTHandle = bNT;
     texture = std::make_unique<Dx11Texture>();
     texture->setShared(true);
-    texture->setTextureSize(width, height, format);
+    texture->setTextureSize(width, height, format, bNT);
     texture->initResource(deviceDx11);
-
-    sharedHandle = getDx11SharedHandle(texture->texture);
+    sharedHandle = getDx11SharedHandle(texture->texture, bNTHandle);
+    // 尝试打开写锁
+    // copySharedToTexture(deviceDx11, sharedHandle, texture->texture, bNT);
     bGpuUpdate = false;
 
     return sharedHandle != nullptr;
 }
 
-void Dx11SharedTex::release() {}
+void Dx11SharedTex::release() {
+    if (bNTHandle && sharedHandle) {
+        CloseHandle(sharedHandle);
+    }
+}
 
 #pragma region ShaderInclude
 ShaderInclude::ShaderInclude(std::string modelName, std::string rctype,

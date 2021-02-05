@@ -35,7 +35,7 @@ endif()
 
 add_library(aoce_vulkan SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
 if(WIN32)
-    target_link_libraries(aoce_vulkan ${Vulkan_LIBRARY} aoce)
+    target_link_libraries(aoce_vulkan ${Vulkan_LIBRARY} aoce aoce_win)
 elseif(ANDROID)
     find_library(OPENGLES3_LIBRARY GLESv2 "OpenGL ES v3.0 library")
     find_library(EGL_LIBRARY EGL "EGL 1.4 library" )

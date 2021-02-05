@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 
+
 namespace aoce {
 namespace vulkan {
 class Win32Window {

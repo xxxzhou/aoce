@@ -15,8 +15,8 @@ class CuOutputLayer : public OutputLayer, public CuLayer {
     std::vector<uint8_t> cpuData;
     std::shared_ptr<win::Dx11SharedTex> shardTex;
     Dx11CudaResource cudaResoure = {};
-    CComPtr<ID3D11Device> device = nullptr;
-    CComPtr<ID3D11DeviceContext> ctx = nullptr;
+    // CComPtr<ID3D11Device> device = nullptr;
+    // CComPtr<ID3D11DeviceContext> ctx = nullptr;
 
    public:
     CuOutputLayer(/* args */);

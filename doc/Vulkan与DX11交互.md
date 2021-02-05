@@ -1,0 +1,42 @@
+# Vulkan与DX11交互
+
+## Demo演示地址[07_wintest](https://github.com/xxxzhou/aoce/blob/master/samples/07_wintest)
+
+## 有什么用
+
+在android平台主流是用opengl es,[android下vulkan与opengles纹理互通](https://zhuanlan.zhihu.com/p/302285687)。
+而在win平台，主流游戏还用的是DX11，aoce只是一个GPGPU计算平台，如果只是把结果通过CPU输出，然后接到dx11,这个性能损失太大，
+我们就需要Vulkan与DX11交互。
+以及完成这个交互后，aoce我就不做dx11模块了，我比较了oeip中的dx11模块与当前的vulkan模块性能相差不大，都比CUDA差，但是通用性更好。
+
+## 主要实现
+
+如果有兴趣，请自己可以下aoce_vulkan/win32/VkWinImage类的实现，dx11与vulkan绑定的逻辑主要在这。
+
+与opengles交互类似，资料不多，主要看到vulkan下有个vulkan_win32的头文件，看到如VkImportMemoryWin32HandleInfoKHR这些结构，用google搜下，
+可以看到[BindImageMemory](https://github.com/roman380/VulkanSdkDemos/blob/d3d11-image-interop/BindImageMemory2/BindImageMemory2.cpp#L154)有比较完整的交互
+逻辑，主要就是用DX11Texture共享纹理，注意这里要用NT句柄，就是相关MiscFlags需要包含D3D11_RESOURCE_MISC_SHARED_NTHANDLE，而在cuda/dx11交互里用cudaGraphicsD3D11RegisterResource用NT句柄
+会失败，所以最好用个标志表示是否需要NT句柄，NT句柄需要自己CreateSharedHandle，相关代码aoce_win/DX11/Dx11SharedTex查看具体实现。
+
+从NT句柄得到相应shader buffer需要通过ID3D11Device1，余下的逻辑和非NT句柄差不多了。
+
+然后就是按照cuda/dx11交互那样，vulkan最后输出结果到绑定dx11texture上的那个vkImage,然后在dx11渲染的另外一个线程把上面的dx11texture结果输出来就行，想的应该是这样，然后就开始
+不断启动就报device lost，然后启动几次后机器卡死/死机蓝屏，我晕，最开始我想的肯定是同步问题，继续在vulkan_win32的头文件找，找到如下VkWin32KeyedMutexAcquireReleaseInfoKHR结构，嗯，这个结构不就是
+dx11不同线程交互的同步API的AcquireSync/ReleaseSync，嗯，根据这个结构搜索到[dx11-vulkan-keymutex](https://github.com/KhronosGroup/VK-GL-CTS/blob/master/external/vulkancts/modules/vulkan/synchronization/vktSynchronizationWin32KeyedMutexTests.cpp)
+根据这里的逻辑改下，然后发现还是卡死/死机，我开始根据新增加代码一行行屏蔽测试，不断死机/蓝屏，最后我忽然想到解决动态启用/关闭层时遇到的一个问题，其中把运算结果
+复制给绑定dx11资源的vkImage,用的是vkCmdBlitImage，改成vkCmdCopyImage，嗯，问题解决，以前我因为vkCmdBlitImage里源和目标纹理不需要同样大小就一直用的这个，我猜测这个API应该是需要渲染管线与交换链那一套的，
+在这里我只有计算管线所以会导致问题，后面有时间验证下这个问题。
+
+这个问题解决后，嗯，可以正常运行了，但是，你不动窗口运行多久没问题，但是一动窗口就vulkan就报timeout,而这timeout一看就是VkWin32KeyedMutexAcquireReleaseInfoKHR上面的，
+我猜测，在移动窗口时，导致绑定dx11texture上的那个vkImage那个资源一直被dx11渲染占用着，所以就有这个问题，而我设计输出层时，设计要求运行线程与输出线程没有等待关系，二个线程可以分别以自己桢率运行
+，就和我在cuda交互里的处理，设置timeout为0，检查锁，如果锁timeout,就马上放弃，线程继续运行，
+而在这，我并不能通过这个接口实现这种逻辑。
+
+最后想了想，vulkan运行线程中，我可以用vkFence知道是否在执行commandbuffer,那么在二次执行中先复制结果一个临时dx11纹理中，
+这样也不需要针对这个临时dx11纹理在vulkan执行线程同步，把原来的绑定dx11texture上的那个vkImage的MiscFlags中的D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX改成D3D11_RESOURCE_MISC_SHARED，然后把相关的
+VkWin32KeyedMutexAcquireReleaseInfoKHR代码去掉，vulkan执行comandbuffer执行完成后，使用vkFence等待，等待完成后把绑定dx11texture上的那个vkImage输出到临时dx11纹理中。
+
+最后在Dx11的渲染线程中，所临时dx11纹理结果拿出来渲染，现在移动窗口正常了。
+
+
+

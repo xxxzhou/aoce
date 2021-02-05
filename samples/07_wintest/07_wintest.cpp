@@ -26,20 +26,27 @@ static std::string uri = "rtmp://58.200.131.2:1935/livetv/hunantv";
 static std::unique_ptr<Dx11Window> window = nullptr;
 static std::unique_ptr<VideoViewGraph> viewGraph = nullptr;
 
-static GpuType gpuType = GpuType::cuda;
+// cuda/vulkan 分别对接不同的DX11输出
+static GpuType gpuType = GpuType::vulkan;
+
+static void* dx11Device = nullptr;
+static void* dx11Tex = nullptr;
 
 static void onTick(void *dx11, void *tex) {
     std::string msg;
     string_format(msg, "time stamp: ", getNowTimeStamp());
     logMessage(LogLevel::info, msg);
-    std::this_thread::sleep_for(std::chrono::milliseconds(30));
-    viewGraph->getOutputLayer()->outDx11GpuTex(dx11, tex);
+    dx11Device = dx11;
+    dx11Tex = tex;
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));  
+    viewGraph->getOutputLayer()->outDx11GpuTex(dx11, dx11Tex);  
 }
 
 #if USE_CAMERA
 static void onDrawFrame(VideoFrame frame) {
     // std::cout << "time stamp:" << frame.timeStamp << std::endl;
     viewGraph->runFrame(frame);
+    // viewGraph->getOutputLayer()->outDx11GpuTex(dx11Device, dx11Tex);
 }
 #else
 class TestMediaPlay : public IMediaPlayerObserver {

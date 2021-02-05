@@ -34,6 +34,7 @@ AOCE_VULKAN_EXPORT VkResult enumerateDevice(
 AOCE_VULKAN_EXPORT bool getMemoryTypeIndex(uint32_t typeBits,
                                            VkFlags quirementsMaks,
                                            uint32_t& index);
+                                           
 AOCE_VULKAN_EXPORT int32_t getByteSize(VkFormat format);
 // Load a SPIR-V shader (binary)
 #if defined(__ANDROID__)

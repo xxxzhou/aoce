@@ -8,10 +8,8 @@ namespace layer {
 
 VkPipeGraph::VkPipeGraph(/* args */) {
     // delayGpu = true;
-
     context = std::make_unique<VulkanContext>();
     context->initContext();
-
     // 创建cpu-gpu通知
     VkFenceCreateInfo fenceInfo = {};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -20,7 +18,6 @@ VkPipeGraph::VkPipeGraph(/* args */) {
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
     }
     vkCreateFence(context->device, &fenceInfo, nullptr, &computerFence);
-
     // 创建一个Event
     VkEventCreateInfo eventInfo = {};
     eventInfo.sType = VK_STRUCTURE_TYPE_EVENT_CREATE_INFO;
@@ -28,7 +25,9 @@ VkPipeGraph::VkPipeGraph(/* args */) {
     eventInfo.flags = 0;
     vkCreateEvent(context->device, &eventInfo, nullptr, &outEvent);
     stageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-
+#if WIN32
+    win::createDevice11(&device, &ctx);
+#endif
     gpu = GpuType::vulkan;
 }
 
@@ -43,6 +42,14 @@ VkPipeGraph::~VkPipeGraph() {
     }
 }
 
+#if WIN32
+ID3D11Device* VkPipeGraph::getD3D11Device() { return device; }
+void VkPipeGraph::addOutMemory(VkWinImage* winImage) {
+    winImages.push_back(winImage);
+    outMemorys.push_back(winImage->getDeviceMemory());
+}
+#endif
+
 VulkanTexturePtr VkPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
     assert(node < nodes.size());
     VkLayer* vkLayer = static_cast<VkLayer*>(nodes[node]->getLayer());
@@ -50,20 +57,24 @@ VulkanTexturePtr VkPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
     return vkLayer->outTexs[outIndex];
 }
 
-bool VkPipeGraph::resourceReady(){
+bool VkPipeGraph::resourceReady() {
     // 资源是否已经重新生成
     auto res = vkGetEventStatus(context->device, outEvent);
     return res == VK_EVENT_SET;
 }
 
 void VkPipeGraph::onReset() {
-    // while (vkGetFenceStatus(context->device, computerFence) == VK_NOT_READY)
-    // {
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    // }
-    // auto res = vkGetEventStatus(context->device, outEvent);
-    // assert(res != VK_EVENT_RESET);
-    // 告诉别的线程,需要等待资源重新生成
+// while (vkGetFenceStatus(context->device, computerFence) == VK_NOT_READY)
+// {
+//     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+// }
+// auto res = vkGetEventStatus(context->device, outEvent);
+// assert(res != VK_EVENT_RESET);
+// 告诉别的线程,需要等待资源重新生成
+#if WIN32
+    outMemorys.clear();
+    winImages.clear();
+#endif
     vkResetEvent(context->device, outEvent);
     vkResetCommandBuffer(context->computerCmd,
                          VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
@@ -95,11 +106,25 @@ bool VkPipeGraph::onInitBuffers() {
     return true;
 }
 
+bool VkPipeGraph::executeOut() {
+    vkWaitForFences(context->device, 1, &computerFence, VK_TRUE,
+                    UINT64_MAX);  // UINT64_MAX
+#if WIN32
+    for(auto* winImage : winImages){
+        winImage->vkCopyTemp(device);
+    }
+#endif
+    vkResetFences(context->device, 1, &computerFence);
+    // 运行输出层
+    for (auto* layer : vkOutputLayers) {
+        if (!layer->onFrame()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool VkPipeGraph::onRun() {
-    // vkCmdWaitEvents(context->computerCmd, 1, &outEvent, stageFlags,
-    //                 stageFlags, 0, nullptr, 0, nullptr, 0,
-    //                 nullptr);
-    // vkCmdResetEvent(context->computerCmd, outEvent, stageFlags);
     // 更新所有层的参数
     for (auto* layer : vkLayers) {
         if (layer->bParametChange) {
@@ -116,37 +141,42 @@ bool VkPipeGraph::onRun() {
     // 等待上一桢执行完成,这种模式会导致当前桢输出的是上一桢的数据
     // 这样不需要等待当前GPU运行这桢数据完成.
     if (delayGpu) {
-        vkWaitForFences(context->device, 1, &computerFence, VK_TRUE,
-                        UINT64_MAX);  // UINT64_MAX
-        vkResetFences(context->device, 1, &computerFence);
-        // 运行输出层
-        for (auto* layer : vkOutputLayers) {
-            if (!layer->onFrame()) {
-                return false;
-            }
-        }
+        executeOut();
     }
     VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO; 
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &context->computerCmd;
     VK_CHECK_RESULT(
         vkQueueSubmit(context->computeQueue, 1, &submitInfo, computerFence));
+    // 同步当前桢完成并输出
     if (!delayGpu) {
-        // 运行输出层
-        for (auto* layer : vkOutputLayers) {
-            if (!layer->onFrame()) {
-                return false;
-            }
-        }
-        vkWaitForFences(context->device, 1, &computerFence, VK_TRUE,
-                        UINT64_MAX);  // UINT64_MAX
-        vkResetFences(context->device, 1, &computerFence);
+        executeOut();
     }
-    // vkCmdSetEvent(context->computerCmd, outEvent, stageFlags);
     return true;
 }
 
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce
+
+// win dx11/vulkan keymutex
+//#if WIN32 
+    // if (outMemorys.size() > 0) {
+    //     uint64_t write = AOCE_DX11_MUTEX_WRITE;
+    //     uint64_t read = AOCE_DX11_MUTEX_READ;
+    //     uint32_t timeOut = 0;
+    //     VkWin32KeyedMutexAcquireReleaseInfoKHR keyedMutexInfo = {};
+    //     keyedMutexInfo.sType =
+    //         VK_STRUCTURE_TYPE_WIN32_KEYED_MUTEX_ACQUIRE_RELEASE_INFO_KHR;
+    //     keyedMutexInfo.pNext = nullptr;
+    //     keyedMutexInfo.acquireCount = outMemorys.size();
+    //     keyedMutexInfo.pAcquireSyncs = outMemorys.data();
+    //     keyedMutexInfo.pAcquireKeys = &write;
+    //     keyedMutexInfo.pAcquireTimeouts = &timeOut;
+    //     keyedMutexInfo.releaseCount = outMemorys.size();
+    //     keyedMutexInfo.pReleaseSyncs = outMemorys.data();
+    //     keyedMutexInfo.pReleaseKeys = &read;
+    //     submitInfo.pNext = &keyedMutexInfo;       
+    // }
+//#endif

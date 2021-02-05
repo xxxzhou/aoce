@@ -7,6 +7,9 @@
 
 #include "../WinHelp.hpp"
 
+#define AOCE_DX11_MUTEX_READ 0
+#define AOCE_DX11_MUTEX_WRITE 1
+
 namespace aoce {
 namespace win {
 
@@ -49,15 +52,18 @@ ACOE_WIN_EXPORT bool createBufferUAV(ID3D11Device* deviceDx11,
                                      ID3D11Texture2D* pBuffer,
                                      ID3D11UnorderedAccessView** ppUAVOut);
 
-ACOE_WIN_EXPORT HANDLE getDx11SharedHandle(ID3D11Resource* source);
+ACOE_WIN_EXPORT HANDLE getDx11SharedHandle(ID3D11Resource* source,
+                                           bool bNT = false);
 
 ACOE_WIN_EXPORT void copySharedToTexture(ID3D11Device* d3ddevice,
-                                         HANDLE& sharedHandle,
-                                         ID3D11Texture2D* texture);
+                                         const HANDLE& sharedHandle,
+                                         ID3D11Texture2D* texture,
+                                         bool bNT = false);
 
 ACOE_WIN_EXPORT void copyTextureToShared(ID3D11Device* d3ddevice,
-                                         HANDLE& sharedHandle,
-                                         ID3D11Texture2D* texture);
+                                         const HANDLE& sharedHandle,
+                                         ID3D11Texture2D* texture,
+                                         bool bNT = false);
 
 ACOE_WIN_EXPORT int32_t sizeDxFormatElement(DXGI_FORMAT format);
 }  // namespace win

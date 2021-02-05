@@ -63,7 +63,7 @@ bool CuInputLayer::onFrame() {
         CComPtr<IDXGIKeyedMutex> pDX11Mutex = nullptr;
         HRESULT hResult = shardTex->texture->texture->QueryInterface(
             __uuidof(IDXGIKeyedMutex), (LPVOID*)&pDX11Mutex);
-        DWORD result = pDX11Mutex->AcquireSync(0, 0);
+        DWORD result = pDX11Mutex->AcquireSync(AOCE_DX11_MUTEX_READ, 0);
         if (result == WAIT_OBJECT_0) {
             if (this->videoFormat.videoType == VideoType::rgb8) {
                 d3dTexture2GpuMat(tempMat, cudaResoure, stream);
@@ -76,7 +76,7 @@ bool CuInputLayer::onFrame() {
             }
             shardTex->bGpuUpdate = false;
         }
-        result = pDX11Mutex->ReleaseSync(1);
+        result = pDX11Mutex->ReleaseSync(AOCE_DX11_MUTEX_WRITE);
     }
     return true;
 }

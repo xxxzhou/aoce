@@ -8,7 +8,10 @@ using namespace aoce::win;
 namespace aoce {
 namespace cuda {
 
-CuOutputLayer::CuOutputLayer(/* args */) { bOutput = true; }
+CuOutputLayer::CuOutputLayer(/* args */) {
+    bOutput = true;
+    shardTex = std::make_shared<Dx11SharedTex>();
+}
 
 CuOutputLayer::~CuOutputLayer() { cudaResoure.unBind(); }
 
@@ -18,13 +21,10 @@ void CuOutputLayer::onInitLayer() {
         cpuData.resize(inFormats[0].width * inFormats[0].height * imageSize);
     }
     if (paramet.bGpu) {
-        if (!device) {
-            createDevice11(&device, &ctx);
-            shardTex = std::make_shared<Dx11SharedTex>();
-        }
         DXGI_FORMAT dxFormat = getImageDXFormt(inFormats[0].imageType);
         // 绑定一个DX11共享资源与CUDA资源
-        registerCudaResource(cudaResoure, shardTex, device, inFormats[0].width,
+        registerCudaResource(cudaResoure, shardTex,
+                             cuPipeGraph->getDX11Device(), inFormats[0].width,
                              inFormats[0].height, dxFormat);
     }
 }
@@ -44,11 +44,11 @@ bool CuOutputLayer::onFrame() {
         CComPtr<IDXGIKeyedMutex> pDX11Mutex = nullptr;
         HRESULT hResult = shardTex->texture->texture->QueryInterface(
             __uuidof(IDXGIKeyedMutex), (LPVOID*)&pDX11Mutex);
-        DWORD result = pDX11Mutex->AcquireSync(0, 0);
+        DWORD result = pDX11Mutex->AcquireSync(AOCE_DX11_MUTEX_WRITE, 0);
         if (result == WAIT_OBJECT_0) {
             gpuMat2D3dTexture(inTexs[0], cudaResoure, stream);
         }
-        result = pDX11Mutex->ReleaseSync(1);
+        result = pDX11Mutex->ReleaseSync(AOCE_DX11_MUTEX_READ);
         shardTex->bGpuUpdate = true;
     }
     return true;

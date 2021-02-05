@@ -75,7 +75,7 @@ cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/
     3. 初始化android surface为vulkan的交换链，把如上结果复制到交换链上显示。
     4. 如果是opengles surface,如何不通过CPU直接把数据从vulkan复制到opengles里。
 
-### 07_wintest win平台下,cuda计算结果与dx11渲染窗口直接交互
+### [07_wintest](https://zhuanlan.zhihu.com/p/349534525) win平台下,cuda/vulkan计算结果与dx11渲染窗口直接交互
 
 ### 08_vulkanextra gpuimage各种图像效果验证
 

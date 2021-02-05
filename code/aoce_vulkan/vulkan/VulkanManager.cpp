@@ -130,7 +130,14 @@ void VulkanManager::createDevice(bool bAloneCompute) {
     deviceCreateInfo.pEnabledFeatures = nullptr;
     std::vector<const char*> deviceExtensions;
     deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-#if __ANDROID__
+#if WIN32
+    deviceExtensions.push_back(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
+#elif __ANDROID__
     // 和android里的AHardwareBuffer交互,没有的话,相关vkGetDeviceProcAddr获取不到对应函数
     deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
@@ -138,7 +145,8 @@ void VulkanManager::createDevice(bool bAloneCompute) {
     deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME);
+    deviceExtensions.push_back(
+        VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME);
 #endif
     deviceCreateInfo.enabledExtensionCount = (uint32_t)deviceExtensions.size();
     deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
@@ -147,6 +155,39 @@ void VulkanManager::createDevice(bool bAloneCompute) {
     bAloneCompute = computeIndex != graphicsIndex;
     vkGetDeviceQueue(device, computeIndex, 0, &computeQueue);
     vkGetDeviceQueue(device, graphicsIndex, 0, &graphicsQueue);
+
+    // 检测是否支持dx11交互
+    VkPhysicalDeviceExternalImageFormatInfo
+        PhysicalDeviceExternalImageFormatInfo = {
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_IMAGE_FORMAT_INFO};
+    PhysicalDeviceExternalImageFormatInfo.handleType =
+        VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT;
+    VkPhysicalDeviceImageFormatInfo2 PhysicalDeviceImageFormatInfo2 = {
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2};
+    PhysicalDeviceImageFormatInfo2.pNext =
+        &PhysicalDeviceExternalImageFormatInfo;
+    PhysicalDeviceImageFormatInfo2.format = VK_FORMAT_R8G8B8A8_UNORM;
+    PhysicalDeviceImageFormatInfo2.type = VK_IMAGE_TYPE_2D;
+    PhysicalDeviceImageFormatInfo2.tiling = VK_IMAGE_TILING_OPTIMAL;
+    PhysicalDeviceImageFormatInfo2.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+    VkExternalImageFormatProperties ExternalImageFormatProperties = {
+        VK_STRUCTURE_TYPE_EXTERNAL_IMAGE_FORMAT_PROPERTIES};
+    VkImageFormatProperties2 ImageFormatProperties2 = {
+        VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2};
+    ImageFormatProperties2.pNext = &ExternalImageFormatProperties;
+    VkResult result = vkGetPhysicalDeviceImageFormatProperties2(
+        VulkanManager::Get().physicalDevice, &PhysicalDeviceImageFormatInfo2,
+        &ImageFormatProperties2);
+    bInterpDx11 = result == VK_SUCCESS;
+    bInterpDx11 &= (ExternalImageFormatProperties.externalMemoryProperties
+                        .externalMemoryFeatures &
+                    VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT) > 0;
+    bInterpDx11 &= (ExternalImageFormatProperties.externalMemoryProperties
+                        .externalMemoryFeatures &
+                    VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT) > 0;
+    bInterpDx11 &= (ExternalImageFormatProperties.externalMemoryProperties
+                        .compatibleHandleTypes &
+                    VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT) > 0;
 }
 
 bool VulkanManager::findSurfaceQueue(VkSurfaceKHR surface,
@@ -196,7 +237,7 @@ void VulkanManager::blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
 }
 
 void VulkanManager::copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
-                              const VulkanTexture* dest) {
+                              VkImage dest) {
     VkImageCopy copyRegion = {};
 
     copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -216,7 +257,7 @@ void VulkanManager::copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
     copyRegion.extent.depth = 1;
 
     vkCmdCopyImage(cmd, src->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                   dest->image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
+                   dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
                    &copyRegion);
 }
 

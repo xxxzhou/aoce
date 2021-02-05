@@ -1,5 +1,7 @@
 #include "Dx11Helper.hpp"
 
+#include <d3d11_1.h>
+#include <dxgi1_2.h>
 #include <math.h>
 
 namespace aoce {
@@ -282,34 +284,53 @@ bool createBufferUAV(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer,
     return SUCCEEDED(result);
 }
 
-HANDLE getDx11SharedHandle(ID3D11Resource* source) {
+HANDLE getDx11SharedHandle(ID3D11Resource* source, bool bNT) {
     HANDLE handle = nullptr;
     // QI IDXGIResource interface to synchronized shared surface.
-    IDXGIResource* dxGIResource = nullptr;
-    HRESULT hr = source->QueryInterface(
-        __uuidof(IDXGIResource), reinterpret_cast<void**>(&dxGIResource));
-    if (FAILED(hr)) {
-        logHResult(hr, "get shared texture error.");
-        return nullptr;
-    }
-    // Obtain handle to IDXGIResource object.
-    dxGIResource->GetSharedHandle(&handle);
-    dxGIResource->Release();
-    dxGIResource = nullptr;
+    CComPtr<IDXGIResource> dxGIResource = nullptr;
+    if (!bNT) {
+        HRESULT hr = source->QueryInterface(
+            __uuidof(IDXGIResource), reinterpret_cast<void**>(&dxGIResource));
+        if (FAILED(hr)) {
+            logHResult(hr, "get shared texture error.");
+            return nullptr;
+        }
+        // Obtain handle to IDXGIResource object.
+        dxGIResource->GetSharedHandle(&handle);
+    } else {
+        CComPtr<IDXGIResource1> dxGIResource1 = nullptr;
+        HRESULT hr = source->QueryInterface(
+            __uuidof(IDXGIResource), reinterpret_cast<void**>(&dxGIResource1));
+        // DXGI_SHARED_RESOURCE_READ | DXGI_SHARED_RESOURCE_WRITE,
+        dxGIResource1->CreateSharedHandle(nullptr, GENERIC_ALL, nullptr,
+                                          &handle);
+    }    
     return handle;
 }
 
-void copySharedToTexture(ID3D11Device* d3ddevice, HANDLE& sharedHandle,
-                         ID3D11Texture2D* texture) {
-    if (!d3ddevice) return;
+void copySharedToTexture(ID3D11Device* d3ddevice, const HANDLE& sharedHandle,
+                         ID3D11Texture2D* texture, bool bNT) {
+    if (!d3ddevice) {
+        return;
+    }
     CComPtr<ID3D11DeviceContext> d3dcontext = nullptr;
-    // ID3D11DeviceContext* d3dcontext = nullptr;
     d3ddevice->GetImmediateContext(&d3dcontext);
-    if (!d3dcontext) return;
+    if (!d3dcontext) {
+        return;
+    }
     if (sharedHandle && texture) {
         CComPtr<ID3D11Texture2D> pBuffer = nullptr;
-        HRESULT hr = d3ddevice->OpenSharedResource(
-            sharedHandle, __uuidof(ID3D11Texture2D), (void**)(&pBuffer));
+        HRESULT hr = 0;
+        if (bNT) {
+            CComPtr<ID3D11Device1> d3d11_Device1 = nullptr;
+            d3ddevice->QueryInterface(__uuidof(ID3D11Device1),
+                                      (void**)&d3d11_Device1);
+            hr = d3d11_Device1->OpenSharedResource1(
+                sharedHandle, __uuidof(ID3D11Texture2D), (void**)(&pBuffer));
+        } else {
+            hr = d3ddevice->OpenSharedResource(
+                sharedHandle, __uuidof(ID3D11Texture2D), (void**)(&pBuffer));
+        }
         if (FAILED(hr) || pBuffer == nullptr) {
             logHResult(hr, "open shared texture error.");
             return;
@@ -321,25 +342,38 @@ void copySharedToTexture(ID3D11Device* d3ddevice, HANDLE& sharedHandle,
             logHResult(hResult, "get IDXGIKeyedMutex failed.");
             return;
         }
-        DWORD result = pDX11Mutex->AcquireSync(1, 0);
+        DWORD result = pDX11Mutex->AcquireSync(AOCE_DX11_MUTEX_READ, 0);
         if (result == WAIT_OBJECT_0 && pBuffer) {
             d3dcontext->CopyResource(texture, pBuffer);
         }
-        result = pDX11Mutex->ReleaseSync(0);
+        result = pDX11Mutex->ReleaseSync(AOCE_DX11_MUTEX_WRITE);
     }
 }
 
-void copyTextureToShared(ID3D11Device* d3ddevice, HANDLE& sharedHandle,
-                         ID3D11Texture2D* texture) {
-    if (!d3ddevice) return;
+void copyTextureToShared(ID3D11Device* d3ddevice, const HANDLE& sharedHandle,
+                         ID3D11Texture2D* texture, bool bNT) {
+    if (!d3ddevice) {
+        return;
+    }
     CComPtr<ID3D11DeviceContext> d3dcontext = nullptr;
     // ID3D11DeviceContext* d3dcontext = nullptr;
     d3ddevice->GetImmediateContext(&d3dcontext);
-    if (!d3dcontext) return;
+    if (!d3dcontext) {
+        return;
+    }
     if (sharedHandle && texture) {
         CComPtr<ID3D11Texture2D> pBuffer = nullptr;
-        HRESULT hr = d3ddevice->OpenSharedResource(
-            sharedHandle, __uuidof(ID3D11Texture2D), (void**)(&pBuffer));
+        HRESULT hr = 0;
+        if (bNT) {
+            CComPtr<ID3D11Device1> d3d11_Device1 = nullptr;
+            d3ddevice->QueryInterface(__uuidof(ID3D11Device1),
+                                      (void**)&d3d11_Device1);
+            hr = d3d11_Device1->OpenSharedResource1(
+                sharedHandle, __uuidof(ID3D11Texture2D), (void**)(&pBuffer));
+        } else {
+            hr = d3ddevice->OpenSharedResource(
+                sharedHandle, __uuidof(ID3D11Texture2D), (void**)(&pBuffer));
+        }
         if (FAILED(hr) || pBuffer == nullptr) {
             logHResult(hr, "open shared texture error.");
             return;
@@ -351,11 +385,11 @@ void copyTextureToShared(ID3D11Device* d3ddevice, HANDLE& sharedHandle,
             logHResult(hResult, "get IDXGIKeyedMutex failed.");
             return;
         }
-        DWORD result = pDX11Mutex->AcquireSync(1, 0);
+        DWORD result = pDX11Mutex->AcquireSync(AOCE_DX11_MUTEX_WRITE, 0);
         if (result == WAIT_OBJECT_0 && pBuffer) {
             d3dcontext->CopyResource(pBuffer, texture);
         }
-        result = pDX11Mutex->ReleaseSync(0);
+        result = pDX11Mutex->ReleaseSync(AOCE_DX11_MUTEX_READ);
     }
 }
 

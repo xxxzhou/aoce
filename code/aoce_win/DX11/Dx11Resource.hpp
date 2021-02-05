@@ -73,11 +73,14 @@ class ACOE_WIN_EXPORT Dx11Texture : public Dx11CSResource {
    private:
     int32_t width = 0;
     int32_t height = 0;
+    // 是否使用NT句柄方式,CUDA不需要,vulkan需要
+    bool bNTHandle = false;
     DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
    public:
     void setTextureSize(int32_t width, int32_t height,
-                        DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
+                        DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM,
+                        bool bNT = false);
 
    protected:
     // 通过 Dx11Resource 继承
@@ -149,10 +152,10 @@ class ACOE_WIN_EXPORT Dx11SharedTex {
     std::unique_ptr<Dx11Texture> texture = nullptr;
     HANDLE sharedHandle = nullptr;
     bool bGpuUpdate = false;
-
+    bool bNTHandle = false;
    public:
     bool restart(ID3D11Device* deviceDx11, int32_t width, int32_t height,
-                 DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
+                 DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM,bool bNT= false);
     void release();
 };
 

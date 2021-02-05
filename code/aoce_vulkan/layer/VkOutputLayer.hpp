@@ -1,9 +1,12 @@
 #pragma once
 #include <Layer/OutputLayer.hpp>
-#if __ANDROID__
+#if WIN32
+#include "../win32/VkWinImage.hpp"
+#elif __ANDROID__
 #include "../android/HardwareImage.hpp"
 #endif
 #include "VkLayer.hpp"
+
 namespace aoce {
 namespace vulkan {
 namespace layer {
@@ -16,9 +19,12 @@ class VkOutputLayer : public OutputLayer, public VkLayer {
     std::vector<uint8_t> cpuData;
     VkOutGpuTex outTex = {};
     std::unique_ptr<VulkanTexture> swapTex = nullptr;
-#if __ANDROID__
+#if WIN32
+    std::unique_ptr<VkWinImage> winImage;
+    bool bWinInterop = false;
+#elif __ANDROID__
     std::unique_ptr<HardwareImage> hardwareImage = nullptr;
-#endif    
+#endif
 
    public:
     VkOutputLayer(/* args */);
@@ -26,19 +32,22 @@ class VkOutputLayer : public OutputLayer, public VkLayer {
 
    protected:
     virtual void onInitGraph() override;
-    
+    virtual void onUpdateParamet() override;
     virtual void onInitVkBuffer() override;
-    virtual void onInitPipe() override {};
+    virtual void onInitPipe() override{};
     virtual void onPreCmd() override;
     virtual bool onFrame() override;
 
    public:
     virtual void outVkGpuTex(const VkOutGpuTex& outTex,
-                           int32_t outIndex = 0) override;
+                             int32_t outIndex = 0) override;
 
 #if __ANDROID__
-    virtual void outGLGpuTex(const VkOutGpuTex& outTex,uint32_t texType = 0,
+    virtual void outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType = 0,
                              int32_t outIndex = 0) override;
+#endif
+#if WIN32
+    virtual void outDx11GpuTex(void* device, void* tex) override;
 #endif
 };
 

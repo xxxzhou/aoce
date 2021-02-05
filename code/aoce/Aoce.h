@@ -13,10 +13,12 @@ enum AOCE_LOG_LEVEL {
     AOCE_LOG_DEBUG,
 };
 
+// 完成win32端vulkan与dx11交互,
+// 经测试性能与dx11性能还高一点，比不上cuda,不过作为通用备份选择足够了
 enum AOCE_GPU_SDK {
     AOCE_GPU_OTHER = 0,
     AOCE_GPU_CUDA,
-    AOCE_GPU_DX11,
+    // AOCE_GPU_DX11,
     AOCE_GPU_VULKAN,
 };
 
@@ -29,10 +31,12 @@ enum class LogLevel {
     debug = AOCE_LOG_DEBUG,
 };
 
+// 完成win32端vulkan与dx11交互,
+// 经测试性能与dx11性能还高一点，比不上cuda,不过作为通用备份选择足够了
 enum class GpuType {
     other = AOCE_GPU_OTHER,
     cuda = AOCE_GPU_CUDA,
-    dx11 = AOCE_GPU_DX11,
+    // dx11 = AOCE_GPU_DX11,
     vulkan = AOCE_GPU_VULKAN,
 };
 
@@ -248,7 +252,7 @@ struct TransposeParamet {
     int32_t bFlipY = false;
 };
 
-struct ReSizeParamet{
+struct ReSizeParamet {
     int32_t bLinear = 1;
     int32_t newWidth = 0;
     int32_t newHeight = 0;

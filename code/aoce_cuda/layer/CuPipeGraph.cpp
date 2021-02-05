@@ -1,11 +1,14 @@
 #include "CuPipeGraph.hpp"
 
+using namespace aoce::win;
+
 namespace aoce {
 namespace cuda {
 
 CuPipeGraph::CuPipeGraph(/* args */) {
     gpu = GpuType::cuda;
     AOCE_CUDEV_SAFE_CALL(cudaStreamCreate(&stream));
+    createDevice11(&device, &ctx);
 }
 
 CuPipeGraph::~CuPipeGraph() {
@@ -15,6 +18,10 @@ CuPipeGraph::~CuPipeGraph() {
     }
 }
 
+ID3D11Device* CuPipeGraph::getDX11Device(){
+    return device;
+}
+
 cudaStream_t CuPipeGraph::getStream() { return stream; }
 
 CudaMatRef CuPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
@@ -22,6 +29,10 @@ CudaMatRef CuPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
     CuLayer* cuLayer = static_cast<CuLayer*>(nodes[node]->getLayer());
     assert(outIndex < cuLayer->outCount);
     return cuLayer->outTexs[outIndex];
+}
+
+void CuPipeGraph::onReset(){
+
 }
 
 bool CuPipeGraph::onInitBuffers() {
