@@ -8,8 +8,7 @@ function(add_sub_path relativePath HEADER_FILES SOURCE_FILELIST)
     # 这是列表的操作方式    
     set(${HEADER_FILES} ${${HEADER_FILES}} ${TEMP_HEADER} PARENT_SCOPE)
     set(${SOURCE_FILELIST} ${${SOURCE_FILELIST}} ${TEMP_SOURCE} PARENT_SCOPE)
-    source_group(${filterPart} FILES ${TEMP_HEADER} ${TEMP_SOURCE})   
-
+    source_group(${filterPart} FILES ${TEMP_HEADER} ${TEMP_SOURCE})  
 endfunction()
 
 # 生成目录
@@ -23,7 +22,7 @@ function(aoce_output targetname)
 endfunction(aoce_output targetname)
 
 # 输出文件到install目录
-function(install_aoce_module module contain_include)
+function(install_aoce_module module contain_include) 
   install(TARGETS ${module}
           EXPORT ${module}EXPORT
           # CONFIGURATIONS Release
@@ -33,8 +32,8 @@ function(install_aoce_module module contain_include)
           # PUBLIC_HEADER DESTINATION include/${module}  # 头文件安装路径
           )   
    # 复制头文件        
-  if(contain_include)     
-    message(STATUS "copy ${module} include")
+  if(contain_include)      
+    message(STATUS "copy ${module} include") 
     install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include 
             FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
             )

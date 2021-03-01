@@ -31,7 +31,7 @@ cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/
 
 ## 模块
 
-### aoce(各个基本功能接口,结构定义)
+### [aoce](https://github.com/xxxzhou/aoce/tree/master/code/aoce)(各个基本功能接口,结构定义)
 
 ### aoce_android(android内关于camera/codec相关实现)
 

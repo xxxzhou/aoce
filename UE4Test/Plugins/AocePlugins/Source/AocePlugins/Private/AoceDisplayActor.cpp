@@ -61,9 +61,10 @@ AAoceDisplayActor::AAoceDisplayActor() {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// gpuType = aoce::GpuType::cuda;
 }
 
-void AAoceDisplayActor::SetTexture(UTexture2D* texture) {
+void AAoceDisplayActor::SetMatTexture(UTexture2D* texture) {
 	if (materialDynamic) {
 		materialDynamic->SetTextureParameterValue("mainTex", texture);
 	}
@@ -81,19 +82,30 @@ void AAoceDisplayActor::BeginPlay() {
 	auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
 	inputLayer = layerFactory->crateInput();
 	outputLayer = layerFactory->createOutput();
+	texLayer = layerFactory->createTexOperate();
+	TexOperateParamet to = {};
+	to.operate.gamma = 2.2f;
+	texLayer->updateParamet(to);
 	// 输出GPU数据
+#if WIN32
+	outputLayer->updateParamet({ false, true });
+#elif __ANDROID__
 	outputLayer->updateParamet({ true, false });
-	// outputLayer->setImageProcessHandle(std::bind(&AoceMediaPlayer::outLayerData, this, _1, _2, _3, _4));
+	outputLayer->setImageProcessHandle(std::bind(&AAoceDisplayActor::outLayerData, this, _1, _2, _3));
+#endif	
 	yuv2rgbLayer = layerFactory->createYUV2RGBA();
 	// 生成图
 	vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
 }
 
-void AAoceDisplayActor::outLayerData(uint8_t* data, int32_t width, int32_t height, int32_t outIndex)
+void AAoceDisplayActor::outLayerData(uint8_t* data, ImageFormat imageFormat, int32_t outIndex)
 {
 #if __ANDROID__
 	AAoceDisplayActor* play = this;
 	ENQUEUE_RENDER_COMMAND(CopyTextureCommand)([play, data](FRHICommandListImmediate& RHICmdList) {
+		if (!play->textureRHI) {
+			return;
+		}
 		FUpdateTextureRegion2D region = {};
 		region.Width = play->format.width;
 		region.Height = play->format.height;
@@ -118,16 +130,18 @@ void AAoceDisplayActor::UpdateFrame(const aoce::VideoFrame& frame) {
 		format.height = frame.height;
 		format.videoType = frame.videoType;
 		inputLayer->setImage(format);
-		yuv2rgbLayer->updateParamet({ format.videoType });
-		initTexture(&sourceTex, frame.width, frame.height, PF_R8G8B8A8);
-		SetTexture(sourceTex);
-		ENQUEUE_RENDER_COMMAND(CreateTextureCommand)([play](FRHICommandListImmediate& RHICmdList) {
-			if (play->sourceTex->IsValidLowLevel()) {
-				play->textureRHI = ((FTexture2DResource*)(play->sourceTex->Resource))->GetTexture2DRHI();
-			}
-			else {
-				play->textureRHI = nullptr;
-			}
+		yuv2rgbLayer->updateParamet({ format.videoType,true });
+		AsyncTask(ENamedThreads::GameThread, [=]() {
+			initTexture(&sourceTex, frame.width, frame.height, PF_R8G8B8A8);
+			SetMatTexture(sourceTex);
+			ENQUEUE_RENDER_COMMAND(CreateTextureCommand)([play](FRHICommandListImmediate& RHICmdList) {
+				if (play->sourceTex->IsValidLowLevel()) {
+					play->textureRHI = ((FTexture2DResource*)(play->sourceTex->Resource))->GetTexture2DRHI();
+				}
+				else {
+					play->textureRHI = nullptr;
+				}
+			});
 		});
 	}
 	inputLayer->inputCpuData(frame, 0);
@@ -137,13 +151,18 @@ void AAoceDisplayActor::UpdateFrame(const aoce::VideoFrame& frame) {
 		if (!texRHI) {
 			return;
 		}
-		if (IsRunningRHIInSeparateThread()) {
-			new (RHICmdList.AllocCommand<FRHICommandUpdateAoceGLTexture>()) FRHICommandUpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
-			RHICmdList.ImmediateFlush(EImmediateFlushType::FlushRHIThread);
-		}
-		else {
-			UpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
-		}
+#if WIN32
+		void* device = RHICmdList.GetNativeDevice();
+		play->outputLayer->outDx11GpuTex(device, texRHI->GetNativeResource());
+#elif __ANDROID__
+		//if (IsRunningRHIInSeparateThread()) {
+		//	new (RHICmdList.AllocCommand<FRHICommandUpdateAoceGLTexture>()) FRHICommandUpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
+		//	RHICmdList.ImmediateFlush(EImmediateFlushType::FlushRHIThread);
+		//}
+		//else {
+		//	UpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
+		//}
+#endif
 	});
 }
 
@@ -167,7 +186,7 @@ void initTexture(UTexture2D** ptexture, int width, int height, EPixelFormat form
 		*ptexture = UTexture2D::CreateTransient(width, height, format);
 		// (*ptexture)->MipGenSettings = TMGS_NoMipmaps;
 		// (*ptexture)->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;;
-		// (*ptexture)->SRGB = false;
+		(*ptexture)->SRGB = true;		
 		(*ptexture)->UpdateResource();
 		(*ptexture)->AddToRoot();
 	}

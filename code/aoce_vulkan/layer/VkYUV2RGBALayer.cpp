@@ -27,7 +27,10 @@ void VkYUV2RGBALayer::onUpdateParamet() {
 
 void VkYUV2RGBALayer::onInitLayer() {
     int32_t yuvType = getYuvIndex(paramet.type);
-    assert(yuvType > 0);
+    if (paramet.type == VideoType::yuy2P && paramet.special != 0) {
+        yuvType = 0;
+    }
+    assert(yuvType >= 0);
     // nv12/yuv420P/yuy2P
     std::string path = "glsl/yuv2rgbaV1.comp.spv";
     if (yuvType > 3) {
@@ -47,7 +50,11 @@ void VkYUV2RGBALayer::onInitLayer() {
         outFormats[0].height = inFormats[0].height / 2;
         // 一个线程处理二个点
         sizeX = divUp(outFormats[0].width, 2 * groupX);
-        sizeY = divUp(outFormats[0].height, groupY);
+        if (paramet.special == 0) {
+            sizeY = divUp(outFormats[0].height, groupY);
+        } else {
+            sizeY = divUp(outFormats[0].height, 2 * groupY);
+        }
     } else if (paramet.type == VideoType::yuv2I ||
                paramet.type == VideoType::yvyuI ||
                paramet.type == VideoType::uyvyI) {
@@ -58,8 +65,7 @@ void VkYUV2RGBALayer::onInitLayer() {
         sizeY = divUp(inFormats[0].height, groupY);
     }
     // 更新constBufCpu
-    std::vector<int> ubo = {outFormats[0].width, outFormats[0].height,
-                            getYuvIndex(paramet.type)};
+    std::vector<int> ubo = {outFormats[0].width, outFormats[0].height, yuvType};
     memcpy(constBufCpu.data(), ubo.data(), conBufSize);
 }
 

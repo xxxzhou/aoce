@@ -10,7 +10,7 @@ else()
     message(FATAL_ERROR "unsupported platform.")
 endif() 
 
-if(WIN32)
+if(WIN32) 
     message(STATUS "using find_package to locate vulkan")
     find_package(Vulkan)
     message(STATUS "vulkan found = ${Vulkan_FOUND}")  

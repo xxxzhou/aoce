@@ -10,6 +10,9 @@ struct InputParamet {
 
 // inputlayer 应该从VkBaseLayer/Dx11BaseLayer/CudaBaseLayer继承
 class ACOE_EXPORT InputLayer : public ITLayer<InputParamet> {
+   public:
+    virtual ~InputLayer(){};
+
    protected:
     VideoFormat videoFormat = {};
     uint8_t* frameData = nullptr;

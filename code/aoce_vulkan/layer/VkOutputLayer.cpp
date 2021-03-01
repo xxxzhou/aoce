@@ -2,8 +2,9 @@
 
 #include "../vulkan/VulkanManager.hpp"
 #include "VkPipeGraph.hpp"
-
+#if WIN32
 using namespace aoce::win;
+#endif
 
 namespace aoce {
 namespace vulkan {
@@ -16,11 +17,11 @@ VkOutputLayer::~VkOutputLayer() {}
 void VkOutputLayer::onInitGraph() {
 #if WIN32
     winImage = std::make_unique<VkWinImage>();
-#elif __ANDROID__
+    bWinInterop = false;
+#elif __ANDROID_API__ >= 26
     hardwareImage = std::make_unique<HardwareImage>();
     // hardwareImage->createAndroidBuffer(format);
 #endif
-    bWinInterop = false;
 }
 
 void VkOutputLayer::onUpdateParamet() {
@@ -116,6 +117,7 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
     if (paramet.bCpu && !paramet.bGpu) {
         if (outBuffer) {
             // 20/12/11,ue4只能这样更新,奇怪了。。。
+            // 21/02/23,更奇怪的是Oculus quest这样更新会卡死。。。
             if (outTex.commandbuffer) {
                 uint8_t* tempPtr = (uint8_t*)outTex.commandbuffer;
                 outBuffer->download(tempPtr);
@@ -127,19 +129,15 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
                 // problems.)
                 glBindTexture(bindType, 0);
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(bindType, outTex.image);
-                // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+                glBindTexture(bindType, outTex.image);                
                 glTexSubImage2D(bindType, 0, 0, 0, outFormats[0].width,
                                 outFormats[0].height, GL_RGBA, GL_UNSIGNED_BYTE,
                                 outBuffer->getCpuData());
-                // glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-                // glTexParameteri(bindType, GL_TEXTURE_MIN_FILTER,
-                // GL_LINEAR); glTexParameteri(bindType,
-                // GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glBindTexture(bindType, 0);
             }
         }
     }
+#if __ANDROID_API__ >= 26
     if (paramet.bGpu) {
         ImageFormat format = hardwareImage->getFormat();
         uint32_t oldIndex = hardwareImage->getTextureId();
@@ -155,6 +153,7 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
         }
         hardwareImage->bindGL(outTex.image, bindType);
     }
+#endif
 }
 #endif
 

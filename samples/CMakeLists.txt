@@ -12,7 +12,7 @@ message(STATUS "    version: ${OpenCV_VERSION}")
 message(STATUS "    version: ${OpenCV_VERSION}")
 message(STATUS "    libraries: ${OpenCV_LIBS}")
 message(STATUS "    librarie path: ${OpenCV_LIB_PATH}")
-message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}") 
 
 function(generate target isopencv iswin32)    
     set(source ${target}/${target}.cpp)     

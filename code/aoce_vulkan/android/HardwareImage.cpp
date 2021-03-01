@@ -104,8 +104,8 @@ void HardwareImage::createAndroidBuffer(const ImageFormat &format) {
                   AHARDWAREBUFFER_USAGE_GPU_COLOR_OUTPUT;
 #if __ANDROID_API__ >= 26
     AHardwareBuffer_allocate(&usage, &buffer);
-#endif
     bindVK(buffer);
+#endif    
 }
 
 // https://android.googlesource.com/platform/cts/+/master/tests/tests/graphics/jni/VulkanTestHelpers.cpp

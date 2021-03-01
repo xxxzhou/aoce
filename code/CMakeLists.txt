@@ -2,7 +2,7 @@
 # 所有目录的对位相对于code,导出到外部相对于统一位置
 include_directories("./")
 
-add_subdirectory(aoce)
+add_subdirectory(aoce) 
 message(STATUS "system:" ${WIN32})
 add_subdirectory(aoce_vulkan)
 add_subdirectory(aoce_vulkan_extra)

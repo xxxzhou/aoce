@@ -57,14 +57,14 @@ void AoceManager::initAndroid(const AndroidEnv &andEnv) {
         applicationContext =
             env->CallObjectMethod(active, getApplicationContextMethod);
     } else {
-        //获取Activity Thread的实例对象
+        // 获取Activity Thread的实例对象
         jclass activityThreadCls = env->FindClass("android/app/ActivityThread");
         jmethodID currentActivityThread =
             env->GetStaticMethodID(activityThreadCls, "currentActivityThread",
                                    "()Landroid/app/ActivityThread;");
         jobject activityThread = env->CallStaticObjectMethod(
             activityThreadCls, currentActivityThread);
-        //获取Application，也就是全局的Context
+        // 获取Application，也就是全局的Context
         jmethodID getApplication = env->GetMethodID(
             activityThreadCls, "getApplication", "()Landroid/app/Application;");
         applicationContext =

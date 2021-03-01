@@ -90,6 +90,12 @@ install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h DESTINATION incl
 add_subdirectory(code)
 add_subdirectory(samples)
 
+find_package(SWIG 4.0)
+if(SWIG_FOUND AND WIN32)
+    message(STATUS "SWIG found: ${SWIG_EXECUTABLE}")
+    add_subdirectory(CSharp)
+endif()
+
 
 
 

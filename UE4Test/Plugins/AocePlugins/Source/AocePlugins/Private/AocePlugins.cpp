@@ -4,6 +4,10 @@
 #include "Core.h"
 #include "aoce/AoceCore.h"
 #include "Modules/ModuleManager.h"
+#if __ANDROID__
+#include "Runtime/Launch/Public/Android/AndroidJNI.h"
+#include "Runtime/ApplicationCore/Public/Android/AndroidApplication.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "FAocePluginsModule"
 

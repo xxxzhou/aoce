@@ -43,25 +43,7 @@ namespace aoce {
     inline OBJCLASS *get##OBJCLASS(OBJTYPE s_type) {               \
         return OBJCLASS##Map[s_type].get();                        \
     }
-// #elif __ANDROID__ // UE4 android下unique_ptr default_delete error?
-// #define AOCE_MANAGER_OBJ(OBJTYPE, OBJCLASS)                        \
-//     typedef std::shared_ptr<OBJCLASS> OBJCLASS##Ptr;               \
-//                                                                    \
-//    private:                                                        \
-//     std::map<OBJTYPE, OBJCLASS##Ptr> OBJCLASS##Map;                \
-//                                                                    \
-//    public:                                                         \
-//     inline void add##OBJCLASS(OBJTYPE s_type, OBJCLASS* manager) { \
-//         OBJCLASS##Ptr ptr(manager);                                \
-//         OBJCLASS##Map[s_type] = ptr;                               \
-//     }                                                              \
-//     inline void remove##OBJCLASS(OBJTYPE s_type) {                 \
-//         OBJCLASS##Map[s_type] = nullptr;                           \
-//     }                                                              \
-//     inline OBJCLASS* get##OBJCLASS(OBJTYPE s_type) {           \
-//         return OBJCLASS##Map[s_type].get();                              \
-//     }
-// #endif
+
 class ACOE_EXPORT AoceManager {
    public:
     static AoceManager &Get();

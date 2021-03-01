@@ -152,8 +152,11 @@ void VkWinImage::vkCopyTemp(ID3D11Device* device) {
     }
 }
 
-void VkWinImage::tempCopyDx11(ID3D11Device* device,ID3D11Texture2D* dx11Tex){
-    if(tempTex->bGpuUpdate){
+void VkWinImage::tempCopyDx11(ID3D11Device* device, ID3D11Texture2D* dx11Tex) {
+    if (!device || !dx11Tex) {
+        return;
+    }
+    if (tempTex->bGpuUpdate) {
         copySharedToTexture(device, tempTex->sharedHandle, dx11Tex);
         tempTex->bGpuUpdate = false;
     }

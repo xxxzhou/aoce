@@ -33,5 +33,10 @@ UE4Test/Plugins/AocePlugins/Binaries
 UE4Test/Plugins/AocePlugins/Intermediate
 UE4Test/Plugins/AocePlugins/Saved
 UE4Test/Plugins/AocePlugins/ThirdParty/Aoce
-
+UE4Test/Content/Assets
+UE4Test/Content/Collections
+UE4Test/Content/Developers
+UE4Test/Content/Maps
+UE4Test/Content/Blueprints
 UE4Test/UE4Test.zip
+CSharp/AoceWrapper/Swig

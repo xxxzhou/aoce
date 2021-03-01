@@ -13,8 +13,8 @@
 using namespace aoce;
 
 AoceMediaPlayer::AoceMediaPlayer() {
-    player = AoceManager::Get().getMediaPlayer(MediaPlayType::ffmpeg);
-    player->setObserver(this);
+	player = AoceManager::Get().getMediaPlayerFactory(MediaPlayType::ffmpeg)->createPlay();
+	player->setObserver(this);
 }
 
 AoceMediaPlayer::~AoceMediaPlayer() {}
@@ -22,24 +22,23 @@ AoceMediaPlayer::~AoceMediaPlayer() {}
 aoce::MediaPlayer* AoceMediaPlayer::getPlay() { return player; }
 
 void AoceMediaPlayer::initPlay(AAoceDisplayActor* pdisplay) {
-    this->display = pdisplay;
+	this->display = pdisplay;
 }
 
 void AoceMediaPlayer::onPrepared() {
-    logMessage(AOCE_LOG_INFO, "media prepared");
-    player->start();
-    bStart = true;
+	logMessage(AOCE_LOG_INFO, "media prepared");
+	player->start();
+	bStart = true;
 }
 
 void AoceMediaPlayer::onError(aoce::PlayStatus staus, int32_t code,
-                              std::string msg) {}
+	std::string msg) {}
 
 void AoceMediaPlayer::onVideoFrame(const aoce::VideoFrame& frame) {
-    if (!bStart) {
-        return;
-    }
-    AsyncTask(ENamedThreads::GameThread,
-              [=]() { display->UpdateFrame(frame); });
+	if (!bStart) {
+		return;
+	}
+	display->UpdateFrame(frame);
 }
 
 void AoceMediaPlayer::onStop() {}

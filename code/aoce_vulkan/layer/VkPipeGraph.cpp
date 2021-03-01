@@ -13,7 +13,7 @@ VkPipeGraph::VkPipeGraph(/* args */) {
     // 创建cpu-gpu通知
     VkFenceCreateInfo fenceInfo = {};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    // 默认是有信号,通过运行的第一桢
+    // 如果是延迟模式,默认是有信号,通过运行的第一桢
     if (delayGpu) {
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
     }
@@ -46,7 +46,7 @@ VkPipeGraph::~VkPipeGraph() {
 ID3D11Device* VkPipeGraph::getD3D11Device() { return device; }
 void VkPipeGraph::addOutMemory(VkWinImage* winImage) {
     winImages.push_back(winImage);
-    outMemorys.push_back(winImage->getDeviceMemory());
+    // outMemorys.push_back(winImage->getDeviceMemory());
 }
 #endif
 
@@ -72,7 +72,7 @@ void VkPipeGraph::onReset() {
 // assert(res != VK_EVENT_RESET);
 // 告诉别的线程,需要等待资源重新生成
 #if WIN32
-    outMemorys.clear();
+    // outMemorys.clear();
     winImages.clear();
 #endif
     vkResetEvent(context->device, outEvent);
@@ -110,7 +110,7 @@ bool VkPipeGraph::executeOut() {
     vkWaitForFences(context->device, 1, &computerFence, VK_TRUE,
                     UINT64_MAX);  // UINT64_MAX
 #if WIN32
-    for(auto* winImage : winImages){
+    for (auto* winImage : winImages) {
         winImage->vkCopyTemp(device);
     }
 #endif
@@ -144,7 +144,7 @@ bool VkPipeGraph::onRun() {
         executeOut();
     }
     VkSubmitInfo submitInfo = {};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO; 
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &context->computerCmd;
     VK_CHECK_RESULT(
@@ -161,22 +161,22 @@ bool VkPipeGraph::onRun() {
 }  // namespace aoce
 
 // win dx11/vulkan keymutex
-//#if WIN32 
-    // if (outMemorys.size() > 0) {
-    //     uint64_t write = AOCE_DX11_MUTEX_WRITE;
-    //     uint64_t read = AOCE_DX11_MUTEX_READ;
-    //     uint32_t timeOut = 0;
-    //     VkWin32KeyedMutexAcquireReleaseInfoKHR keyedMutexInfo = {};
-    //     keyedMutexInfo.sType =
-    //         VK_STRUCTURE_TYPE_WIN32_KEYED_MUTEX_ACQUIRE_RELEASE_INFO_KHR;
-    //     keyedMutexInfo.pNext = nullptr;
-    //     keyedMutexInfo.acquireCount = outMemorys.size();
-    //     keyedMutexInfo.pAcquireSyncs = outMemorys.data();
-    //     keyedMutexInfo.pAcquireKeys = &write;
-    //     keyedMutexInfo.pAcquireTimeouts = &timeOut;
-    //     keyedMutexInfo.releaseCount = outMemorys.size();
-    //     keyedMutexInfo.pReleaseSyncs = outMemorys.data();
-    //     keyedMutexInfo.pReleaseKeys = &read;
-    //     submitInfo.pNext = &keyedMutexInfo;       
-    // }
+//#if WIN32
+// if (outMemorys.size() > 0) {
+//     uint64_t write = AOCE_DX11_MUTEX_WRITE;
+//     uint64_t read = AOCE_DX11_MUTEX_READ;
+//     uint32_t timeOut = 0;
+//     VkWin32KeyedMutexAcquireReleaseInfoKHR keyedMutexInfo = {};
+//     keyedMutexInfo.sType =
+//         VK_STRUCTURE_TYPE_WIN32_KEYED_MUTEX_ACQUIRE_RELEASE_INFO_KHR;
+//     keyedMutexInfo.pNext = nullptr;
+//     keyedMutexInfo.acquireCount = outMemorys.size();
+//     keyedMutexInfo.pAcquireSyncs = outMemorys.data();
+//     keyedMutexInfo.pAcquireKeys = &write;
+//     keyedMutexInfo.pAcquireTimeouts = &timeOut;
+//     keyedMutexInfo.releaseCount = outMemorys.size();
+//     keyedMutexInfo.pReleaseSyncs = outMemorys.data();
+//     keyedMutexInfo.pReleaseKeys = &read;
+//     submitInfo.pNext = &keyedMutexInfo;
+// }
 //#endif

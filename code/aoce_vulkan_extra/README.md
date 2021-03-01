@@ -23,7 +23,9 @@ gl_GlobalInvocationID = blockIdx*blockDim + gl_LocalInvocationID
 opencv cudafilters的高斯卷积,就采用先计算水平卷积,然后计算垂直卷积的优化方式.
 
 其中边框模式暂时先固定为REPLICATE.
+
 [调整图像边缘](https://blog.csdn.net/shuiyixin/article/details/106472722)
+
 ![Alt text](https://img-blog.csdnimg.cn/20200602093115149.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NodWl5aXhpbg==,size_16,color_47FFFF,t_70 "REPLICATE image")
 
 ### chromKey

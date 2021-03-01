@@ -24,6 +24,13 @@ void BaseLayer::onInit() {
 
 PipeGraph* BaseLayer::getGraph() { return pipeGraph; }
 
+PipeNode* BaseLayer::getNode() {
+    if (pipeNode.expired()) {
+        return nullptr;
+    }
+    return pipeNode.lock().get();
+}
+
 bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,
                            int32_t outputIndex) {
     if (inIndex >= inCount) {
@@ -57,7 +64,7 @@ void BaseLayer::initLayer() {
     if (!bInput) {
         for (int32_t i = 0; i < size; i++) {
             pipeGraph->getLayerOutFormat(inLayers[i].nodeIndex,
-                                      inLayers[i].outputIndex, inFormats[i]);
+                                         inLayers[i].outputIndex, inFormats[i]);
         }
     }
     // 默认所有outputFormat == inputFormats[0]
@@ -68,6 +75,11 @@ void BaseLayer::initLayer() {
     }
     // 如果每层的outputFormat需要更新,请在如下函数单独处理
     onInitLayer();
+}
+
+PipeNode* ILayer::getNode() {
+    assert(getLayer());
+    return getLayer()->getNode();
 }
 
 }  // namespace aoce

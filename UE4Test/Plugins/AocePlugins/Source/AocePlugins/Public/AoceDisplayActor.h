@@ -21,25 +21,28 @@ public:
 		class AStaticMeshActor* actor;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		class UMaterialInterface* material;
-public:
-	UFUNCTION(BlueprintCallable)
-		void SetTexture(UTexture2D* texture);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		UTexture2D* sourceTex = nullptr;
+private:
+	// UFUNCTION(BlueprintCallable)
+	void SetMatTexture(UTexture2D* texture);
 private:
 	class UMaterialInstanceDynamic* materialDynamic = nullptr;
-private:
+
 	aoce::PipeGraph* vkGraph = nullptr;
 	aoce::InputLayer* inputLayer = nullptr;
 	aoce::OutputLayer* outputLayer = nullptr;
 	aoce::YUV2RGBALayer* yuv2rgbLayer = nullptr;
+	aoce::TexOperateLayer* texLayer = nullptr;
 	aoce::VideoFormat format = {};
 
 	aoce::GpuType gpuType = aoce::GpuType::vulkan;
 	FTexture2DRHIRef textureRHI = nullptr;
-	UTexture2D* sourceTex = nullptr;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void outLayerData(uint8_t* data, int32_t width, int32_t height,
+	void outLayerData(uint8_t* data, aoce::ImageFormat imageFormat,
 		int32_t outIndex);
 public:
 	// Called every frame

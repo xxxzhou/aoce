@@ -17,8 +17,7 @@ AAoceLiveActor::AAoceLiveActor() {
 
 // Called when the game starts or when spawned
 void AAoceLiveActor::BeginPlay() {
-	Super::BeginPlay();
-	// loadAoce();
+	Super::BeginPlay();	
 
 	liveManager = std::make_unique<AoceLiveManager>();
 	liveManager->initRoom(aoce::LiveType::agora, dispActor);
@@ -36,11 +35,13 @@ void AAoceLiveActor::BeginPlay() {
 }
 
 void AAoceLiveActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
-	liveManager->getRoom()->shutdownRoom();
+	if (liveManager) {
+		liveManager->getRoom()->logoutRoom();
+		liveManager->getRoom()->shutdownRoom();
+	}
 	if (mediaPlayer) {
 		mediaPlayer->getPlay()->stop();
-	}
-	// unloadAoce();
+	}	
 }
 
 // Called every frame

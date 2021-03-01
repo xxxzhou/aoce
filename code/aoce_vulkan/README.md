@@ -40,7 +40,7 @@ VkPipeGraph 提供延迟运行方式，由delayGpu控制,如果为true,则输出
 
 (2) 新问题,选择移动窗口会导致vulkan timeout.
 
-嗯，这个问题用上面的方法解决，加入中间层，原因应该就是如上需要满足一要求一释放，那这样，直接用中间层，VK运行线程直接写入结果，也不需要用D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX，改为D3D11_RESOURCE_MISC_SHARED，用vkFence保证GPU里VK CommandBuffer执行顺序与DX11拷贝到临时变量的顺序。这样VK执行线程与DX11外部显示线程可以用不同频率跑。
+嗯，这个问题用上面的方法解决，加入中间层，原因应该就是如上需要满足计算与使用二线程无等待关系，那这样，直接用中间层，VK运行线程直接写入结果，也不需要用D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX，改为D3D11_RESOURCE_MISC_SHARED，用vkFence保证GPU里VK CommandBuffer执行顺序与DX11拷贝到临时变量的顺序。这样VK执行线程与DX11外部显示线程可以用不同频率跑。
 
 ### Resize 重置大小
 

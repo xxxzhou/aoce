@@ -210,6 +210,7 @@ struct AudioFrame {
 
 struct YUVParamet {
     VideoType type = VideoType::nv12;
+    int32_t special = 0;
 };
 
 // ARGB<->BGRA<->RGBA<->RRRR

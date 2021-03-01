@@ -97,7 +97,7 @@ bool VulkanManager::findAloneCompute(int32_t& familyIndex) {
     return false;
 }
 
-void VulkanManager::createDevice(bool bAloneCompute) {
+bool VulkanManager::createDevice(bool bAloneCompute) {
     assert(physical->queueGraphicsIndexs.size() > 0);
     // 创建虚拟设备
     // 创建一个device,这个device根据条件能否访问graphics/compute
@@ -137,7 +137,7 @@ void VulkanManager::createDevice(bool bAloneCompute) {
     deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
-#elif __ANDROID__
+#elif __ANDROID_API__ >= 26 //__ANDROID__
     // 和android里的AHardwareBuffer交互,没有的话,相关vkGetDeviceProcAddr获取不到对应函数
     deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
@@ -155,7 +155,7 @@ void VulkanManager::createDevice(bool bAloneCompute) {
     bAloneCompute = computeIndex != graphicsIndex;
     vkGetDeviceQueue(device, computeIndex, 0, &computeQueue);
     vkGetDeviceQueue(device, graphicsIndex, 0, &graphicsQueue);
-
+#if WIN32
     // 检测是否支持dx11交互
     VkPhysicalDeviceExternalImageFormatInfo
         PhysicalDeviceExternalImageFormatInfo = {
@@ -188,6 +188,8 @@ void VulkanManager::createDevice(bool bAloneCompute) {
     bInterpDx11 &= (ExternalImageFormatProperties.externalMemoryProperties
                         .compatibleHandleTypes &
                     VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT) > 0;
+#endif
+    return true;
 }
 
 bool VulkanManager::findSurfaceQueue(VkSurfaceKHR surface,

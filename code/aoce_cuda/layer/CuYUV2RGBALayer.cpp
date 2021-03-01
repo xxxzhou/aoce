@@ -9,6 +9,8 @@ void yuv2rgb_gpu(PtrStepSz<uchar> source, PtrStepSz<uchar4> dest,
                  int32_t yuvtype, cudaStream_t stream);
 void yuv2rgb_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool ufront,
                  bool yfront, cudaStream_t stream);
+void yuva2rgb_gpu(PtrStepSz<uchar> source, PtrStepSz<uchar4> dest,
+                  cudaStream_t stream);
 
 CuYUV2RGBALayer::CuYUV2RGBALayer(/* args */) {}
 
@@ -35,7 +37,11 @@ bool CuYUV2RGBALayer::onFrame() {
     if (paramet.type == VideoType::nv12 || paramet.type == VideoType::yuv420P ||
         paramet.type == VideoType::yuy2P) {
         int32_t yuvType = getYuvIndex(paramet.type);
-        yuv2rgb_gpu(*inTexs[0], *outTexs[0], yuvType, stream);
+        if (paramet.type == VideoType::yuy2P && paramet.special != 0) {
+            yuva2rgb_gpu(*inTexs[0], *outTexs[0], stream);
+        } else {
+            yuv2rgb_gpu(*inTexs[0], *outTexs[0], yuvType, stream);
+        }
     } else if (paramet.type == VideoType::yuv2I ||
                paramet.type == VideoType::yvyuI ||
                paramet.type == VideoType::uyvyI) {
@@ -53,7 +59,7 @@ bool CuYUV2RGBALayer::onFrame() {
 }
 
 void CuYUV2RGBALayer::onUpdateParamet() {
-    assert(getYuvIndex(paramet.type) > 0);
+    assert(getYuvIndex(paramet.type) >= 0);
     if (pipeGraph) {
         pipeGraph->reset();
     }

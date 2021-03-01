@@ -35,7 +35,7 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
 #if WIN32    
     CComPtr<ID3D11Device> device = nullptr;
     CComPtr<ID3D11DeviceContext> ctx = nullptr;
-    std::vector<VkDeviceMemory> outMemorys;
+    // std::vector<VkDeviceMemory> outMemorys;
     std::vector<VkWinImage*> winImages;
     bool bDX11Update = false;
 #endif

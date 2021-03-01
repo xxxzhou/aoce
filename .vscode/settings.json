@@ -77,7 +77,12 @@
         "locale": "cpp",
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
-        "*.cuh": "cpp"
+        "*.cuh": "cpp",
+        "aoce.h": "c",
+        "baselayer.hpp": "c",
+        "aocemanager.hpp": "c",
+        "videomanager.hpp": "c",
+        "mediaplayer.hpp": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,

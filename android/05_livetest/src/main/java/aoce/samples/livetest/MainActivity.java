@@ -19,6 +19,7 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, IV
     static {
         System.loadLibrary("05_livetest");
         System.loadLibrary("agora-rtc-sdk-jni");
+        // System.loadLibrary("vrapi");
     }
 
     private VKVideoRender vkVideoRender = null;

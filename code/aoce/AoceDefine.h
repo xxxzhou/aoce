@@ -64,7 +64,7 @@
 
 #define NOMINMAX 1
 
-//采用opencv里的数据描述,前三BIT表示类型，后三BIT表示通道个数
+// 采用opencv里的数据描述,前三BIT表示类型，后三BIT表示通道个数
 #pragma region opencv
 #define AOCE_CV_CN_MAX 512
 #define AOCE_CV_CN_SHIFT 3
@@ -154,7 +154,7 @@
 // #define min(a, b) (((a) < (b)) ? (a) : (b))
 // #endif
 
-//回调定义,C++传值改用std::function.
+// 回调定义,C++传值改用std::function.
 // typedef C++ function后缀定义 handle,C为action,前缀不要加on
 // 定义的handle变量为on前缀,event后缀
 // 定义的handle包装方法为on前缀,handle后缀

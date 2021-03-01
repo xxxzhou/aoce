@@ -20,10 +20,11 @@ PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
         logMessage(LogLevel::error, "node layer gpu type no equal graph");
     }
     assert(this->gpu == layer->gpu);
-    layer->pipeGraph = this;
+    layer->pipeGraph = this;    
     layer->onInit();
     PipeNodePtr ptr(new PipeNode(layer));
     ptr->graphIndex = (int32_t)nodes.size();
+    layer->pipeNode = ptr;
     nodes.push_back(ptr);
     return ptr;
 }

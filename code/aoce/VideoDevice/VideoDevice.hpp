@@ -25,6 +25,7 @@ typedef std::function<void(VideoFrame colorFrame, VideoFrame depthFrame,
                            void* alignParamt)>
     depthFrameHandle;
 typedef std::shared_ptr<class VideoDevice> VideoDevicePtr;
+typedef std::weak_ptr<class VideoDevice> VideoDeviceWeak;
 
 class ACOE_EXPORT VideoDevice {
    protected:

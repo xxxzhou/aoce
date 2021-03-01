@@ -36,8 +36,9 @@ class ACOE_EXPORT BaseLayer {
     friend class PipeNode;
     friend class PipeGraph;
     friend class InputLayer;
-    //ITLayer类的所有实例化, 都为BaseLayer的友元
-    template <typename T> friend class ITLayer;
+    // ITLayer类的所有实例化, 都为BaseLayer的友元
+    template <typename T>
+    friend class ITLayer;
 
     GpuType gpu = GpuType::other;
     // 定义当前层需要的输入数量
@@ -45,6 +46,8 @@ class ACOE_EXPORT BaseLayer {
     // 定义当前层需要的输出数量
     int32_t outCount = 1;
     class PipeGraph* pipeGraph = nullptr;
+    // weak_ptr用于检测是否sharp_ptr是否已经没有引用,避免指向野指针
+    std::weak_ptr<class PipeNode> pipeNode;
     // 每个层的imagetype对应shader里类型,连接时需要检测
     std::vector<ImageFormat> inFormats;
     // 每个层的imagetype对应shader里类型,连接时需要检测
@@ -60,8 +63,10 @@ class ACOE_EXPORT BaseLayer {
     virtual ~BaseLayer();
 
    public:
-    // virtual void onParametChange(){};
+    // 附加到那个图表上
     class PipeGraph* getGraph();
+    // 附加到图表上的节点
+    class PipeNode* getNode();
 
    protected:
     bool addInLayer(int32_t inIndex, int32_t nodeIndex, int32_t outputIndex);
@@ -87,12 +92,14 @@ class ILayer {
    public:
     // 请看上面宏AOCE_LAYER_QUERYINTERFACE提供的默认实现
     virtual BaseLayer* getLayer() = 0;
+
+   public:
+    class PipeNode* getNode();
 };
 
 // 分离导致层不同参数的差异(AOCE_LAYER_QUERYINTERFACE)
 template <typename T>
 class ITLayer : public ILayer {
-
    protected:
     T oldParamet = {};
     T paramet = {};
@@ -108,17 +115,27 @@ class ITLayer : public ILayer {
 };
 
 // YUV 2 RGBA 转换
-class YUV2RGBALayer : public ITLayer<YUVParamet> {};
+typedef ITLayer<YUVParamet> YUV2RGBALayer;
+// RGBA 2 YUV 转换
+typedef ITLayer<YUVParamet> RGBA2YUVLayer;
+typedef ITLayer<TexOperateParamet> TexOperateLayer;
+typedef ITLayer<TransposeParamet> TransposeLayer;
+typedef ITLayer<ReSizeParamet> ReSizeLayer;
+typedef ITLayer<BlendParamet> BlendLayer;
+typedef ITLayer<YUVParamet> YUV2RGBALayer;
+
+// YUV 2 RGBA 转换
+//class YUV2RGBALayer : public ITLayer<YUVParamet> {};
 
 // RGBA 2 YUV 转换
-class RGBA2YUVLayer : public ITLayer<YUVParamet> {};
+// class RGBA2YUVLayer : public ITLayer<YUVParamet> {};
 
-class TexOperateLayer : public ITLayer<TexOperateParamet> {};
+// class TexOperateLayer : public ITLayer<TexOperateParamet> {};
 
-class TransposeLayer : public ITLayer<TransposeParamet> {};
+// class TransposeLayer : public ITLayer<TransposeParamet> {};
 
-class ReSizeLayer : public ITLayer<ReSizeParamet> {};
+// class ReSizeLayer : public ITLayer<ReSizeParamet> {};
 
-class BlendLayer : public ITLayer<BlendParamet> {};
+// class BlendLayer : public ITLayer<BlendParamet> {};
 
 }  // namespace aoce

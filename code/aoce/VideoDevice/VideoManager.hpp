@@ -19,4 +19,5 @@ class ACOE_EXPORT VideoManager {
    public:
     const std::vector<VideoDevicePtr>& getDeviceList(bool bUpdate = false);
 };
+
 }  // namespace aoce

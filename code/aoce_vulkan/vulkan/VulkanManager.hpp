@@ -23,7 +23,7 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     bool createInstance(const char* appName);
     // 查找一个不同于渲染通道的计算通道
     bool findAloneCompute(int32_t& familyIndex);
-    void createDevice(bool bAloneCompute = false);
+    bool createDevice(bool bAloneCompute = false);
     // presentIndex默认会选择graphicsIndex,如果graphicsIndex支持呈现,返回true
     bool findSurfaceQueue(VkSurfaceKHR surface, int32_t& presentIndex);
 

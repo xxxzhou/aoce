@@ -87,7 +87,13 @@ class TestLive : public ILiveObserver {
     // 用户对应流的视频桢数据
     virtual void onVideoFrame(int32_t userId, int32_t index,
                               const VideoFrame &videoFrame) {
-        inputLayer->inputCpuData(videoFrame,0);
+        std::string  str;
+        string_format(str,"width:",videoFrame.width," height:",videoFrame.height," yuvtype:",to_string(videoFrame.videoType));
+        logMessage(LogLevel::info,str);
+        if (yuv2rgbLayer->getParamet().type != videoFrame.videoType) {
+            yuv2rgbLayer->updateParamet({videoFrame.videoType, true});
+        }
+        inputLayer->inputCpuData(videoFrame, 0);
 #if WIN32
         vkGraph->run();
 #endif
@@ -148,7 +154,6 @@ void android_main(struct android_app *app)
     // 如果是要用nativewindow,请使用这个
     bool battach = false;
     AoceManager::Get().initAndroid(app);
-
 #endif
     // 生成一张执行图
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
@@ -168,7 +173,7 @@ void android_main(struct android_app *app)
         LiveRoom *room = AoceManager::Get().getLiveRoom(LiveType::agora);
         live = new TestLive(room);
         AgoraContext contex = {};
-        contex.bLoopback = true;
+        contex.bLoopback = false;
 #if __ANDROID__
         contex.context =
             nullptr;  // AoceManager::Get().getAppEnv().application;
@@ -177,7 +182,8 @@ void android_main(struct android_app *app)
         room->loginRoom("123", 5, 0);
     });
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
-    window = std::make_unique<VulkanWindow>(onPreCommand, false); // onPreCommand
+    window =
+        std::make_unique<VulkanWindow>(onPreCommand, false);  // onPreCommand
 #if _WIN32
     window->initWindow(hInstance, 1280, 720, "vulkan test");
     winINit();
@@ -201,8 +207,9 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_initEngine(
     andEnv.env = env;
     andEnv.activity = thiz;
     AoceManager::Get().initAndroid(andEnv);
-//    // 生成一张执行图
-//    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    // // 生成一张执行图
+    // vkGraph =
+    // AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     // 生成一张执行图
     auto graphFactory = AoceManager::Get().getPipeGraphFactory(gpuType);
     if (graphFactory == nullptr) {
@@ -222,7 +229,6 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_initEngine(
     // 初始化agora
     void *android_app_context =
         reinterpret_cast<void *>(env->NewGlobalRef(j_context));
-
 }
 
 JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_vkInitSurface(

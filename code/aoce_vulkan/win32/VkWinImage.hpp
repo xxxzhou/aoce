@@ -1,5 +1,6 @@
 #pragma once
 
+// 用于vulkan与dx11交互
 // PS:
 // https://github.com/krOoze/Hello_Triangle/blob/dxgi_interop/src/WSI/DxgiWsi.h
 // https://github.com/roman380/VulkanSdkDemos/blob/d3d11-image-interop/BindImageMemory2/BindImageMemory2.cpp#L154

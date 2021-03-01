@@ -8,7 +8,9 @@ import io.agora.rtc2.RtcEngine2;
 public class MainActivity2 extends NativeActivity {
     static {
         RtcEngine2.getSdkVersion();
+        // System.loadLibrary("vrapi");
         System.loadLibrary("05_livetest");
         System.loadLibrary("agora-rtc-sdk-jni");
+
     }
 }
