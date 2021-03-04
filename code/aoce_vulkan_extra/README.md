@@ -1,5 +1,8 @@
 # 移植GPUImage的实现,用vulkan的compute shader完成各个功能
 
+[iOS直播技术学习笔记-美颜滤镜效果（三）](https://www.jianshu.com/p/90f55e5b7d16)
+[GPUImage 简介](https://gitee.com/xudoubi/GPUImage)
+
 ## opengl/cuda computer shader 线程
 
 gl_NumWorkGroups/gridDim: 所有线程块的多少.

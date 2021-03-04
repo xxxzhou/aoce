@@ -35,12 +35,12 @@ void VideoViewGraph::updateParamet(YUVParamet yparamet, InputParamet iparamet,
 
 void VideoViewGraph::runFrame(const VideoFrame &frame) {
     if (getYuvIndex(frame.videoType) >= 0) {
-        yuv2rgbLayer->getNode()->setVisable(true);
+        yuv2rgbLayer->getLayerNode()->setVisable(true);
         if (yuv2rgbLayer->getParamet().type != frame.videoType) {
             yuv2rgbLayer->updateParamet({frame.videoType});
         }
     } else {
-        yuv2rgbLayer->getNode()->setVisable(false);
+        yuv2rgbLayer->getLayerNode()->setVisable(false);
     }
     inputLayer->inputCpuData(frame, 0);
     graph->run();

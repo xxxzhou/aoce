@@ -23,6 +23,24 @@ void VkLayer::setUBOSize(int size, bool bMatchParamet) {
     bParametMatch = bMatchParamet;
 }
 
+void VkLayer::generateLayout() {
+    std::vector<UBOLayoutItem> items;
+    for (int i = 0; i < inCount; i++) {
+        items.push_back(
+            {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT});
+    }
+    for (int i = 0; i < outCount; i++) {
+        items.push_back(
+            {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT});
+    }
+    if (constBuf) {
+        items.push_back(
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT});
+    }
+    layout->addSetLayout(items);
+    layout->generateLayout();
+}
+
 void VkLayer::updateUBO() {
     if (constBuf) {
         constBuf->upload(constBufCpu.data());
@@ -54,12 +72,6 @@ void VkLayer::onInit() {
 }
 
 void VkLayer::onInitLayer() {
-    // for(int i =0;i<inCount;i++){
-    //     inFormats[i].imageType = ImageType::rgba8;
-    // }
-    // for(int i =0;i<outCount;i++){
-    //     outFormats[i].imageType = ImageType::rgba8;
-    // }
     if (inCount > 0) {
         sizeX = divUp(inFormats[0].width, groupX);
         sizeY = divUp(inFormats[0].height, groupY);
@@ -98,11 +110,27 @@ void VkLayer::onInitBuffer() {
 
 bool VkLayer::onFrame() { return true; }
 
+void VkLayer::onInitGraph() {
+    if (!glslPath.empty()) {
+        shader->loadShaderModule(context->device, glslPath);
+    }
+    generateLayout();
+}
+
 void VkLayer::onInitPipe() {
-    inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    layout->updateSetLayout(0, 0, &inTexs[0]->descInfo, &outTexs[0]->descInfo,
-                            &constBuf->descInfo);
+    std::vector<void*> bufferInfos;
+    for (int i = 0; i < inCount; i++) {
+        inTexs[i]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        bufferInfos.push_back(&inTexs[i]->descInfo);
+    }
+    for (int i = 0; i < outCount; i++) {
+        outTexs[i]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        bufferInfos.push_back(&outTexs[i]->descInfo);
+    }
+    if (constBuf) {
+        bufferInfos.push_back(&constBuf->descInfo);
+    }
+    layout->updateSetLayout(0, 0, bufferInfos);
     auto computePipelineInfo = VulkanPipeline::createComputePipelineInfo(
         layout->pipelineLayout, shader->shaderStage);
     VK_CHECK_RESULT(vkCreateComputePipelines(
@@ -111,12 +139,16 @@ void VkLayer::onInitPipe() {
 }
 
 void VkLayer::onPreCmd() {
-    inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
-                          VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-                          VK_ACCESS_SHADER_READ_BIT);
-    outTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
-                           VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-                           VK_ACCESS_SHADER_WRITE_BIT);
+    for (int i = 0; i < inCount; i++) {
+        inTexs[i]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
+                              VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                              VK_ACCESS_SHADER_READ_BIT);
+    }
+    for (int i = 0; i < outCount; i++) {
+        outTexs[i]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
+                               VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                               VK_ACCESS_SHADER_WRITE_BIT);
+    }
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, computerPipeline);
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE,
                             layout->pipelineLayout, 0, 1,

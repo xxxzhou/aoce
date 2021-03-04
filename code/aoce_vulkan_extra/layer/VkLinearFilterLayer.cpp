@@ -6,7 +6,10 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkLinearFilterLayer::VkLinearFilterLayer(/* args */) { setUBOSize(16); }
+VkLinearFilterLayer::VkLinearFilterLayer(bool bOneChannel) {
+    this->bOneChannel = bOneChannel;
+    setUBOSize(16);
+}
 
 VkLinearFilterLayer::~VkLinearFilterLayer() {}
 
@@ -17,7 +20,12 @@ void VkLinearFilterLayer::onUpdateParamet() {
 }
 
 void VkLinearFilterLayer::onInitGraph() {
-    std::string path = "glsl/filter2D.comp.spv";
+    std::string path = "glsl/filter2D.comp.spv";    
+    if (bOneChannel) {
+        path = "glsl/filter2DC1.comp.spv";
+        inFormats[0].imageType = ImageType::r8;
+        outFormats[0].imageType = ImageType::r8;
+    }
     shader->loadShaderModule(context->device, path);
 
     std::vector<UBOLayoutItem> items = {
@@ -29,7 +37,24 @@ void VkLinearFilterLayer::onInitGraph() {
     layout->generateLayout();
 }
 
-void VkLinearFilterLayer::onInitVkBuffer() {
+void VkLinearFilterLayer::onInitPipe() {
+    inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    layout->updateSetLayout(0, 0, &inTexs[0]->descInfo, &outTexs[0]->descInfo,
+                            &constBuf->descInfo, &kernelBuffer->descInfo);
+    auto computePipelineInfo = VulkanPipeline::createComputePipelineInfo(
+        layout->pipelineLayout, shader->shaderStage);
+    VK_CHECK_RESULT(vkCreateComputePipelines(
+        context->device, context->pipelineCache, 1, &computePipelineInfo,
+        nullptr, &computerPipeline));
+}
+
+VkBoxBlurLayer::VkBoxBlurLayer(bool bOneChannel)
+    : VkLinearFilterLayer(bOneChannel) {}
+
+VkBoxBlurLayer::~VkBoxBlurLayer() {}
+
+void VkBoxBlurLayer::onInitVkBuffer() {
     std::vector<int32_t> ubo = {paramet.kernelSizeX, paramet.kernelSizeY,
                                 paramet.kernelSizeX / 2,
                                 paramet.kernelSizeY / 2};
@@ -44,18 +69,6 @@ void VkLinearFilterLayer::onInitVkBuffer() {
         BufferUsage::onestore,
         paramet.kernelSizeX * paramet.kernelSizeY * sizeof(float),
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());
-}
-
-void VkLinearFilterLayer::onInitPipe() {
-    inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    layout->updateSetLayout(0, 0, &inTexs[0]->descInfo, &outTexs[0]->descInfo,
-                            &constBuf->descInfo, &kernelBuffer->descInfo);
-    auto computePipelineInfo = VulkanPipeline::createComputePipelineInfo(
-        layout->pipelineLayout, shader->shaderStage);
-    VK_CHECK_RESULT(vkCreateComputePipelines(
-        context->device, context->pipelineCache, 1, &computePipelineInfo,
-        nullptr, &computerPipeline));
 }
 
 }  // namespace layer

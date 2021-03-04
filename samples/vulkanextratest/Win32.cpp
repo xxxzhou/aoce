@@ -6,8 +6,9 @@
 static VkExtraBaseView* view = nullptr;
 
 // box模糊
-static ITLayer<FilterParamet>* boxFilterLayer = nullptr;
+static ITLayer<BoxBlueParamet>* boxFilterLayer = nullptr;
 static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
+static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -24,13 +25,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
     keyParamet.ambientColor = {0.1f, 0.6f, 0.1f};
     keyParamet.alphaCutoffMin = 0.001f;
-    chromKeyLayer->updateParamet(keyParamet); 
+    chromKeyLayer->updateParamet(keyParamet);
 
-    view->initGraph(chromKeyLayer, hInstance);
+    adaptiveLayer = createAdaptiveThresholdLayer();
+    AdaptiveThresholdParamet adaParamet = {};
+    adaParamet.boxBlue = {4,4};
+    adaptiveLayer->updateParamet(adaParamet);
+
+    view->initGraph(boxFilterLayer, hInstance);
     view->openDevice();
 
-    std::thread trd([&](){
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));        
+    std::thread trd([&]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         view->enableLayer(false);
     });
     trd.detach();

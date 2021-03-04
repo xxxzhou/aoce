@@ -64,8 +64,8 @@ void UBOLayout::generateLayout() {
     descriptorPoolInfo.poolSizeCount = (uint32_t)poolSizes.size();
     descriptorPoolInfo.pPoolSizes = poolSizes.data();
     descriptorPoolInfo.maxSets = groupCount;
-    VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo,
-                                           nullptr, &descPool));
+    VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr,
+                                           &descPool));
     descSetLayouts.resize(size);
     descSets.resize(size);
     // 创建VkDescriptorSetLayout
@@ -90,9 +90,8 @@ void UBOLayout::generateLayout() {
         descriptorLayoutInfo.pBindings = layoutBindings.data();
         descriptorLayoutInfo.bindingCount = (uint32_t)layoutBindings.size();
         // 生成VkDescriptorSetLayout
-        VK_CHECK_RESULT(
-            vkCreateDescriptorSetLayout(device, &descriptorLayoutInfo,
-                                        nullptr, &descSetLayouts[x]));
+        VK_CHECK_RESULT(vkCreateDescriptorSetLayout(
+            device, &descriptorLayoutInfo, nullptr, &descSetLayouts[x]));
         // 生成VkDescriptorSet
         descSets[x].resize(groupSize[x]);
         VkDescriptorSetAllocateInfo descAllocInfo = {};
@@ -100,8 +99,8 @@ void UBOLayout::generateLayout() {
         descAllocInfo.descriptorPool = descPool;
         descAllocInfo.pSetLayouts = &descSetLayouts[x];
         descAllocInfo.descriptorSetCount = groupSize[x];
-        VK_CHECK_RESULT(vkAllocateDescriptorSets(
-            device, &descAllocInfo, descSets[x].data()));
+        VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descAllocInfo,
+                                                 descSets[x].data()));
     }
     // 生成pipelineLayout
     VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo{};
@@ -109,8 +108,8 @@ void UBOLayout::generateLayout() {
         VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutCreateInfo.setLayoutCount = descSetLayouts.size();
     pipelineLayoutCreateInfo.pSetLayouts = descSetLayouts.data();
-    VK_CHECK_RESULT(vkCreatePipelineLayout(
-        device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+    VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo,
+                                           nullptr, &pipelineLayout));
 }
 
 void UBOLayout::updateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...) {
@@ -152,9 +151,51 @@ void UBOLayout::updateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...) {
         writes.push_back(write);
     }
     va_end(args);
-    vkUpdateDescriptorSets(device,
-                           static_cast<uint32_t>(writes.size()), writes.data(),
-                           0, nullptr);
+    vkUpdateDescriptorSets(device, static_cast<uint32_t>(writes.size()),
+                           writes.data(), 0, nullptr);
+}
+
+void UBOLayout::updateSetLayout(uint32_t groupIndex, uint32_t setIndex,
+                                std::vector<void*> bufferInfos) {
+    auto& descSet = descSets[groupIndex][setIndex];
+    auto& group = items[groupIndex];
+    std::vector<VkWriteDescriptorSet> writes;
+    for (auto i = 0; i < group.size(); i++) {
+        VkWriteDescriptorSet write = {};
+        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write.dstSet = descSet;
+        write.dstBinding = i;
+        write.descriptorType = group[i].descriptorType;
+        switch (write.descriptorType) {
+            // pImageInfo里的sample
+            case VK_DESCRIPTOR_TYPE_SAMPLER:
+            // pImageInfo里的imageView与imageLayout
+            case VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE:
+            case VK_DESCRIPTOR_TYPE_STORAGE_IMAGE:
+            case VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT:
+            // pImageInfo里的所有成员
+            case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+                write.pImageInfo =
+                    static_cast<VkDescriptorImageInfo*>(bufferInfos[i]);
+                break;
+            case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+            case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+            case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC:
+            case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
+                write.pBufferInfo =
+                    static_cast<VkDescriptorBufferInfo*>(bufferInfos[i]);
+                break;
+            case VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER:
+                write.pTexelBufferView =
+                    static_cast<VkBufferView*>(bufferInfos[i]);
+            default:
+                break;
+        }        
+        write.descriptorCount = 1;
+        writes.push_back(write);
+    }
+    vkUpdateDescriptorSets(device, static_cast<uint32_t>(writes.size()),
+                           writes.data(), 0, nullptr);
 }
 
 VulkanPipeline::VulkanPipeline(/* args */) {}
@@ -234,7 +275,8 @@ VkPipelineShaderStageCreateInfo VulkanPipeline::loadShader(
     shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderStage.stage = stage;
 #if defined(__ANDROID__)
-    shaderStage.module = aoce::vulkan::loadShader(assetManager, fileName.c_str(), device);
+    shaderStage.module =
+        aoce::vulkan::loadShader(assetManager, fileName.c_str(), device);
 #else
     shaderStage.module = aoce::vulkan::loadShader(fileName.c_str(), device);
 #endif

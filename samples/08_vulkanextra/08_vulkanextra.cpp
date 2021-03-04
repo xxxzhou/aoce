@@ -19,8 +19,9 @@ static InputLayer* inputLayer;
 static OutputLayer* outputLayer;
 static YUV2RGBALayer* yuv2rgbLayer;
 // box模糊
-static ITLayer<FilterParamet>* boxFilterLayer;
+static ITLayer<BoxBlueParamet>* boxFilterLayer;
 static ITLayer<ChromKeyParamet>* chromKeyLayer;
+static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 
 static GpuType gpuType = GpuType::vulkan;
 
@@ -76,8 +77,12 @@ int main() {
     keyParamet.chromaColor = {0.15f,0.6f,0.0f};
     keyParamet.ambientColor = {0.6f,0.1f,0.6f};
     keyParamet.alphaCutoffMin = 0.001f;
-
     chromKeyLayer->updateParamet(keyParamet);
+
+    adaptiveLayer = createAdaptiveThresholdLayer();
+    AdaptiveThresholdParamet adaParamet = {};
+    adaParamet.boxBlue = {4,4};
+    adaptiveLayer->updateParamet(adaParamet);
 
     VideoType videoType = selectFormat.videoType;
     if (selectFormat.videoType == VideoType::mjpg) {
@@ -87,7 +92,7 @@ int main() {
         yuv2rgbLayer->updateParamet({videoType});
     }    
     // 生成图
-    vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(chromKeyLayer)->addNode(outputLayer);
+    vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(adaptiveLayer)->addNode(outputLayer);
     // vkGraph->addNode(inputLayer)->addNode(outputLayer);
     // 设定输出函数回调
     outputLayer->setImageProcessHandle(onImageProcessHandle);
@@ -95,11 +100,11 @@ int main() {
     inputLayer->setImage(selectFormat);
 
     //显示
-    show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
+    show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC1);
     show2 = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
     while (int key = cv::waitKey(30)) {
-        cv::cvtColor(*show, *show2, cv::COLOR_RGBA2BGRA);
-        cv::imshow("a", *show2);
+        //cv::cvtColor(*show, *show2, cv::COLOR_RGBA2BGRA);
+        cv::imshow("a", *show);
         if (key == 'q') {
             break;
         } else if (key == 'c') {

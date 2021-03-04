@@ -22,6 +22,8 @@ class ACOE_EXPORT PipeNode {
     bool bDisable = false;
     // 在graph的索引
     int32_t graphIndex = 0;
+    std::weak_ptr<PipeNode> startNode;
+    // PipeNode* startNode = nullptr;
 
    public:
     PipeNode(BaseLayer* _layer);
@@ -32,6 +34,8 @@ class ACOE_EXPORT PipeNode {
     void setEnable(bool benable);
     inline BaseLayer* getLayer() { return layer; };
     inline int32_t getNodeIndex() { return graphIndex; };
+    void setStartNode(PipeNodePtr node);
+    PipeNodePtr getStartNode();
 
    public:
     // 有一个隐藏的line关系,当前节点第一个输出连接下一节点的第一个输入

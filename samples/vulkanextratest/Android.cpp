@@ -13,7 +13,7 @@
 static VkExtraBaseView* view = nullptr;
 
 // box模糊
-static ITLayer<FilterParamet>* boxFilterLayer = nullptr;
+static ITLayer<BoxBlueParamet>* boxFilterLayer = nullptr;
 static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
 static ChromKeyParamet keyParamet = {};
 

@@ -77,6 +77,8 @@ class AOCE_VULKAN_EXPORT UBOLayout {
     void generateLayout();
 
     void updateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...);
+
+    void updateSetLayout(uint32_t groupIndex, uint32_t setIndex,std::vector<void*> bufferInfos);
 };
 
 class AOCE_VULKAN_EXPORT VulkanPipeline {

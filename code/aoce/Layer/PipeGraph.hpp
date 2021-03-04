@@ -46,6 +46,7 @@ class ACOE_EXPORT PipeGraph {
     // 引发resetGraphr执行,但是不一定与当前执行同线程
     void reset() { bReset = true; }
 
+    PipeNodePtr getLastNode();
     PipeNodePtr addNode(BaseLayer* layer);
     PipeNodePtr addNode(ILayer* layer);
     bool addLine(int32_t from, int32_t to, int32_t formOut = 0,
@@ -54,7 +55,7 @@ class ACOE_EXPORT PipeGraph {
                  int32_t toIn = 0);
 
     void getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
-                           ImageFormat& format);
+                           ImageFormat& format,bool bOutput = false);
 
     // 清除连线(当逻辑变更导致执行列表重组)
     void clearLines();

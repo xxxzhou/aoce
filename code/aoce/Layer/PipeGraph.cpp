@@ -7,9 +7,18 @@
 #include <stack>
 
 namespace aoce {
+
 PipeGraph::PipeGraph(/* args */) {}
 
 PipeGraph::~PipeGraph() {}
+
+PipeNodePtr PipeGraph::getLastNode() {
+    int32_t count = (int32_t)nodes.size();
+    if (count > 0) {
+        return nodes[count - 1];
+    }
+    return nullptr;
+}
 
 PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
     if (layer == nullptr) {
@@ -20,12 +29,13 @@ PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
         logMessage(LogLevel::error, "node layer gpu type no equal graph");
     }
     assert(this->gpu == layer->gpu);
-    layer->pipeGraph = this;    
+    layer->pipeGraph = this;
     layer->onInit();
     PipeNodePtr ptr(new PipeNode(layer));
     ptr->graphIndex = (int32_t)nodes.size();
     layer->pipeNode = ptr;
     nodes.push_back(ptr);
+    layer->onInitNode();
     return ptr;
 }
 
@@ -61,10 +71,15 @@ bool PipeGraph::addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut,
 }
 
 void PipeGraph::getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
-                                  ImageFormat& format) {
+                                  ImageFormat& format, bool bOutput) {
     if (nodeIndex < nodes.size() &&
         outputIndex < nodes[nodeIndex]->layer->outFormats.size()) {
-        format = nodes[nodeIndex]->layer->outFormats[outputIndex];
+        auto& tempFormat = nodes[nodeIndex]->layer->outFormats[outputIndex];
+        format.width = tempFormat.width;
+        format.height = tempFormat.height;
+        if (bOutput) {
+            format.imageType = tempFormat.imageType;
+        }
     }
 }
 
@@ -134,7 +149,7 @@ void PipeGraph::validNode() {
                     // 当前连接节点不可见的话,尝试自动去掉当前节点链接下一节点
                     // 需要注意,下一节点/下下节点也可能没有启用
                     int toNode = line->toNode;
-                    if (nodes[toNode]->bInvisible) {                        
+                    if (nodes[toNode]->bInvisible) {
                         int32_t toSize = toLines[toNode].size();
                         int32_t formSize = formLines[toNode].size();
                         if (toSize != 1 || formSize != 1) {

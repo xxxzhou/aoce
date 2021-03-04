@@ -9,8 +9,8 @@ namespace aoce {
 enum class GpuBit {
     other = 0,
     vulkan = 1,
-    dx11 = 2,
-    cuda = 4,
+    cuda = 2,
+    // dx11 = 4,
 };
 
 // 每个从继承ILayer的类,请在类头文件里添加这个宏,或是自己实现
@@ -36,6 +36,7 @@ class ACOE_EXPORT BaseLayer {
     friend class PipeNode;
     friend class PipeGraph;
     friend class InputLayer;
+    friend class GroupLayer;
     // ITLayer类的所有实例化, 都为BaseLayer的友元
     template <typename T>
     friend class ITLayer;
@@ -66,16 +67,19 @@ class ACOE_EXPORT BaseLayer {
     // 附加到那个图表上
     class PipeGraph* getGraph();
     // 附加到图表上的节点
-    class PipeNode* getNode();
+    std::shared_ptr<class PipeNode> getNode();
 
    protected:
     bool addInLayer(int32_t inIndex, int32_t nodeIndex, int32_t outputIndex);
     bool vaildInLayers();
     void initLayer();
+    void resetGraph();
 
    protected:
     // 添加进pipeGraph时调用
     virtual void onInit();
+    // 添加pipeGraph赋值节点后,一般用于组合多节点层
+    virtual void onInitNode(){};
     // 已经添加进pipeGraph,pipeGraph把所有层连接起来,此时知道inputFormats的长宽
     // 并根据当前层的需求,设定对应outFormats,也就是下一层的inputFormats
     // 可分配线程组的大小了
@@ -94,7 +98,7 @@ class ILayer {
     virtual BaseLayer* getLayer() = 0;
 
    public:
-    class PipeNode* getNode();
+    class PipeNode* getLayerNode();
 };
 
 // 分离导致层不同参数的差异(AOCE_LAYER_QUERYINTERFACE)
@@ -125,7 +129,7 @@ typedef ITLayer<BlendParamet> BlendLayer;
 typedef ITLayer<YUVParamet> YUV2RGBALayer;
 
 // YUV 2 RGBA 转换
-//class YUV2RGBALayer : public ITLayer<YUVParamet> {};
+// class YUV2RGBALayer : public ITLayer<YUVParamet> {};
 
 // RGBA 2 YUV 转换
 // class RGBA2YUVLayer : public ITLayer<YUVParamet> {};

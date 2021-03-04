@@ -1,23 +1,18 @@
 #pragma once
 
+#include "../VkExtraExport.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
 namespace vulkan {
 namespace layer {
 
-// 边框默认使用REPLICATE模式
-class VkSeparableLinearLayer : public VkLayer {    
-   protected:
+class VkLuminanceLayer : public VkLayer {
+   private:
     /* data */
-    int32_t rSizeX = 0;
-    int32_t cSizeY = 0;
-
-    std::unique_ptr<VulkanShader> shader2;
-
    public:
-    VkSeparableLinearLayer(/* args */);
-    ~VkSeparableLinearLayer();
+    VkLuminanceLayer(/* args */);
+    ~VkLuminanceLayer();
 
    protected:
     virtual void onInitGraph() override;

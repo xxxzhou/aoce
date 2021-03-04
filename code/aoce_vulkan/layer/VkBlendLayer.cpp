@@ -11,7 +11,7 @@ namespace layer {
 VkBlendLayer::VkBlendLayer(/* args */) {
     setUBOSize(sizeof(VkBlendParamet));
     inCount = 2;
-    outCount = 1;
+    outCount = 1;    
 }
 
 VkBlendLayer::~VkBlendLayer() {}

@@ -2,6 +2,7 @@
 
 #include "PipeGraph.hpp"
 namespace aoce {
+
 PipeNode::PipeNode(BaseLayer* _layer) {
     if (_layer == nullptr) {
         logMessage(LogLevel::error, "node layer can not be empty");
@@ -26,6 +27,15 @@ void PipeNode::setEnable(bool benable) {
     }
 }
 
+void PipeNode::setStartNode(PipeNodePtr node) { startNode = node; }
+
+PipeNodePtr PipeNode::getStartNode() {
+    if (startNode.expired()) {
+        return nullptr;
+    }
+    return startNode.lock();
+}
+
 PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
     if (this->layer->gpu != layer->gpu) {
         logMessage(LogLevel::error, "layer gpu not equal node");
@@ -41,7 +51,11 @@ PipeNodePtr PipeNode::addNode(ILayer* layer) {
 }
 
 PipeNodePtr PipeNode::addLine(PipeNodePtr to, int32_t formOut, int32_t toIn) {
-    layer->pipeGraph->addLine(this->graphIndex, to->graphIndex, formOut, toIn);
+    int toIndex = to->graphIndex;
+    if (to->getStartNode()) {
+        toIndex = to->getStartNode()->graphIndex;
+    }
+    layer->pipeGraph->addLine(this->graphIndex, toIndex, formOut, toIn);
     return to;
 }
 

@@ -64,6 +64,8 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     // 保证一个PipeGraph里都在更新数据线程里更新
     bool bParametChange = false;
 
+    std::string glslPath = "";
+
    public:
     VkLayer(/* args */);
     ~VkLayer() override;
@@ -74,6 +76,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     void createOutTexs();
 
    public:
+    void generateLayout();
     void updateUBO();
 
    protected:
@@ -87,7 +90,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
 
    protected:
     // vulkan层在onInit后,shader可以放这编译,如果参数影响shader编译,需要放入onInitPipe
-    virtual void onInitGraph(){};
+    virtual void onInitGraph();
     // onInitBuffer后,onInitBuffer已经关联后上层的输出当做本层的输入
     virtual void onInitVkBuffer(){};
     // 根据上面shader/buffer,组建计算管线
