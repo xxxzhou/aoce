@@ -13,11 +13,15 @@ gl_GlobalInvocationID = blockIdx*blockDim + gl_LocalInvocationID
 
 ## 功能介绍
 
-### adaptiveThreshold 自适应阈值化操作
+### ChromKey
 
-### luminance 取亮度
+[UE4 Matting](https://www.unrealengine.com/en-US/tech-blog/setting-up-a-chroma-key-material-in-ue4)
 
-### boxBlur 均值模糊
+主要注意一点,UBO,我特意把一个float,vec3放一起,想当然的认为是按照vec4排列,这里注意,vec3不管前后接什么,按照vec4排的.
+
+### Luminance 取亮度
+
+### BoxBlur 均值模糊
 
 [图像处理中的卷积核分离](https://zhuanlan.zhihu.com/p/81683945)
 
@@ -31,8 +35,20 @@ opencv cudafilters的高斯卷积,就采用先计算水平卷积,然后计算垂
 
 ![Alt text](https://img-blog.csdnimg.cn/20200602093115149.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NodWl5aXhpbg==,size_16,color_47FFFF,t_70 "REPLICATE image")
 
-### chromKey
+### GaussianBlur
 
-[UE4 Matting](https://www.unrealengine.com/en-US/tech-blog/setting-up-a-chroma-key-material-in-ue4)
+[OpenCV高斯滤波GaussianBlur](https://blog.csdn.net/godadream/article/details/81568844)
 
-主要注意一点,UBO,我特意把一个float,vec3放一起,想当然的认为是按照vec4排列,这里注意,vec3不管前后接什么,按照vec4排的.
+### AdaptiveThreshold 自适应阈值化操作
+
+[自适应阈值化操作](https://www.cnblogs.com/GaloisY/p/11037350.html)
+
+效果图:
+
+![avatar](../../images/adaptiveThreshold1.PNG "REPLICATE image")
+
+### HarrisCornerDetection
+
+[How to detect corners in a binary images with OpenGL?](https://dsp.stackexchange.com/questions/401/how-to-detect-corners-in-a-binary-images-with-opengl)
+
+[Harris 角点检测](https://blog.csdn.net/u014485485/article/details/79056666)

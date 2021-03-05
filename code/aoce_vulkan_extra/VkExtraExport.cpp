@@ -1,8 +1,10 @@
 #include "VkExtraExport.hpp"
 
 #include "layer/VkAdaptiveThresholdLayer.hpp"
+#include "layer/VkAlphaShowLayer.hpp"
 #include "layer/VkChromKeyLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
+#include "layer/VkLuminanceLayer.hpp"
 
 using namespace aoce::vulkan::layer;
 
@@ -21,6 +23,16 @@ ITLayer<ChromKeyParamet>* createChromKeyLayer() {
 
 ITLayer<AdaptiveThresholdParamet>* createAdaptiveThresholdLayer() {
     VkAdaptiveThresholdLayer* layer = new VkAdaptiveThresholdLayer();
+    return layer;
+}
+
+BaseLayer* createLuminanceLayer() {
+    VkLuminanceLayer* layer = new VkLuminanceLayer();
+    return layer;
+}
+
+BaseLayer* createAlphaShowLayer() {
+    VkAlphaShowLayer* layer = new VkAlphaShowLayer();
     return layer;
 }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "../VkExtraExport.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
@@ -7,12 +9,12 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkLuminanceLayer : public VkLayer {
+class VkAlphaShowLayer : public VkLayer {
    private:
     /* data */
    public:
-    VkLuminanceLayer(/* args */);
-    ~VkLuminanceLayer();
+    VkAlphaShowLayer(/* args */);
+    ~VkAlphaShowLayer();
 
    protected:
     virtual void onInitGraph() override;

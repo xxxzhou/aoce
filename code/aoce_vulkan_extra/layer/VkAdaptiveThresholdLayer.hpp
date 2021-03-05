@@ -25,7 +25,6 @@ class VkAdaptiveThresholdLayer : public VkLayer,
     virtual void onUpdateParamet() override;
     virtual void onInitGraph() override;
     virtual void onInitNode() override;
-    // virtual void onInitPipe() override;
 };
 
 }  // namespace layer

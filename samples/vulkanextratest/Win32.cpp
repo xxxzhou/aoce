@@ -9,6 +9,7 @@ static VkExtraBaseView* view = nullptr;
 static ITLayer<BoxBlueParamet>* boxFilterLayer = nullptr;
 static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
+static BaseLayer* alphaShowLayer = nullptr;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -29,17 +30,21 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     adaptiveLayer = createAdaptiveThresholdLayer();
     AdaptiveThresholdParamet adaParamet = {};
-    adaParamet.boxBlue = {4,4};
+    adaParamet.boxBlue = {10, 10};
+    adaParamet.offset = 0.02f;
     adaptiveLayer->updateParamet(adaParamet);
 
-    view->initGraph(boxFilterLayer, hInstance);
+    alphaShowLayer = createAlphaShowLayer();
+
+    view->initGraph(adaptiveLayer, hInstance, alphaShowLayer);
+    // view->initGraph(boxFilterLayer, hInstance);
     view->openDevice();
 
-    std::thread trd([&]() {
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-        view->enableLayer(false);
-    });
-    trd.detach();
+    // std::thread trd([&]() {
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    //     view->enableLayer(false);
+    // });
+    // trd.detach();
 
     view->run();
 

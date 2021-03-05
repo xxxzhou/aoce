@@ -71,6 +71,28 @@ void VkBoxBlurLayer::onInitVkBuffer() {
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());
 }
 
+VkGaussianBlurLayer::VkGaussianBlurLayer(bool bOneChannel)
+    : VkLinearFilterLayer(bOneChannel) {}
+
+VkGaussianBlurLayer::~VkGaussianBlurLayer() {}
+
+void VkGaussianBlurLayer::onInitVkBuffer() {
+    std::vector<int32_t> ubo = {paramet.kernelSizeX, paramet.kernelSizeX,
+                                paramet.kernelSizeX / 2,
+                                paramet.kernelSizeX / 2};
+    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
+
+    int kernelSize = paramet.kernelSizeX * paramet.kernelSizeX;
+    float kvulve = 1.0f / (float)kernelSize;
+    std::vector<float> karray(kernelSize, kvulve);
+
+    kernelBuffer = std::make_unique<VulkanBuffer>();
+    kernelBuffer->initResoure(
+        BufferUsage::onestore,
+        paramet.kernelSizeX * paramet.kernelSizeY * sizeof(float),
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());
+}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

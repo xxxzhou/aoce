@@ -40,6 +40,17 @@ class VkBoxBlurLayer : public VkLinearFilterLayer {
     virtual void onInitVkBuffer() override;
 };
 
+class VkGaussianBlurLayer : public VkLinearFilterLayer {
+    AOCE_LAYER_QUERYINTERFACE(VkGaussianBlurLayer)
+
+   public:
+    VkGaussianBlurLayer(bool bOneChannel = false);
+    virtual ~VkGaussianBlurLayer();
+
+   protected:
+    virtual void onInitVkBuffer() override;
+};
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

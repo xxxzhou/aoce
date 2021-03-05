@@ -16,9 +16,6 @@ class VkChromKeyLayer : public VkLayer, public ITLayer<ChromKeyParamet> {
    public:
     VkChromKeyLayer(/* args */);
     ~VkChromKeyLayer(); 
-
-   protected:
-    virtual void onInitGraph() override;
 };
 
 }  // namespace layer

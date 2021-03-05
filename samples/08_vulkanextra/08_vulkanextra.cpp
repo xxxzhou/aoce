@@ -22,6 +22,7 @@ static YUV2RGBALayer* yuv2rgbLayer;
 static ITLayer<BoxBlueParamet>* boxFilterLayer;
 static ITLayer<ChromKeyParamet>* chromKeyLayer;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
+static BaseLayer* luminance = nullptr;
 
 static GpuType gpuType = GpuType::vulkan;
 
@@ -36,7 +37,8 @@ static void onImageProcessHandle(uint8_t* data, ImageFormat format,
     // std::cout << "data:" << (int)data[10000] << std::endl;
     // std::vector<float> vecf(width*height * 4);
     // memcpy(vecf.data(), data, width * height * elementSize);
-    memcpy(show->ptr<char>(0), data, format.width * format.height * getImageTypeSize(format.imageType));
+    memcpy(show->ptr<char>(0), data,
+           format.width * format.height * getImageTypeSize(format.imageType));
 }
 
 int main() {
@@ -69,20 +71,22 @@ int main() {
     outputLayer = layerFactory->createOutput();
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     boxFilterLayer = createBoxFilterLayer();
-    boxFilterLayer->updateParamet({10,10});
+    boxFilterLayer->updateParamet({10, 10});
 
     chromKeyLayer = createChromKeyLayer();
     ChromKeyParamet keyParamet = {};
     keyParamet.ambientScale = 0.1f;
-    keyParamet.chromaColor = {0.15f,0.6f,0.0f};
-    keyParamet.ambientColor = {0.6f,0.1f,0.6f};
+    keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
+    keyParamet.ambientColor = {0.6f, 0.1f, 0.6f};
     keyParamet.alphaCutoffMin = 0.001f;
     chromKeyLayer->updateParamet(keyParamet);
 
     adaptiveLayer = createAdaptiveThresholdLayer();
     AdaptiveThresholdParamet adaParamet = {};
-    adaParamet.boxBlue = {4,4};
+    adaParamet.boxBlue = {4, 4};
     adaptiveLayer->updateParamet(adaParamet);
+
+    luminance = createLuminanceLayer();
 
     VideoType videoType = selectFormat.videoType;
     if (selectFormat.videoType == VideoType::mjpg) {
@@ -90,21 +94,23 @@ int main() {
     }
     if (getYuvIndex(videoType) > 0) {
         yuv2rgbLayer->updateParamet({videoType});
-    }    
+    }
     // 生成图
-    vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(adaptiveLayer)->addNode(outputLayer);
+    vkGraph->addNode(inputLayer)
+        ->addNode(yuv2rgbLayer)
+        ->addNode(chromKeyLayer)
+        ->addNode(outputLayer);
     // vkGraph->addNode(inputLayer)->addNode(outputLayer);
     // 设定输出函数回调
     outputLayer->setImageProcessHandle(onImageProcessHandle);
     // 设定输入格式
     inputLayer->setImage(selectFormat);
-
     //显示
-    show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC1);
+    show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
     show2 = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
     while (int key = cv::waitKey(30)) {
-        //cv::cvtColor(*show, *show2, cv::COLOR_RGBA2BGRA);
-        cv::imshow("a", *show);
+        cv::cvtColor(*show, *show2, cv::COLOR_RGBA2BGRA);
+        cv::imshow("a", *show2);
         if (key == 'q') {
             break;
         } else if (key == 'c') {

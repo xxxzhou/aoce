@@ -45,6 +45,7 @@ struct ChromKeyParamet {
 
 struct AdaptiveThresholdParamet {
     BoxBlueParamet boxBlue = {};
+    float offset = 0.05f;
 };
 
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<BoxBlueParamet>* createBoxFilterLayer();
@@ -53,6 +54,10 @@ AOCE_VULKAN_EXTRA_EXPORT ITLayer<ChromKeyParamet>* createChromKeyLayer();
 
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<AdaptiveThresholdParamet>*
 createAdaptiveThresholdLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createLuminanceLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createAlphaShowLayer();
 
 }  // namespace vulkan
 }  // namespace aoce

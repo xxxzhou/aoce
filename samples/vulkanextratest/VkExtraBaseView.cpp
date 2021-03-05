@@ -6,7 +6,7 @@ VkExtraBaseView::VkExtraBaseView() {}
 
 VkExtraBaseView::~VkExtraBaseView() {}
 
-void VkExtraBaseView::initGraph(ILayer* layer, void* hinst) {
+void VkExtraBaseView::initGraph(ILayer* layer, void* hinst, BaseLayer* nextLayer) {
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
@@ -19,6 +19,9 @@ void VkExtraBaseView::initGraph(ILayer* layer, void* hinst) {
     resizeLayer->updateParamet({1, 240, 120});
     yuvNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
     layerNode = yuvNode->addNode(layer);
+    if (nextLayer) {
+        layerNode = layerNode->addNode(nextLayer);
+    }
 #if _WIN32
     TexOperateParamet texParamet = {};
     texParamet.operate.bFlipX = false;

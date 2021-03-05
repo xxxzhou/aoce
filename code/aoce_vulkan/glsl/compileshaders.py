@@ -34,6 +34,7 @@ if len(failedshaders) == 0:
 	dest = path + "/../../../build/bin/Release/glsl/"
 	for risvfile in risvfiles:
 		shutil.copy(risvfile,dest+os.path.basename(risvfile))
+	print("SUCCESS: Copy All shaders: "+dest)
 else:
 	print("ERROR: %d shader(s) could not be compiled:\n" % len(failedshaders))
 	for failedshader in failedshaders:

@@ -45,7 +45,7 @@ class VkExtraBaseView {
     void onPreCommand(uint32_t index);
 
    public:
-    void initGraph(ILayer* layer, void* hinst);
+    void initGraph(ILayer* layer, void* hinst, BaseLayer* nextLayer = nullptr);
 
     void openDevice(int32_t id = 0);
     void closeDevice();
