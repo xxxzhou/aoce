@@ -19,7 +19,7 @@ static InputLayer* inputLayer;
 static OutputLayer* outputLayer;
 static YUV2RGBALayer* yuv2rgbLayer;
 // box模糊
-static ITLayer<BoxBlueParamet>* boxFilterLayer;
+static ITLayer<KernelSizeParamet>* boxFilterLayer;
 static ITLayer<ChromKeyParamet>* chromKeyLayer;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static BaseLayer* luminance = nullptr;
@@ -83,7 +83,7 @@ int main() {
 
     adaptiveLayer = createAdaptiveThresholdLayer();
     AdaptiveThresholdParamet adaParamet = {};
-    adaParamet.boxBlue = {4, 4};
+    adaParamet.boxSize = 4;
     adaptiveLayer->updateParamet(adaParamet);
 
     luminance = createLuminanceLayer();

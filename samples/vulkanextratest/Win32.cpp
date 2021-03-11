@@ -6,7 +6,8 @@
 static VkExtraBaseView* view = nullptr;
 
 // box模糊
-static ITLayer<BoxBlueParamet>* boxFilterLayer = nullptr;
+static ITLayer<KernelSizeParamet>* boxFilterLayer = nullptr;
+static ITLayer<GaussianBlurParamet>* gaussianLayer = nullptr;
 static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static BaseLayer* alphaShowLayer = nullptr;
@@ -17,6 +18,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     view = new VkExtraBaseView();
     boxFilterLayer = createBoxFilterLayer();
     boxFilterLayer->updateParamet({4, 4});
+
+    gaussianLayer = createGaussianBlurLayer();
+    gaussianLayer->updateParamet({10, 5.0f});
 
     chromKeyLayer = createChromKeyLayer();
     ChromKeyParamet keyParamet = {};
@@ -30,14 +34,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     adaptiveLayer = createAdaptiveThresholdLayer();
     AdaptiveThresholdParamet adaParamet = {};
-    adaParamet.boxBlue = {10, 10};
-    adaParamet.offset = 0.02f;
+    adaParamet.boxSize = 10;
+    adaParamet.offset = 0.01f;
     adaptiveLayer->updateParamet(adaParamet);
 
     alphaShowLayer = createAlphaShowLayer();
 
-    view->initGraph(adaptiveLayer, hInstance, alphaShowLayer);
-    // view->initGraph(boxFilterLayer, hInstance);
+    // 查看自适应阈值化效果
+    // view->initGraph(adaptiveLayer, hInstance, alphaShowLayer);
+    // 查看高斯模糊效果
+    view->initGraph(gaussianLayer, hInstance);
     view->openDevice();
 
     // std::thread trd([&]() {

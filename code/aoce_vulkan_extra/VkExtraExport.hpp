@@ -16,14 +16,20 @@
 namespace aoce {
 namespace vulkan {
 
-struct BoxBlueParamet {
+struct KernelSizeParamet {
     int32_t kernelSizeX = 3;
     int32_t kernelSizeY = 3;
 
-    inline bool operator==(const BoxBlueParamet& right) {
+    inline bool operator==(const KernelSizeParamet& right) {
         return this->kernelSizeX == right.kernelSizeX &&
                this->kernelSizeY == right.kernelSizeY;
     }
+};
+
+struct GaussianBlurParamet {
+    int32_t blurRadius = 4;
+    // sigma值越小,整个分布长度范围越大，原始值占比越高，周围占比越低
+    float sigma = 2.0f;
 };
 
 struct ChromKeyParamet {
@@ -44,11 +50,13 @@ struct ChromKeyParamet {
 };
 
 struct AdaptiveThresholdParamet {
-    BoxBlueParamet boxBlue = {};
+    int32_t boxSize = 10;
     float offset = 0.05f;
 };
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<BoxBlueParamet>* createBoxFilterLayer();
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<GaussianBlurParamet>* createGaussianBlurLayer();
 
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<ChromKeyParamet>* createChromKeyLayer();
 

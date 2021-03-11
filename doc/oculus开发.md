@@ -6,7 +6,7 @@
 
 1 Oculus quest需要在手机下Oculus app,需要翻墙.
 
-2 Oculus quest在2023年之前可以使用Oculus账号(现好像已经关闭注册),Oculus quest推荐你使用facebook账号,但是国内的facebook容易被封停，如何封停，容易导致Oculus quest设备时所有选项都无法正常使用，需要重置成出产设置，非常麻烦，个人建议使用Oculus账号，如果你有的话。如果是Oculus quest2，那就没办法，只能用facebook账号了。
+2 Oculus quest在2023年之前可以使用Oculus账号(现好像已经关闭注册),Oculus quest推荐你使用facebook账号,但是国内的facebook容易被封停，如果封停，容易导致Oculus quest设备时所有选项都无法正常使用，需要重置成出产设置，非常麻烦，个人建议使用Oculus账号，如果你有的话。如果是Oculus quest2，那就没办法，只能用facebook账号了。
 
 3 Oculus quest需要进行配对这些设置，其中WIFI比较麻烦，需要可以翻墙，如果你有可以翻墙的路由器，那就没什么说的了，如果没有，在没进Oculus quest系统界面前的配置界面，是不能设置代理的，所以就算你电脑/手机可以翻墙，分享的热点是翻不了的，需要SSTAP将SSR翻墙节点转换成类VPN的全局效果，然后用Connectify Hotspot把此链接变成WIFI热点，这样Oculus quest能直连此热点而不设置代理就可以翻墙，大约需要更新1G左右的内容，要等一久。
 

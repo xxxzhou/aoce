@@ -1,38 +1,152 @@
 #include "VkSeparableLinearLayer.hpp"
 
+#include "aoce/Layer/PipeGraph.hpp"
 #define PATCH_PER_BLOCK 4
 
 namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkSeparableLinearLayer::VkSeparableLinearLayer(/* args */) {}
+VkSeparableLayer::VkSeparableLayer(bool bOneChannel) {
+    this->bOneChannel = bOneChannel;
+    setUBOSize(8);
+#if WIN32
+    glslPath = "glsl/filterRow.comp.spv";
+#elif __ANDROID__
+    glslPath = "glsl/filterRow.comp.spv";
+#endif
+}
 
-VkSeparableLinearLayer::~VkSeparableLinearLayer() {}
+VkSeparableLayer::~VkSeparableLayer() {}
 
-void VkSeparableLinearLayer::onInitGraph() {
-    std::string path = "glsl/filterRow.comp.spv";
-    std::string path2 = "glsl/filterColumn.comp.spv";
-    shader->loadShaderModule(context->device, path);
+void VkSeparableLayer::updateBuffer(std::vector<float> data) {
+    int32_t size = data.size();
+    std::vector<int32_t> ubo = {size, size / 2};
+    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
 
-    shader2 = std::make_unique<VulkanShader>();
-    shader2->loadShaderModule(context->device, path);
+    kernelBuffer = std::make_unique<VulkanBuffer>();
+    kernelBuffer->initResoure(BufferUsage::onestore, size * sizeof(float),
+                              VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                              (uint8_t*)data.data());
+}
+
+void VkSeparableLayer::onInitGraph() {
+    shader->loadShaderModule(context->device, glslPath);
 
     std::vector<UBOLayoutItem> items = {
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT}};
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT}};
     layout->addSetLayout(items);
     layout->generateLayout();
 }
 
-void VkSeparableLinearLayer::onInitLayer() {
+void VkSeparableLayer::onInitLayer() {
     // row[rSizeX,sizeY] column[sizeX,cSizeY]
-    sizeX = divUp(inFormats[0].width, groupX);
+    // 线程组只取平常宽的1/4,每个线程处理四个点
+    sizeX = divUp(inFormats[0].width, groupX * PATCH_PER_BLOCK);
     sizeY = divUp(inFormats[0].height, groupY);
-    // 线程组只取平常宽的1/4
-    rSizeX = divUp(inFormats[0].width, groupX * PATCH_PER_BLOCK);
-    cSizeY = divUp(inFormats[0].height, groupY* PATCH_PER_BLOCK);
+}
+
+void VkSeparableLayer::onInitPipe() {
+    inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    layout->updateSetLayout(0, 0, &inTexs[0]->descInfo, &outTexs[0]->descInfo,
+                            &constBuf->descInfo, &kernelBuffer->descInfo);
+    auto computePipelineInfo = VulkanPipeline::createComputePipelineInfo(
+        layout->pipelineLayout, shader->shaderStage);
+    VK_CHECK_RESULT(vkCreateComputePipelines(
+        context->device, context->pipelineCache, 1, &computePipelineInfo,
+        nullptr, &computerPipeline));
+}
+
+VkSeparableLinearLayer::VkSeparableLinearLayer(bool bOneChannel)
+    : VkSeparableLayer(bOneChannel) {
+    rowLayer = std::make_unique<VkSeparableLayer>(bOneChannel);
+#if WIN32
+    glslPath = "glsl/filterColumn.comp.spv";
+#elif __ANDROID__
+    glslPath = "glsl/filterColumn.comp.spv";
+#endif
+}
+
+VkSeparableLinearLayer::~VkSeparableLinearLayer() {}
+
+void VkSeparableLinearLayer::onInitGraph() {
+    VkSeparableLayer::onInitGraph();
+    pipeGraph->addNode(rowLayer.get());
+}
+
+void VkSeparableLinearLayer::onInitNode() {
+    rowLayer->getNode()->addLine(getNode(), 0, 0);
+    getNode()->setStartNode(rowLayer->getNode());
+}
+
+void VkSeparableLinearLayer::onInitLayer() {
+    sizeX = divUp(inFormats[0].width, groupX);
+    // 线程组只取平常宽的1/4,每个线程处理四个点
+    sizeY = divUp(inFormats[0].height, groupY * PATCH_PER_BLOCK);
+}
+
+VkBoxBlurSLayer::VkBoxBlurSLayer(bool bOneChannel)
+    : VkSeparableLinearLayer(bOneChannel) {}
+
+VkBoxBlurSLayer::~VkBoxBlurSLayer() {}
+
+void VkBoxBlurSLayer::onUpdateParamet() {
+    if (pipeGraph) {
+        pipeGraph->reset();
+    }
+}
+
+void VkBoxBlurSLayer::getKernel(int size, std::vector<float>& kernels) {
+    kernels.resize(size);
+    float sum = 1.0 / size;
+    for (int i = 0; i < size; i++) {
+        kernels[i] = sum;
+    }
+}
+
+void VkBoxBlurSLayer::onInitLayer() {
+    VkSeparableLinearLayer::onInitLayer();
+    int ksizex = paramet.kernelSizeX;
+    std::vector<float> karrayX;
+    std::vector<float> karrayY;
+    getKernel(paramet.kernelSizeX,karrayX);
+    getKernel(paramet.kernelSizeY,karrayY);
+    rowLayer->updateBuffer(karrayX);
+    updateBuffer(karrayY);
+}
+
+VkGaussianBlurSLayer::VkGaussianBlurSLayer(bool bOneChannel)
+    : VkSeparableLinearLayer(bOneChannel) {}
+
+VkGaussianBlurSLayer::~VkGaussianBlurSLayer() {}
+
+void VkGaussianBlurSLayer::onUpdateParamet() {
+    if (pipeGraph) {
+        pipeGraph->reset();
+    }
+}
+
+void VkGaussianBlurSLayer::onInitLayer() {
+    VkSeparableLinearLayer::onInitLayer();
+    int ksize = paramet.blurRadius * 2 + 1;
+    std::vector<float> karray(ksize);
+    double sum = 0.0;
+    double scale = 1.0f / (paramet.sigma * paramet.sigma * 2.0);
+    for (int i = 0; i < ksize; i++) {
+        int x = i - (ksize - 1) / 2;
+        karray[i] = exp(-scale * (x * x));
+        sum += karray[i];
+    }
+    sum = 1.0 / sum;
+    for (int i = 0; i < ksize; i++) {
+        karray[i] *= sum;
+    }
+    rowLayer->updateBuffer(karray);
+    updateBuffer(karray);
 }
 
 }  // namespace layer

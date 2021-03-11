@@ -17,7 +17,7 @@ vulkan项目使用glsl,请安装Vulkan SDK,通过工具glslangValidator把glsl�
 
 统一平台win/andorid的视频源的获取,图像的GPU处理,以及方便对接各种界面显示.
 
-GPU计算模块的选择,win平台准备完成cuda/vulkan/dx11模块,主要完成cuda,win平台推荐cuda.android平台原则上只实现vulkan模块。
+GPU计算模块的选择,win平台准备完成cuda/vulkan模块,主要完成cuda,win平台推荐cuda.android平台原则上只实现vulkan模块。
 
 Camera内置WIN平台MF的SDK,而anroid基于ndk camera2实现。
 
@@ -25,13 +25,13 @@ Camera内置WIN平台MF的SDK,而anroid基于ndk camera2实现。
 
 cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/vulkan库为基准,方便自己的layer层实现,其中aoce_talkto/aoce_vulkan_extra分别以aoce_cuda/aoce_vulkan库的类来扩展外置的gpugpu实现,各位可以参照实现。
 
-能方便使用各种UI框架进行显示,包含不限于Unity3D/UE4/WinForm等.
+能方便对接各种引擎,使用各种UI框架进行显示,包含不限于Unity3D/UE4/WinForm等.
 
 各模块现主要通过CMake动态链接,通过相应选项可以选择去除不需要模块,后期完善静态编译成一个文件功能.
 
 ## 模块
 
-### [aoce](https://github.com/xxxzhou/aoce/tree/master/code/aoce)(各个基本功能接口,结构定义)
+### [aoce](https://github.com/xxxzhou/aoce)(各个基本功能接口,结构定义)
 
 ### aoce_android(android内关于camera/codec相关实现)
 

@@ -5,15 +5,21 @@
 #include "layer/VkChromKeyLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
 #include "layer/VkLuminanceLayer.hpp"
+#include "layer/VkSeparableLinearLayer.hpp"
 
 using namespace aoce::vulkan::layer;
 
 namespace aoce {
 namespace vulkan {
 
-ITLayer<BoxBlueParamet>* createBoxFilterLayer() {
-    VkBoxBlurLayer* boxBlur = new VkBoxBlurLayer();
+ITLayer<KernelSizeParamet>* createBoxFilterLayer() {
+    VkBoxBlurSLayer* boxBlur = new VkBoxBlurSLayer();
     return boxBlur;
+}
+
+ITLayer<GaussianBlurParamet>* createGaussianBlurLayer() {
+    VkGaussianBlurSLayer* layer = new VkGaussianBlurSLayer();
+    return layer;
 }
 
 ITLayer<ChromKeyParamet>* createChromKeyLayer() {

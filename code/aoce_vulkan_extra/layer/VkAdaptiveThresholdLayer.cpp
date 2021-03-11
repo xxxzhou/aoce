@@ -11,6 +11,8 @@ VkAdaptiveThresholdLayer::VkAdaptiveThresholdLayer(/* args */) {
     setUBOSize(4);
     luminance = std::make_unique<VkLuminanceLayer>();
     boxBlur = std::make_unique<VkBoxBlurLayer>(true);
+    // kernel size会导致Graph重置,在onInitGraph之前更新下,避免可能的二次重置
+    boxBlur->updateParamet({paramet.boxSize, paramet.boxSize});
     inCount = 2;
     outCount = 1;
     glslPath = "glsl/adaptiveThreshold.comp.spv";
@@ -19,8 +21,8 @@ VkAdaptiveThresholdLayer::VkAdaptiveThresholdLayer(/* args */) {
 VkAdaptiveThresholdLayer::~VkAdaptiveThresholdLayer() {}
 
 void VkAdaptiveThresholdLayer::onUpdateParamet() {
-    if (!(paramet.boxBlue == oldParamet.boxBlue)) {
-        boxBlur->updateParamet(paramet.boxBlue);
+    if (paramet.boxSize != oldParamet.boxSize) {
+        boxBlur->updateParamet({paramet.boxSize, paramet.boxSize});
     }
     if (paramet.offset != oldParamet.offset) {
         memcpy(constBufCpu.data(), &paramet.offset, conBufSize);

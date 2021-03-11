@@ -38,7 +38,9 @@ bool CuRGBA2YUVLayer::onFrame() {
         paramet.type == VideoType::yuy2P) {
         int32_t yuvType = getYuvIndex(paramet.type);
         if (paramet.type == VideoType::yuy2P && paramet.special != 0) {
+#ifdef AOCE_INSTALL_TALKTO
             rgba2yuv_gpu(*inTexs[0], *outTexs[0], stream);
+#endif
         } else {
             rgb2yuv_gpu(*inTexs[0], *outTexs[0], yuvType, stream);
         }

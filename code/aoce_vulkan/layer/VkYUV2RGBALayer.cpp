@@ -27,9 +27,11 @@ void VkYUV2RGBALayer::onUpdateParamet() {
 
 void VkYUV2RGBALayer::onInitLayer() {
     int32_t yuvType = getYuvIndex(paramet.type);
+#ifdef AOCE_INSTALL_TALKTO
     if (paramet.type == VideoType::yuy2P && paramet.special != 0) {
         yuvType = 0;
     }
+#endif
     assert(yuvType >= 0);
     // nv12/yuv420P/yuy2P
     std::string path = "glsl/yuv2rgbaV1.comp.spv";

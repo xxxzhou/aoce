@@ -15,67 +15,70 @@ layout (binding = 3) buffer inBuffer{
 
 const int PATCH_PER_BLOCK = 4;
 const int HALO_SIZE = 1; 
-// 扩充高
-shared vec4 column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];//vec4[local_size_y][local_size_x]
+
+// 共享块，扩充前后二边HALO_SIZE(分为上HALO_SIZE，中间自身*PATCH_PER_BLOCK，下HALO_SIZE)
+shared uint column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];//vec4[local_size_y][local_size_x]
+// packUnorm4x8/unpackUnorm4x8 
 
 // 假定1920*1080,gl_WorkGroupSize(16,16),gl_NumWorkGroups(120,68/4),每一个线程高度要管理4个
 // 核心的最大高度由HALO_SIZE*gl_WorkGroupSize.y决定
-void main(){
-    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+void main(){    
     ivec2 size = imageSize(outTex);    
     uint x = gl_GlobalInvocationID.x;
     if( x>= size.x){
         return;
     }
-    // 正常范围的起点
+    // 纹理范围的全局起点
     uint yStart = gl_WorkGroupID.y * (gl_WorkGroupSize.y*PATCH_PER_BLOCK) + gl_LocalInvocationID.y;
-    // 填充TOP扩展的范围,第一列的线程组
-    if(gl_WorkGroupID.y == 0){// TOP不在纹理中
+    // 填充每个块的上HALO_SIZE，注意每列最前面的那个块取不到纹理数据
+    if(gl_WorkGroupID.y > 0){// 填充非第一列的上边
+        for(int j=0;j<HALO_SIZE;++j){
+            vec4 rgba = imageLoad(inTex,ivec2(x,yStart-(HALO_SIZE-j)*gl_WorkGroupSize.y));
+            column_shared[gl_LocalInvocationID.y+ j*gl_WorkGroupSize.y][gl_LocalInvocationID.x] = packUnorm4x8(rgba);
+        }        
+    }else{ // 每列最上边 
         for(int j=0;j<HALO_SIZE;++j){  
             uint maxIdy = max(0,yStart-(HALO_SIZE-j)*gl_WorkGroupSize.y);
             vec4 rgba = imageLoad(inTex,ivec2(x,maxIdy));             
-            column_shared[gl_LocalInvocationID.y+ j*gl_WorkGroupSize.y][gl_LocalInvocationID.x] = rgba;
-        }
-    }else{ //左边在纹理中(每个线程组填充HALO_SIZE*gl_WorkGroupSize个数据)
-        for(int j=0;j<HALO_SIZE;++j){
-            vec4 rgba = imageLoad(inTex,ivec2(x,yStart-(HALO_SIZE-j)*gl_WorkGroupSize.y));
-            column_shared[gl_LocalInvocationID.y+ j*gl_WorkGroupSize.y][gl_LocalInvocationID.x] = rgba;
+            column_shared[gl_LocalInvocationID.y+ j*gl_WorkGroupSize.y][gl_LocalInvocationID.x] = packUnorm4x8(rgba);
         }
     }
-    // 填充正常加右边扩展的数据
-    if(gl_WorkGroupID.y + 2 < gl_NumWorkGroups.x){
+    // 填充正常加下边扩展的块,注意每列最后面的那个块取不到下HALO_SIZE块纹理数据
+    if(gl_WorkGroupID.y + 2 < gl_NumWorkGroups.y){
         // 主要导入的数据,一个线程取行上四个位置数据
         for(int j=0;j<PATCH_PER_BLOCK;++j){
             vec4 rgba = imageLoad(inTex,ivec2(x,yStart+j*gl_WorkGroupSize.y));
             uint y = gl_LocalInvocationID.y + (HALO_SIZE+j)*gl_WorkGroupSize.y;
-            column_shared[y][gl_LocalInvocationID.x] = rgba;
+            column_shared[y][gl_LocalInvocationID.x] = packUnorm4x8(rgba);
         }
-        // 右边的扩展中,还在纹理中
+        // 下边的扩展中,还在纹理中
         for(int j=0;j<HALO_SIZE;++j){
             vec4 rgba = imageLoad(inTex,ivec2(x,yStart+(PATCH_PER_BLOCK+j)*gl_WorkGroupSize.y));
             uint y = gl_LocalInvocationID.y + (PATCH_PER_BLOCK+HALO_SIZE+j)*gl_WorkGroupSize.y;
-            column_shared[y][gl_LocalInvocationID.x] = rgba;
+            column_shared[y][gl_LocalInvocationID.x] = packUnorm4x8(rgba);
         }
-    }else{
+    }else{// 每列最后边的一个块
         for (int j = 0; j < PATCH_PER_BLOCK; ++j){
             uint minIdy = min(size.y-1,yStart+j*gl_WorkGroupSize.y);
             uint y = gl_LocalInvocationID.y + (HALO_SIZE+j)*gl_WorkGroupSize.y;
-            column_shared[y][gl_LocalInvocationID.x] = imageLoad(inTex,ivec2(x,minIdy));
+            column_shared[y][gl_LocalInvocationID.x] = packUnorm4x8(imageLoad(inTex,ivec2(x,minIdy)));
         }
         for(int j=0;j<HALO_SIZE;++j){
             uint minIdy = min(size.y-1,yStart+(PATCH_PER_BLOCK+j)*gl_WorkGroupSize.y);
             uint y = gl_LocalInvocationID.y + (PATCH_PER_BLOCK+HALO_SIZE+j)*gl_WorkGroupSize.y;
-            column_shared[y][gl_LocalInvocationID.x] = imageLoad(inTex,ivec2(x,minIdy));
+            column_shared[y][gl_LocalInvocationID.x] = packUnorm4x8(imageLoad(inTex,ivec2(x,minIdy)));
         }
     }
-    groupMemoryBarrier();
+    barrier();
+    // groupMemoryBarrier();    
+    // memoryBarrier();
     for (int j = 0; j < PATCH_PER_BLOCK; ++j){
         uint y = yStart + j*gl_WorkGroupSize.y;
         if(y<size.y){
             vec4 sum = vec4(0);
             for(int k=0;k<ubo.yksize;++k){
                 uint yy = gl_LocalInvocationID.y + (HALO_SIZE+j)*gl_WorkGroupSize.y - ubo.anchor + k;
-                sum = sum + column_shared[yy][gl_LocalInvocationID.x] * kernel[k];
+                sum = sum + unpackUnorm4x8(column_shared[yy][gl_LocalInvocationID.x]) * kernel[k];
             }
             imageStore(outTex, ivec2(x,y),sum); 
         }

@@ -10,7 +10,7 @@ namespace vulkan {
 namespace layer {
 
 // 边框默认使用REPLICATE模式
-class VkLinearFilterLayer : public VkLayer, public ITLayer<BoxBlueParamet> {
+class VkLinearFilterLayer : public VkLayer {
     // AOCE_LAYER_QUERYINTERFACE(VkLinearFilterLayer)
    protected:
     std::unique_ptr<VulkanBuffer> kernelBuffer;
@@ -21,15 +21,14 @@ class VkLinearFilterLayer : public VkLayer, public ITLayer<BoxBlueParamet> {
     virtual ~VkLinearFilterLayer();
 
    protected:
-    virtual void onUpdateParamet() override;
-
     virtual void onInitGraph() override;
     // virtual void onInitLayer() override;
     // virtual void onInitVkBuffer() override;
     virtual void onInitPipe() override;
 };
 
-class VkBoxBlurLayer : public VkLinearFilterLayer {
+class VkBoxBlurLayer : public VkLinearFilterLayer,
+                       public ITLayer<KernelSizeParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkBoxBlurLayer)
 
    public:
@@ -37,10 +36,12 @@ class VkBoxBlurLayer : public VkLinearFilterLayer {
     virtual ~VkBoxBlurLayer();
 
    protected:
+    virtual void onUpdateParamet() override;
     virtual void onInitVkBuffer() override;
 };
 
-class VkGaussianBlurLayer : public VkLinearFilterLayer {
+class VkGaussianBlurLayer : public VkLinearFilterLayer,
+                            public ITLayer<GaussianBlurParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkGaussianBlurLayer)
 
    public:
@@ -48,6 +49,7 @@ class VkGaussianBlurLayer : public VkLinearFilterLayer {
     virtual ~VkGaussianBlurLayer();
 
    protected:
+    virtual void onUpdateParamet() override;
     virtual void onInitVkBuffer() override;
 };
 

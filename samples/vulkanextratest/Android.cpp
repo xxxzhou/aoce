@@ -13,7 +13,8 @@
 static VkExtraBaseView* view = nullptr;
 
 // box模糊
-static ITLayer<BoxBlueParamet>* boxFilterLayer = nullptr;
+static ITLayer<KernelSizeParamet>* boxFilterLayer = nullptr;
+static ITLayer<GaussianBlurParamet>* gaussianLayer = nullptr;
 static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
 static ChromKeyParamet keyParamet = {};
 
@@ -29,6 +30,9 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     view = new VkExtraBaseView();
     boxFilterLayer = createBoxFilterLayer();
     boxFilterLayer->updateParamet({4, 4});
+
+    gaussianLayer = createGaussianBlurLayer();
+    gaussianLayer->updateParamet({10,5.0f});
 
     chromKeyLayer = createChromKeyLayer();    
     keyParamet.despillCuttofMax = 0.42f;
