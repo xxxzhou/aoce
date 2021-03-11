@@ -1,12 +1,12 @@
 # Vulkan移植GpuImage(一)高斯模糊与自适应阈值
 
-## 自适应阈值效果图
+## 自适应阈值效果图 [demo](https://github.com/xxxzhou/aoce/tree/master/samples/vulkanextratest)
 
 ![avatar](../images/adaptiveThreshold1.PNG "REPLICATE image")
 
 这几天抽空看了下GpuImage的filter,移植了高斯模糊与自适应阈值的vulkan compute shader实现,一个是基本的图像处理,一个是组合基础图像处理聚合,算是比较有代表性的二种.
 
-## 高斯模糊实现与优化
+## [高斯模糊实现与优化](https://github.com/xxxzhou/aoce/tree/master/code/aoce_vulkan_extra)
 
 大部分模糊效果主要是卷积核的实现,相应值根据公式得到.
 
@@ -43,7 +43,7 @@ layout (binding = 0, rgba8) uniform readonly image2D inTex;
 layout (binding = 1, rgba8) uniform image2D outTex;
 layout (binding = 2) uniform UBO 
 {
-	int xksize;	
+    int xksize;	
     int yksize;	
     int xanchor;
     int yanchor;
@@ -66,18 +66,8 @@ void main(){
             int x = uv.x-ubo.xanchor+j;
             int y = uv.y-ubo.yanchor+i;
             // REPLICATE border
-            if(x<0) {
-                x = 0;
-            }
-            if(x>=size.x){
-                x = size.x-1;
-            }
-            if(y<0){
-                y = 0;
-            }
-            if(y>=size.y){
-                y = size.y-1;
-            }
+            x = max(0,min(x,size.x-1));
+            y = max(0,min(y,size.y-1));
             vec4 rgba = imageLoad(inTex,ivec2(x,y)) * kernel[kInd++];
             sum = sum + rgba;
         }
@@ -213,7 +203,7 @@ void main(){
 
 把更新后的实现再次放入Radmi K10 Pro,同样1080P下21核长下,可以看到不是放幻灯片了,差不多有10桢了吧,没有专业工具测试,后续有时间完善测试比对.
 
-## AdaptiveThreshold 自适应阈值化
+## AdaptiveThreshold [自适应阈值化](https://github.com/xxxzhou/aoce/blob/master/code/aoce_vulkan_extra/layer/VkAdaptiveThresholdLayer.cpp)
 
 可以先看下GPUImage3里的实现.
 
@@ -263,4 +253,4 @@ void VkAdaptiveThresholdLayer::onInitNode() {
 
 相应的luminance/adaptiveThreshold以及专门显示只有一个通道层的图像处理大家有兴趣自己翻看,比较简单就不贴了.
 
-有兴趣的可以在samples/vulkanextratest里,PC平台修改Win32.cpp,Android平台修改Android.cpp查看不同效果.后续有时间完善android下的UI使之查看不同层效果.
+有兴趣的可以在[samples/vulkanextratest](https://github.com/xxxzhou/aoce/blob/master/samples/vulkanextratest)里,PC平台修改Win32.cpp,Android平台修改Android.cpp查看不同效果.后续有时间完善android下的UI使之查看不同层效果.

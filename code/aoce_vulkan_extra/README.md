@@ -55,7 +55,7 @@ opencv cudafilters的高斯卷积,就采用先计算水平卷积,然后计算垂
 
 主要使用opencv里opencv_cudafilters模块代码。
 
-| row kenrel || |
+|  |row kenrel| |
 | ------ | ------ | ------ |
 | WorkGroupSize*HALO_SIZE | WorkGroupSize*PATCH_PER_BLOCK | WorkGroupSize*HALO_SIZE |
 
@@ -74,9 +74,9 @@ opencv cudafilters的高斯卷积,就采用先计算水平卷积,然后计算垂
 
 在1080P下取核半径为10的高斯模糊查看没有优化/优化的效果。
 
-![avatar](../../images/gaussianA.PNG "gaussian image")
+![avatar](../../images/gaussianA.png "gaussian image")
 
-![avatar](../../images/gaussianB.PNG "gaussian image")
+![avatar](../../images/gaussianB.png "gaussian image")
 
 其中没优化的需要12.03ms,而优化后的是0.60+0.61=1.21ms,差不多10倍左右的差距.
 
@@ -86,7 +86,7 @@ opencv cudafilters的高斯卷积,就采用先计算水平卷积,然后计算垂
 
 效果图:
 
-![avatar](../../images/adaptiveThreshold1.PNG "REPLICATE image")
+![avatar](../../images/adaptiveThreshold1.png "REPLICATE image")
 
 ### HarrisCornerDetection
 

@@ -28,18 +28,8 @@ void main(){
             int x = uv.x-ubo.xanchor+j;
             int y = uv.y-ubo.yanchor+i;
             // REPLICATE border
-            if(x<0) {
-                x = 0;
-            }
-            if(x>=size.x){
-                x = size.x-1;
-            }
-            if(y<0){
-                y = 0;
-            }
-            if(y>=size.y){
-                y = size.y-1;
-            }
+            x = max(0,min(x,size.x-1));
+            y = max(0,min(y,size.y-1));
             vec4 rgba = imageLoad(inTex,ivec2(x,y)) * kernel[kInd++];
             sum = sum + rgba;
         }
