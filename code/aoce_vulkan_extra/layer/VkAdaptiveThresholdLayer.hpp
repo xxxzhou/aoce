@@ -3,6 +3,7 @@
 #include "../VkExtraExport.hpp"
 #include "VkLinearFilterLayer.hpp"
 #include "VkLuminanceLayer.hpp"
+#include "VkSeparableLinearLayer.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -15,7 +16,7 @@ class VkAdaptiveThresholdLayer : public VkLayer,
    private:
     /* data */
     std::unique_ptr<VkLuminanceLayer> luminance;
-    std::unique_ptr<VkBoxBlurLayer> boxBlur;
+    std::unique_ptr<VkBoxBlurSLayer> boxBlur;
 
    public:
     VkAdaptiveThresholdLayer(/* args */);

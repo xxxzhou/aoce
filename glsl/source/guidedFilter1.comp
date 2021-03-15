@@ -1,0 +1,20 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+layout (binding = 1, rgba32f) uniform image2D outTex1;
+layout (binding = 2, rgba32f) uniform image2D outTex2;
+layout (binding = 3, rgba32f) uniform image2D outTex3;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }
+    vec4 c = imageLoad(inTex,uv);
+    //得到Guided filter所需要的矩阵
+    imageStore(outTex1, uv, vec4(c.rgb*c.a,1.0f)); 
+    imageStore(outTex2, uv, vec4(vec3(c.r*c.r, c.g*c.g, c.b*c.b),1.0f)); 
+    imageStore(outTex3, uv, vec4(vec3(c.r*c.g, c.r*c.b, c.g*c.b),1.0f)); 
+}

@@ -1,0 +1,42 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;
+
+layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+layout (binding = 1, rgba32f) uniform image2D inTex1;
+layout (binding = 2, rgba32f) uniform image2D inTex2;
+layout (binding = 3, rgba32f) uniform image2D inTex3;
+layout (binding = 4, rgba32f) uniform image2D outTex;
+layout (binding = 5) uniform UBO 
+{
+	float eps;
+} ubo;
+
+// 导向滤波求值 Guided filter 论文地址http://kaiminghe.com/publications/pami12guidedfilter.pdf
+// https://blog.csdn.net/baimafujinji/article/details/74750283
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }
+    vec4 color = imageLoad(inTex,uv);
+	vec3 mean_I = color.xyz;
+	float mean_p = color.w;
+	vec3 mean_Ip = imageLoad(inTex1,uv).xyz;
+	vec3 var_I_r = imageLoad(inTex2,uv).xyz; - mean_I.x*mean_I;
+	vec3 var_I_gbxfv = imageLoad(inTex3,uv).xyz;
+	//计算方差
+	float gg = var_I_gbxfv.x - mean_I.y*mean_I.y;
+	float gb = var_I_gbxfv.y - mean_I.y*mean_I.z;
+	float bb = var_I_gbxfv.z - mean_I.z*mean_I.z;
+	//cov为协方差
+	vec3 cov_Ip = mean_Ip - mean_I * mean_p;
+	vec3 col0 = var_I_r + vec3(ubo.eps, 0.f, 0.f);
+	vec3 col1 = vec3(var_I_r.y, gg + ubo.eps, gb);
+	vec3 col2 = vec3(var_I_r.z, gb, bb + ubo.eps);
+    vec3 a = cov_Ip * inverse(mat3(col0,col1,col2));
+	float b = mean_p - dot(a, mean_I);
+	//把当前ay+by+cz+w的解存入
+	 imageStore(outTex, uv,vec4(a, b));
+}

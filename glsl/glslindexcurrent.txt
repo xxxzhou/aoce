@@ -1,0 +1,2 @@
+guidedFilter1.comp
+guidedFilter2.comp

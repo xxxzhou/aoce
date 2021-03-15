@@ -7,14 +7,15 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkSeparableLayer::VkSeparableLayer(bool bOneChannel) {
-    this->bOneChannel = bOneChannel;
+VkSeparableLayer::VkSeparableLayer(ImageType imageType) {
+    this->imageType = imageType;
     setUBOSize(8);
-#if WIN32
     glslPath = "glsl/filterRow.comp.spv";
-#elif __ANDROID__
-    glslPath = "glsl/filterRow.comp.spv";
-#endif
+    if (imageType == ImageType::r8) {
+        glslPath = "glsl/filterRowC1.comp.spv";
+    } else if (imageType == ImageType::rgbaf32) {
+        glslPath = "glsl/filterRowF4.comp.spv";
+    }
 }
 
 VkSeparableLayer::~VkSeparableLayer() {}
@@ -31,6 +32,9 @@ void VkSeparableLayer::updateBuffer(std::vector<float> data) {
 }
 
 void VkSeparableLayer::onInitGraph() {
+    inFormats[0].imageType = imageType;
+    outFormats[0].imageType = imageType;
+
     shader->loadShaderModule(context->device, glslPath);
 
     std::vector<UBOLayoutItem> items = {
@@ -61,14 +65,15 @@ void VkSeparableLayer::onInitPipe() {
         nullptr, &computerPipeline));
 }
 
-VkSeparableLinearLayer::VkSeparableLinearLayer(bool bOneChannel)
-    : VkSeparableLayer(bOneChannel) {
-    rowLayer = std::make_unique<VkSeparableLayer>(bOneChannel);
-#if WIN32
+VkSeparableLinearLayer::VkSeparableLinearLayer(ImageType imageType)
+    : VkSeparableLayer(imageType) {
+    rowLayer = std::make_unique<VkSeparableLayer>(imageType);
     glslPath = "glsl/filterColumn.comp.spv";
-#elif __ANDROID__
-    glslPath = "glsl/filterColumn.comp.spv";
-#endif
+    if (imageType == ImageType::r8) {
+        glslPath = "glsl/filterColumnC1.comp.spv";
+    } else if (imageType == ImageType::rgbaf32) {
+        glslPath = "glsl/filterColumnF4.comp.spv";
+    }
 }
 
 VkSeparableLinearLayer::~VkSeparableLinearLayer() {}
@@ -89,8 +94,8 @@ void VkSeparableLinearLayer::onInitLayer() {
     sizeY = divUp(inFormats[0].height, groupY * PATCH_PER_BLOCK);
 }
 
-VkBoxBlurSLayer::VkBoxBlurSLayer(bool bOneChannel)
-    : VkSeparableLinearLayer(bOneChannel) {}
+VkBoxBlurSLayer::VkBoxBlurSLayer(ImageType imageType)
+    : VkSeparableLinearLayer(imageType) {}
 
 VkBoxBlurSLayer::~VkBoxBlurSLayer() {}
 
@@ -113,14 +118,14 @@ void VkBoxBlurSLayer::onInitLayer() {
     int ksizex = paramet.kernelSizeX;
     std::vector<float> karrayX;
     std::vector<float> karrayY;
-    getKernel(paramet.kernelSizeX,karrayX);
-    getKernel(paramet.kernelSizeY,karrayY);
+    getKernel(paramet.kernelSizeX, karrayX);
+    getKernel(paramet.kernelSizeY, karrayY);
     rowLayer->updateBuffer(karrayX);
     updateBuffer(karrayY);
 }
 
-VkGaussianBlurSLayer::VkGaussianBlurSLayer(bool bOneChannel)
-    : VkSeparableLinearLayer(bOneChannel) {}
+VkGaussianBlurSLayer::VkGaussianBlurSLayer(ImageType imageType)
+    : VkSeparableLinearLayer(imageType) {}
 
 VkGaussianBlurSLayer::~VkGaussianBlurSLayer() {}
 

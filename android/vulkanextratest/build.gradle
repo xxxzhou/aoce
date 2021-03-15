@@ -48,15 +48,7 @@ android {
 
 task copyTask {
     copy {
-        from '../../code/aoce_vulkan/glsl'
-        into 'assets/glsl'
-        include('**/*.spv', '**/*.ppm')
-    }
-}
-
-task copyTaskExtra {
-    copy {
-        from '../../code/aoce_vulkan_extra/glsl'
+        from '../../glsl/target'
         into 'assets/glsl'
         include('**/*.spv', '**/*.ppm')
     }

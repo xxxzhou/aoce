@@ -61,7 +61,9 @@ AAoceDisplayActor::AAoceDisplayActor() {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// gpuType = aoce::GpuType::cuda;
+#if WIN32
+	gpuType = aoce::GpuType::cuda;
+#endif
 }
 
 void AAoceDisplayActor::SetMatTexture(UTexture2D* texture) {
@@ -82,10 +84,10 @@ void AAoceDisplayActor::BeginPlay() {
 	auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
 	inputLayer = layerFactory->crateInput();
 	outputLayer = layerFactory->createOutput();
-	texLayer = layerFactory->createTexOperate();
-	TexOperateParamet to = {};
-	to.operate.gamma = 2.2f;
-	texLayer->updateParamet(to);
+	// texLayer = layerFactory->createTexOperate();
+	// TexOperateParamet to = {};
+	// to.operate.gamma = 2.2f;
+	// texLayer->updateParamet(to);
 	// 输出GPU数据
 #if WIN32
 	outputLayer->updateParamet({ false, true });
@@ -186,7 +188,7 @@ void initTexture(UTexture2D** ptexture, int width, int height, EPixelFormat form
 		*ptexture = UTexture2D::CreateTransient(width, height, format);
 		// (*ptexture)->MipGenSettings = TMGS_NoMipmaps;
 		// (*ptexture)->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;;
-		(*ptexture)->SRGB = true;		
+		(*ptexture)->SRGB = true;
 		(*ptexture)->UpdateResource();
 		(*ptexture)->AddToRoot();
 	}

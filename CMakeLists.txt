@@ -89,6 +89,7 @@ install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h DESTINATION incl
 
 add_subdirectory(code)
 add_subdirectory(samples)
+add_subdirectory(glsl)
 
 find_package(SWIG 4.0)
 if(SWIG_FOUND AND WIN32)

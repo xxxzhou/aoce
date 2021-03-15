@@ -76,7 +76,7 @@ void main(){
 }
 ```
 
-这样一个简单的高斯模糊就实现了,结果就是我在用Radmi K10 Pro在摄像头1080P下使用21的核长是不到一桢的处理速度.
+这样一个简单的高斯模糊就实现了,结果就是我在用Redmi 10X Pro在摄像头1080P下使用21的核长是不到一桢的处理速度.
 
 高斯模糊的优化都有现成的讲解与实现,其一就是[图像处理中的卷积核分离](https://zhuanlan.zhihu.com/p/81683945),一个m行乘以n列的高斯卷积可以分解成一个1行乘以n列的行卷积,计算复杂度从原来的O(k^2)降为O(k),其二就是用shared局部显存减少访问纹理显存的操作,注意这块容量非常有限,如果不合理分配,能并行的组就少了.考虑到Android平台,使用packUnorm4x8/unpackUnorm4x8优化局部显存占用.
 
@@ -189,7 +189,7 @@ void main(){
 }
 ```
 
-一般compute shader常用图像处理操作来说,我们一个线程处理一个像素,在这里PATCH_PER_BLOCK=4,表示一个线程操作4个像素,所以线程组的分配也会改变,针对图像块就是WorkGroupSize*PATCH_PER_BLOCK这块正常取对应数据,其中HALO_SIZE块在row中是左右二边,如果是最左边和最右边需要考虑取不到的情况,我采用的逻辑对应opencv的边框填充REPLICATE模式,余下的块的HALO_SIZE块都不是对应当前线程组对应的图像块.column的上下块同理,可以看到最大核的大小限定在HALO_SIZEx2+WorkGroupSize,如果填有超大核的要求,可以变大HALO_SIZE.
+一般compute shader常用图像处理操作来说,我们一个线程处理一个像素,在这里PATCH_PER_BLOCK=4,表示一个线程操作4个像素,所以线程组的分配也会改变,针对图像块就是WorkGroupSize*PATCH_PER_BLOCK这块正常取对应数据,其中HALO_SIZE块在row中是左右二边,如果是最左边和最右边需要考虑取不到的情况,我采用的逻辑对应opencv的边框填充REPLICATE模式,余下的块的HALO_SIZE块都不是对应当前线程组对应的图像块.column的上下块同理,可以看到最大核的大小限定在HALO_SIZEx2+WorkGroupSize,如果真有超大核的要求,可以变大HALO_SIZE.
 
 不过优化完后,我发现在PC平台应用会有噪点,特别是核小的时候.我分别针对filterRow/filterColumn做测试应用,发现只有filterColumn有问题,而代码我反复检测也没发现那有逻辑错误,更新逻辑查看filterColumn各种测试中,我发现在groupMemoryBarrier后,隔gl_WorkGroupSize.y的数据能拿到,但是行+1拿的是有噪点的,断定问题出在同步局部共享显存上,前面核大不会出现这问题也应该是核大导致局部共享显存变大导致并行线程组数少,groupMemoryBarrier改为memoryBarrier还是不行,后改为barrier可行,按逻辑上来说,应该是用groupMemoryBarrier就行,不知是不是和硬件有关,不为奇怪的是为啥filterRow的使用groupMemoryBarrier没问题了,二者唯一区别一个是扩展宽度,一个扩展长度,有思路的朋友欢迎解答.
 
@@ -201,7 +201,7 @@ void main(){
 
 其中没优化的需要12.03ms,而优化后的是0.60+0.61=1.21ms,差不多10倍左右的差距,符合前面k/2的优化值,之所以快到理论值,应该要加上优化方向二使用局部共享显存减少访问纹理显存这个.
 
-把更新后的实现再次放入Radmi K10 Pro,同样1080P下21核长下,可以看到不是放幻灯片了,差不多有10桢了吧,没有专业工具测试,后续有时间完善测试比对.
+把更新后的实现再次放入Redmi 10X Pro,同样1080P下21核长下,可以看到不是放幻灯片了,差不多有10桢了吧,没有专业工具测试,后续有时间完善测试比对.
 
 ## AdaptiveThreshold [自适应阈值化](https://github.com/xxxzhou/aoce/blob/master/code/aoce_vulkan_extra/layer/VkAdaptiveThresholdLayer.cpp)
 

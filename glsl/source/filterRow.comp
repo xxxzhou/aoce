@@ -1,8 +1,16 @@
 #version 450
 
 layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+#if CHANNEL_RGBA
 layout (binding = 0, rgba8) uniform readonly image2D inTex;
 layout (binding = 1, rgba8) uniform image2D outTex;
+#elif CHANNEL_R8
+layout (binding = 0, r8) uniform readonly image2D inTex;
+layout (binding = 1, r8) uniform image2D outTex;
+#elif CHANNEL_RGBAF32
+layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+layout (binding = 1, rgba32f) uniform image2D outTex;
+#endif
 layout (binding = 2) uniform UBO 
 {
 	int xksize;	
@@ -16,7 +24,13 @@ layout (binding = 3) buffer inBuffer{
 const int PATCH_PER_BLOCK = 4;
 const int HALO_SIZE = 1;
 // 共享块，扩充左边右边HALO_SIZE(分为左边HALO_SIZE，中间自身*PATCH_PER_BLOCK，右边HALO_SIZE)
+#if CHANNEL_RGBAF32
+shared vec4 row_shared[16][16*(PATCH_PER_BLOCK+HALO_SIZE*2)];
+#define packUnorm4x8
+#define unpackUnorm4x8
+#else
 shared uint row_shared[16][16*(PATCH_PER_BLOCK+HALO_SIZE*2)];//vec4[local_size_y][local_size_x]
+#endif
 
 // 假定1920*1080,gl_WorkGroupSize(16,16),gl_NumWorkGroups(120/4,68),每一个线程宽度要管理4个
 // 核心的最大宽度由HALO_SIZE*gl_WorkGroupSize.x决定

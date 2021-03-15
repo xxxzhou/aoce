@@ -1,8 +1,13 @@
 #version 450
 
 layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+#if CHANNEL_RGBA
 layout (binding = 0, rgba8) uniform readonly image2D inTex;
 layout (binding = 1, rgba8) uniform image2D outTex;
+#elif CHANNEL_R8
+layout (binding = 0, r8) uniform readonly image2D inTex;
+layout (binding = 1, r8) uniform image2D outTex;
+#endif
 layout (binding = 2) uniform UBO 
 {
 	int xksize;	

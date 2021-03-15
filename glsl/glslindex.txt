@@ -1,0 +1,23 @@
+filter2D.comp filter2D.comp CHANNEL_RGBA=1
+filter2D.comp filter2DC1.comp CHANNEL_R8=1
+adaptiveThreshold.comp
+alphaShow.comp
+blend.comp
+chromaKey.comp
+filterColumn.comp filterColumn.comp CHANNEL_RGBA=1
+filterColumn.comp filterColumnC1.comp CHANNEL_R8=1
+filterColumn.comp filterColumnF4.comp CHANNEL_RGBAF32=1
+filterRow.comp filterRow.comp CHANNEL_RGBA=1
+filterRow.comp filterRowC1.comp CHANNEL_R8=1
+filterRow.comp filterRowF4.comp CHANNEL_RGBAF32=1
+inputv1.comp
+luminance.comp
+operate.comp
+resize.comp
+rgba2yuvV1.comp
+rgba2yuvV2.comp
+transpose.comp
+yuv2rgbaV1.comp
+yuv2rgbaV2.comp
+guidedFilter1.comp
+guidedFilter2.comp

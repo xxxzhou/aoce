@@ -12,12 +12,12 @@ namespace layer {
 // 边框默认使用REPLICATE模式
 class VkSeparableLayer : public VkLayer {
    protected:
-    /* data */
-    bool bOneChannel = false;
+    /* data */    
+    ImageType imageType = ImageType::rgba8;
     std::unique_ptr<VulkanBuffer> kernelBuffer;
 
    public:
-    VkSeparableLayer(bool bOneChannel = false);
+    VkSeparableLayer(ImageType imageType = ImageType::rgba8);
     ~VkSeparableLayer();
 
     void updateBuffer(std::vector<float> data);
@@ -33,7 +33,7 @@ class VkSeparableLinearLayer : public VkSeparableLayer {
     std::unique_ptr<VkSeparableLayer> rowLayer;
 
    public:
-    VkSeparableLinearLayer(bool bOneChannel = false);
+    VkSeparableLinearLayer(ImageType imageType = ImageType::rgba8);
     ~VkSeparableLinearLayer();
 
    protected:
@@ -47,7 +47,7 @@ class VkBoxBlurSLayer : public VkSeparableLinearLayer,
     AOCE_LAYER_QUERYINTERFACE(VkBoxBlurSLayer)
 
    public:
-    VkBoxBlurSLayer(bool bOneChannel = false);
+    VkBoxBlurSLayer(ImageType imageType = ImageType::rgba8);
     virtual ~VkBoxBlurSLayer();
 
    public:
@@ -63,7 +63,7 @@ class VkGaussianBlurSLayer : public VkSeparableLinearLayer,
     AOCE_LAYER_QUERYINTERFACE(VkGaussianBlurSLayer)
 
    public:
-    VkGaussianBlurSLayer(bool bOneChannel = false);
+    VkGaussianBlurSLayer(ImageType imageType = ImageType::rgba8);
     virtual ~VkGaussianBlurSLayer();
 
    protected:

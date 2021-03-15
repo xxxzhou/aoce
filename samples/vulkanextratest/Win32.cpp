@@ -41,9 +41,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     alphaShowLayer = createAlphaShowLayer();
 
     // 查看自适应阈值化效果
-    // view->initGraph(adaptiveLayer, hInstance, alphaShowLayer);
+    view->initGraph(adaptiveLayer, hInstance, alphaShowLayer);
     // 查看高斯模糊效果
-    view->initGraph(gaussianLayer, hInstance);
+    // view->initGraph(gaussianLayer, hInstance);
     view->openDevice();
 
     // std::thread trd([&]() {

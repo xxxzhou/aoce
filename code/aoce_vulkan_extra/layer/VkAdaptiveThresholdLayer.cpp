@@ -10,7 +10,7 @@ namespace layer {
 VkAdaptiveThresholdLayer::VkAdaptiveThresholdLayer(/* args */) {
     setUBOSize(4);
     luminance = std::make_unique<VkLuminanceLayer>();
-    boxBlur = std::make_unique<VkBoxBlurLayer>(true);
+    boxBlur = std::make_unique<VkBoxBlurSLayer>(ImageType::r8);
     // kernel size会导致Graph重置,在onInitGraph之前更新下,避免可能的二次重置
     boxBlur->updateParamet({paramet.boxSize, paramet.boxSize});
     inCount = 2;
