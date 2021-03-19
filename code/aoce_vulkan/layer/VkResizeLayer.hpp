@@ -1,17 +1,21 @@
 #pragma once
 #include <Layer/BaseLayer.hpp>
+
 #include "VkLayer.hpp"
 
 namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkResizeLayer : public VkLayer, public ReSizeLayer {
-    AOCE_LAYER_QUERYINTERFACE(VkResizeLayer)   
+class AOCE_VULKAN_EXPORT VkResizeLayer : public VkLayer, public ReSizeLayer {
+    AOCE_LAYER_QUERYINTERFACE(VkResizeLayer)
    private:
     /* data */
+    ImageType imageType = ImageType::rgba8;
+
    public:
-    VkResizeLayer(/* args */);
+    VkResizeLayer();
+    VkResizeLayer(ImageType imageType);
     ~VkResizeLayer();
 
    protected:

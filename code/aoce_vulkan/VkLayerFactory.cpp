@@ -1,13 +1,13 @@
 #include "VkLayerFactory.hpp"
 
-#include "layer/VkInputLayer.hpp"
-#include "layer/VkOutputLayer.hpp"
-#include "layer/VkYUV2RGBALayer.hpp"
-#include "layer/VkRGBA2YUVLayer.hpp"
-#include "layer/VkOperateLayer.hpp"
-#include "layer/VkTransposeLayer.hpp"
-#include "layer/VkResizeLayer.hpp"
 #include "layer/VkBlendLayer.hpp"
+#include "layer/VkInputLayer.hpp"
+#include "layer/VkOperateLayer.hpp"
+#include "layer/VkOutputLayer.hpp"
+#include "layer/VkRGBA2YUVLayer.hpp"
+#include "layer/VkResizeLayer.hpp"
+#include "layer/VkTransposeLayer.hpp"
+#include "layer/VkYUV2RGBALayer.hpp"
 
 namespace aoce {
 namespace vulkan {
@@ -40,13 +40,9 @@ TransposeLayer* VkLayerFactory::createTranspose() {
     return new VkTransposeLayer();
 }
 
-ReSizeLayer* VkLayerFactory::createSize() {
-    return new VkResizeLayer();
-}
+ReSizeLayer* VkLayerFactory::createSize() { return new VkResizeLayer(); }
 
-BlendLayer* VkLayerFactory::createBlend() {
-    return new VkBlendLayer();
-}
+BlendLayer* VkLayerFactory::createBlend() { return new VkBlendLayer(); }
 
 }  // namespace layer
 }  // namespace vulkan

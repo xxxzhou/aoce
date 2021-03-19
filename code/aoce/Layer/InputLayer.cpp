@@ -11,7 +11,7 @@ void InputLayer::setImage(VideoFormat videoFormat, int32_t index) {
     this->getLayer()->inFormats[0] = videoFormat2ImageFormat(videoFormat);
     this->getLayer()->outFormats[0] = this->getLayer()->inFormats[0];
     // 重新组织图
-    this->getLayer()->getGraph()->reset();
+    this->getLayer()->resetGraph();
 }
 
 void InputLayer::inputCpuData(uint8_t* data, int32_t index) {
@@ -51,7 +51,7 @@ void InputLayer::inputCpuData(uint8_t* data, const ImageFormat& imageFormat) {
         oldFormat.imageType != imageFormat.imageType) {
         layer->inFormats[0] = imageFormat;
         layer->outFormats[0] = imageFormat;
-        layer->getGraph()->reset();
+        layer->resetGraph();
     }
     frameData = data;
     onDataReady();

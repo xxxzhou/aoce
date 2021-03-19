@@ -2,6 +2,8 @@
 
 #include "VkPipeGraph.hpp"
 
+#define IS_SAMPLER 0
+
 namespace aoce {
 namespace vulkan {
 namespace layer {
@@ -11,21 +13,34 @@ struct VkResizeParamet {
     float fx = 1.f;
     float fy = 1.f;
 };
+VkResizeLayer::VkResizeLayer() : VkResizeLayer(ImageType::rgba8) {}
 
-VkResizeLayer::VkResizeLayer(/* args */) {
+VkResizeLayer::VkResizeLayer(ImageType imageType) {
+    this->imageType = imageType;
     setUBOSize(sizeof(VkResizeParamet));
+    paramet.bLinear = true;
+    paramet.newWidth = 1920;
+    paramet.newHeight = 1080;
 }
 
 VkResizeLayer::~VkResizeLayer() {}
 
 void VkResizeLayer::onUpdateParamet() {
-    if (pipeGraph) {
-        pipeGraph->reset();
+    if (paramet == oldParamet) {
+        return;
     }
+    resetGraph();
 }
 
 void VkResizeLayer::onInitGraph() {
+    inFormats[0].imageType = imageType;
+    outFormats[0].imageType = imageType;
     std::string path = "glsl/resize.comp.spv";
+    if (imageType == ImageType::r8) {
+        path = "glsl/resizeC1.comp.spv";
+    } else if (imageType == ImageType::rgbaf32) {
+        path = "glsl/resizeF4.comp.spv";
+    }
     shader->loadShaderModule(context->device, path);
     // VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
     std::vector<UBOLayoutItem> items = {
@@ -51,6 +66,7 @@ void VkResizeLayer::onInitLayer() {
 }
 
 void VkResizeLayer::onInitPipe() {
+#if IS_SAMPLER
     inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
     outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
     if (paramet.bLinear) {
@@ -65,6 +81,9 @@ void VkResizeLayer::onInitPipe() {
     VK_CHECK_RESULT(vkCreateComputePipelines(
         context->device, context->pipelineCache, 1, &computePipelineInfo,
         nullptr, &computerPipeline));
+#else
+    VkLayer::onInitPipe();
+#endif
 }
 
 }  // namespace layer

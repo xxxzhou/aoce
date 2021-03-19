@@ -257,6 +257,10 @@ struct ReSizeParamet {
     int32_t bLinear = 1;
     int32_t newWidth = 0;
     int32_t newHeight = 0;
+    inline bool operator==(const ReSizeParamet &right) {
+        return this->newWidth == right.newWidth && this->newHeight == right.newHeight &&
+               this->bLinear == right.bLinear;
+    }
 };
 
 struct vec3 {

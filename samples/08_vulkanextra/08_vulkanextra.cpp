@@ -59,6 +59,7 @@ int main() {
                   << " hight:" << vf.height << " fps:" << vf.fps
                   << " format:" << to_string(vf.videoType) << std::endl;
     }
+    formatIndex = video->findFormatIndex(1920, 1080);
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();

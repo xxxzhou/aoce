@@ -1,7 +1,15 @@
 #version 450
 
 layout (local_size_x = 16, local_size_y = 16) in;
+
+#if CHANNEL_RGBA
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+#elif CHANNEL_R8
 layout (binding = 0, r8) uniform readonly image2D inTex;
+#elif CHANNEL_RGBAF32
+layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+#endif
+
 layout (binding = 1, rgba32f) uniform image2D outTex;
 
 void main(){
@@ -10,6 +18,11 @@ void main(){
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     }
-    float alpha = imageLoad(inTex,uv).r;     
-    imageStore(outTex,uv,vec4(alpha)); 
+    #if CHANNEL_R8 
+        float alpha = imageLoad(inTex,uv).r;     
+        imageStore(outTex,uv,vec4(alpha)); 
+    #else
+        vec4 color = imageLoad(inTex,uv);     
+        imageStore(outTex,uv,color); 
+    #endif
 }

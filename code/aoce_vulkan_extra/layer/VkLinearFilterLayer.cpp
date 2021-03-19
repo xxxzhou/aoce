@@ -14,8 +14,8 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkLinearFilterLayer::VkLinearFilterLayer(bool bOneChannel) {
-    this->bOneChannel = bOneChannel;
+VkLinearFilterLayer::VkLinearFilterLayer(ImageType imageType) {
+    this->imageType = imageType;
     setUBOSize(16);
 }
 
@@ -23,10 +23,12 @@ VkLinearFilterLayer::~VkLinearFilterLayer() {}
 
 void VkLinearFilterLayer::onInitGraph() {
     std::string path = "glsl/filter2D.comp.spv";
-    if (bOneChannel) {
+    inFormats[0].imageType = imageType;
+    outFormats[0].imageType = imageType;
+    if (imageType == ImageType::r8) {
         path = "glsl/filter2DC1.comp.spv";
-        inFormats[0].imageType = ImageType::r8;
-        outFormats[0].imageType = ImageType::r8;
+    } else if (imageType == ImageType::rgbaf32) {
+        path = "glsl/filter2DF4.comp.spv";
     }
     shader->loadShaderModule(context->device, path);
 
@@ -51,8 +53,8 @@ void VkLinearFilterLayer::onInitPipe() {
         nullptr, &computerPipeline));
 }
 
-VkBoxBlurLayer::VkBoxBlurLayer(bool bOneChannel)
-    : VkLinearFilterLayer(bOneChannel) {}
+VkBoxBlurLayer::VkBoxBlurLayer(ImageType imageType)
+    : VkLinearFilterLayer(imageType) {}
 
 VkBoxBlurLayer::~VkBoxBlurLayer() {}
 
@@ -60,9 +62,7 @@ void VkBoxBlurLayer::onUpdateParamet() {
     if (paramet == oldParamet) {
         return;
     }
-    if (pipeGraph) {
-        pipeGraph->reset();
-    }
+    resetGraph();
 }
 
 void VkBoxBlurLayer::onInitVkBuffer() {
@@ -82,8 +82,8 @@ void VkBoxBlurLayer::onInitVkBuffer() {
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());
 }
 
-VkGaussianBlurLayer::VkGaussianBlurLayer(bool bOneChannel)
-    : VkLinearFilterLayer(bOneChannel) {}
+VkGaussianBlurLayer::VkGaussianBlurLayer(ImageType imageType)
+    : VkLinearFilterLayer(imageType) {}
 
 VkGaussianBlurLayer::~VkGaussianBlurLayer() {}
 
@@ -92,9 +92,7 @@ void VkGaussianBlurLayer::onUpdateParamet() {
         paramet.sigma == oldParamet.sigma) {
         return;
     }
-    if (pipeGraph) {
-        pipeGraph->reset();
-    }
+    resetGraph();
 }
 
 void VkGaussianBlurLayer::onInitVkBuffer() {

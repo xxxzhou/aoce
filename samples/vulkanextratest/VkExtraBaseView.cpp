@@ -6,7 +6,17 @@ VkExtraBaseView::VkExtraBaseView() {}
 
 VkExtraBaseView::~VkExtraBaseView() {}
 
-void VkExtraBaseView::initGraph(ILayer* layer, void* hinst, BaseLayer* nextLayer) {
+void VkExtraBaseView::initGraph(ILayer* layer, void* hinst,
+                                BaseLayer* nextLayer) {
+    std::vector<BaseLayer*> layers;
+    layers.push_back(layer->getLayer());
+    if (nextLayer != nullptr) {
+        layers.push_back(nextLayer);
+    }
+    initGraph(layers,hinst);
+}
+
+void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst) {
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
@@ -18,9 +28,9 @@ void VkExtraBaseView::initGraph(ILayer* layer, void* hinst, BaseLayer* nextLayer
     resizeLayer = layerFactory->createSize();
     resizeLayer->updateParamet({1, 240, 120});
     yuvNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
-    layerNode = yuvNode->addNode(layer);
-    if (nextLayer) {
-        layerNode = layerNode->addNode(nextLayer);
+    PipeNodePtr layerNode = yuvNode;
+    for (auto& layer : layers) {
+        layerNode = layerNode->addNode(layer);
     }
 #if _WIN32
     TexOperateParamet texParamet = {};
@@ -87,9 +97,9 @@ void VkExtraBaseView::closeDevice() {
 }
 
 void VkExtraBaseView::enableLayer(bool bEnable) {
-    if (layerNode) {
-        layerNode->setVisable(bEnable);
-    }
+    // if (layerNode) {
+    //     layerNode->setVisable(bEnable);
+    // }
 }
 
 void VkExtraBaseView::onFrame(VideoFrame frame) {

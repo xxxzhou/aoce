@@ -1,8 +1,13 @@
 #version 450
 
 layout (local_size_x = 16, local_size_y = 16) in;
+#if CHANNEL_RGBA
 layout (binding = 0, rgba8) uniform readonly image2D inTex;
 layout (binding = 1, rgba32f) uniform image2D outTex;
+#elif CHANNEL_RGBAF32
+layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+#endif
 
 void main(){
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);

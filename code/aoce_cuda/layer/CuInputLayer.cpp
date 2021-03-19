@@ -18,9 +18,10 @@ CuInputLayer::CuInputLayer(/* args */) { bInput = true; }
 CuInputLayer::~CuInputLayer() {}
 
 void CuInputLayer::onUpdateParamet() {
-    if (pipeGraph) {
-        pipeGraph->reset();
+    if (paramet.bCpu == oldParamet.bCpu && paramet.bGpu == oldParamet.bGpu) {
+        return;
     }
+    resetGraph();
 }
 
 void CuInputLayer::onInitCuBufffer() {

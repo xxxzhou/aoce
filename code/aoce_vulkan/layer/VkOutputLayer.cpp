@@ -26,7 +26,7 @@ void VkOutputLayer::onInitGraph() {
 
 void VkOutputLayer::onUpdateParamet() {
     if (pipeGraph && paramet.bGpu != oldParamet.bGpu) {
-        pipeGraph->reset();
+        resetGraph();
     }
 }
 
@@ -129,7 +129,7 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
                 // problems.)
                 glBindTexture(bindType, 0);
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(bindType, outTex.image);                
+                glBindTexture(bindType, outTex.image);
                 glTexSubImage2D(bindType, 0, 0, 0, outFormats[0].width,
                                 outFormats[0].height, GL_RGBA, GL_UNSIGNED_BYTE,
                                 outBuffer->getCpuData());
@@ -147,11 +147,11 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
             format.height = outTex.height;
             format.imageType == ImageType::rgba8;
             hardwareImage->createAndroidBuffer(format);
-            // hardwareImage->bindGL(outTex.image, bindType);
+            hardwareImage->bindGL(outTex.image, bindType);
             // 重新生成cmdbuffer
             this->getGraph()->reset();
         }
-        hardwareImage->bindGL(outTex.image, bindType);
+        // hardwareImage->bindGL(outTex.image, bindType);
     }
 #endif
 }
@@ -159,9 +159,12 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
 
 #if WIN32
 void VkOutputLayer::outDx11GpuTex(void* device, void* tex) {
+    if (!pipeGraph) {
+        return;
+    }
     if (!bWinInterop) {
         bWinInterop = true;
-        vkPipeGraph->reset();
+        resetGraph();
         return;
     }
     if (!vkPipeGraph->resourceReady()) {

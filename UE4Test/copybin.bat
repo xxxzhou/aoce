@@ -3,14 +3,14 @@ echo copy window/android install to ue4 aoce plugins
 echo=
 echo====copy mode====
 	echo = 1 debug(pdb)
-	echo = 2 release
+	echo = 2 install
 echo================
 set/p copyMode=
 if %copyMode%== 1 (
 	echo start copy debug
 ) ^
 else if %copyMode%== 2 (
-	echo start copy release
+	echo start copy install
 )
 set curdir=%~dp0
 cd /d %curdir%
@@ -21,7 +21,7 @@ xcopy /s /e /y /c /i "..\build\install\win\include" ".\Plugins\AocePlugins\Third
 echo end copy  include
 
 timeout 1
-echo start copy bin
+echo start copy window bin
 if %copyMode%== 1 (
 	xcopy /s /e /y /c /i "..\build\bin\Debug" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\bin"
 	xcopy /s /e /y /c /i "..\build\lib\Debug" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\lib"
@@ -30,15 +30,15 @@ else if %copyMode%== 2 (
 	xcopy /s /e /y /c /i "..\build\install\win\bin" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\bin"
 	xcopy /s /e /y /c /i "..\build\install\win\lib" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\lib"
 )
-xcopy /s /e /y /c /i "..\code\aoce_vulkan\glsl" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\bin\glsl"
+xcopy /s /e /y /c /i "..\glsl\target" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\bin\glsl"
 copy "..\thirdparty\agora\x64\dll\agora_rtc_sdk.dll" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\bin\agora_rtc_sdk.dll"
 echo end copy bin
 
 timeout 1
-echo start copy android
+echo start copy android bin
 set androidDir=05_livetest
 xcopy /s /e /y /c /i "..\android\%androidDir%\build\intermediates\cmake\debug\obj\armeabi-v7a" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a"
-xcopy /s /e /y /c /i "..\code\aoce_vulkan\glsl" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a\glsl"
+xcopy /s /e /y /c /i "..\glsl\target" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a\glsl"
 copy "..\thirdparty\agora\android\agora-rtc-sdk.jar" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\agora-rtc-sdk.jar"
 copy "..\thirdparty\agora\android\armeabi-v7a\libagora-rtc-sdk-jni.so" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a\libagora-rtc-sdk-jni.so"
 echo end copy android

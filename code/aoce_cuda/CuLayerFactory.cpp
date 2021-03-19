@@ -2,8 +2,9 @@
 
 #include "layer/CuInputLayer.hpp"
 #include "layer/CuOutputLayer.hpp"
-#include "layer/CuYUV2RGBALayer.hpp"
 #include "layer/CuRGBA2YUVLayer.hpp"
+#include "layer/CuResizeLayer.hpp"
+#include "layer/CuYUV2RGBALayer.hpp"
 
 namespace aoce {
 namespace cuda {
@@ -23,18 +24,10 @@ YUV2RGBALayer* CuLayerFactory::createYUV2RGBA() {
 RGBA2YUVLayer* CuLayerFactory::createRGBA2YUV() {
     return new CuRGBA2YUVLayer();
 }
-TexOperateLayer* CuLayerFactory::createTexOperate() {
-    return nullptr;
-}
-TransposeLayer* CuLayerFactory::createTranspose() {
-    return nullptr;
-}
-ReSizeLayer* CuLayerFactory::createSize() {
-    return nullptr;
-}
-BlendLayer* CuLayerFactory::createBlend() {
-    return nullptr;
-}
+TexOperateLayer* CuLayerFactory::createTexOperate() { return nullptr; }
+TransposeLayer* CuLayerFactory::createTranspose() { return nullptr; }
+ReSizeLayer* CuLayerFactory::createSize() { return new CuResizeLayer(); }
+BlendLayer* CuLayerFactory::createBlend() { return nullptr; }
 
 }  // namespace cuda
 }  // namespace aoce

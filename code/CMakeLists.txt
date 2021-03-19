@@ -16,7 +16,7 @@ elseif(ANDROID)
     add_subdirectory(aoce_android)
 endif()
 
-if(AOCE_INSTALL_AGORA)
+if(AOCE_INSTALL_AGORA AND AOCE_AGORA_EXIST)
     add_subdirectory(aoce_agora)
 endif()
 
@@ -24,7 +24,7 @@ if(AOCE_INSTALL_FFMPEG)
     add_subdirectory(aoce_ffmpeg)
 endif()
 
-if(AOCE_INSTALL_TALKTO)
+if(AOCE_INSTALL_TALKTO AND AOCE_TALKTO_EXIST)
     add_subdirectory(aoce_talkto)
 endif()
 

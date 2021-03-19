@@ -14,10 +14,11 @@ class VkLinearFilterLayer : public VkLayer {
     // AOCE_LAYER_QUERYINTERFACE(VkLinearFilterLayer)
    protected:
     std::unique_ptr<VulkanBuffer> kernelBuffer;
-    bool bOneChannel = false;
+    // bool bOneChannel = false;
+    ImageType imageType = ImageType::rgba8;
 
    public:
-    VkLinearFilterLayer(bool bOneChannel = false);
+    VkLinearFilterLayer(ImageType imageType = ImageType::rgba8);
     virtual ~VkLinearFilterLayer();
 
    protected:
@@ -32,7 +33,7 @@ class VkBoxBlurLayer : public VkLinearFilterLayer,
     AOCE_LAYER_QUERYINTERFACE(VkBoxBlurLayer)
 
    public:
-    VkBoxBlurLayer(bool bOneChannel = false);
+    VkBoxBlurLayer(ImageType imageType = ImageType::rgba8);
     virtual ~VkBoxBlurLayer();
 
    protected:
@@ -45,7 +46,7 @@ class VkGaussianBlurLayer : public VkLinearFilterLayer,
     AOCE_LAYER_QUERYINTERFACE(VkGaussianBlurLayer)
 
    public:
-    VkGaussianBlurLayer(bool bOneChannel = false);
+    VkGaussianBlurLayer(ImageType imageType = ImageType::rgba8);
     virtual ~VkGaussianBlurLayer();
 
    protected:

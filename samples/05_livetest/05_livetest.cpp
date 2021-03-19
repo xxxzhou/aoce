@@ -94,8 +94,11 @@ class TestLive : public ILiveObserver {
             yuv2rgbLayer->updateParamet({videoFrame.videoType, true});
         }
         inputLayer->inputCpuData(videoFrame, 0);
-#if WIN32
         vkGraph->run();
+#if __ANDROID__
+        if (window) {
+            window->tick();
+        }
 #endif
     };
 
@@ -116,10 +119,6 @@ class TestLive : public ILiveObserver {
 };
 
 void onPreCommand(uint32_t index) {
-#if __ANDROID__
-    vkGraph->run();
-#endif
-
     VkImage winImage = window->images[index];
     VkCommandBuffer cmd = window->cmdBuffers[index];
     // 我们要把cs生成的图复制到正在渲染的图上,先改变渲染图的layout
@@ -236,7 +235,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_vkInitSurface(
     room = AoceManager::Get().getLiveRoom(LiveType::agora);
     live = new TestLive(room);
     AgoraContext contex = {};
-    contex.bLoopback = true;
+    contex.bLoopback = false;
     // contex.context = android_app_context;
     room->initRoom(&contex, live);
 

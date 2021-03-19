@@ -17,7 +17,7 @@ class VkYUV2RGBALayer : public VkLayer, public YUV2RGBALayer {
    protected:
     virtual void onInitGraph() override;
     virtual void onUpdateParamet() override;
-    virtual void onInitLayer() override;
+    virtual void onInitLayer() override; 
 };
 
 }  // namespace layer

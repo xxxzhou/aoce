@@ -20,14 +20,15 @@ void VkYUV2RGBALayer::onInitGraph() {
 
 void VkYUV2RGBALayer::onUpdateParamet() {
     assert(getYuvIndex(paramet.type) > 0);
-    if (pipeGraph) {
-        pipeGraph->reset();
+    if (paramet.type == oldParamet.type) {
+        return;
     }
+    resetGraph();
 }
 
 void VkYUV2RGBALayer::onInitLayer() {
     int32_t yuvType = getYuvIndex(paramet.type);
-#ifdef AOCE_INSTALL_TALKTO
+#if defined(AOCE_INSTALL_AGORA)
     if (paramet.type == VideoType::yuy2P && paramet.special != 0) {
         yuvType = 0;
     }

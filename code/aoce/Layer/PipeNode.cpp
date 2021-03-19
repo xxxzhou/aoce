@@ -16,24 +16,32 @@ PipeNode::~PipeNode() {}
 void PipeNode::setVisable(bool bvisable) {
     if (bInvisible == bvisable) {
         bInvisible = !bvisable;
-        layer->pipeGraph->reset();
+        layer->resetGraph();
     }
 }
 
 void PipeNode::setEnable(bool benable) {
     if (bDisable == benable) {
         bDisable = !benable;
-        layer->pipeGraph->reset();
+        layer->resetGraph();
     }
 }
 
 void PipeNode::setStartNode(PipeNodePtr node) { startNode = node; }
+void PipeNode::setEndNode(PipeNodePtr node) { endNode = node; }
 
 PipeNodePtr PipeNode::getStartNode() {
     if (startNode.expired()) {
         return nullptr;
     }
     return startNode.lock();
+}
+
+PipeNodePtr PipeNode::getEndNode() {
+    if (endNode.expired()) {
+        return nullptr;
+    }
+    return endNode.lock();
 }
 
 PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
@@ -52,10 +60,15 @@ PipeNodePtr PipeNode::addNode(ILayer* layer) {
 
 PipeNodePtr PipeNode::addLine(PipeNodePtr to, int32_t formOut, int32_t toIn) {
     int toIndex = to->graphIndex;
-    if (to->getStartNode()) {
-        toIndex = to->getStartNode()->graphIndex;
+    auto start = to->getStartNode();
+    if (start) {
+        toIndex = start->graphIndex;
     }
     layer->pipeGraph->addLine(this->graphIndex, toIndex, formOut, toIn);
+    auto end = to->getEndNode();
+    if (end) {
+        return end;
+    }
     return to;
 }
 

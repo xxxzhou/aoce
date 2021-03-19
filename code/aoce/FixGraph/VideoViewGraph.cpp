@@ -22,8 +22,14 @@ void VideoViewGraph::initGraph(GpuType gpuType) {
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
+    resizeLayer1 = layerFactory->createSize();
+    resizelayer2 = layerFactory->createSize();
     // 链接图
-    graph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
+    graph->addNode(inputLayer)
+        ->addNode(yuv2rgbLayer)
+        //->addNode(resizeLayer1)
+        //->addNode(resizelayer2)
+        ->addNode(outputLayer);
 }
 
 void VideoViewGraph::updateParamet(YUVParamet yparamet, InputParamet iparamet,
@@ -42,6 +48,8 @@ void VideoViewGraph::runFrame(const VideoFrame &frame) {
     } else {
         yuv2rgbLayer->getLayerNode()->setVisable(false);
     }
+    resizeLayer1->updateParamet({true, frame.width / 8, frame.height / 8});
+    resizelayer2->updateParamet({true, frame.width, frame.height});
     inputLayer->inputCpuData(frame, 0);
     graph->run();
 }

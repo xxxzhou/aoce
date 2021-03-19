@@ -1,3 +1,9 @@
+
+\out\
+\.vs\
+\$tf\
+\android\04_vulkantest\.cxx
+
 \build
 \thirdparty\
 \samples\talktotest\
@@ -38,7 +44,3 @@
 \UE4Test\Content\Blueprints
 \UE4Test\UE4Test.zip
 \CSharp\AoceWrapper\Swig
-
-\out\
-\.vs\
-\$tf\

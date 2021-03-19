@@ -9,23 +9,19 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-enum class ConvertType {
-    other = 0,
-    rgba82rgba32f,
-};
-
 // RGBA8->RGBA32F
-class VkConvertImage : public VkLayer {
+class VkConvertImageLayer : public VkLayer {
    private:
     /* data */
+    ConvertType convert = ConvertType::rgba82rgba32f;
+
    public:
-    VkConvertImage(/* args */);
-    ~VkConvertImage();
+    VkConvertImageLayer(ConvertType convert = ConvertType::rgba82rgba32f);
+    ~VkConvertImageLayer();
+
+   protected:
+    virtual void onInitGraph() override;
 };
-
-VkConvertImage::VkConvertImage(/* args */) {}
-
-VkConvertImage::~VkConvertImage() {}
 
 }  // namespace layer
 }  // namespace vulkan

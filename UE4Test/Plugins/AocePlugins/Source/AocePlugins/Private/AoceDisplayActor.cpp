@@ -7,6 +7,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
+#include "aoce/Layer/BaseLayer.hpp"
 
 #if __ANDROID__
 #include <GLES2/gl2.h>
@@ -62,7 +63,7 @@ AAoceDisplayActor::AAoceDisplayActor() {
 	PrimaryActorTick.bCanEverTick = true;
 
 #if WIN32
-	gpuType = aoce::GpuType::cuda;
+	// gpuType = aoce::GpuType::cuda;
 #endif
 }
 
@@ -92,8 +93,8 @@ void AAoceDisplayActor::BeginPlay() {
 #if WIN32
 	outputLayer->updateParamet({ false, true });
 #elif __ANDROID__
-	outputLayer->updateParamet({ true, false });
-	outputLayer->setImageProcessHandle(std::bind(&AAoceDisplayActor::outLayerData, this, _1, _2, _3));
+	outputLayer->updateParamet({ false, true });
+	// outputLayer->setImageProcessHandle(std::bind(&AAoceDisplayActor::outLayerData, this, _1, _2, _3));
 #endif	
 	yuv2rgbLayer = layerFactory->createYUV2RGBA();
 	// 生成图
@@ -131,7 +132,6 @@ void AAoceDisplayActor::UpdateFrame(const aoce::VideoFrame& frame) {
 		format.width = frame.width;
 		format.height = frame.height;
 		format.videoType = frame.videoType;
-		inputLayer->setImage(format);
 		yuv2rgbLayer->updateParamet({ format.videoType,true });
 		AsyncTask(ENamedThreads::GameThread, [=]() {
 			initTexture(&sourceTex, frame.width, frame.height, PF_R8G8B8A8);
@@ -145,7 +145,7 @@ void AAoceDisplayActor::UpdateFrame(const aoce::VideoFrame& frame) {
 				}
 			});
 		});
-	}
+	}	
 	inputLayer->inputCpuData(frame, 0);
 	vkGraph->run();
 	ENQUEUE_RENDER_COMMAND(CopyTextureCommand)([play](FRHICommandListImmediate& RHICmdList) {
@@ -157,13 +157,13 @@ void AAoceDisplayActor::UpdateFrame(const aoce::VideoFrame& frame) {
 		void* device = RHICmdList.GetNativeDevice();
 		play->outputLayer->outDx11GpuTex(device, texRHI->GetNativeResource());
 #elif __ANDROID__
-		//if (IsRunningRHIInSeparateThread()) {
-		//	new (RHICmdList.AllocCommand<FRHICommandUpdateAoceGLTexture>()) FRHICommandUpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
-		//	RHICmdList.ImmediateFlush(EImmediateFlushType::FlushRHIThread);
-		//}
-		//else {
-		//	UpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
-		//}
+		if (IsRunningRHIInSeparateThread()) {
+			new (RHICmdList.AllocCommand<FRHICommandUpdateAoceGLTexture>()) FRHICommandUpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
+			RHICmdList.ImmediateFlush(EImmediateFlushType::FlushRHIThread);
+		}
+		else {
+			UpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
+		}
 #endif
 	});
 }

@@ -38,7 +38,7 @@ bool CuYUV2RGBALayer::onFrame() {
         paramet.type == VideoType::yuy2P) {
         int32_t yuvType = getYuvIndex(paramet.type);
         if (paramet.type == VideoType::yuy2P && paramet.special != 0) {
-#ifdef AOCE_INSTALL_TALKTO
+#if defined(AOCE_INSTALL_AGORA)
             yuva2rgb_gpu(*inTexs[0], *outTexs[0], stream);
 #endif
         } else {
@@ -62,9 +62,10 @@ bool CuYUV2RGBALayer::onFrame() {
 
 void CuYUV2RGBALayer::onUpdateParamet() {
     assert(getYuvIndex(paramet.type) >= 0);
-    if (pipeGraph) {
-        pipeGraph->reset();
+    if (paramet.type == oldParamet.type) {
+        return;
     }
+    resetGraph();
 }
 
 }  // namespace cuda

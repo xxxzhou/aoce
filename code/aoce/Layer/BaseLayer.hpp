@@ -53,8 +53,12 @@ class ACOE_EXPORT BaseLayer {
     std::vector<ImageFormat> inFormats;
     // 每个层的imagetype对应shader里类型,连接时需要检测
     std::vector<ImageFormat> outFormats;
+    // 输入层
     bool bInput = false;
+    // 输出层
     bool bOutput = false;
+    // 是否自动拿上一层的ImageType
+    bool bAutoImageType = false;
 
     std::vector<NodeIndex> inLayers;
 
@@ -74,6 +78,9 @@ class ACOE_EXPORT BaseLayer {
     bool vaildInLayers();
     void initLayer();
     void resetGraph();
+
+   public:
+    bool getInFormat(ImageFormat& format, int32_t index = 0);
 
    protected:
     // 添加进pipeGraph时调用
@@ -109,13 +116,13 @@ class ITLayer : public ILayer {
     T paramet = {};
 
    public:
-    inline void updateParamet(const T& t) {
+    void updateParamet(const T& t) {
         oldParamet = this->paramet;
         this->paramet = t;
         getLayer()->onUpdateParamet();
     };
 
-    inline T getParamet() { return paramet; }
+    T getParamet() { return paramet; }
 };
 
 // YUV 2 RGBA 转换
@@ -128,18 +135,13 @@ typedef ITLayer<ReSizeParamet> ReSizeLayer;
 typedef ITLayer<BlendParamet> BlendLayer;
 typedef ITLayer<YUVParamet> YUV2RGBALayer;
 
-// YUV 2 RGBA 转换
+// // YUV 2 RGBA 转换
 // class YUV2RGBALayer : public ITLayer<YUVParamet> {};
-
-// RGBA 2 YUV 转换
+// // RGBA 2 YUV 转换
 // class RGBA2YUVLayer : public ITLayer<YUVParamet> {};
-
 // class TexOperateLayer : public ITLayer<TexOperateParamet> {};
-
 // class TransposeLayer : public ITLayer<TransposeParamet> {};
-
 // class ReSizeLayer : public ITLayer<ReSizeParamet> {};
-
 // class BlendLayer : public ITLayer<BlendParamet> {};
 
 }  // namespace aoce

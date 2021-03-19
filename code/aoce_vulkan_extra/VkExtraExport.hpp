@@ -16,9 +16,11 @@
 namespace aoce {
 namespace vulkan {
 
+enum class ConvertType { other = 0, rgba82rgba32f, rgba32f2rgba8 };
+
 struct KernelSizeParamet {
-    int32_t kernelSizeX = 3;
-    int32_t kernelSizeY = 3;
+    int32_t kernelSizeX = 5;
+    int32_t kernelSizeY = 5;
 
     inline bool operator==(const KernelSizeParamet& right) {
         return this->kernelSizeX == right.kernelSizeX &&
@@ -30,6 +32,11 @@ struct GaussianBlurParamet {
     int32_t blurRadius = 4;
     // sigma值越小,整个分布长度范围越大，原始值占比越高，周围占比越低
     float sigma = 2.0f;
+
+    inline bool operator==(const GaussianBlurParamet& right) {
+        return this->blurRadius == right.blurRadius &&
+               this->sigma == right.sigma;
+    }
 };
 
 struct ChromKeyParamet {
@@ -54,18 +61,40 @@ struct AdaptiveThresholdParamet {
     float offset = 0.05f;
 };
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer();
+struct GuidedParamet {
+    int32_t boxSize = 10;
+    // //0.1-0.000001
+    float eps = 0.00001f;
+};
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<GaussianBlurParamet>* createGaussianBlurLayer();
+struct GuidedMattingParamet {
+    GuidedParamet guided = {};
+};
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer(
+    ImageType imageType = ImageType::rgba8);
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<GaussianBlurParamet>* createGaussianBlurLayer(
+    ImageType imageType = ImageType::rgba8);
 
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<ChromKeyParamet>* createChromKeyLayer();
 
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<AdaptiveThresholdParamet>*
 createAdaptiveThresholdLayer();
 
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<GuidedParamet>* createGuidedLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<ReSizeParamet>* createResizeLayer(
+    ImageType imageType = ImageType::rgba8);
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<GuidedMattingParamet>*
+createGuidedMattingLayer(BaseLayer* mattingLayer);
+
 AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createLuminanceLayer();
 
 AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createAlphaShowLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createConvertImageLayer();
 
 }  // namespace vulkan
 }  // namespace aoce

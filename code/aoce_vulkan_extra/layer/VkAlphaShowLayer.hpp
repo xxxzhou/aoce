@@ -12,12 +12,13 @@ namespace layer {
 class VkAlphaShowLayer : public VkLayer {
    private:
     /* data */
+
    public:
-    VkAlphaShowLayer(/* args */);
+    VkAlphaShowLayer();
     ~VkAlphaShowLayer();
 
    protected:
-    virtual void onInitGraph() override;
+    virtual void onInitLayer() override;
 };
 
 }  // namespace layer

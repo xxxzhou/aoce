@@ -12,6 +12,8 @@ class ACOE_EXPORT VideoViewGraph {
     InputLayer* inputLayer = nullptr;
     OutputLayer* outputLayer = nullptr;
     YUV2RGBALayer* yuv2rgbLayer = nullptr;
+    ReSizeLayer* resizeLayer1 = nullptr;
+    ReSizeLayer* resizelayer2 = nullptr;
 #if WIN32
     GpuType gpuType = GpuType::cuda;
 #elif __ANDROID__

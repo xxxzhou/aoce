@@ -67,7 +67,7 @@ void BaseLayer::initLayer() {
         for (int32_t i = 0; i < size; i++) {
             pipeGraph->getLayerOutFormat(inLayers[i].nodeIndex,
                                          inLayers[i].outputIndex, inFormats[i],
-                                         bOutput);
+                                         bOutput || bAutoImageType);
         }
     }
     // 默认所有输出长宽为第一个输入
@@ -75,7 +75,7 @@ void BaseLayer::initLayer() {
         for (auto& outFormat : outFormats) {
             outFormat.width = inFormats[0].width;
             outFormat.height = inFormats[0].height;
-            if(bOutput){
+            if (bOutput) {
                 outFormat.imageType = inFormats[0].imageType;
             }
         }
@@ -90,8 +90,17 @@ void BaseLayer::resetGraph() {
     }
 }
 
+bool BaseLayer::getInFormat(ImageFormat& format, int32_t index) {
+    if (inFormats.size() > index) {
+        format = inFormats[index];
+        return true;
+    }
+    return false;
+}
+
 PipeNode* ILayer::getLayerNode() {
     assert(getLayer());
     return getLayer()->getNode().get();
 }
+
 }  // namespace aoce

@@ -379,8 +379,9 @@ VkShaderModule loadShader(const char* fileName, VkDevice device) {
 
         return shaderModule;
     } else {
-        std::cerr << "Error: Could not open shader file \"" << fileName << "\""
-                  << "\n";
+        std::string msg;
+        string_format(msg, "error: could not open shader file ", fileName);
+        logMessage(LogLevel::error, msg);
         return VK_NULL_HANDLE;
     }
 }

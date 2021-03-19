@@ -3,6 +3,7 @@
 #include "layer/VkAdaptiveThresholdLayer.hpp"
 #include "layer/VkAlphaShowLayer.hpp"
 #include "layer/VkChromKeyLayer.hpp"
+#include "layer/VkGuidedLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
 #include "layer/VkLuminanceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
@@ -12,13 +13,13 @@ using namespace aoce::vulkan::layer;
 namespace aoce {
 namespace vulkan {
 
-ITLayer<KernelSizeParamet>* createBoxFilterLayer() {
-    VkBoxBlurSLayer* boxBlur = new VkBoxBlurSLayer();
+ITLayer<KernelSizeParamet>* createBoxFilterLayer(ImageType imageType) {
+    VkBoxBlurSLayer* boxBlur = new VkBoxBlurSLayer(imageType);
     return boxBlur;
 }
 
-ITLayer<GaussianBlurParamet>* createGaussianBlurLayer() {
-    VkGaussianBlurSLayer* layer = new VkGaussianBlurSLayer();
+ITLayer<GaussianBlurParamet>* createGaussianBlurLayer(ImageType imageType) {
+    VkGaussianBlurSLayer* layer = new VkGaussianBlurSLayer(imageType);
     return layer;
 }
 
@@ -32,6 +33,22 @@ ITLayer<AdaptiveThresholdParamet>* createAdaptiveThresholdLayer() {
     return layer;
 }
 
+ITLayer<GuidedParamet>* createGuidedLayer() {
+    VkGuidedLayer* layer = new VkGuidedLayer();
+    return layer;
+}
+
+ITLayer<ReSizeParamet>* createResizeLayer(ImageType imageType) {
+    VkResizeLayer* layer = new VkResizeLayer(imageType);
+    return layer;
+}
+
+ITLayer<GuidedMattingParamet>* createGuidedMattingLayer(
+    BaseLayer* mattingLayer) {
+    VkGuidedMattingLayer* layer = new VkGuidedMattingLayer(mattingLayer);
+    return layer;
+}
+
 BaseLayer* createLuminanceLayer() {
     VkLuminanceLayer* layer = new VkLuminanceLayer();
     return layer;
@@ -39,6 +56,11 @@ BaseLayer* createLuminanceLayer() {
 
 BaseLayer* createAlphaShowLayer() {
     VkAlphaShowLayer* layer = new VkAlphaShowLayer();
+    return layer;
+}
+
+BaseLayer* createConvertImageLayer() {
+    VkConvertImageLayer* layer = new VkConvertImageLayer();
     return layer;
 }
 

@@ -95,14 +95,18 @@ void VkSeparableLinearLayer::onInitLayer() {
 }
 
 VkBoxBlurSLayer::VkBoxBlurSLayer(ImageType imageType)
-    : VkSeparableLinearLayer(imageType) {}
+    : VkSeparableLinearLayer(imageType) {
+    paramet.kernelSizeX = 5;
+    paramet.kernelSizeY = 5;
+}
 
 VkBoxBlurSLayer::~VkBoxBlurSLayer() {}
 
 void VkBoxBlurSLayer::onUpdateParamet() {
-    if (pipeGraph) {
-        pipeGraph->reset();
+    if (paramet == oldParamet) {
+        return;
     }
+    resetGraph();
 }
 
 void VkBoxBlurSLayer::getKernel(int size, std::vector<float>& kernels) {
@@ -125,14 +129,18 @@ void VkBoxBlurSLayer::onInitLayer() {
 }
 
 VkGaussianBlurSLayer::VkGaussianBlurSLayer(ImageType imageType)
-    : VkSeparableLinearLayer(imageType) {}
+    : VkSeparableLinearLayer(imageType) {
+    paramet.blurRadius = 4;
+    paramet.sigma = 2.0f;
+}
 
 VkGaussianBlurSLayer::~VkGaussianBlurSLayer() {}
 
 void VkGaussianBlurSLayer::onUpdateParamet() {
-    if (pipeGraph) {
-        pipeGraph->reset();
+    if (paramet == oldParamet) {
+        return;
     }
+    resetGraph();
 }
 
 void VkGaussianBlurSLayer::onInitLayer() {

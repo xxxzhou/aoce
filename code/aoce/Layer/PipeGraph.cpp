@@ -281,7 +281,7 @@ bool PipeGraph::resetGraph() {
 
 bool PipeGraph::run() {
     // 保证一次只处理一桢(MF 异步模式每次读取的数据可能并不在同一线程上)
-    // std::lock_guard<std::mutex> mtx_locker(mtx);
+    std::lock_guard<std::mutex> mtx_locker(mtx);
     if (bReset) {
         logMessage(LogLevel::info, "start build graph.");
         bReset = false;
