@@ -294,8 +294,10 @@ int32_t getImageTypeSize(const aoce::ImageType& imageType) {
             return 1;
         case ImageType::rgba8:
             return 4;
-        case ImageType::rgbaf32:
+        case ImageType::rgba32f:
             return 16;
+        case ImageType::r32f:
+            return 4;
         default:
             return 0;
     }

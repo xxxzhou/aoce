@@ -22,8 +22,11 @@ DXGI_FORMAT getImageDXFormt(ImageType imageType) {
         case ImageType::bgra8:
             dxFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
             break;
-        case ImageType::rgbaf32:
+        case ImageType::rgba32f:
             dxFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
+            break;
+        case ImageType::r32f:
+            dxFormat = DXGI_FORMAT_R32_FLOAT;
             break;
         default:
             dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -304,7 +307,7 @@ HANDLE getDx11SharedHandle(ID3D11Resource* source, bool bNT) {
         // DXGI_SHARED_RESOURCE_READ | DXGI_SHARED_RESOURCE_WRITE,
         dxGIResource1->CreateSharedHandle(nullptr, GENERIC_ALL, nullptr,
                                           &handle);
-    }    
+    }
     return handle;
 }
 

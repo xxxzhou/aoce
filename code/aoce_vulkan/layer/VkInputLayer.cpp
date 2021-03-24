@@ -3,9 +3,10 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkInputLayer::VkInputLayer(/* args */) { bInput = true;
+VkInputLayer::VkInputLayer(/* args */) {
+    bInput = true;
     setUBOSize(12);
- }
+}
 
 VkInputLayer::~VkInputLayer() {}
 
@@ -65,7 +66,7 @@ void VkInputLayer::onInitVkBuffer() {
     }
     std::vector<int> ubo = {outFormats[0].width, outFormats[0].height,
                             imageIndex};
-    memcpy(constBufCpu.data(), ubo.data(), conBufSize);    
+    updateUBO(ubo.data());
 }
 
 void VkInputLayer::onInitPipe() {

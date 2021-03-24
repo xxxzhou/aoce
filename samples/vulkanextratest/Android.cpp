@@ -1,13 +1,12 @@
 #ifdef __ANDROID__
 
-#include "VkExtraBaseView.hpp"
-
 #include <android/native_activity.h>
 #include <android/native_window.h>
 #include <android/native_window_jni.h>
 #include <android_native_app_glue.h>
 
 #include "../../code/aoce/Aoce.h"
+#include "VkExtraBaseView.hpp"
 #include "errno.h"
 
 static VkExtraBaseView* view = nullptr;
@@ -17,6 +16,7 @@ static ITLayer<KernelSizeParamet>* boxFilterLayer = nullptr;
 static ITLayer<GaussianBlurParamet>* gaussianLayer = nullptr;
 static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
 static ChromKeyParamet keyParamet = {};
+static ITLayer<GuidedParamet>* guidedLayer = nullptr;
 
 extern "C" JNIEXPORT void JNICALL
 Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
@@ -32,24 +32,29 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     boxFilterLayer->updateParamet({4, 4});
 
     gaussianLayer = createGaussianBlurLayer();
-    gaussianLayer->updateParamet({10,5.0f});
+    gaussianLayer->updateParamet({10, 5.0f});
 
-    chromKeyLayer = createChromKeyLayer();    
-    keyParamet.despillCuttofMax = 0.42f;
-    keyParamet.despillExponent = 0.1f;
-    keyParamet.ambientScale = 1.0f;
+    chromKeyLayer = createChromKeyLayer();
+    keyParamet.alphaScale = 10.0f;
     keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
     keyParamet.ambientColor = {0.9f, 0.1f, 0.1f};
-    keyParamet.alphaCutoffMin = 0.001f;
+    keyParamet.despillScale = 10.0f;
+    keyParamet.despillExponent = 0.1f;
     chromKeyLayer->updateParamet(keyParamet);
-    view->initGraph(chromKeyLayer, nullptr);
-}
 
+    guidedLayer = createGuidedLayer();
+    guidedLayer->updateParamet({20, 0.00001f});
+
+    std::vector<BaseLayer*> layers;
+    layers.push_back(chromKeyLayer->getLayer());
+    layers.push_back(guidedLayer->getLayer());
+    view->initGraph(layers, nullptr);
+}
 
 extern "C" JNIEXPORT void JNICALL
 Java_aoce_samples_vulkanextratest_MainActivity_glCopyTex(
     JNIEnv* env, jobject thiz, jint texture_id, jint width, jint height) {
-    if(!view){
+    if (!view) {
         return;
     }
     VkOutGpuTex outGpuTex = {};
@@ -60,34 +65,35 @@ Java_aoce_samples_vulkanextratest_MainActivity_glCopyTex(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_aoce_samples_vulkanextratest_MainActivity_openCamera(JNIEnv* env, jobject thiz,
-                                                      jint index) {
+Java_aoce_samples_vulkanextratest_MainActivity_openCamera(JNIEnv* env,
+                                                          jobject thiz,
+                                                          jint index) {
     view->openDevice(index);
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_aoce_samples_vulkanextratest_MainActivity_enableLayer(JNIEnv *env, jobject thiz,
+extern "C" JNIEXPORT void JNICALL
+Java_aoce_samples_vulkanextratest_MainActivity_enableLayer(JNIEnv* env,
+                                                           jobject thiz,
                                                            jboolean enable) {
     // TODO: implement enableLayer()
     view->enableLayer(enable);
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_aoce_samples_vulkanextratest_MainActivity_updateParamet(JNIEnv *env, jobject thiz,
-                                                             jboolean green, jfloat luma,
-                                                             jfloat min, jfloat max, jfloat scale) {
+extern "C" JNIEXPORT void JNICALL
+Java_aoce_samples_vulkanextratest_MainActivity_updateParamet(
+    JNIEnv* env, jobject thiz, jboolean green, jfloat luma, jfloat min,
+    jfloat scale, jfloat exponent,jfloat dscale) {
     // TODO: implement updateParamet()
     keyParamet.lumaMask = luma;
     keyParamet.alphaCutoffMin = min;
-    keyParamet.alphaCutoffMin = max;
-    keyParamet.alphaExponent = scale;
+    keyParamet.alphaScale = scale * 10.f;
+    keyParamet.alphaExponent = exponent;
     aoce::vec3 color = {0.15f, 0.6f, 0.0f};
-    if(!green){
-        color = {0.15f,0.2f,0.8f};
+    if (!green) {
+        color = {0.15f, 0.2f, 0.8f};
     }
-    keyParamet.chromaColor =color;
+    keyParamet.chromaColor = color;
+    keyParamet.despillScale = dscale;
     chromKeyLayer->updateParamet(keyParamet);
 }
 

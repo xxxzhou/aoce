@@ -15,9 +15,10 @@ static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static ITLayer<GuidedParamet>* guidedLayer = nullptr;
 static BaseLayer* convertLayer = nullptr;
 static BaseLayer* alphaShowLayer = nullptr;
+static BaseLayer* luminanceLayer = nullptr;
 static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
 static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
-static ITLayer<GuidedMattingParamet>* guidedMattingLayer = nullptr;
+static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -31,13 +32,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     chromKeyLayer = createChromKeyLayer();
     ChromKeyParamet keyParamet = {};
-    keyParamet.despillCuttofMax = 0.22f;
+    keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
+    keyParamet.alphaScale = 20.0f;
+    keyParamet.alphaExponent = 0.1f;
+    keyParamet.alphaCutoffMin = 0.2f;
+    keyParamet.lumaMask = 2.0f;
+    keyParamet.ambientColor = {0.1f, 0.1f, 0.9f};
+    keyParamet.despillScale = 0.0f;
     keyParamet.despillExponent = 0.1f;
     keyParamet.ambientScale = 1.0f;
-    keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
-    keyParamet.ambientColor = {0.9f, 0.1f, 0.1f};
-    keyParamet.alphaCutoffMax = 0.21f;
-    keyParamet.alphaCutoffMin = 0.20f;
     chromKeyLayer->updateParamet(keyParamet);
 
     adaptiveLayer = createAdaptiveThresholdLayer();
@@ -47,28 +50,30 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     adaptiveLayer->updateParamet(adaParamet);
 
     alphaShowLayer = createAlphaShowLayer();
-    convertLayer = createConvertImageLayer();
-    resizeLayer = createResizeLayer(aoce::ImageType::rgbaf32);
-    resizeLayer->updateParamet({false, 1920 / 8, 1080 / 8});
-    box1Layer = createBoxFilterLayer(aoce::ImageType::rgbaf32);
-    box1Layer->updateParamet({10, 10});
+    luminanceLayer = createLuminanceLayer();
+
+    hcdLayer = createHarrisCornerDetectionLayer();
+    HarrisCornerDetectionParamet hcdParamet = {};
+    hcdParamet.threshold = 0.02f;
+    hcdLayer->updateParamet(hcdParamet);
+
     guidedLayer = createGuidedLayer();
-
-    guidedMattingLayer = createGuidedMattingLayer(chromKeyLayer->getLayer());
-
-    // 查看自适应阈值化效果
-    // view->initGraph(guidedLayer, hInstance, alphaShowLayer);
-    // 查看高斯模糊效果
+    guidedLayer->updateParamet({20, 0.000001f});
     std::vector<BaseLayer*> layers;
-    layers.push_back(guidedMattingLayer->getLayer());
+    // 查看自适应阈值化效果
+    // view->initGraph(adaptiveLayer, hInstance, alphaShowLayer);
+    // 查看导向滤波效果    
+    // layers.push_back(chromKeyLayer->getLayer());
+    // layers.push_back(guidedLayer->getLayer());
+    // layers.push_back(alphaShowLayer);
+    // view->initGraph(layers, hInstance);
+    // 查看Harris 角点检测
+    layers.push_back(luminanceLayer);
+    layers.push_back(hcdLayer->getLayer());
+    layers.push_back(alphaShowLayer);
     view->initGraph(layers, hInstance);
-    view->openDevice();
-    // std::thread trd([&]() {
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    //     view->enableLayer(false);
-    // });
-    // trd.detach();
 
+    view->openDevice(); 
     view->run();
     unloadAoce();
 }

@@ -9,13 +9,15 @@ namespace layer {
 
 VkAdaptiveThresholdLayer::VkAdaptiveThresholdLayer(/* args */) {
     setUBOSize(4);
+    inCount = 2;
+    outCount = 1;
+    glslPath = "glsl/adaptiveThreshold.comp.spv";
+    //
     luminance = std::make_unique<VkLuminanceLayer>();
     boxBlur = std::make_unique<VkBoxBlurSLayer>(ImageType::r8);
     // kernel size会导致Graph重置,在onInitGraph之前更新下,避免可能的二次重置
     boxBlur->updateParamet({paramet.boxSize, paramet.boxSize});
-    inCount = 2;
-    outCount = 1;
-    glslPath = "glsl/adaptiveThreshold.comp.spv";
+    updateUBO(&paramet.offset);
 }
 
 VkAdaptiveThresholdLayer::~VkAdaptiveThresholdLayer() {}
@@ -25,7 +27,7 @@ void VkAdaptiveThresholdLayer::onUpdateParamet() {
         boxBlur->updateParamet({paramet.boxSize, paramet.boxSize});
     }
     if (paramet.offset != oldParamet.offset) {
-        memcpy(constBufCpu.data(), &paramet.offset, conBufSize);
+        updateUBO(&paramet.offset);
         bParametChange = true;
     }
 }
@@ -38,8 +40,6 @@ void VkAdaptiveThresholdLayer::onInitGraph() {
     outFormats[0].imageType = ImageType::r8;
     // 这几个节点添加在本节点之前
     pipeGraph->addNode(luminance.get())->addNode(boxBlur->getLayer());
-    // 更新下默认UBO信息
-    memcpy(constBufCpu.data(), &paramet.offset, conBufSize);
 }
 
 void VkAdaptiveThresholdLayer::onInitNode() {

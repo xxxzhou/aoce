@@ -93,8 +93,8 @@ void AAoceDisplayActor::BeginPlay() {
 #if WIN32
 	outputLayer->updateParamet({ false, true });
 #elif __ANDROID__
-	outputLayer->updateParamet({ false, true });
-	// outputLayer->setImageProcessHandle(std::bind(&AAoceDisplayActor::outLayerData, this, _1, _2, _3));
+	outputLayer->updateParamet({ true, false });
+	outputLayer->setImageProcessHandle(std::bind(&AAoceDisplayActor::outLayerData, this, _1, _2, _3));
 #endif	
 	yuv2rgbLayer = layerFactory->createYUV2RGBA();
 	// 生成图
@@ -157,13 +157,13 @@ void AAoceDisplayActor::UpdateFrame(const aoce::VideoFrame& frame) {
 		void* device = RHICmdList.GetNativeDevice();
 		play->outputLayer->outDx11GpuTex(device, texRHI->GetNativeResource());
 #elif __ANDROID__
-		if (IsRunningRHIInSeparateThread()) {
-			new (RHICmdList.AllocCommand<FRHICommandUpdateAoceGLTexture>()) FRHICommandUpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
-			RHICmdList.ImmediateFlush(EImmediateFlushType::FlushRHIThread);
-		}
-		else {
-			UpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
-		}
+		//if (IsRunningRHIInSeparateThread()) {
+		//	new (RHICmdList.AllocCommand<FRHICommandUpdateAoceGLTexture>()) FRHICommandUpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
+		//	RHICmdList.ImmediateFlush(EImmediateFlushType::FlushRHIThread);
+		//}
+		//else {
+		//	UpdateAoceGLTexture(play->outputLayer, texRHI, play->format.width, play->format.height);
+		//}
 #endif
 	});
 }

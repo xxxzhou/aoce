@@ -15,8 +15,10 @@ VkFormat ImageFormat2Vk(ImageType imageType) {
                                         // VK_FORMAT_R8_UNORM
         case ImageType::rgba8:
             return VK_FORMAT_R8G8B8A8_UNORM;
-        case ImageType::rgbaf32:
+        case ImageType::rgba32f:
             return VK_FORMAT_R32G32B32A32_SFLOAT;
+        case ImageType::r32f:
+            return VK_FORMAT_R32_SFLOAT;
         default:
             return VK_FORMAT_UNDEFINED;
     }

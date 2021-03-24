@@ -48,7 +48,12 @@ void AoceLiveManager::onEvent(int32_t operater, int32_t code,
 
 void AoceLiveManager::onInitRoom() {}
 
-void AoceLiveManager::onLoginRoom(bool bReConnect) {}
+void AoceLiveManager::onLoginRoom(bool bReConnect) {
+	PushSetting setting = {};
+	setting.bVideo = 0;
+	setting.bAudio = 1;
+	room->pushStream(0, setting);
+}
 
 void AoceLiveManager::onUserChange(int32_t userId, bool bAdd) {
 	std::string str;

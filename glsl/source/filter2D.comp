@@ -30,7 +30,7 @@ void main(){
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     }
-    vec4 sum = vec4(0);
+    vec4 sum = vec4(0.0f);
     int kInd = 0;
     for(int i = 0; i< ubo.yksize; ++i){
         for(int j= 0; j< ubo.xksize; ++j){

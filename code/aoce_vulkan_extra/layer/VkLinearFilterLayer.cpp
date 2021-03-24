@@ -27,7 +27,7 @@ void VkLinearFilterLayer::onInitGraph() {
     outFormats[0].imageType = imageType;
     if (imageType == ImageType::r8) {
         path = "glsl/filter2DC1.comp.spv";
-    } else if (imageType == ImageType::rgbaf32) {
+    } else if (imageType == ImageType::rgba32f) {
         path = "glsl/filter2DF4.comp.spv";
     }
     shader->loadShaderModule(context->device, path);
@@ -69,7 +69,7 @@ void VkBoxBlurLayer::onInitVkBuffer() {
     std::vector<int32_t> ubo = {paramet.kernelSizeX, paramet.kernelSizeY,
                                 paramet.kernelSizeX / 2,
                                 paramet.kernelSizeY / 2};
-    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
+    updateUBO(ubo.data());
 
     int kernelSize = paramet.kernelSizeX * paramet.kernelSizeY;
     float kvulve = 1.0f / (float)kernelSize;
@@ -97,7 +97,7 @@ void VkGaussianBlurLayer::onUpdateParamet() {
 
 void VkGaussianBlurLayer::onInitVkBuffer() {
     int ksize = paramet.blurRadius * 2 + 1;
-    if (paramet.sigma <= 0) {
+    if (paramet.sigma <= 0.0f) {
         paramet.sigma = ((ksize - 1) * 0.5 - 1) * 0.3 + 0.8;
     }
     double scale = 1.0f / (paramet.sigma * paramet.sigma * 2.0);
@@ -122,7 +122,7 @@ void VkGaussianBlurLayer::onInitVkBuffer() {
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());
     std::vector<int32_t> ubo = {ksize, ksize, paramet.blurRadius,
                                 paramet.blurRadius};
-    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
+    updateUBO(ubo.data());
 }
 
 }  // namespace layer

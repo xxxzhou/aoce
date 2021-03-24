@@ -2,11 +2,19 @@
 
 ## 01_findmodule 验证模块功能加载
 
+win端上验证模块加载相关功能.
+
 ## 02_showdevice 摄像机模块
+
+win端验证摄像机模块,图像显示需要opencv配置.
 
 ## 03_findvulkan vulkan与opencv,vulkan图像处理,opencv显示
 
+win端验证vulkan/cuda计算模块,图像显示需要opencv配置.
+
 ## 04_vulkantest (android/win)vulkan自身窗口交换链显示
+
+android端简单演示,win端自身窗口显示,不需要配置opencv.
 
 ## 05_livetest (android/win)结合直播模块展示
 

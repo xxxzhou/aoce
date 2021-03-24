@@ -65,7 +65,7 @@ class AOCE_VULKAN_EXPORT UBOLayout {
     std::vector<VkDescriptorSetLayout> descSetLayouts;
 
    public:
-    VkPipelineLayout pipelineLayout;
+    VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
     // 根据layout生成不同的
     std::vector<std::vector<VkDescriptorSet>> descSets;
 

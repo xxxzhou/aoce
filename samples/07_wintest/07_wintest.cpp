@@ -27,7 +27,7 @@ static std::unique_ptr<Dx11Window> window = nullptr;
 static std::unique_ptr<VideoViewGraph> viewGraph = nullptr;
 
 // cuda/vulkan 分别对接不同的DX11输出
-static GpuType gpuType = GpuType::vulkan;
+static GpuType gpuType = GpuType::cuda;
 
 static void* dx11Device = nullptr;
 static void* dx11Tex = nullptr;

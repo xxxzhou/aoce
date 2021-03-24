@@ -16,11 +16,8 @@ static InputLayer* inputLayer;
 static OutputLayer* outputLayer;
 static YUV2RGBALayer* yuv2rgbLayer;
 
-#if __ANDORID__
+// cuda也可测试 
 static GpuType gpuType = GpuType::vulkan;
-#else
-static GpuType gpuType = GpuType::vulkan;
-#endif
 
 static void onDrawFrame(VideoFrame frame) {
     // std::cout << "time stamp:" << frame.timeStamp << std::endl;

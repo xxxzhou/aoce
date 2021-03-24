@@ -6,6 +6,7 @@ namespace layer {
 
 VkTransposeLayer::VkTransposeLayer(/* args */) {
     setUBOSize(sizeof(TransposeParamet), true);
+    onUpdateParamet();
 }
 
 VkTransposeLayer::~VkTransposeLayer() {}

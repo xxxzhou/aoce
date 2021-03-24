@@ -147,7 +147,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="max" />
+                        android:text="scale" />
 
                     <SeekBar
                         android:id="@+id/seekBar3"
@@ -165,14 +165,14 @@
                     android:layout_height="match_parent">
 
                     <TextView
-                        android:id="@+id/textView4"
+                        android:id="@+id/textView5"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="比差系数" />
+                        android:text="exponent" />
 
                     <SeekBar
-                        android:id="@+id/seekBar4"
+                        android:id="@+id/seekBar5"
                         style="@style/Widget.AppCompat.SeekBar"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -182,7 +182,28 @@
                         android:progress="10"
                         android:progressTint="#FFFFFF" />
                 </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="dscale" />
+
+                    <SeekBar
+                        android:id="@+id/seekBar4"
+                        style="@style/Widget.AppCompat.SeekBar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="5"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="20"
+                        android:progressTint="#FFFFFF" />
+                </TableRow>
             </TableLayout>
 
         </LinearLayout>

@@ -69,7 +69,7 @@ void VkYUV2RGBALayer::onInitLayer() {
     }
     // 更新constBufCpu
     std::vector<int> ubo = {outFormats[0].width, outFormats[0].height, yuvType};
-    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
+    updateUBO(ubo.data());
 }
 
 }  // namespace layer

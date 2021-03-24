@@ -94,6 +94,8 @@ opencv cudafilters的高斯卷积,就采用先计算水平卷积,然后计算垂
 
 [Harris 角点检测](https://blog.csdn.net/u014485485/article/details/79056666)
 
+genType step(float edge,genType x),step generates a step function by comparing x to edge.For element i of the return value, 0.0 is returned if edge >= x, and 1.0 is returned otherwise.
+
 ### 导向滤波(Guided Filter)
 
 引导滤波是由何凯明等人于2010年发表在ECCV的文章《Guided Image Filtering》中提出的，后续于2013年发表了改进算法快速引导滤波的实现。它与双边滤波最大的相似之处，就是同样具有保持边缘特性。该模型认为，某函数上一点与其邻近部分的点成线性关系，一个复杂的函数就可以用很多局部的线性函数来表示，当需要求该函数上某一点的值时，只需计算所有包含该点的线性函数的值并做平均即可。这种模型，在表示非解析函数上，非常有用。

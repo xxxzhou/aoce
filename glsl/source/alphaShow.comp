@@ -8,9 +8,11 @@ layout (binding = 0, rgba8) uniform readonly image2D inTex;
 layout (binding = 0, r8) uniform readonly image2D inTex;
 #elif CHANNEL_RGBAF32
 layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+#elif CHANNEL_RF32
+layout (binding = 0, r32f) uniform image2D inTex;
 #endif
 
-layout (binding = 1, rgba32f) uniform image2D outTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
 
 void main(){
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
@@ -18,11 +20,11 @@ void main(){
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     }
-    #if CHANNEL_R8 
+    #if CHANNEL_R8 || CHANNEL_RF32
         float alpha = imageLoad(inTex,uv).r;     
         imageStore(outTex,uv,vec4(alpha)); 
     #else
         vec4 color = imageLoad(inTex,uv);     
-        imageStore(outTex,uv,color); 
+        imageStore(outTex,uv,vec4(color.w)); 
     #endif
 }

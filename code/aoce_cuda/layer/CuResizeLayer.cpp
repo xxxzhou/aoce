@@ -29,7 +29,7 @@ bool CuResizeLayer::onFrame() {
         resize_gpu<uchar>(*inTexs[0], *outTexs[0], paramet.bLinear, stream);
     } else if (imageType == ImageType::rgba8) {
         resize_gpu<uchar4>(*inTexs[0], *outTexs[0], paramet.bLinear, stream);
-    } else if (imageType == ImageType::rgbaf32) {
+    } else if (imageType == ImageType::rgba32f) {
         resize_gpu<float4>(*inTexs[0], *outTexs[0], paramet.bLinear, stream);
     }
     return true;

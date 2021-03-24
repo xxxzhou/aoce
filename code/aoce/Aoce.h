@@ -111,7 +111,8 @@ enum class ImageType {
     r16,
     // 游戏中fbo,rtt使用,输入与输出层使用,经输入层自动转化rgba8
     bgra8,
-    rgbaf32,
+    rgba32f,
+    r32f,
 };
 
 enum class VideoCodec {
@@ -244,6 +245,12 @@ struct BlendParamet {
     float height = 0.4f;
     // 显示如上位置图像的透明度
     float alaph = 0.2f;
+
+    inline bool operator==(const BlendParamet &right) {
+        return this->centerX == right.centerX &&
+               this->centerY == right.centerY && this->width == right.width &&
+               this->height == right.height && this->alaph == right.alaph;
+    }
 };
 
 // width/height 变成height/width
@@ -258,7 +265,8 @@ struct ReSizeParamet {
     int32_t newWidth = 0;
     int32_t newHeight = 0;
     inline bool operator==(const ReSizeParamet &right) {
-        return this->newWidth == right.newWidth && this->newHeight == right.newHeight &&
+        return this->newWidth == right.newWidth &&
+               this->newHeight == right.newHeight &&
                this->bLinear == right.bLinear;
     }
 };

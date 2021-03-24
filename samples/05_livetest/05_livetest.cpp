@@ -58,6 +58,10 @@ class TestLive : public ILiveObserver {
     // loginRoom的网络应答
     virtual void onLoginRoom(bool bReConnect = false) {
         logMessage(LogLevel::info, "login success");
+        PushSetting setting = {};
+        setting.bVideo = 0;
+        setting.bAudio = 1;
+        room->pushStream(0, setting);
     };
 
     // 加入的房间人数变化
@@ -87,9 +91,11 @@ class TestLive : public ILiveObserver {
     // 用户对应流的视频桢数据
     virtual void onVideoFrame(int32_t userId, int32_t index,
                               const VideoFrame &videoFrame) {
-        std::string  str;
-        string_format(str,"width:",videoFrame.width," height:",videoFrame.height," yuvtype:",to_string(videoFrame.videoType));
-        logMessage(LogLevel::info,str);
+        std::string str;
+        string_format(str, "width:", videoFrame.width,
+                      " height:", videoFrame.height,
+                      " yuvtype:", to_string(videoFrame.videoType));
+        logMessage(LogLevel::info, str);
         if (yuv2rgbLayer->getParamet().type != videoFrame.videoType) {
             yuv2rgbLayer->updateParamet({videoFrame.videoType, true});
         }
@@ -178,7 +184,7 @@ void android_main(struct android_app *app)
             nullptr;  // AoceManager::Get().getAppEnv().application;
 #endif
         room->initRoom(&contex, live);
-        room->loginRoom("123", 5, 0);
+        room->loginRoom("123", 701, 1);
     });
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
     window =
@@ -265,7 +271,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_joinRoom(
     // copy
     std::string roomname = str;
     env->ReleaseStringUTFChars(uri, str);
-    room->loginRoom(roomname.c_str(), 123, 0);
+    room->loginRoom(roomname.c_str(), 123, 1);
 }
 }
 #endif

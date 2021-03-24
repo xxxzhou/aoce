@@ -38,7 +38,7 @@ void VkResizeLayer::onInitGraph() {
     std::string path = "glsl/resize.comp.spv";
     if (imageType == ImageType::r8) {
         path = "glsl/resizeC1.comp.spv";
-    } else if (imageType == ImageType::rgbaf32) {
+    } else if (imageType == ImageType::rgba32f) {
         path = "glsl/resizeF4.comp.spv";
     }
     shader->loadShaderModule(context->device, path);
@@ -58,8 +58,8 @@ void VkResizeLayer::onInitLayer() {
     VkResizeParamet vpar = {};
     vpar.bLinear = paramet.bLinear;
     vpar.fx = (float)inFormats[0].width / outFormats[0].width;
-    vpar.fy = (float)inFormats[0].height / outFormats[0].height;
-    memcpy(constBufCpu.data(), &vpar, conBufSize);
+    vpar.fy = (float)inFormats[0].height / outFormats[0].height;    
+    updateUBO(&vpar);
 
     sizeX = divUp(outFormats[0].width, groupX);
     sizeY = divUp(outFormats[0].height, groupY);

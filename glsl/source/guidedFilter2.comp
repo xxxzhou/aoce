@@ -35,7 +35,12 @@ void main(){
 	vec3 col0 = var_I_r + vec3(ubo.eps, 0.f, 0.f);
 	vec3 col1 = vec3(var_I_r.y, gg + ubo.eps, gb);
 	vec3 col2 = vec3(var_I_r.z, gb, bb + ubo.eps);
-    vec3 a = cov_Ip * inverse(mat3(col0,col1,col2));// * cov_Ip;
+	mat3 invMat = inverse(mat3(col0,col1,col2));
+	// float ax = dot(cov_Ip,vec3(invMat[0].x,invMat[1].x,invMat[2].x));
+	// float ay = dot(cov_Ip,vec3(invMat[0].y,invMat[1].y,invMat[2].y));
+	// float az = dot(cov_Ip,vec3(invMat[0].z,invMat[1].z,invMat[2].z));
+	// vec3 a = vec3(ax,ay,az);
+    vec3 a = cov_Ip * invMat;	
 	float b = mean_p - dot(a, mean_I);
 	//把当前ay+by+cz+w的解存入
 	 imageStore(outTex, uv,vec4(a, b));

@@ -4,6 +4,7 @@
 #include "layer/VkAlphaShowLayer.hpp"
 #include "layer/VkChromKeyLayer.hpp"
 #include "layer/VkGuidedLayer.hpp"
+#include "layer/VkHarrisCornerDetectionLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
 #include "layer/VkLuminanceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
@@ -43,9 +44,8 @@ ITLayer<ReSizeParamet>* createResizeLayer(ImageType imageType) {
     return layer;
 }
 
-ITLayer<GuidedMattingParamet>* createGuidedMattingLayer(
-    BaseLayer* mattingLayer) {
-    VkGuidedMattingLayer* layer = new VkGuidedMattingLayer(mattingLayer);
+ITLayer<HarrisCornerDetectionParamet>* createHarrisCornerDetectionLayer() {
+    VkHarrisCornerDetectionLayer* layer = new VkHarrisCornerDetectionLayer();
     return layer;
 }
 

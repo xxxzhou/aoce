@@ -15,6 +15,6 @@ void main(){
     vec4 c = imageLoad(inTex,uv);
     //得到Guided filter所需要的矩阵
     imageStore(outTex1, uv, vec4(c.rgb*c.a,1.0f)); 
-    imageStore(outTex2, uv, vec4(vec3(c.r*c.r, c.g*c.g, c.b*c.b),1.0f)); 
-    imageStore(outTex3, uv, vec4(vec3(c.r*c.g, c.r*c.b, c.g*c.b),1.0f)); 
+    imageStore(outTex2, uv, vec4(c.rgb*c.r,1.0f)); 
+    imageStore(outTex3, uv, vec4(vec3(c.g*c.g, c.g*c.b, c.b*c.b),1.0f)); 
 }

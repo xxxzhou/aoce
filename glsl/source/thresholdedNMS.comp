@@ -1,0 +1,47 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, r32f) uniform readonly image2D inTex;
+layout (binding = 1, r8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {
+    float threshold;
+} ubo;
+
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }  
+    float values[9];
+    for(int i = 0; i< 3; ++i){
+        for(int j= 0; j< 3; ++j){
+            int x = uv.x - 1 + j;
+            int y = uv.y - 1 + i;
+            // REPLICATE border
+            x = max(0,min(x,size.x-1));
+            y = max(0,min(y,size.y-1));            
+            float value = imageLoad(inTex,ivec2(x,y)).r;
+            values[j+i*3] = value;
+        }
+    }
+    // 0 1 2
+    // 3 4 5
+    // 6 7 8
+    // 如果左上角(0,1,3,6)大于当前点,multiplier=0
+    float multiplier = 1.0 - step(values[4], values[1]);
+    multiplier = multiplier * (1.0 - step(values[4], values[0]));
+    multiplier = multiplier * (1.0 - step(values[4], values[3]));
+    multiplier = multiplier * (1.0 - step(values[4], values[6]));
+    // 查找右下角(2,5,7,8)的最大值
+    float maxValue = max(values[4], values[7]);
+    maxValue = max(values[4], values[8]);
+    maxValue = max(values[4], values[5]);
+    maxValue = max(values[4], values[2]);
+    // step(maxValue, values[4])需要当前值最大才为1
+    float result = values[4]* step(maxValue, values[4]) * multiplier;
+    result = step(ubo.threshold, result);
+    imageStore(outTex,uv,vec4(result)); 
+}

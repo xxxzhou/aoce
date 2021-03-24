@@ -11,12 +11,15 @@ namespace layer {
 VkBlendLayer::VkBlendLayer(/* args */) {
     setUBOSize(sizeof(VkBlendParamet));
     inCount = 2;
-    outCount = 1;    
+    outCount = 1;
 }
 
 VkBlendLayer::~VkBlendLayer() {}
 
 void VkBlendLayer::onUpdateParamet() {
+    if (paramet == oldParamet) {
+        return;
+    }
     parametTransform();
     // 运行时更新UBO
     bParametChange = true;
@@ -45,16 +48,13 @@ void VkBlendLayer::parametTransform() {
         vkParamet.fx = inFormats[1].width / vkParamet.width;
         vkParamet.fy = inFormats[1].height / vkParamet.height;
     }
-    memcpy(constBufCpu.data(), &vkParamet, conBufSize);
-}
-
-void VkBlendLayer::onInitLayer() {
-    VkLayer::onInitLayer();
-
-    parametTransform();
+    updateUBO(&vkParamet);
 }
 
 void VkBlendLayer::onInitPipe() {
+    // 更新一次UBO
+    parametTransform();
+    // 更新
     inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
     outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
     inTexs[1]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;

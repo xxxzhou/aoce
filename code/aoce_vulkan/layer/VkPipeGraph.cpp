@@ -128,7 +128,7 @@ bool VkPipeGraph::onRun() {
     // 更新所有层的参数
     for (auto* layer : vkLayers) {
         if (layer->bParametChange) {
-            layer->updateUBO();
+            layer->submitUBO();
             layer->bParametChange = false;
         }
     }

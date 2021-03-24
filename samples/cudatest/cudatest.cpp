@@ -1,8 +1,9 @@
 
 extern "C" void testFastGuided();
+extern "C" void test10();
 
 int main() {
-    testFastGuided();
+    test10();
 
     return 0;
 }

@@ -21,7 +21,7 @@ void AAoceLiveActor::BeginPlay() {
 
 	liveManager = std::make_unique<AoceLiveManager>();
 	liveManager->initRoom(aoce::LiveType::agora, dispActor);
-	liveManager->getRoom()->loginRoom("123", 16, 0);
+	liveManager->getRoom()->loginRoom("123", 710, 1);
 
 //	std::string uri = "rtmp://58.200.131.2:1935/livetv/hunantv";
 //	mediaPlayer = std::make_unique< AoceMediaPlayer>();

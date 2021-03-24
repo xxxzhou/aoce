@@ -30,6 +30,7 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, Vi
     private SeekBar minBar = null;
     private SeekBar maxBar = null;
     private SeekBar scaleBar = null;
+    private SeekBar dscaleBar = null;
 
     private static final int PERMISSION_REQUEST_CODE_CAMERA = 1;
 
@@ -48,6 +49,7 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, Vi
         minBar = findViewById(R.id.seekBar2);
         maxBar = findViewById(R.id.seekBar3);
         scaleBar = findViewById(R.id.seekBar4);
+        dscaleBar = findViewById(R.id.seekBar5);
 
         if (checkSelfPermission( Manifest.permission.CAMERA) !=
                 PackageManager.PERMISSION_GRANTED) {
@@ -106,9 +108,10 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, Vi
         boolean green = greenButton.isChecked();
         float luma = (float)lumaBar.getProgress()/lumaBar.getMax()*10.0f;
         float min =(float)minBar.getProgress()/minBar.getMax();
-        float max = (float)maxBar.getProgress()/maxBar.getMax();
-        float scale = (float)scaleBar.getProgress()/scaleBar.getMax();
-        updateParamet(green,luma,min,max,scale);
+        float scale = (float)maxBar.getProgress()/maxBar.getMax()*100;
+        float exponent = (float)scaleBar.getProgress()/scaleBar.getMax()*10;
+        float dscale = (float)dscaleBar.getProgress()/dscaleBar.getMax()*100;
+        updateParamet(green,luma,min,scale,exponent,dscale);
     }
 
     public native void initEngine();
@@ -116,7 +119,7 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, Vi
     public native void openCamera(int index);
 
     public native void enableLayer(boolean enable);
-    public native void updateParamet(boolean green,float luma,float min,float max,float scale);
+    public native void updateParamet(boolean green,float luma,float min,float scale,float exponent,float dscale);
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {

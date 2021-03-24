@@ -17,9 +17,9 @@ VkConvertImageLayer::~VkConvertImageLayer() {}
 void VkConvertImageLayer::onInitGraph() {
     VkLayer::onInitGraph();
     inFormats[0].imageType = ImageType::rgba8;
-    outFormats[0].imageType = ImageType::rgbaf32;
+    outFormats[0].imageType = ImageType::rgba32f;
     if (convert == ConvertType::rgba32f2rgba8) {
-        inFormats[0].imageType = ImageType::rgbaf32;
+        inFormats[0].imageType = ImageType::rgba32f;
         outFormats[0].imageType = ImageType::rgba8;
     }
 }

@@ -43,6 +43,7 @@ for gfile in files:
         cmdStr = "glslangValidator -V %s -o %s %s" % (gfile.srcfile, gfile.desfile, gfile.macro)
     if subprocess.call(cmdStr, shell=True) != 0 :
         bSucess = False
+        break
 
 print("\n-------- Compilation result --------\n")
 

@@ -82,7 +82,10 @@
         "baselayer.hpp": "c",
         "aocemanager.hpp": "c",
         "videomanager.hpp": "c",
-        "mediaplayer.hpp": "c"
+        "mediaplayer.hpp": "c",
+        "clocale": "cpp",
+        "optional": "cpp",
+        "shared_mutex": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,

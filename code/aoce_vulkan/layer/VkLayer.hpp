@@ -72,12 +72,13 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
 
    protected:
     // 初始化时请指定
-    void setUBOSize(int size, bool bMatchParamet= false);
+    void setUBOSize(int size, bool bMatchParamet = false);
     void createOutTexs();
 
    public:
     void generateLayout();
-    void updateUBO();
+    void updateUBO(void* data);
+    void submitUBO();
 
    protected:
     // 只发生在附加PipeGraph时,特定VK一些实现,如果要特定实现onInitGraph

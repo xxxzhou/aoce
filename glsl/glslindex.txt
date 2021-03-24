@@ -5,6 +5,7 @@ adaptiveThreshold.comp
 alphaShow.comp alphaShow.comp CHANNEL_RGBA=1
 alphaShow.comp alphaShowC1.comp CHANNEL_R8=1
 alphaShow.comp alphaShowF4.comp CHANNEL_RGBAF32=1
+alphaShow.comp alphaShowF1.comp CHANNEL_RF32=1
 blend.comp
 chromaKey.comp
 filterColumn.comp filterColumn.comp CHANNEL_RGBA=1
@@ -29,3 +30,7 @@ guidedFilter2.comp
 guidedMatting.comp
 convertImage.comp convertImage.comp CHANNEL_RGBA=1
 convertImage.comp convertImageF4.comp CHANNEL_RGBAF32=1
+prewitt.comp
+harrisCornerDetection.comp
+thresholdedNMS.comp
+showRound.comp

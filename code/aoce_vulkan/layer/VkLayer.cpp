@@ -24,6 +24,9 @@ void VkLayer::setUBOSize(int size, bool bMatchParamet) {
 }
 
 void VkLayer::generateLayout() {
+    if (layout->pipelineLayout != VK_NULL_HANDLE) {
+        return;
+    }
     std::vector<UBOLayoutItem> items;
     for (int i = 0; i < inCount; i++) {
         items.push_back(
@@ -41,7 +44,11 @@ void VkLayer::generateLayout() {
     layout->generateLayout();
 }
 
-void VkLayer::updateUBO() {
+void VkLayer::updateUBO(void* data) {
+    memcpy(constBufCpu.data(), data, conBufSize);
+}
+
+void VkLayer::submitUBO() {
     if (constBuf) {
         constBuf->upload(constBufCpu.data());
         constBuf->submit();
@@ -105,7 +112,7 @@ void VkLayer::onInitBuffer() {
     onInitVkBuffer();
     onInitPipe();
     // 默认更新一次UBO
-    updateUBO();
+    submitUBO();
 }
 
 bool VkLayer::onFrame() { return true; }

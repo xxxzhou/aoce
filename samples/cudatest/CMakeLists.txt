@@ -10,7 +10,7 @@ set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-O3; -G; -g;-std=c++14")
 include_directories("../../code")
 include_directories("../../code/aoce_cuda")
 
-file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.cu")
+file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/*.cu")
 
 add_executable(cudatest ${AOCE_SOURCE} )
 set_target_properties(

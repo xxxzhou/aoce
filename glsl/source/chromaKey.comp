@@ -7,7 +7,7 @@ layout (binding = 0, rgba8) uniform readonly image2D inTex;
 layout (binding = 1, rgba8) uniform image2D outTex;
 
 layout (std140, binding = 2) uniform UBO {
-    // 0.2 控制亮度的强度系数
+    // 1 控制亮度的强度系数
     float lumaMask;
     float chromaColorX;
     float chromaColorY;
@@ -16,14 +16,11 @@ layout (std140, binding = 2) uniform UBO {
     float ambientScale;
     float ambientColorX;  
     float ambientColorY; 
-    float ambientColorZ;   
-    // 0.4
-    float alphaCutoffMin;
-    // 0.5
-    float alphaCutoffMax;
-    float alphaExponent;
-    // 0.8
-    float despillCuttofMax;
+    float ambientColorZ;       
+    float alphaCutoffMin;    
+    float alphaScale;
+    float alphaExponent;   
+    float despillScale;
     float despillExponent;
 } ubo;
 
@@ -52,21 +49,17 @@ void main(){
     vec3 color2 = extractColor(inputColor,ubo.lumaMask);
     vec3 subColor = color1 - color2;
     float diffSize = length(subColor);
-    float minClamp = diffSize-ubo.alphaCutoffMin;
-    float dist = ubo.alphaCutoffMax - ubo.alphaCutoffMin;
+    float minClamp = max((diffSize-ubo.alphaCutoffMin)*ubo.alphaScale,0.0);    
     // 扣像alpha
-    float alpha= clamp(pow(max(minClamp/dist,0),ubo.alphaExponent),0.0,1.0);
+    float alpha= clamp(pow(minClamp,ubo.alphaExponent),0.0,1.0);
     // 受扣像背景影响的颜色alpha
-    float inputClamp = ubo.despillCuttofMax - ubo.alphaCutoffMin;
-    float despillAlpha = 1.0f- clamp(pow(max(minClamp/inputClamp,0),ubo.despillExponent),0.0,1.0);
+    float despillAlpha = 1.0f - clamp(pow(minClamp,ubo.despillExponent),0.0,1.0);
     // 亮度系数
-    vec3 lumaFactor = vec3(0.3f,0.59f,0.11f);    
+    vec3 lumaFactor = vec3(0.3f,0.59f,0.11f);   
+    vec3 dcolor = inputColor; 
+    // 去除扣像背景影响的颜色
+    dcolor -= inputColor*chromaColor*despillAlpha*ubo.despillScale; 
     // 添加环境光收益
-    vec3 dcolor = inputColor*lumaFactor*ambientColor*ubo.ambientScale*despillAlpha;
-    // 去除扣像背景
-    dcolor -= inputColor*chromaColor*despillAlpha;
-    dcolor += inputColor;    
-    // 为了显示查看效果,后面屏蔽
-    dcolor = inputColor*alpha + ambientColor*(1.0-alpha);
-    imageStore(outTex,uv,vec4(dcolor,alpha)); 
+    dcolor += inputColor*lumaFactor*ambientColor*ubo.ambientScale*despillAlpha;
+    imageStore(outTex,uv,vec4(dcolor,alpha)); // vec4(dcolor,alpha)
 }

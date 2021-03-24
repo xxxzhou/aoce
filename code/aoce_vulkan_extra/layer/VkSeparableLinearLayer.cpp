@@ -13,7 +13,7 @@ VkSeparableLayer::VkSeparableLayer(ImageType imageType) {
     glslPath = "glsl/filterRow.comp.spv";
     if (imageType == ImageType::r8) {
         glslPath = "glsl/filterRowC1.comp.spv";
-    } else if (imageType == ImageType::rgbaf32) {
+    } else if (imageType == ImageType::rgba32f) {
         glslPath = "glsl/filterRowF4.comp.spv";
     }
 }
@@ -23,7 +23,7 @@ VkSeparableLayer::~VkSeparableLayer() {}
 void VkSeparableLayer::updateBuffer(std::vector<float> data) {
     int32_t size = data.size();
     std::vector<int32_t> ubo = {size, size / 2};
-    memcpy(constBufCpu.data(), ubo.data(), conBufSize);
+    updateUBO(ubo.data());
 
     kernelBuffer = std::make_unique<VulkanBuffer>();
     kernelBuffer->initResoure(BufferUsage::onestore, size * sizeof(float),
@@ -71,7 +71,7 @@ VkSeparableLinearLayer::VkSeparableLinearLayer(ImageType imageType)
     glslPath = "glsl/filterColumn.comp.spv";
     if (imageType == ImageType::r8) {
         glslPath = "glsl/filterColumnC1.comp.spv";
-    } else if (imageType == ImageType::rgbaf32) {
+    } else if (imageType == ImageType::rgba32f) {
         glslPath = "glsl/filterColumnF4.comp.spv";
     }
 }
@@ -130,8 +130,6 @@ void VkBoxBlurSLayer::onInitLayer() {
 
 VkGaussianBlurSLayer::VkGaussianBlurSLayer(ImageType imageType)
     : VkSeparableLinearLayer(imageType) {
-    paramet.blurRadius = 4;
-    paramet.sigma = 2.0f;
 }
 
 VkGaussianBlurSLayer::~VkGaussianBlurSLayer() {}
@@ -145,7 +143,10 @@ void VkGaussianBlurSLayer::onUpdateParamet() {
 
 void VkGaussianBlurSLayer::onInitLayer() {
     VkSeparableLinearLayer::onInitLayer();
-    int ksize = paramet.blurRadius * 2 + 1;
+    int ksize = paramet.blurRadius * 2 + 1;   
+    if (paramet.sigma <= 0.0f) {
+        paramet.sigma = ((ksize - 1) * 0.5 - 1) * 0.3 + 0.8;
+    }
     std::vector<float> karray(ksize);
     double sum = 0.0;
     double scale = 1.0f / (paramet.sigma * paramet.sigma * 2.0);

@@ -1,3 +1,4 @@
-guidedFilter1.comp
-guidedFilter2.comp
-guidedMatting.comp
+prewitt.comp
+harrisCornerDetection.comp
+thresholdedNMS.comp
+showRound.comp

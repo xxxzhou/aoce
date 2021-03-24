@@ -99,7 +99,7 @@ class ACOE_EXPORT BaseLayer {
 };
 
 // 实现层(非抽像层)不会单独从ILayer继承,还一个继承路径应该从BaseLayer来
-class ILayer {
+class ACOE_EXPORT ILayer {
    public:
     // 请看上面宏AOCE_LAYER_QUERYINTERFACE提供的默认实现
     virtual BaseLayer* getLayer() = 0;

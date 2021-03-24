@@ -13,7 +13,7 @@ void VkExtraBaseView::initGraph(ILayer* layer, void* hinst,
     if (nextLayer != nullptr) {
         layers.push_back(nextLayer);
     }
-    initGraph(layers,hinst);
+    initGraph(layers, hinst);
 }
 
 void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst) {
@@ -30,7 +30,11 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst) {
     yuvNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
     PipeNodePtr layerNode = yuvNode;
     for (auto& layer : layers) {
-        layerNode = layerNode->addNode(layer);
+        if (layerNode->getEndNode()) {
+            layerNode->getEndNode()->addNode(layer);
+        } else {
+            layerNode = layerNode->addNode(layer);
+        }
     }
 #if _WIN32
     TexOperateParamet texParamet = {};
@@ -71,7 +75,11 @@ void VkExtraBaseView::openDevice(int32_t id) {
     index = id;
     video = deviceList[index];
     auto& formats = video->getFormats();
+#if WIN32
     formatIndex = video->findFormatIndex(1920, 1080);
+#elif __ANDROID__
+    formatIndex = video->findFormatIndex(1280, 720);
+#endif
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();

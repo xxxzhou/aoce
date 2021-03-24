@@ -7,7 +7,7 @@ namespace layer {
 VkChromKeyLayer::VkChromKeyLayer(/* args */) {
     setUBOSize(sizeof(ChromKeyParamet), true);
     glslPath = "glsl/chromaKey.comp.spv";
-    
+    onUpdateParamet();    
 }
 
 VkChromKeyLayer::~VkChromKeyLayer() {} 

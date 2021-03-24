@@ -19,7 +19,18 @@ namespace layer {
 class VkToMatLayer : public VkLayer {
    public:
     VkToMatLayer();
-    ~VkToMatLayer();
+    virtual ~VkToMatLayer();
+
+   protected:
+    virtual void onInitGraph() override;
+};
+
+class VkGuidedSolveLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkGuidedSolveLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   public:
+    VkGuidedSolveLayer();
+    virtual ~VkGuidedSolveLayer();
 
    protected:
     virtual void onInitGraph() override;
@@ -36,15 +47,15 @@ class VkGuidedLayer : public VkLayer, public ITLayer<GuidedParamet> {
     std::unique_ptr<VkBoxBlurSLayer> box2Layer;
     std::unique_ptr<VkBoxBlurSLayer> box3Layer;
     std::unique_ptr<VkBoxBlurSLayer> box4Layer;
-    std::unique_ptr<VkBoxBlurSLayer> box5Layer;
-
+    std::unique_ptr<VkGuidedSolveLayer> guidedSlayerLayer;
+    std::unique_ptr<VkBoxBlurSLayer> box5Layer;    
     std::unique_ptr<VkResizeLayer> resize1Layer;
 
     const int32_t zoom = 8;
 
    public:
     VkGuidedLayer(/* args */);
-    ~VkGuidedLayer();
+    virtual ~VkGuidedLayer();
 
    protected:
     virtual void onUpdateParamet() override;
@@ -53,23 +64,6 @@ class VkGuidedLayer : public VkLayer, public ITLayer<GuidedParamet> {
     virtual void onInitLayer() override;
 };
 
-class VkGuidedMattingLayer : public VkLayer,
-                             public ITLayer<GuidedMattingParamet> {
-    AOCE_LAYER_QUERYINTERFACE(VkGuidedMattingLayer)
-   private:
-    std::unique_ptr<VkGuidedLayer> guidedLayer = nullptr;
-    BaseLayer* mattingLayer = nullptr;
-
-   public:
-    // baseLayer为输出RGBA的图像,其中RGB代表颜色图,A代表导向图
-    VkGuidedMattingLayer(BaseLayer* baseLayer);
-    ~VkGuidedMattingLayer();
-
-   protected:
-    virtual void onUpdateParamet() override;
-    virtual void onInitGraph() override;
-    virtual void onInitNode() override;
-};
 
 }  // namespace layer
 }  // namespace vulkan

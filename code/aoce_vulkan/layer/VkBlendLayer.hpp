@@ -34,7 +34,6 @@ class VkBlendLayer : public VkLayer, public BlendLayer {
    protected:
     virtual void onUpdateParamet() override;
     virtual void onInitGraph() override;
-    virtual void onInitLayer() override;
 
     virtual void onInitPipe() override;
 };
