@@ -26,6 +26,22 @@ void VkAlphaShowLayer::onInitLayer() {
     VkLayer::onInitLayer();
 }
 
+VkAlphaShow2Layer::VkAlphaShow2Layer() {
+    glslPath = "glsl/showRound.comp.spv";
+    inCount = 2;
+    outCount = 1;
+}
+
+VkAlphaShow2Layer::~VkAlphaShow2Layer() {}
+
+void VkAlphaShow2Layer::onInitGraph() {
+    VkLayer::onInitGraph();
+    //
+    inFormats[0].imageType = ImageType::r8;
+    inFormats[1].imageType = ImageType::rgba8;
+    outFormats[0].imageType = ImageType::rgba8;
+}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

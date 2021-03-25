@@ -21,6 +21,15 @@ class VkAlphaShowLayer : public VkLayer {
     virtual void onInitLayer() override;
 };
 
+class VkAlphaShow2Layer : public VkLayer {
+   public:
+    VkAlphaShow2Layer();
+    ~VkAlphaShow2Layer();
+
+   protected:
+    virtual void onInitGraph() override;
+};
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

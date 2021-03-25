@@ -78,7 +78,7 @@ struct GuidedMattingParamet {
 
 struct HarrisCornerDetectionParamet {
     float edgeStrength = 1.0f;
-    GaussianBlurParamet blueParamet = {};
+    GaussianBlurParamet blueParamet = {4,0.0f};
     float harris = 0.04f;
     float sensitivity = 5.0f;
     float threshold = 0.2f;
@@ -106,6 +106,8 @@ createHarrisCornerDetectionLayer();
 AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createLuminanceLayer();
 
 AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createAlphaShowLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createAlphaShow2Layer();
 
 AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createConvertImageLayer();
 

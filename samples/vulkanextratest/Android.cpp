@@ -15,9 +15,18 @@ static VkExtraBaseView* view = nullptr;
 static ITLayer<KernelSizeParamet>* boxFilterLayer = nullptr;
 static ITLayer<GaussianBlurParamet>* gaussianLayer = nullptr;
 static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
-static ChromKeyParamet keyParamet = {};
+static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static ITLayer<GuidedParamet>* guidedLayer = nullptr;
+static BaseLayer* convertLayer = nullptr;
+static BaseLayer* alphaShowLayer = nullptr;
+static BaseLayer* alphaShow2Layer = nullptr;
+static BaseLayer* luminanceLayer = nullptr;
+static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
+static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
+static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
+static ITLayer<KernelSizeParamet>* boxFilterLayer1 = nullptr;
 
+static ChromKeyParamet keyParamet = {};
 extern "C" JNIEXPORT void JNICALL
 Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
                                                           jobject thiz) {
@@ -45,9 +54,26 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     guidedLayer = createGuidedLayer();
     guidedLayer->updateParamet({20, 0.00001f});
 
+    hcdLayer = createHarrisCornerDetectionLayer();
+    HarrisCornerDetectionParamet hcdParamet = {};
+    hcdParamet.threshold = 0.4f;
+    hcdParamet.harris = 0.04f;
+    hcdParamet.edgeStrength = 1.0f;
+    hcdLayer->updateParamet(hcdParamet);
+
+    boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);
+    alphaShow2Layer = createAlphaShow2Layer();
+    luminanceLayer = createLuminanceLayer();
+
     std::vector<BaseLayer*> layers;
-    layers.push_back(chromKeyLayer->getLayer());
-    layers.push_back(guidedLayer->getLayer());
+    // // 导向滤波
+    // layers.push_back(chromKeyLayer->getLayer());
+    // layers.push_back(guidedLayer->getLayer());
+    // 查看Harris 角点检测
+    layers.push_back(luminanceLayer);
+    layers.push_back(hcdLayer->getLayer());
+    layers.push_back(boxFilterLayer1->getLayer());
+    layers.push_back(alphaShow2Layer);
     view->initGraph(layers, nullptr);
 }
 
@@ -82,8 +108,9 @@ Java_aoce_samples_vulkanextratest_MainActivity_enableLayer(JNIEnv* env,
 extern "C" JNIEXPORT void JNICALL
 Java_aoce_samples_vulkanextratest_MainActivity_updateParamet(
     JNIEnv* env, jobject thiz, jboolean green, jfloat luma, jfloat min,
-    jfloat scale, jfloat exponent,jfloat dscale) {
+    jfloat scale, jfloat exponent, jfloat dscale) {
     // TODO: implement updateParamet()
+
     keyParamet.lumaMask = luma;
     keyParamet.alphaCutoffMin = min;
     keyParamet.alphaScale = scale * 10.f;

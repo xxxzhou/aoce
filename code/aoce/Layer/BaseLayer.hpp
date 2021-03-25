@@ -72,6 +72,8 @@ class ACOE_EXPORT BaseLayer {
     class PipeGraph* getGraph();
     // 附加到图表上的节点
     std::shared_ptr<class PipeNode> getNode();
+    int32_t getInCount();
+    int32_t getOutCount();
 
    protected:
     bool addInLayer(int32_t inIndex, int32_t nodeIndex, int32_t outputIndex);

@@ -32,6 +32,9 @@ PipeNodePtr BaseLayer::getNode() {
     return pipeNode.lock();
 }
 
+int32_t BaseLayer::getInCount() { return inCount; };
+int32_t BaseLayer::getOutCount() { return outCount; };
+
 bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,
                            int32_t outputIndex) {
     if (inIndex >= inCount) {

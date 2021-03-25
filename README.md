@@ -29,20 +29,52 @@ cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/
 
 各模块现主要通过CMake动态链接,通过相应选项可以选择去除不需要模块,后期完善静态编译成一个文件功能.
 
-## 模块
+## [模块](code)
 
-### [aoce](https://github.com/xxxzhou/aoce)(各个基本功能接口,结构定义)
+### [aoce](code/aoce)
 
-### aoce_android(android内关于camera/codec相关实现)
+各个基本功能接口,结构定义.
 
-### aoce_cuda(aoce图像计算层的cuda实现)
+### [aoce_android](code/aoce_android)
 
-### aoce_ffmpeg(aoce音视频资源播放的ffmpeg实现)
+android一些特定功能,比如camera/codec相关实现
 
-### aoce_vulkan(aoce图像计算层的vulkan实现)
+### [aoce_cuda](code/aoce_cuda)
 
-### aoce_win(win平台下基本功能,包含dx11各种资源定义等)
+aoce图像计算层的cuda实现
 
-### aoce_win_mf(win平台下aoce图像获取设备的Media Foundation实现)
+### [aoce_ffmpeg](code/aoce_ffmpeg)
 
-### aoce_vulkan_extra(用vulkan的compute shader实现gpuimage)
+aoce音视频资源播放的ffmpeg实现
+
+### [aoce_vulkan](code/aoce_vulkan)
+
+aoce图像计算层的vulkan实现
+
+### [aoce_win](code/aoce_win)
+
+win平台下特定功能,现包含Media Foundation,dx11t各种资源定义等.
+
+### [aoce_win_mf](code/aoce_win_mf)
+
+win平台下aoce图像获取设备的Media Foundation实现
+
+### [aoce_vulkan_extra](code/aoce_vulkan_extra)
+
+用vulkan的compute shader实现gpuimage
+
+## [例子](samples)
+
+## [文档](doc)
+
+[ChromaKey](doc/ChromaKey.md)
+
+[Vulkan与DX11交互](doc/Vulkan与DX11交互.md)
+
+[Vulkan移植GpuImage(一)高斯模糊与自适应阈值](doc/Vulkan移植GpuImage1.md)
+
+[Vulkan移植GpuImage(二)Harris角点检测与导向滤波](doc/Vulkan移植GpuImage2.md)
+
+## [GPUImage移植模块](code/aoce_vulkan_extra)
+
+## [glsl编码](glsl)

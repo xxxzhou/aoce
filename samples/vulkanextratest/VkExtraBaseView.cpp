@@ -30,11 +30,10 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst) {
     yuvNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
     PipeNodePtr layerNode = yuvNode;
     for (auto& layer : layers) {
-        if (layerNode->getEndNode()) {
-            layerNode->getEndNode()->addNode(layer);
-        } else {
-            layerNode = layerNode->addNode(layer);
-        }
+        layerNode = layerNode->addNode(layer);
+    }
+    if (layerNode->getLayer()->getInCount() == 2) {
+        yuvNode->addLine(layerNode, 0, 1);
     }
 #if _WIN32
     TexOperateParamet texParamet = {};

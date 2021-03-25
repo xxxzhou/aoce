@@ -15,10 +15,12 @@ static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static ITLayer<GuidedParamet>* guidedLayer = nullptr;
 static BaseLayer* convertLayer = nullptr;
 static BaseLayer* alphaShowLayer = nullptr;
+static BaseLayer* alphaShow2Layer = nullptr;
 static BaseLayer* luminanceLayer = nullptr;
 static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
 static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
 static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
+static ITLayer<KernelSizeParamet>* boxFilterLayer1 = nullptr;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -50,30 +52,38 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     adaptiveLayer->updateParamet(adaParamet);
 
     alphaShowLayer = createAlphaShowLayer();
+    alphaShow2Layer = createAlphaShow2Layer();
     luminanceLayer = createLuminanceLayer();
 
     hcdLayer = createHarrisCornerDetectionLayer();
     HarrisCornerDetectionParamet hcdParamet = {};
-    hcdParamet.threshold = 0.02f;
+    hcdParamet.threshold = 0.2f;
+    hcdParamet.harris = 0.05f;
+    hcdParamet.edgeStrength = 1.0f;  
+       
     hcdLayer->updateParamet(hcdParamet);
+
+    boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);
 
     guidedLayer = createGuidedLayer();
     guidedLayer->updateParamet({20, 0.000001f});
     std::vector<BaseLayer*> layers;
     // 查看自适应阈值化效果
     // view->initGraph(adaptiveLayer, hInstance, alphaShowLayer);
-    // 查看导向滤波效果    
-    // layers.push_back(chromKeyLayer->getLayer());
-    // layers.push_back(guidedLayer->getLayer());
-    // layers.push_back(alphaShowLayer);
-    // view->initGraph(layers, hInstance);
     // 查看Harris 角点检测
-    layers.push_back(luminanceLayer);
-    layers.push_back(hcdLayer->getLayer());
+    // layers.push_back(luminanceLayer);
+    // layers.push_back(hcdLayer->getLayer());
+    // layers.push_back(boxFilterLayer1->getLayer());
+    // layers.push_back(alphaShow2Layer);
+    // view->initGraph(layers, hInstance);
+    // 查看导向滤波效果
+    layers.push_back(chromKeyLayer->getLayer());
+    layers.push_back(guidedLayer->getLayer());
     layers.push_back(alphaShowLayer);
+    
     view->initGraph(layers, hInstance);
 
-    view->openDevice(); 
+    view->openDevice();
     view->run();
     unloadAoce();
 }

@@ -59,6 +59,11 @@ BaseLayer* createAlphaShowLayer() {
     return layer;
 }
 
+BaseLayer* createAlphaShow2Layer() {
+    VkAlphaShow2Layer* layer = new VkAlphaShow2Layer();
+    return layer;
+}
+
 BaseLayer* createConvertImageLayer() {
     VkConvertImageLayer* layer = new VkConvertImageLayer();
     return layer;

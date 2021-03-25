@@ -30,7 +30,9 @@ void VulkanShader::loadShaderModule(VkDevice device, std::string path,
     std::string fullPath = getAocePath() + "/" + path;
     shaderModule = loadShader(fullPath.c_str(), device);
 #endif
-    logAssert(shaderModule != VK_NULL_HANDLE, "file: " + path + " load shader failed");
+    logAssert(shaderModule != VK_NULL_HANDLE,
+              "file: " + path + " load shader failed");
+    assert(shaderModule != VK_NULL_HANDLE);
     shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     shaderStage.stage = shaderFlag;
     shaderStage.pName = "main";

@@ -2,7 +2,7 @@
 
 ## 自适应阈值效果图 [demo](https://github.com/xxxzhou/aoce/tree/master/samples/vulkanextratest)
 
-![avatar](../images/adaptiveThreshold1.PNG "REPLICATE image")
+![avatar](../images/adaptiveThreshold1.png "REPLICATE image")
 
 这几天抽空看了下GpuImage的filter,移植了高斯模糊与自适应阈值的vulkan compute shader实现,一个是基本的图像处理,一个是组合基础图像处理聚合,算是比较有代表性的二种.
 
