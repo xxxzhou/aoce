@@ -4,12 +4,16 @@ android/window 多媒体与游戏引擎交互.
 
 ## 配置项目
 
+本项目尽量不引入第三方库,暂时只有aoce_ffmpeg需要引入ffmpeg.其中有些samples需要引入opencv显示画面,但是项目本身是不需要opencv做为第三方库,详细情况请转入[samples](samples/README.md).
+
 本项目编写主要使用vscode,配合相应插件C++/CMake。用anroid studio完成anroid平台特定功能与测试等。visual studio 2019配合Nsight调试CUDA相关代码。通过CMake使vscode/android studio/visual studio针对项目文件统一修改。
 
-第三方库引用[aoce_thirdparty](https://github.com/xxxzhou/aoce_thirdparty)
-在code平级创建一个目录thirdparty,把aoce_thirdparty里的内容放入这个目录.
+第三方库引用备份:[aoce_thirdparty](https://github.com/xxxzhou/aoce_thirdparty)
+在code平级创建一个目录thirdparty,把aoce_thirdparty里的内容放入这个目录,CMake就会根据项目所需第三方库自动引入.
 
 vulkan项目使用glsl,请安装Vulkan SDK,通过工具glslangValidator把glsl编译成SPIR-V.
+
+如果要查看aoce_cuda,请安装CUDA.
 
 ## 做什么
 
@@ -77,4 +81,6 @@ win平台下aoce图像获取设备的Media Foundation实现
 
 ## [GPUImage移植模块](code/aoce_vulkan_extra)
 
-## [glsl编码](glsl)
+## [glsl代码](glsl)
+
+## 图片格式

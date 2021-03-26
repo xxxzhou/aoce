@@ -153,7 +153,15 @@ void PipeGraph::validNode() {
                         int32_t toSize = toLines[toNode].size();
                         int32_t formSize = formLines[toNode].size();
                         if (toSize != 1 || formSize != 1) {
-                            continue;
+                            std::string message;
+                            string_format(message,
+                                          "layer is visible,but more input or "
+                                          "output,node: ",
+                                          toNode);
+                            logMessage(LogLevel::warn, message);
+                            // if (toSize != 1) {
+                            //     continue;
+                            // }
                         }
                         PipeLinePtr nline(new PipeLine());
                         // 新线取当前节点的输入线
@@ -167,8 +175,17 @@ void PipeGraph::validNode() {
                             int32_t formSize = formLines[toNode].size();
                             // 只支持一对一的
                             if (toSize != 1 || formSize != 1) {
+                                std::string message;
+                                string_format(
+                                    message,
+                                    "layer is visible,but more input or "
+                                    "output,node: ",
+                                    toNode);
+                                logMessage(LogLevel::warn, message);
                                 bfind = false;
-                                break;
+                                // if (toSize != 1) {
+                                //     break;
+                                // }
                             }
                             toNode = formLines[toNode][0]->toNode;
                         }

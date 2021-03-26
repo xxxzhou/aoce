@@ -28,7 +28,7 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst) {
     resizeLayer = layerFactory->createSize();
     resizeLayer->updateParamet({1, 240, 120});
     yuvNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
-    PipeNodePtr layerNode = yuvNode;
+    layerNode = yuvNode;
     for (auto& layer : layers) {
         layerNode = layerNode->addNode(layer);
     }
@@ -62,7 +62,7 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst) {
 
 void VkExtraBaseView::openDevice(int32_t id) {
 #if WIN32
-    CameraType cameraType = CameraType::win_mf;  // realsense
+    CameraType cameraType = CameraType::realsense;  // realsense
 #elif __ANDROID__
     CameraType cameraType = CameraType::and_camera2;
 #endif
@@ -84,17 +84,11 @@ void VkExtraBaseView::openDevice(int32_t id) {
     auto& selectFormat = video->getSelectFormat();
     video->setVideoFrameHandle(std::bind(&VkExtraBaseView::onFrame, this, _1));
     VideoType videoType = selectFormat.videoType;
-    bool bYUV = false;
 #if WIN32
     if (selectFormat.videoType == VideoType::mjpg) {
         videoType = VideoType::yuv2I;
     }
 #endif
-    if (getYuvIndex(videoType) > 0) {
-        yuv2rgbLayer->updateParamet({videoType});
-    } else {
-        bYUV = true;
-    }
 }
 
 void VkExtraBaseView::closeDevice() {
@@ -111,6 +105,9 @@ void VkExtraBaseView::enableLayer(bool bEnable) {
 
 void VkExtraBaseView::onFrame(VideoFrame frame) {
     if (getYuvIndex(frame.videoType) < 0) {
+        if (layerNode->getLayer()->getInCount() == 2) {
+            inputLayer->getLayerNode()->addLine(layerNode, 0, 1);
+        }
         yuvNode->setVisable(false);
     } else if (yuv2rgbLayer->getParamet().type != frame.videoType) {
         yuvNode->setVisable(true);

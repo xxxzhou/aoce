@@ -42,11 +42,19 @@ void VkResizeLayer::onInitGraph() {
         path = "glsl/resizeF4.comp.spv";
     }
     shader->loadShaderModule(context->device, path);
-    // VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+// VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+#if IS_SAMPLER
+    std::vector<UBOLayoutItem> items = {
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+         VK_SHADER_STAGE_COMPUTE_BIT},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT}};
+#else
     std::vector<UBOLayoutItem> items = {
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
         {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT}};
+#endif
     layout->addSetLayout(items);
     layout->generateLayout();
 }
@@ -58,7 +66,7 @@ void VkResizeLayer::onInitLayer() {
     VkResizeParamet vpar = {};
     vpar.bLinear = paramet.bLinear;
     vpar.fx = (float)inFormats[0].width / outFormats[0].width;
-    vpar.fy = (float)inFormats[0].height / outFormats[0].height;    
+    vpar.fy = (float)inFormats[0].height / outFormats[0].height;
     updateUBO(&vpar);
 
     sizeX = divUp(outFormats[0].width, groupX);

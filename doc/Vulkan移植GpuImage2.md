@@ -117,7 +117,7 @@ void VkGuidedLayer::onInitNode() {
 
 如何保证层的执行顺序,可以查看[PipeGraph](https://github.com/xxxzhou/aoce/blob/master/code/aoce/Layer/PipeGraph.cpp)的resetGraph的实现,简单来说,pipegraph添加节点的顺序不重要,重要的是addLine接入接出正确,PipeGraph会自动根据节点连接线来重构执行顺序.
 
-可以看到虽然有很多计算层,但是效率非常高,N卡2070下,1080P的图像 ,快速导向resize长宽/8下,关于导向滤波的处理差不多就1ms,主要是导向滤波与图像的分辨率无关,中间所有计算可以在很少的分辨率下进行.
+可以看到虽然有很多计算层,但是效率非常高,N卡2070下,1080P的图像,快速导向resize长宽/8下,所有boxblur使用20核长,关于导向滤波的处理差不多就1ms,主要是导向滤波与图像的分辨率无关,中间所有计算可以在很少的分辨率下进行.
 
 ![avatar](../images/guidedtest_nsight.png "导向滤波性能图")
 

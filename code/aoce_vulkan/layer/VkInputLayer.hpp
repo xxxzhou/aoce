@@ -8,6 +8,7 @@ namespace vulkan {
 namespace layer {
 
 // 把各种VideoFormat转化成ImageFormat,主要二种,R8/RGBA8
+// InputLayer相对别的层,在
 class VkInputLayer : public InputLayer, public VkLayer {
     AOCE_LAYER_QUERYINTERFACE(VkInputLayer)
    private:

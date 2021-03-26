@@ -66,6 +66,10 @@ class TestLive : public ILiveObserver {
 
     // 加入的房间人数变化
     virtual void onUserChange(int32_t userId, bool bAdd) {
+        if (703 == userId) {
+            logMessage(LogLevel::info, "self login");
+            return;
+        }
         std::string str;
         string_format(str, (bAdd ? "add" : "remove"), "user: ", userId);
         logMessage(LogLevel::info, str);
@@ -271,7 +275,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_joinRoom(
     // copy
     std::string roomname = str;
     env->ReleaseStringUTFChars(uri, str);
-    room->loginRoom(roomname.c_str(), 123, 1);
+    room->loginRoom(roomname.c_str(), 703, 1);
 }
 }
 #endif

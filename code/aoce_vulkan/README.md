@@ -40,7 +40,7 @@ VkPipeGraph 提供延迟运行方式，由delayGpu控制,如果为true,则输出
 
 当层内包含别的层时,用来指定层内之间的数据如何链接.
 
-4 onInitLayer,当PipeGraph构建完执行列表.
+4 onInitLayer,当PipeGraph根据连接线重新构建正确的执行顺序后.
 
 根据各层是否启用等,PipeGraph构建正确的各层执行顺序,在这里,每层都知道对应层数据的输入输出层,也知道输入输出层的大小.
 

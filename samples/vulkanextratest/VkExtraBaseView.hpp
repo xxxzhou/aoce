@@ -26,7 +26,7 @@ class VkExtraBaseView {
     ILayer* extraLayer = nullptr;
 
     PipeNodePtr yuvNode = nullptr;
-    // PipeNodePtr layerNode = nullptr;
+    PipeNodePtr layerNode = nullptr;
     VideoDevicePtr video = nullptr;
 
     GpuType gpuType = GpuType::vulkan;
@@ -46,7 +46,7 @@ class VkExtraBaseView {
 
    public:
     void initGraph(ILayer* layer, void* hinst, BaseLayer* nextLayer = nullptr);
-    void initGraph(std::vector<BaseLayer*> layers,void* hinst);
+    void initGraph(std::vector<BaseLayer*> layers, void* hinst);
 
     void openDevice(int32_t id = 0);
     void closeDevice();

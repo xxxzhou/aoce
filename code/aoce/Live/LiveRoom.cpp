@@ -37,6 +37,8 @@ void LiveRoom::resetStreams() {
     pullStreams.clear();
 }
 
+float LiveRoom::getMicVolume() { return micVolume; }
+
 bool LiveRoom::initRoom(void* liveContext, ILiveObserver* liveBack) {
     if (roomType != RoomType::noInit) {
         logMessage(LogLevel::info, "live module is have inited");

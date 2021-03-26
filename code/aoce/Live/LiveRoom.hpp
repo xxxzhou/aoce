@@ -22,8 +22,6 @@ struct PullSetting {
     int32_t bAudio = 1;
     // 是否拉取视频
     int32_t bVideo = 1;
-    // 是否自动播放声音(如果为0,则自己去处理声音)
-    int32_t bPlayAudio = 1;
 };
 
 struct PullStream {
@@ -75,6 +73,7 @@ class ACOE_EXPORT LiveRoom {
     int32_t pushCount = 1;
     // 如果为true,可以动态添加推流,则不需要在登录时指定推流个数
     bool bDyncPush = false;
+    float micVolume = 0.0f;
 
    public:
     LiveRoom(/* args */);
@@ -101,13 +100,17 @@ class ACOE_EXPORT LiveRoom {
    public:
     int32_t getPullIndex(int32_t userId, int32_t index);
     void resetStreams();
+    float getMicVolume();
+
+   public:
+    // 设置播放拉流音量,0静音,100最大,如果自己处理音量数据,请设置为0
+    virtual void setPlayVolume(int32_t value){};
 
    public:
     // 因为每个直播SDK初始化信息不相同,简单使用void*表示
     bool initRoom(void* liveContext, ILiveObserver* liveBack);
     // 登陆房间,房间名,用户id,推流个数(这个会影响一些设置)
-    bool loginRoom(const char* roomName, int32_t useId,
-                   int32_t pushCount);
+    bool loginRoom(const char* roomName, int32_t useId, int32_t pushCount);
 
     bool pushStream(int32_t index, const PushSetting& setting);
     void stopPushStream(int32_t index);

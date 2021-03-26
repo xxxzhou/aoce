@@ -18,7 +18,7 @@ class ACOE_EXPORT ILiveObserver {
     // 网络发生的各种情况与处理码,如断网,网络情况不好等
     virtual void onEvent(int32_t operater, int32_t code, LogLevel level,
                          const std::string& msg){};
-    // 
+    //
     virtual void onInitRoom(){};
     // loginRoom的网络应答
     virtual void onLoginRoom(bool bReConnect = false){};
@@ -35,6 +35,10 @@ class ACOE_EXPORT ILiveObserver {
     // 用户对应流的音频桢数据
     virtual void onAudioFrame(int32_t userId, int32_t index,
                               const AudioFrame& audioFrame){};
+
+    // 当前拉流对应用户音量
+    virtual void onPlayVolume(int32_t userId, int32_t index, float volume){};
+
     // 推流的质量
     virtual void onPushQuality(int32_t index, int32_t quality, float fps,
                                float kbs){};

@@ -1,3 +1,6 @@
+input.comp inputRGB.comp CHANNEL_RGB=1
+input.comp inputBRGA.comp CHANNEL_BRGA=1
+input.comp inputARGB.comp CHANNEL_ARGB=1
 filter2D.comp filter2D.comp CHANNEL_RGBA=1
 filter2D.comp filter2DC1.comp CHANNEL_R8=1
 filter2D.comp filter2DF4.comp CHANNEL_RGBAF32=1
@@ -14,7 +17,6 @@ filterColumn.comp filterColumnF4.comp CHANNEL_RGBAF32=1
 filterRow.comp filterRow.comp CHANNEL_RGBA=1
 filterRow.comp filterRowC1.comp CHANNEL_R8=1
 filterRow.comp filterRowF4.comp CHANNEL_RGBAF32=1
-inputv1.comp
 luminance.comp
 operate.comp
 resize.comp resize.comp CHANNEL_RGBA=1

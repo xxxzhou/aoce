@@ -18,6 +18,7 @@ static BaseLayer* alphaShowLayer = nullptr;
 static BaseLayer* alphaShow2Layer = nullptr;
 static BaseLayer* luminanceLayer = nullptr;
 static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
+static ITLayer<ReSizeParamet>* resizeLayer2 = nullptr;
 static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
 static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
 static ITLayer<KernelSizeParamet>* boxFilterLayer1 = nullptr;
@@ -57,32 +58,39 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     hcdLayer = createHarrisCornerDetectionLayer();
     HarrisCornerDetectionParamet hcdParamet = {};
-    hcdParamet.threshold = 0.2f;
-    hcdParamet.harris = 0.05f;
-    hcdParamet.edgeStrength = 1.0f;  
-       
+    hcdParamet.threshold = 0.1f;
+    hcdParamet.harris = 0.04f;
+    hcdParamet.edgeStrength = 1.0f;
+
     hcdLayer->updateParamet(hcdParamet);
 
     boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);
 
+    resizeLayer = createResizeLayer(ImageType::rgba8);
+    resizeLayer->updateParamet({true, 1920 / 8, 1080 / 8});
+    resizeLayer2 = createResizeLayer(ImageType::rgba8);
+    resizeLayer2->updateParamet({true, 1920, 1080});
+
     guidedLayer = createGuidedLayer();
     guidedLayer->updateParamet({20, 0.000001f});
     std::vector<BaseLayer*> layers;
-    // 查看自适应阈值化效果
-    // view->initGraph(adaptiveLayer, hInstance, alphaShowLayer);
+    // 检测resize效果
+    layers.push_back(resizeLayer->getLayer());
+    layers.push_back(resizeLayer2->getLayer());    
+    // 查看自适应阈值化效果    
+    // layers.push_back(adaptiveLayer->getLayer());
+    // layers.push_back(alphaShowLayer);
     // 查看Harris 角点检测
     // layers.push_back(luminanceLayer);
     // layers.push_back(hcdLayer->getLayer());
     // layers.push_back(boxFilterLayer1->getLayer());
-    // layers.push_back(alphaShow2Layer);
-    // view->initGraph(layers, hInstance);
+    // layers.push_back(alphaShow2Layer);    
     // 查看导向滤波效果
-    layers.push_back(chromKeyLayer->getLayer());
-    layers.push_back(guidedLayer->getLayer());
-    layers.push_back(alphaShowLayer);
-    
-    view->initGraph(layers, hInstance);
+    // layers.push_back(chromKeyLayer->getLayer());
+    // layers.push_back(guidedLayer->getLayer());
+    // layers.push_back(alphaShowLayer); 
 
+    view->initGraph(layers, hInstance);
     view->openDevice();
     view->run();
     unloadAoce();
