@@ -195,9 +195,9 @@ void main(){
 
 在1080P下取核长为21(半径为10)的高斯模糊查看PC平台没有优化及优化的效果.
 
-![avatar](../images/gaussianA.PNG "gaussian image")
+![avatar](../images/gaussianA.png "gaussian image")
 
-![avatar](../images/gaussianB.PNG "gaussian image")
+![avatar](../images/gaussianB.png "gaussian image")
 
 其中没优化的需要12.03ms,而优化后的是0.60+0.61=1.21ms,差不多10倍左右的差距,符合前面k/2的优化值,之所以快到理论值,应该要加上优化方向二使用局部共享显存减少访问纹理显存这个.
 
