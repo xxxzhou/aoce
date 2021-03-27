@@ -83,9 +83,8 @@ void main(){
             column_shared[y][gl_LocalInvocationID.x] = packUnorm4x8(imageLoad(inTex,ivec2(x,minIdy)));
         }
     }
-    barrier();
-    // groupMemoryBarrier();    
-    // memoryBarrier();
+	memoryBarrierShared();
+	barrier();
     for (int j = 0; j < PATCH_PER_BLOCK; ++j){
         uint y = yStart + j*gl_WorkGroupSize.y;
         if(y<size.y){

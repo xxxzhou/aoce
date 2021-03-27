@@ -32,11 +32,8 @@ void main(){
     vec4 rect = vec4(ubo.centerX - ubo.width / 2.f, ubo.centerY - ubo.height / 2.f, ubo.centerX + ubo.width / 2.f, ubo.centerY + ubo.height / 2.f);
 	vec4 color = imageLoad(inTex,id);
     if (uv.x >= rect.x && uv.x < rect.z && uv.y >= rect.y && uv.y < rect.w) {
-		vec2 uv2 = vec2((uv.x - rect.x), (uv.y - rect.y));
-        // 转成inSampler2 id,用的texelFetch,边缘根据设定处理
-        int ix = int(uv2.x*ubo.fx);
-        int iy = int(uv2.y*ubo.fy);
-        vec4 color2 = texelFetch(inSampler2, ivec2(ix,iy),0);		
+		vec2 uv2 = vec2((uv.x - rect.x)/ubo.width, (uv.y - rect.y)/ubo.height); 
+        vec4 color2 = textureLod(inSampler2, uv2,0);		
 		color = color2 * (1.f - ubo.opacity) + color * ubo.opacity;
 	}
     imageStore(outTex, id, color); 

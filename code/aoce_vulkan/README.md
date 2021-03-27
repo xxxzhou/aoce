@@ -26,7 +26,7 @@ VkPipeGraph 提供延迟运行方式，由delayGpu控制,如果为true,则输出
 
 一般指定使用的shader路径,UBO大小,更新UBO内数据.
 
-默认认为一个输入,一个输出,如果是多输入与多输出,可以在这指定.
+默认认为一个输入,一个输出,如果是多输入与多输出,可以在这指定,记着的输入/输出个数一定要在onInitGraph之前确定,相应数组会根据这二个值生成空间.
 
 2 onInitGraph,当vklayer被添加到VkPipeGraph时上被调用.
 
@@ -108,4 +108,6 @@ UBO一般来说,有四种.
 
 我尝试用sampler来实现,可以大大简化代码,性能提升并不确定,并且上面的方式有优化的空间,结果很奇怪,在运行时看不到结果全黑,但是用RenderDoc查看运行过程时,又能得到正确结果,这里先留个问号.
 
-解决: 1 改texture为texelFetch, 2 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER为VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,奇怪啊,这里应该为sampler才对,是什么导致这种现象,现测试win/android都可以得到结果.
+1 改texture为texelFetch, 2 VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER为VK_DESCRIPTOR_TYPE_STORAGE_IMAGE有结果,但是不对,奇怪啊,这里应该为sampler才对,是什么导致这种现象,现测试win/android都可以得到结果.
+
+上述问题解决: 创建的texture没有加上VK_IMAGE_USAGE_SAMPLED_BIT标记,导致使用使用sampler取不到数据.

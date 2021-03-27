@@ -25,7 +25,7 @@ void CuLayer::onInitBuffer() {
         for (int32_t i = 0; i < inCount; i++) {
             auto& inLayer = this->inLayers[i];
             inTexs.push_back(
-                cuPipeGraph->getOutTex(inLayer.nodeIndex, inLayer.outputIndex));
+                cuPipeGraph->getOutTex(inLayer.nodeIndex, inLayer.siteIndex));
         }
     }
     // 当前层计算结果

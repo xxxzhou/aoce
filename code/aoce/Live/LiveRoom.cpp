@@ -21,6 +21,8 @@ LiveRoom::LiveRoom(/* args */) {}
 
 LiveRoom::~LiveRoom() {}
 
+int32_t LiveRoom::getUserId() { return userId; }
+
 int32_t LiveRoom::getPullIndex(int32_t userId, int32_t index) {
     auto size = pullStreams.size();
     for (int i = 0; i < size; i++) {

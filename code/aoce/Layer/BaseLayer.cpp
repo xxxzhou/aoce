@@ -14,6 +14,7 @@ void BaseLayer::onInit() {
     inFormats.resize(inCount);
     outFormats.resize(outCount);
     inLayers.resize(inCount);
+    outLayers.resize(outCount);
     // 默认imagetype
     for (auto& format : inFormats) {
         format.imageType = ImageType::rgba8;
@@ -41,12 +42,19 @@ bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,
         logMessage(LogLevel::warn, "layer add in layer error inindex.");
         return false;
     }
-    // if (inLayers[inIndex].nodeIndex >= 0) {
-    //     logMessage(LogLevel::warn, "layer add in layer error have add.");
-    //     return false;
-    // }
     inLayers[inIndex].nodeIndex = nodeIndex;
-    inLayers[inIndex].outputIndex = outputIndex;
+    inLayers[inIndex].siteIndex = outputIndex;
+    return true;
+}
+
+bool BaseLayer::addOutLayer(int32_t outIndex, int32_t nodeIndex,
+                            int32_t inIndex) {
+    if (outIndex >= outCount) {
+        logMessage(LogLevel::warn, "layer add in layer error inindex.");
+        return false;
+    }
+    outLayers[outIndex].nodeIndex = nodeIndex;
+    outLayers[outIndex].siteIndex = inIndex;
     return true;
 }
 
@@ -56,7 +64,7 @@ bool BaseLayer::vaildInLayers() {
         return true;
     }
     for (const auto& layer : inLayers) {
-        if (layer.nodeIndex < 0 || layer.outputIndex < 0) {
+        if (layer.nodeIndex < 0 || layer.siteIndex < 0) {
             return false;
         }
     }
@@ -69,7 +77,7 @@ void BaseLayer::initLayer() {
     if (!bInput) {
         for (int32_t i = 0; i < size; i++) {
             pipeGraph->getLayerOutFormat(inLayers[i].nodeIndex,
-                                         inLayers[i].outputIndex, inFormats[i],
+                                         inLayers[i].siteIndex, inFormats[i],
                                          bOutput || bAutoImageType);
         }
     }

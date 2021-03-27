@@ -29,8 +29,11 @@ void VkLayer::generateLayout() {
     }
     std::vector<UBOLayoutItem> items;
     for (int i = 0; i < inCount; i++) {
-        items.push_back(
-            {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT});
+        VkDescriptorType vdt = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+        if (getSampled(i)) {
+            vdt = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        }
+        items.push_back({vdt, VK_SHADER_STAGE_COMPUTE_BIT});
     }
     for (int i = 0; i < outCount; i++) {
         items.push_back(
@@ -91,8 +94,15 @@ void VkLayer::createOutTexs() {
         const ImageFormat& format = outFormats[i];
         VkFormat vkft = ImageFormat2Vk(format.imageType);
         VulkanTexturePtr texPtr(new VulkanTexture());
-        texPtr->InitResource(format.width, format.height, vkft,
-                             VK_IMAGE_USAGE_STORAGE_BIT, 0);
+        // VkMemoryPropertyFlags
+        VkMemoryPropertyFlags texFlags = VK_IMAGE_USAGE_STORAGE_BIT;
+        auto& outLayer = this->outLayers[i];
+        // 查看对应输出层是否需要采样功能
+        if (vkPipeGraph->getMustSampled(outLayer.nodeIndex,
+                                        outLayer.siteIndex)) {
+            texFlags = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        }
+        texPtr->InitResource(format.width, format.height, vkft, texFlags, 0);
         outTexs.push_back(texPtr);
     }
 }
@@ -103,7 +113,7 @@ void VkLayer::onInitBuffer() {
         for (int32_t i = 0; i < inCount; i++) {
             auto& inLayer = this->inLayers[i];
             inTexs.push_back(
-                vkPipeGraph->getOutTex(inLayer.nodeIndex, inLayer.outputIndex));
+                vkPipeGraph->getOutTex(inLayer.nodeIndex, inLayer.siteIndex));
         }
     }
     if (!bOutput) {
@@ -128,6 +138,13 @@ void VkLayer::onInitPipe() {
     std::vector<void*> bufferInfos;
     for (int i = 0; i < inCount; i++) {
         inTexs[i]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        if (getSampled(i)) {
+            VkSampler sampler = context->linearSampler;
+            if (sampledNearest(i)) {
+                sampler = context->nearestSampler;
+            }
+            inTexs[0]->descInfo.sampler = sampler;
+        }
         bufferInfos.push_back(&inTexs[i]->descInfo);
     }
     for (int i = 0; i < outCount; i++) {
@@ -143,6 +160,13 @@ void VkLayer::onInitPipe() {
     VK_CHECK_RESULT(vkCreateComputePipelines(
         context->device, context->pipelineCache, 1, &computePipelineInfo,
         nullptr, &computerPipeline));
+}
+
+void VkLayer::onPreFrame() {
+    if (bParametChange) {
+        submitUBO();
+        bParametChange = false;
+    }
 }
 
 void VkLayer::onPreCmd() {

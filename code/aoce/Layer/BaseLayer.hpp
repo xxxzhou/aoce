@@ -29,7 +29,7 @@ class ACOE_EXPORT BaseLayer {
    protected:
     struct NodeIndex {
         int32_t nodeIndex = -1;
-        int32_t outputIndex = -1;
+        int32_t siteIndex = -1;
     };
 
    protected:
@@ -61,6 +61,7 @@ class ACOE_EXPORT BaseLayer {
     bool bAutoImageType = false;
 
     std::vector<NodeIndex> inLayers;
+    std::vector<NodeIndex> outLayers;
 
    public:
     BaseLayer(/* args */) : BaseLayer(1, 1){};
@@ -77,6 +78,7 @@ class ACOE_EXPORT BaseLayer {
 
    protected:
     bool addInLayer(int32_t inIndex, int32_t nodeIndex, int32_t outputIndex);
+    bool addOutLayer(int32_t outIndex, int32_t nodeIndex, int32_t inIndex);
     bool vaildInLayers();
     void initLayer();
     void resetGraph();

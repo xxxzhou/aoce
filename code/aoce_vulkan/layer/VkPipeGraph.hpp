@@ -7,8 +7,8 @@
 #include "VkLayer.hpp"
 
 #if WIN32
-#include "aoce_win/DX11/Dx11Helper.hpp"
 #include "../win32/VkWinImage.hpp"
+#include "aoce_win/DX11/Dx11Helper.hpp"
 #endif
 
 namespace aoce {
@@ -28,11 +28,11 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
     // GPU是否执行完成
     VkFence computerFence;
 
-    bool delayGpu = false;    
+    bool delayGpu = false;
     // 确定是否在重置生成资源与commandbuffer中
     VkEvent outEvent = VK_NULL_HANDLE;
     VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
-#if WIN32    
+#if WIN32
     CComPtr<ID3D11Device> device = nullptr;
     CComPtr<ID3D11DeviceContext> ctx = nullptr;
     // std::vector<VkDeviceMemory> outMemorys;
@@ -46,7 +46,7 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
    public:
     inline VulkanContext* getContext() { return context.get(); };
     VulkanTexturePtr getOutTex(int32_t node, int32_t outIndex);
-
+    bool getMustSampled(int32_t node, int32_t inIndex);
     bool resourceReady();
 
 #if WIN32
@@ -54,7 +54,6 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
     void addOutMemory(VkWinImage* winImage);
 #endif
     bool executeOut();
-
 
    protected:
     // 所有layer调用initbuffer后

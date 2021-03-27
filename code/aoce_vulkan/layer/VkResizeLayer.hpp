@@ -19,11 +19,11 @@ class AOCE_VULKAN_EXPORT VkResizeLayer : public VkLayer, public ReSizeLayer {
     ~VkResizeLayer();
 
    protected:
+    virtual bool getSampled(int inIndex) override;
+    virtual bool sampledNearest(int32_t inIndex) override;
     virtual void onUpdateParamet() override;
     virtual void onInitGraph() override;
     virtual void onInitLayer() override;
-
-    virtual void onInitPipe() override;
 };
 
 }  // namespace layer

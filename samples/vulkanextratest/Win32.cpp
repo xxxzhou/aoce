@@ -71,24 +71,26 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     resizeLayer2 = createResizeLayer(ImageType::rgba8);
     resizeLayer2->updateParamet({true, 1920, 1080});
 
+    convertLayer = createConvertImageLayer();
+
     guidedLayer = createGuidedLayer();
     guidedLayer->updateParamet({20, 0.000001f});
     std::vector<BaseLayer*> layers;
-    // 检测resize效果
-    layers.push_back(resizeLayer->getLayer());
-    layers.push_back(resizeLayer2->getLayer());    
-    // 查看自适应阈值化效果    
+    // 检测resize效果    
+    // layers.push_back(resizeLayer->getLayer());
+    // layers.push_back(resizeLayer2->getLayer());    
+    // 查看自适应阈值化效果
     // layers.push_back(adaptiveLayer->getLayer());
     // layers.push_back(alphaShowLayer);
     // 查看Harris 角点检测
     // layers.push_back(luminanceLayer);
     // layers.push_back(hcdLayer->getLayer());
     // layers.push_back(boxFilterLayer1->getLayer());
-    // layers.push_back(alphaShow2Layer);    
+    // layers.push_back(alphaShow2Layer);
     // 查看导向滤波效果
-    // layers.push_back(chromKeyLayer->getLayer());
-    // layers.push_back(guidedLayer->getLayer());
-    // layers.push_back(alphaShowLayer); 
+    layers.push_back(chromKeyLayer->getLayer());
+    layers.push_back(guidedLayer->getLayer());
+    layers.push_back(alphaShowLayer);
 
     view->initGraph(layers, hInstance);
     view->openDevice();

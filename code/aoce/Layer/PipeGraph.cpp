@@ -229,6 +229,8 @@ bool PipeGraph::resetGraph() {
         // 填充layer的,此时经过enable/visable过滤后,每个输入节点应该是一一对应的
         nodes[line->toNode]->layer->addInLayer(line->toInIndex, line->fromNode,
                                                line->fromOutIndex);
+        nodes[line->fromNode]->layer->addOutLayer(
+            line->fromOutIndex, line->toNode, line->toInIndex);
     }
     nodeExcs.clear();
     for (int32_t i = 0; i < nodes.size(); i++) {
@@ -276,12 +278,12 @@ bool PipeGraph::resetGraph() {
         for (int i = 0; i < size; i++) {
             const auto& fromNode = nodes[index]->layer->inLayers[i];
             if (nodes[fromNode.nodeIndex]
-                    ->layer->outFormats[fromNode.outputIndex]
+                    ->layer->outFormats[fromNode.siteIndex]
                     .imageType != nodes[index]->layer->inFormats[i].imageType) {
                 std::string message;
                 string_format(message, "graph error,",
                               "from node: ", fromNode.nodeIndex, "-",
-                              fromNode.outputIndex,
+                              fromNode.siteIndex,
                               " not match image type in node:", index, "-", i);
                 logMessage(LogLevel::error, message);
                 return false;

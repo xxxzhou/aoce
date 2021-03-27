@@ -57,6 +57,13 @@ VulkanTexturePtr VkPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
     return vkLayer->outTexs[outIndex];
 }
 
+bool VkPipeGraph::getMustSampled(int32_t node, int32_t inIndex) {
+    assert(node < nodes.size());
+    VkLayer* vkLayer = static_cast<VkLayer*>(nodes[node]->getLayer());
+    assert(inIndex < vkLayer->inCount);
+    return vkLayer->getSampled(inIndex);
+}
+
 bool VkPipeGraph::resourceReady() {
     // 资源是否已经重新生成
     auto res = vkGetEventStatus(context->device, outEvent);
@@ -125,12 +132,9 @@ bool VkPipeGraph::executeOut() {
 }
 
 bool VkPipeGraph::onRun() {
-    // 更新所有层的参数
+    // 更新所有层的发生改动的vulkan资源
     for (auto* layer : vkLayers) {
-        if (layer->bParametChange) {
-            layer->submitUBO();
-            layer->bParametChange = false;
-        }
+        layer->onPreFrame();
     }
     // 除开输出层,运行所有层
     for (auto* layer : vkLayers) {

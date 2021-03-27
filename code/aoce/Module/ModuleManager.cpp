@@ -143,7 +143,7 @@ LONG WINAPI unhandledFilter(struct _EXCEPTION_POINTERS* lpExceptionInfo) {
     TCHAR szFileName[64];
     SYSTEMTIME st;
     ::GetLocalTime(&st);
-    wsprintf(szFileName, TEXT("OEIP_%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp"),
+    wsprintf(szFileName, TEXT("AOCE_%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp"),
              st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond,
              GetCurrentProcessId(), GetCurrentThreadId());
 

@@ -88,6 +88,9 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     // VK自动根据输入初始化相应的信息,如果要修改,请在PipeGraph实现
     virtual void onInitBuffer() final;
     virtual bool onFrame() override;
+    // 根据输入节点返回是否需要sampled
+    virtual bool getSampled(int32_t inIndex) { return false; };
+    virtual bool sampledNearest(int32_t inIndex) { return false; };
 
    protected:
     // vulkan层在onInit后,shader可以放这编译,如果参数影响shader编译,需要放入onInitPipe
@@ -96,6 +99,9 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     virtual void onInitVkBuffer(){};
     // 根据上面shader/buffer,组建计算管线
     virtual void onInitPipe();
+    // 每桢onFrame之前调用,与onFrame/执行commandbuffer在同一线程.
+    // 可以用来根据标记更新一些Vulkan 资源
+    virtual void onPreFrame();
     // CommandBuffer
     virtual void onPreCmd();
 };

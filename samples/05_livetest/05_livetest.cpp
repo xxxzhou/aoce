@@ -62,6 +62,7 @@ class TestLive : public ILiveObserver {
         setting.bVideo = 0;
         setting.bAudio = 1;
         room->pushStream(0, setting);
+        room->setPlayVolume(100);
     };
 
     // 加入的房间人数变化
@@ -114,7 +115,9 @@ class TestLive : public ILiveObserver {
 
     // 用户对应流的音频桢数据
     virtual void onAudioFrame(int32_t userId, int32_t index,
-                              const AudioFrame &audioFrame){};
+                              const AudioFrame &audioFrame){
+        logMessage(LogLevel::info,"audio frame.");
+    };
 
     // 推流的质量
     virtual void onPushQuality(int32_t index, int32_t quality, float fps,

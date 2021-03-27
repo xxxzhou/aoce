@@ -98,6 +98,7 @@ class ACOE_EXPORT LiveRoom {
     virtual void onShutdownRoom() = 0;
 
    public:
+    int32_t getUserId();
     int32_t getPullIndex(int32_t userId, int32_t index);
     void resetStreams();
     float getMicVolume();
