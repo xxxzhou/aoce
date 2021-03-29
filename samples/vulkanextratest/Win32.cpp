@@ -61,10 +61,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     hcdParamet.threshold = 0.1f;
     hcdParamet.harris = 0.04f;
     hcdParamet.edgeStrength = 1.0f;
+    hcdParamet.blueParamet = {5, 0.0f};
 
     hcdLayer->updateParamet(hcdParamet);
 
     boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);
+    boxFilterLayer1->updateParamet({21,21});
 
     resizeLayer = createResizeLayer(ImageType::rgba8);
     resizeLayer->updateParamet({true, 1920 / 8, 1080 / 8});
@@ -76,21 +78,21 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     guidedLayer = createGuidedLayer();
     guidedLayer->updateParamet({20, 0.000001f});
     std::vector<BaseLayer*> layers;
-    // 检测resize效果    
+    // 检测resize效果
     // layers.push_back(resizeLayer->getLayer());
-    // layers.push_back(resizeLayer2->getLayer());    
+    // layers.push_back(resizeLayer2->getLayer());
     // 查看自适应阈值化效果
     // layers.push_back(adaptiveLayer->getLayer());
     // layers.push_back(alphaShowLayer);
     // 查看Harris 角点检测
-    // layers.push_back(luminanceLayer);
-    // layers.push_back(hcdLayer->getLayer());
-    // layers.push_back(boxFilterLayer1->getLayer());
-    // layers.push_back(alphaShow2Layer);
+    layers.push_back(luminanceLayer);
+    layers.push_back(hcdLayer->getLayer());
+    layers.push_back(boxFilterLayer1->getLayer());
+    layers.push_back(alphaShow2Layer);
     // 查看导向滤波效果
-    layers.push_back(chromKeyLayer->getLayer());
-    layers.push_back(guidedLayer->getLayer());
-    layers.push_back(alphaShowLayer);
+    // layers.push_back(chromKeyLayer->getLayer());
+    // layers.push_back(guidedLayer->getLayer());
+    // layers.push_back(alphaShowLayer);
 
     view->initGraph(layers, hInstance);
     view->openDevice();

@@ -1,0 +1,36 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+const int BLOCK_SIZE_X = 16;// gl_WorkGroupSize.x
+const int BLOCK_SIZE_Y = 16;// gl_WorkGroupSize.y
+
+// 一个线程处理每行PATCH_SIZE_X个元素
+const int PATCH_SIZE_X = 4;
+// 一个线程处理每列PATCH_SIZE_Y个元素
+const int PATCH_SIZE_Y = 4;
+// 每个线程组处理元素个数为:block size(16*4)*(16*4)
+
+// min/max/sum 等
+#define OPERATE min
+
+void reduce(ivec2 size){
+    vec4 result = vec4(0.0f);
+    uint x0 = gl_WorkGroupID.x * (gl_WorkGroupSize.x*PATCH_SIZE_X) + gl_LocalInvocationID.x;
+    uint y0 = gl_WorkGroupID.y * (gl_WorkGroupSize.y*PATCH_SIZE_Y) + gl_LocalInvocationID.y;
+    // 周边PATCH_SIZE_X*PATCH_SIZE_Y个线程组,混合取PATCH_SIZE_X*PATCH_SIZE_Y个值.
+    // 
+    for (int i = 0, y = y0; i < PATCH_SIZE_Y && y < size.y; ++i, y += gl_WorkGroupSize.y){
+        for (int j = 0, x = x0; j < PATCH_SIZE_X && x < size.x; ++j, x += gl_WorkGroupSize.x){
+            vec4 rgba = imageLoad(inTex,ivec2(j,i));            
+            result = OPERATE(rgba);
+        }
+    }
+    for (uint stride = blockDim.x*blockDim.y / 2; stride > 0; stride >>= 1){
+        //stride 2^n
+        if (threadId < stride){
+            memoryBarrierShared();
+        }
+    }
+}
+

@@ -60,8 +60,10 @@ class ACOE_EXPORT BaseLayer {
     // 是否自动拿上一层的ImageType
     bool bAutoImageType = false;
 
+    // 每个输入节点对应一个输入
     std::vector<NodeIndex> inLayers;
-    std::vector<NodeIndex> outLayers;
+    // 每个输出节点可以对应多个输出
+    std::vector<std::vector<NodeIndex>> outLayers;
 
    public:
     BaseLayer(/* args */) : BaseLayer(1, 1){};

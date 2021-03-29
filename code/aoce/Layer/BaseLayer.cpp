@@ -10,11 +10,11 @@ BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
 
 BaseLayer::~BaseLayer() {}
 
-void BaseLayer::onInit() {
-    inFormats.resize(inCount);
-    outFormats.resize(outCount);
-    inLayers.resize(inCount);
-    outLayers.resize(outCount);
+void BaseLayer::onInit() {    
+    inFormats.resize(inCount);    
+    outFormats.resize(outCount);    
+    inLayers.resize(inCount);    
+    outLayers.resize(outCount);    
     // 默认imagetype
     for (auto& format : inFormats) {
         format.imageType = ImageType::rgba8;
@@ -53,8 +53,8 @@ bool BaseLayer::addOutLayer(int32_t outIndex, int32_t nodeIndex,
         logMessage(LogLevel::warn, "layer add in layer error inindex.");
         return false;
     }
-    outLayers[outIndex].nodeIndex = nodeIndex;
-    outLayers[outIndex].siteIndex = inIndex;
+    NodeIndex nd = {nodeIndex, inIndex};
+    outLayers[outIndex].push_back(nd);
     return true;
 }
 

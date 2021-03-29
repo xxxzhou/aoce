@@ -4,7 +4,7 @@ layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
 layout (binding = 0, rgba8) uniform readonly image2D inTex;
 // 8*8*(格子(64*64)),把8*8向上平放堆,可以理解成一个每面64像素的正方体.
 // 其中每个格子的水平方是红色从0-1.0,垂直方向是绿色从0-1.0,而对于正方体的垂直方向是蓝色从0-1.0.
-layout (binding = 1, rgba8) uniform readonly image2D inTex1;
+layout (binding = 1, rgba8) uniform readonly image2D inSampler;
 layout (binding = 2, rgba8) uniform image2D outTex;
 
 void main(){
@@ -13,14 +13,25 @@ void main(){
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     }     
-    vec4 color = imageLoad(inTex,uv); 
-    //
+    vec4 color = imageLoad(inTex,uv);       
+    // 如果b是0.175,对应b所在位置11.2,那就查找二张图(11,12)
     float b = color.b * 63.0;
+    // 查找11这张图在8*8格子所在位置(1,3)
     vec2 q1 ;
     q1.y = floor(floor(b)/8.0f);
     q1.x = floor(b) - (q1.y * 8.0f);
-    
-
-
-    vec4 lookColor = imageLoad(inTex1,uv);   
+    // 查找12这张图在8*8格子所在位置(1,4)
+    vec2 q2 ;
+    q2.y = floor(ceil(b)/8.0f);
+    q2.x = ceil(b) - (q2.y * 8.0f); 
+    // 格子UV+在每个格子中的UV,q1/q2[0,8)整数,rg[0.0,1.0]浮点位置转到[0,512)
+    // 整点[0,512)转(0.0,1.0f),需要(整点位置+0.5)/512.0
+    vec2 pos1 = (q1*64.0f + color.rg*63.0f + 0.5f)/512.f;
+    vec2 pos2 = (q2*64.0f + color.rg*63.0f + 0.5f)/512.f;
+    // 取pos1/pos2上值
+    vec4 c1 = textureLod(inSampler, pos1,0);  
+    vec4 c2 = textureLod(inSampler, pos2,0); 
+    // linear混合11,12这二张图的值
+    vec4 result = mix(c1,c2,fract(b));
+    imageStore(outTex,uv,result);
 }

@@ -92,3 +92,5 @@ add_subdirectory(vulkanextratest)
 if(AOCE_INSTALL_TALKTO)
     add_subdirectory(cudatest)
 endif() 
+
+add_subdirectory(mathtest)

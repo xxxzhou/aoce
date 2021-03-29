@@ -97,9 +97,17 @@ void VkLayer::createOutTexs() {
         // VkMemoryPropertyFlags
         VkMemoryPropertyFlags texFlags = VK_IMAGE_USAGE_STORAGE_BIT;
         auto& outLayer = this->outLayers[i];
+        // 需要检测当前层的输出层是否需要当前层的纹理需要纹理
+        bool bMustSampled = false;
+        for (int32_t i = 0; i < outLayer.size(); i++) {
+            if (vkPipeGraph->getMustSampled(outLayer[i].nodeIndex,
+                                            outLayer[i].siteIndex)) {
+                bMustSampled = true;
+                break;
+            }
+        }
         // 查看对应输出层是否需要采样功能
-        if (vkPipeGraph->getMustSampled(outLayer.nodeIndex,
-                                        outLayer.siteIndex)) {
+        if (bMustSampled) {
             texFlags = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
         }
         texPtr->InitResource(format.width, format.height, vkft, texFlags, 0);
