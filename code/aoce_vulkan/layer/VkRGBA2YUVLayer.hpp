@@ -15,8 +15,7 @@ class VkRGBA2YUVLayer : public VkLayer, public RGBA2YUVLayer {
     VkRGBA2YUVLayer(/* args */);
     ~VkRGBA2YUVLayer();
 
-   protected:
-    virtual void onInitGraph() override;
+   protected:   
     virtual void onUpdateParamet() override;
     virtual void onInitLayer() override;
 

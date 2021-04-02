@@ -41,14 +41,14 @@ void VkInputLayer::onInitVkBuffer() {
         // 不直接在cs shader用buf->tex,兼容性考虑cpu map/cs read权限.
         if (videoFormat.videoType == VideoType::rgb8) {
             // 每个线程组处理240个数据,一个线程拿buffer三个数据生成四个点
-            sizeX = divUp(imageSize / 4, 256);
+            sizeX = divUp(imageSize / 4, 240);
             inBufferX = std::make_unique<VulkanBuffer>();
             inBufferX->initResoure(BufferUsage::program, imageSize * 3,
                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT |
                                        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
         } else if (videoFormat.videoType == VideoType::argb8 ||
                    videoFormat.videoType == VideoType::bgra8) {
-            sizeX = divUp(imageSize, 256);
+            sizeX = divUp(imageSize, 240);
             inBufferX = std::make_unique<VulkanBuffer>();
             inBufferX->initResoure(BufferUsage::program, imageSize * 4,
                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT |

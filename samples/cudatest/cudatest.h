@@ -170,3 +170,70 @@ inline __global__ void guidedFilterResult(PtrStepSz<float4> source,
         destp(idy, idx) = (uchar)(__saturatef(alpha) * 255.0f);
     }
 }
+
+template <int blockx, int blocky>
+inline __global__ void calcBeta(PtrStepSz<uchar4> source, float* tempDiffs) {
+    __shared__ float diffs[blockx * blocky];
+
+    const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+    const int threadId = threadIdx.x + threadIdx.y * blockDim.x;
+
+    diffs[threadId] = 0.f;
+    __syncthreads();
+    if (idx < source.cols - 1 && idy < source.rows - 1) {
+        float4 color = make_float4(source(idy, idx));
+        float4 hcolor = make_float4(source(idy, idx + 1)) - color;
+        float4 vcolor = make_float4(source(idy + 1, idx)) - color;
+
+        diffs[threadId] = dot(hcolor, hcolor) + dot(vcolor, vcolor);
+    }
+    __syncthreads();
+    for (uint stride = blockDim.x * blockDim.y / 2; stride > 0; stride >>= 1) {
+        if (threadId < stride) {
+            diffs[threadId] += diffs[threadId + stride];
+        }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0 && threadIdx.y == 0) {
+        int blockId = blockIdx.x + blockIdx.y * gridDim.x;
+        tempDiffs[blockId] = diffs[0];
+    }
+}
+
+// block 1*1
+template <int blockx, int blocky>
+inline __global__ void calcBeta(float* tempDiffs, int arrayCount, int edgeCount,
+                                float& beta) {
+    __shared__ float diffs[blockx * blocky];
+    const int threadId = threadIdx.x + threadIdx.y * blockDim.x;
+    const int blockcount = blockDim.x * blockDim.y;
+    diffs[threadId] = 0.f;
+    __syncthreads();
+    int count = arrayCount / blockcount + 1;
+    for (int i = 0; i < count; i++) {
+        int id = i * blockcount + threadId;
+        if (id < arrayCount) {
+            diffs[threadId] += tempDiffs[id];
+        }
+    }
+    __syncthreads();
+    for (uint stride = blockDim.x * blockDim.y / 2; stride > 0; stride >>= 1) {
+        if (threadId < stride) {
+            diffs[threadId] += diffs[threadId + stride];
+        }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0 && threadIdx.y == 0) {
+        float tbeta = diffs[0];
+        if (tbeta < 0.000001)
+            beta = 0.f;
+        else
+            beta = (float)edgeCount / (2.f * tbeta);  // bate越小,边的权重越大
+    }
+}
+// dim3 block(BLOCK_X, BLOCK_Y);
+// dim3 grid(cv::divUp(source.cols, block.x), cv::divUp(source.rows, block.y));
+// int size = grid.x * grid.y;
+// calcBeta<BLOCK_X, BLOCK_Y><<<grid, block>>>(source, tempDiffs);
+// calcBeta<BLOCK_X, BLOCK_Y><<<1, block>>>(tempDiffs, size, count, *dbeta);

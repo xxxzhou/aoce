@@ -1,0 +1,53 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+#if CHANNEL_RGBA
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+#elif CHANNEL_R8
+layout (binding = 0, r8) uniform readonly image2D inTex;
+layout (binding = 1, r8) uniform image2D outTex;
+#endif
+
+// opencv_cudaimgproc bilateral_filter.cu
+
+layout (std140, binding = 2) uniform UBO {
+    int ksz;
+    float sigma_spatial2_inv_half;
+    float sigma_color2_inv_half;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }   
+    vec4 center = imageLoad(inTex,uv);
+
+    vec4 sum1 = vec4(0.0f);
+    float sum2 = 0.0f;
+    int r = ubo.ksz / 2;
+    float r2 = float(r*r);
+
+    // 最长半径
+    int tx = uv.x - r + ubo.ksz;
+    int ty = uv.y - r + ubo.ksz;
+    // 半径为r的圆里数据根据比重混合
+    for(int cy = uv.y-r;cy<ty;++cy){
+        for(int cx = uv.x-r;cx<tx;++cx){
+            float space2 = (uv.x-cx)*(uv.x-cx) + (uv.y-cy)*(uv.y-cy);
+            if(space2 < r2){
+                int bx = max(0,min(cx,size.x-1));
+                int by = max(0,min(cy,size.y-1));
+                vec4 color = imageLoad(inTex,ivec2(bx,by));
+                float norm = dot(abs(color-center),vec4(1.0f));
+                float weight = exp(space2*ubo.sigma_spatial2_inv_half + norm*norm*ubo.sigma_color2_inv_half);
+                sum1 = sum1 + weight * color;
+                sum2 = sum2 + weight;
+            }
+        }
+    }    
+    imageStore(outTex,uv,sum1/sum2);
+}

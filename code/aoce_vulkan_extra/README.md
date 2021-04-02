@@ -105,3 +105,15 @@ genType step(float edge,genType x),step generates a step function by comparing x
 一张8x8x(格子(64x64)),把8x8垂直平放堆叠,可以理解成一个每面64像素的正方体,其中每个格子的水平方是红色从0-1.0,垂直方向是绿色从0-1.0,而对于正方体的垂直方向是蓝色从0-1.0.
 
 颜色对应就很简单了,原图的蓝色确定是那二个格子(浮点数需要二个格子平均),红色找到对应格子的水平方向,绿色是垂直方向.
+
+## AverageLuminanceThreshold
+
+不同于GPUImage,先平均缩少3*3倍,然后读到CPU中计算平均亮度,然后再给下一层计算.
+
+这步回读会浪费大量时间,我之前在GPU测试过,1080P的回读大约在2ms左右,就算少了9倍,也需要0.2ms,再加上,回读CPU需要同步vulkan的cmd执行线程,早早的vkQueueSubmit,同步等待的时间根据运行层的复杂度可能会比上面更长.
+
+因为在这里,不考虑GPUImage的这种实现方式,全GPU流程处理,使用Reduce方式算图像的聚合数据(min/max/sum)等,然后保存结果到1x1的纹理中,现在实现效果在2070下1080P下需要0.08ms,比一般的普通计算层更短.
+
+## 双边滤波bilateralFilter
+
+[双边滤波bilateralFilter](https://zhuanlan.zhihu.com/p/127023952)

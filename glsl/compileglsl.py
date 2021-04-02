@@ -14,8 +14,8 @@ class fileNode():
         self.macro  = macro
 
 files = []
-# glslindexcurrent glslindex
-glslIndex = 'glslindexcurrent.txt'
+# glslindexcurrent glslindex glsl_a_c
+glslIndex = 'glsl_a_c.txt'
 with open(os.path.join(path, glslIndex), 'r') as lines:
     for line in lines:
         nodes = line.strip().split(" ")

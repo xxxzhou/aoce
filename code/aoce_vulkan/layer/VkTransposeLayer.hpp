@@ -15,8 +15,7 @@ class VkTransposeLayer : public VkLayer, public TransposeLayer {
     VkTransposeLayer(/* args */);
     ~VkTransposeLayer();
 
-   public:
-    virtual void onInitGraph() override;
+   public:    
     virtual void onInitLayer() override;
 };
 

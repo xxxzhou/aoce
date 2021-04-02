@@ -15,7 +15,7 @@ class VkChromKeyLayer : public VkLayer, public ITLayer<ChromKeyParamet> {
    protected:
    public:
     VkChromKeyLayer(/* args */);
-    ~VkChromKeyLayer();
+    virtual ~VkChromKeyLayer();
 };
 
 }  // namespace layer

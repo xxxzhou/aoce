@@ -20,7 +20,7 @@ class VkAdaptiveThresholdLayer : public VkLayer,
 
    public:
     VkAdaptiveThresholdLayer(/* args */);
-    ~VkAdaptiveThresholdLayer();
+    virtual ~VkAdaptiveThresholdLayer();
 
    protected:
     virtual void onUpdateParamet() override;

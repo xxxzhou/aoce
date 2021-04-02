@@ -18,6 +18,12 @@ namespace vulkan {
 
 enum class ConvertType { other = 0, rgba82rgba32f, rgba32f2rgba8 };
 
+enum class ReduceOperate {
+    sum,
+    min,
+    max,
+};
+
 struct KernelSizeParamet {
     int32_t kernelSizeX = 5;
     int32_t kernelSizeY = 5;
@@ -78,10 +84,23 @@ struct GuidedMattingParamet {
 
 struct HarrisCornerDetectionParamet {
     float edgeStrength = 1.0f;
-    GaussianBlurParamet blueParamet = {4,0.0f};
+    GaussianBlurParamet blueParamet = {4, 0.0f};
     float harris = 0.04f;
     float sensitivity = 5.0f;
     float threshold = 0.2f;
+};
+
+struct BilateralParamet {
+    // 模糊周边的半径(圆形)
+    int32_t kernelSize = 5;
+    float sigma_spatial = 10.0f;
+    float sigma_color = 10.0f;
+
+    inline bool operator==(const BilateralParamet& right) {
+        return this->kernelSize == right.kernelSize &&
+               this->sigma_spatial == right.sigma_spatial &&
+               this->sigma_color == right.sigma_color;
+    }
 };
 
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer(
@@ -102,6 +121,10 @@ AOCE_VULKAN_EXTRA_EXPORT ITLayer<ReSizeParamet>* createResizeLayer(
 
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<HarrisCornerDetectionParamet>*
 createHarrisCornerDetectionLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<float>* createAverageLuminanceThresholdLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<BilateralParamet>* createBilateralLayer();
 
 AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createLuminanceLayer();
 

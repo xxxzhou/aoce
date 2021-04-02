@@ -1,3 +1,3 @@
 resize.comp resize.comp CHANNEL_RGBA=1
 resize.comp resizeC1.comp CHANNEL_R8=1
-resize.comp resizeF4.comp CHANNEL_RGBAF32=1
+resize.comp resizeF4.comp CHANNEL_RGBA32F=1

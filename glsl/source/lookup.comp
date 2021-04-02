@@ -4,7 +4,7 @@ layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
 layout (binding = 0, rgba8) uniform readonly image2D inTex;
 // 8*8*(格子(64*64)),把8*8向上平放堆,可以理解成一个每面64像素的正方体.
 // 其中每个格子的水平方是红色从0-1.0,垂直方向是绿色从0-1.0,而对于正方体的垂直方向是蓝色从0-1.0.
-layout (binding = 1, rgba8) uniform readonly image2D inSampler;
+layout (binding = 1) uniform sampler2D inSampler;
 layout (binding = 2, rgba8) uniform image2D outTex;
 
 void main(){
@@ -29,7 +29,7 @@ void main(){
     vec2 pos1 = (q1*64.0f + color.rg*63.0f + 0.5f)/512.f;
     vec2 pos2 = (q2*64.0f + color.rg*63.0f + 0.5f)/512.f;
     // 取pos1/pos2上值
-    vec4 c1 = textureLod(inSampler, pos1,0);  
+    vec4 c1 = textureLod(inSampler, pos1,0.0f);  
     vec4 c2 = textureLod(inSampler, pos2,0); 
     // linear混合11,12这二张图的值
     vec4 result = mix(c1,c2,fract(b));

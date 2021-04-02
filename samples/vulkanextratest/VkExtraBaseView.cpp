@@ -16,7 +16,9 @@ void VkExtraBaseView::initGraph(ILayer* layer, void* hinst,
     initGraph(layers, hinst);
 }
 
-void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst) {
+void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst,
+                                bool bAutoIn) {
+    this->bAutoIn = bAutoIn;
     vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
@@ -62,7 +64,7 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst) {
 
 void VkExtraBaseView::openDevice(int32_t id) {
 #if WIN32
-    CameraType cameraType = CameraType::realsense;  // realsense
+    CameraType cameraType = CameraType::win_mf;  // realsense win_mf
 #elif __ANDROID__
     CameraType cameraType = CameraType::and_camera2;
 #endif
@@ -105,7 +107,7 @@ void VkExtraBaseView::enableLayer(bool bEnable) {
 
 void VkExtraBaseView::onFrame(VideoFrame frame) {
     if (getYuvIndex(frame.videoType) < 0) {
-        if (layerNode->getLayer()->getInCount() == 2) {
+        if (layerNode->getLayer()->getInCount() == 2 && bAutoIn) {
             inputLayer->getLayerNode()->addLine(layerNode, 0, 1);
         }
         yuvNode->setVisable(false);

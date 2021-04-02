@@ -104,7 +104,7 @@ enum class CameraType {
 };
 
 // aoce外部接收图像暂时就包含这几种
-enum class ImageType {
+enum class ImageType {    
     other = 0,
     r8,
     rgba8,

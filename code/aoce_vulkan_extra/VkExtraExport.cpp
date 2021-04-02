@@ -2,11 +2,13 @@
 
 #include "layer/VkAdaptiveThresholdLayer.hpp"
 #include "layer/VkAlphaShowLayer.hpp"
+#include "layer/VkBilateralLayer.hpp"
 #include "layer/VkChromKeyLayer.hpp"
 #include "layer/VkGuidedLayer.hpp"
 #include "layer/VkHarrisCornerDetectionLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
 #include "layer/VkLuminanceLayer.hpp"
+#include "layer/VkReduceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
 
 using namespace aoce::vulkan::layer;
@@ -46,6 +48,17 @@ ITLayer<ReSizeParamet>* createResizeLayer(ImageType imageType) {
 
 ITLayer<HarrisCornerDetectionParamet>* createHarrisCornerDetectionLayer() {
     VkHarrisCornerDetectionLayer* layer = new VkHarrisCornerDetectionLayer();
+    return layer;
+}
+
+ITLayer<float>* createAverageLuminanceThresholdLayer() {
+    VkAverageLuminanceThresholdLayer* layer =
+        new VkAverageLuminanceThresholdLayer();
+    return layer;
+}
+
+ITLayer<BilateralParamet>* createBilateralLayer() {
+    VkBilateralLayer* layer = new VkBilateralLayer();
     return layer;
 }
 

@@ -17,10 +17,10 @@ blend.comp
 chromaKey.comp
 filterColumn.comp filterColumn.comp CHANNEL_RGBA=1
 filterColumn.comp filterColumnC1.comp CHANNEL_R8=1
-filterColumn.comp filterColumnF4.comp CHANNEL_RGBAF32=1
+filterColumn.comp filterColumnF4.comp CHANNEL_RGBA32F=1
 filterRow.comp filterRow.comp CHANNEL_RGBA=1
 filterRow.comp filterRowC1.comp CHANNEL_R8=1
-filterRow.comp filterRowF4.comp CHANNEL_RGBAF32=1
+filterRow.comp filterRowF4.comp CHANNEL_RGBA32F=1
 ```
 
 glsl代码修改如下
@@ -32,13 +32,13 @@ layout (binding = 1, rgba8) uniform image2D outTex;
 #elif CHANNEL_R8
 layout (binding = 0, r8) uniform readonly image2D inTex;
 layout (binding = 1, r8) uniform image2D outTex;
-#elif CHANNEL_RGBAF32
+#elif CHANNEL_RGBA32F
 layout (binding = 0, rgba32f) uniform readonly image2D inTex;
 layout (binding = 1, rgba32f) uniform image2D outTex;
 #endif
 
 // 共享块，扩充前后二边HALO_SIZE(分为上HALO_SIZE，中间自身*PATCH_PER_BLOCK，下HALO_SIZE)
-#if CHANNEL_RGBAF32
+#if CHANNEL_RGBA32F
 shared vec4 column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];//vec4[local_size_y][local_size_x]
 #define packUnorm4x8
 #define unpackUnorm4x8

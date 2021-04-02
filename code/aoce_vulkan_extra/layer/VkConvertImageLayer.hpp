@@ -17,7 +17,7 @@ class VkConvertImageLayer : public VkLayer {
 
    public:
     VkConvertImageLayer(ConvertType convert = ConvertType::rgba82rgba32f);
-    ~VkConvertImageLayer();
+    virtual ~VkConvertImageLayer();
 
    protected:
     virtual void onInitGraph() override;

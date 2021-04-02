@@ -1,0 +1,71 @@
+#version 450
+
+layout (local_size_x = 256, local_size_y = 1) in;// gl_WorkGroupSize
+#if CHANNEL_RGBA32F
+layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+layout (binding = 1, rgba32f) uniform image2D outTex;
+#elif CHANNEL_R32F
+layout (binding = 0, r32f) uniform readonly image2D inTex;
+layout (binding = 1, r32f) uniform image2D outTex;
+#endif
+
+shared vec4 data_shared[256];
+
+// min/max/sum 等
+#if REDUCE_MIN
+    #define OPERATE min
+    #define ATOMIC_OPERATE atomicMin
+    #define INIT_VEC4 vec4(1.0f)
+#endif
+
+#if REDUCE_MAX
+    #define OPERATE max
+    #define ATOMIC_OPERATE atomicMax
+    #define INIT_VEC4 vec4(0.0f)
+#endif
+
+#if REDUCE_SUM
+    #define OPERATE add
+    #define ATOMIC_OPERATE atomicAdd
+    #define INIT_VEC4 vec4(0.0f)
+#endif
+
+vec4 add(vec4 a,vec4 b){
+    return a+b;
+}
+
+// 只分配一个线程组
+void main(){
+    int size = imageSize(inTex).x;      
+    // 线程组内索引
+    int tid = int(gl_LocalInvocationID.x); 
+    data_shared[tid] = INIT_VEC4;
+    memoryBarrierShared(); 
+    barrier();
+    // 线程组大小
+    int blockSize = int(gl_WorkGroupSize.x);
+    // 因为只分配一个线程组，所以我们需要算出需要几个线程组
+    int count = (size+1)/blockSize;
+    // 把所有值算入分配的唯一一个线程组内
+    for(int i=0;i<count;i++){        
+        int id = i * blockSize + tid;
+        if(id<size){            
+            vec4 rgba = imageLoad(inTex,ivec2(id,0));   
+            data_shared[tid] = OPERATE(rgba,data_shared[tid]);
+        }
+    } 
+    memoryBarrierShared();
+    barrier();
+    for (uint stride = gl_WorkGroupSize.x*gl_WorkGroupSize.y / 2; stride > 0; stride >>= 1) {
+       if (tid < stride){
+            data_shared[tid] = OPERATE(data_shared[tid], data_shared[tid+stride]);            
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+    memoryBarrierShared();
+    barrier();
+    if(tid == 0){ 
+        imageStore(outTex, ivec2(0,0), data_shared[0]);
+    }
+}

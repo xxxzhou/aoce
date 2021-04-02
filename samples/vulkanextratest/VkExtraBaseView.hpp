@@ -33,6 +33,8 @@ class VkExtraBaseView {
 
     std::unique_ptr<VulkanWindow> window = nullptr;
 
+    bool bAutoIn = false;
+
     std::mutex mtx;
 
    public:
@@ -46,7 +48,8 @@ class VkExtraBaseView {
 
    public:
     void initGraph(ILayer* layer, void* hinst, BaseLayer* nextLayer = nullptr);
-    void initGraph(std::vector<BaseLayer*> layers, void* hinst);
+    void initGraph(std::vector<BaseLayer*> layers, void* hinst,
+                   bool bAutoIn = false);
 
     void openDevice(int32_t id = 0);
     void closeDevice();

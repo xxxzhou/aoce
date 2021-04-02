@@ -1,0 +1,21 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;
+layout (binding = 0, r8) uniform readonly image2D inTex;
+layout (binding = 1, r32f) uniform readonly image2D inTex1;
+layout (binding = 2, r8) uniform image2D outTex;
+layout (std140, binding = 3) uniform UBO {
+    float threshold; // 0.05f
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }
+    float luminance = imageLoad(inTex,uv).r; 
+    float auvluminance = imageLoad(inTex1,ivec2(0,0)).r; 
+    float result = step(auvluminance,luminance*ubo.threshold*size.x*size.y);
+    imageStore(outTex,uv,vec4(result)); 
+}

@@ -7,13 +7,12 @@ layout (binding = 1, rgba8) uniform image2D outTex;
 #elif CHANNEL_R8
 layout (binding = 0, r8) uniform readonly image2D inTex;
 layout (binding = 1, r8) uniform image2D outTex;
-#elif CHANNEL_RGBAF32
+#elif CHANNEL_RGBA32F
 layout (binding = 0, rgba32f) uniform readonly image2D inTex;
 layout (binding = 1, rgba32f) uniform image2D outTex;
 #endif
 
-layout (binding = 2) uniform UBO 
-{
+layout (binding = 2) uniform UBO {
 	int xksize;	
     int yksize;	
     int xanchor;

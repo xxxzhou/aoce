@@ -1,0 +1,102 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+#if CHANNEL_RGBA
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+#elif CHANNEL_R8
+layout (binding = 0, r8) uniform readonly image2D inTex;
+#elif CHANNEL_RGBA32F
+layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+#elif CHANNEL_R32F
+layout (binding = 0, r32f) uniform image2D inTex;
+#endif
+
+#if CHANNEL_RGBA || CHANNEL_RGBA32F
+layout (binding = 1, rgba32f) uniform image2D outTex;
+#elif CHANNEL_R8 || CHANNEL_R32F
+layout (binding = 1, r32f) uniform image2D outTex;
+#endif
+
+shared vec4 data_shared[256];
+
+// 一个线程处理每行PATCH_SIZE_X个元素
+const int PATCH_SIZE_X = 4;
+// 一个线程处理每列PATCH_SIZE_Y个元素
+const int PATCH_SIZE_Y = 4;
+// 每个线程组处理元素个数为:block size(16*4)*(16*4)
+
+// min/max/sum 等
+#if REDUCE_MIN
+    #define OPERATE min
+    #define ATOMIC_OPERATE atomicMin
+    #define INIT_VEC4 vec4(1.0f)
+#endif
+
+#if REDUCE_MAX
+    #define OPERATE max
+    #define ATOMIC_OPERATE atomicMax
+    #define INIT_VEC4 vec4(0.0f)
+#endif
+
+#if REDUCE_SUM
+    #define OPERATE add
+    #define ATOMIC_OPERATE atomicAdd
+    #define INIT_VEC4 vec4(0.0f)
+#endif
+
+vec4 add(vec4 a,vec4 b){
+    return a+b;
+}
+
+// 前面一个线程取多点的逻辑参照opencv cuda模块里的reduce思路
+void main(){
+    ivec2 size = imageSize(inTex);  
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);  
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }  
+    // 组内线程一维索引    
+    int tid = int(gl_LocalInvocationIndex);  
+    data_shared[tid] = INIT_VEC4;
+#if REDUCE_AVERAGE
+    float avg = 1000.0/(gl_WorkGroupSize.x * gl_WorkGroupSize.y * PATCH_SIZE_Y * PATCH_SIZE_X);
+#endif
+    memoryBarrierShared();
+    barrier();
+    // 线程块对应内存块索引
+    uint x0 = gl_WorkGroupID.x * (gl_WorkGroupSize.x*PATCH_SIZE_X) + gl_LocalInvocationID.x;
+    uint y0 = gl_WorkGroupID.y * (gl_WorkGroupSize.y*PATCH_SIZE_Y) + gl_LocalInvocationID.y;
+    // 周边PATCH_SIZE_X*PATCH_SIZE_Y个线程组的线程,互相混合取PATCH_SIZE_X*PATCH_SIZE_Y个值.
+    // 每一个线程会赋值给周边PATCH_SIZE线程边上地址,编号x0/y0就给每个PATCH_SIZE所有线程第x号块赋值.
+    // 相比直接取本身线程组周边PATCH_SIZE_X*PATCH_SIZE_Y地址进行比较来说,有什么区别吗?
+    // 由sizex/sizey的范围缩小到数线程大小(sizex/PATCH_SIZE_X,sizey/PATCH_SIZE_Y)范围
+    for (uint i = 0, y = y0; i < PATCH_SIZE_Y && y < size.y; ++i, y += gl_WorkGroupSize.y){
+        for (uint j = 0, x = x0; j < PATCH_SIZE_X && x < size.x; ++j, x += gl_WorkGroupSize.x){
+            vec4 rgba = imageLoad(inTex,ivec2(x,y));            
+            data_shared[tid] = OPERATE(rgba,data_shared[tid]);
+        }
+    }
+    memoryBarrierShared();
+    barrier();
+    // 然后线程组内二分比较,把值保存在data_shared[0]中
+    for (uint stride = gl_WorkGroupSize.x*gl_WorkGroupSize.y / 2; stride > 0; stride >>= 1) {
+       if (tid < stride){
+            data_shared[tid] = OPERATE(data_shared[tid], data_shared[tid+stride]);                     
+        }
+        memoryBarrierShared();
+        barrier();
+    }
+    memoryBarrierShared();
+    barrier();
+    // 原子操作所有data_shared[0]
+    // if(tid == 0){
+    //     ATOMIC_OPERATE()
+    // }
+    // 原子操作限定太多,放弃
+    if(tid == 0){ 
+        int wid = int(gl_WorkGroupID.x + gl_WorkGroupID.y * gl_NumWorkGroups.x);         
+        imageStore(outTex, ivec2(wid,0), data_shared[0]);
+    }
+}
+

@@ -9,14 +9,6 @@ VkRGBA2YUVLayer::VkRGBA2YUVLayer(/* args */) { setUBOSize(12); }
 
 VkRGBA2YUVLayer::~VkRGBA2YUVLayer() {}
 
-void VkRGBA2YUVLayer::onInitGraph() {
-    std::vector<UBOLayoutItem> items = {
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT}};
-    layout->addSetLayout(items);
-    layout->generateLayout();
-}
 
 void VkRGBA2YUVLayer::onUpdateParamet() {
     assert(getYuvIndex(paramet.type) > 0);

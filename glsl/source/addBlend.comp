@@ -15,7 +15,7 @@ void main(){
     vec4 base = imageLoad(inTex1,uv);      
     
     float balpha = base.a * overlay.a;
-    vec3 color = vec4(overlay.rgb*base.a + base.rgb*overlay.a);
+    vec3 color = vec3(overlay.rgb*base.a + base.rgb*overlay.a);
     vec3 tcolor = vec3(overlay.rgb*(1.0f-base.a) + base.rgb*(1.0f-overlay.a)+ balpha);  
     
     vec3 cstep = step(balpha,color);

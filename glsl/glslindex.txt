@@ -3,25 +3,25 @@ input.comp inputBRGA.comp CHANNEL_BRGA=1
 input.comp inputARGB.comp CHANNEL_ARGB=1
 filter2D.comp filter2D.comp CHANNEL_RGBA=1
 filter2D.comp filter2DC1.comp CHANNEL_R8=1
-filter2D.comp filter2DF4.comp CHANNEL_RGBAF32=1
+filter2D.comp filter2DF4.comp CHANNEL_RGBA32F=1
 adaptiveThreshold.comp
 alphaShow.comp alphaShow.comp CHANNEL_RGBA=1
 alphaShow.comp alphaShowC1.comp CHANNEL_R8=1
-alphaShow.comp alphaShowF4.comp CHANNEL_RGBAF32=1
-alphaShow.comp alphaShowF1.comp CHANNEL_RF32=1
+alphaShow.comp alphaShowF4.comp CHANNEL_RGBA32F=1
+alphaShow.comp alphaShowF1.comp CHANNEL_R32F=1
 blend.comp
 chromaKey.comp
 filterColumn.comp filterColumn.comp CHANNEL_RGBA=1
 filterColumn.comp filterColumnC1.comp CHANNEL_R8=1
-filterColumn.comp filterColumnF4.comp CHANNEL_RGBAF32=1
+filterColumn.comp filterColumnF4.comp CHANNEL_RGBA32F=1
 filterRow.comp filterRow.comp CHANNEL_RGBA=1
 filterRow.comp filterRowC1.comp CHANNEL_R8=1
-filterRow.comp filterRowF4.comp CHANNEL_RGBAF32=1
+filterRow.comp filterRowF4.comp CHANNEL_RGBA32F=1
 luminance.comp
 operate.comp
 resize.comp resize.comp CHANNEL_RGBA=1
 resize.comp resizeC1.comp CHANNEL_R8=1
-resize.comp resizeF4.comp CHANNEL_RGBAF32=1
+resize.comp resizeF4.comp CHANNEL_RGBA32F=1
 rgba2yuvV1.comp
 rgba2yuvV2.comp
 transpose.comp
@@ -31,8 +31,16 @@ guidedFilter1.comp
 guidedFilter2.comp
 guidedMatting.comp
 convertImage.comp convertImage.comp CHANNEL_RGBA=1
-convertImage.comp convertImageF4.comp CHANNEL_RGBAF32=1
+convertImage.comp convertImageF4.comp CHANNEL_RGBA32F=1
 prewitt.comp
 harrisCornerDetection.comp
 thresholdedNMS.comp
 showRound.comp
+addBlend.comp
+alphaBlend.comp
+lookup.comp
+reduce.comp reduce_sum.comp REDUCE_SUM=1 CHANNEL_RGBA=1
+reduce.comp reduce_sumC1.comp REDUCE_SUM=1 CHANNEL_R8=1
+reduce2.comp reduce2_sumF4.comp REDUCE_SUM=1 CHANNEL_RGBA32F=1
+reduce2.comp reduce2_sumF1.comp REDUCE_SUM=1 CHANNEL_R32F=1
+averageLuminanceThreshold.comp

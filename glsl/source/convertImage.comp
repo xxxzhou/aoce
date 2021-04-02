@@ -4,7 +4,7 @@ layout (local_size_x = 16, local_size_y = 16) in;
 #if CHANNEL_RGBA
 layout (binding = 0, rgba8) uniform readonly image2D inTex;
 layout (binding = 1, rgba32f) uniform image2D outTex;
-#elif CHANNEL_RGBAF32
+#elif CHANNEL_RGBA32F
 layout (binding = 0, rgba32f) uniform readonly image2D inTex;
 layout (binding = 1, rgba8) uniform image2D outTex;
 #endif
