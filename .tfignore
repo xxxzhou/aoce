@@ -2,6 +2,7 @@
 \out\
 \.vs\
 \$tf\
+\$tf1\
 \android\04_vulkantest\.cxx
 
 \build

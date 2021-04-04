@@ -45,5 +45,5 @@ CSharp/AoceWrapper/Swig
 out/
 .vs/
 $tf/
-code/aoce/AoceBuildSettings.h
-code/aoce/AoceBuildSettings.h
+$tf1/
+code/aoce/AoceBuildSettings.*
