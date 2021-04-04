@@ -9,16 +9,14 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkLookupLayer : public VkLayer {
+class VkBrightnessLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkBrightnessLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
    private:
     /* data */
    public:
-    VkLookupLayer(/* args */);
-    virtual ~VkLookupLayer();
-
-   protected:
-    virtual bool getSampled(int inIndex) override;
-    virtual void onInitLayer() override;
+    VkBrightnessLayer(/* args */);
+    virtual ~VkBrightnessLayer();
 };
 
 }  // namespace layer

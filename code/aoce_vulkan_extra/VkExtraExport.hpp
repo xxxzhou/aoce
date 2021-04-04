@@ -65,6 +65,17 @@ struct ChromKeyParamet {
     float despillScale = 0.0f;
     // 溢漏(蓝绿幕对物体的影响)指数
     float despillExponent = 0.1f;
+    inline bool operator==(const ChromKeyParamet& right) {
+        return this->lumaMask == right.lumaMask &&
+               this->chromaColor == right.chromaColor &&
+               this->ambientScale == right.ambientScale &&
+               this->ambientColor == right.ambientColor &&
+               this->alphaCutoffMin == right.alphaCutoffMin &&
+               this->alphaScale == right.alphaScale &&
+               this->alphaExponent == right.alphaExponent &&
+               this->despillScale == right.despillScale &&
+               this->despillExponent == right.despillExponent;
+    }
 };
 
 struct AdaptiveThresholdParamet {
@@ -93,13 +104,31 @@ struct HarrisCornerDetectionParamet {
 struct BilateralParamet {
     // 模糊周边的半径(圆形)
     int32_t kernelSize = 5;
+    // 同高斯模糊的sigma,值越小,周边占比越小
     float sigma_spatial = 10.0f;
+    // sigma_spatial是距离间系数,sigma_color是颜色差异比较
+    // 同上,这值越小,颜色差异大的部分占比小
     float sigma_color = 10.0f;
 
     inline bool operator==(const BilateralParamet& right) {
         return this->kernelSize == right.kernelSize &&
                this->sigma_spatial == right.sigma_spatial &&
                this->sigma_color == right.sigma_color;
+    }
+};
+
+struct BulgeDistortionParamet {
+    float aspectRatio = 1920.0f / 1080.0f;
+    float centerX = 0.5f;
+    float centerY = 0.5f;
+    float radius = 0.25f;
+    float scale = 0.5f;
+
+    inline bool operator==(const BulgeDistortionParamet& right) {
+        return this->aspectRatio == right.aspectRatio &&
+               this->centerX == right.centerX &&
+               this->centerY == right.centerY && this->radius == right.radius &&
+               this->scale == right.scale;
     }
 };
 

@@ -6,7 +6,7 @@ namespace layer {
 
 VkOperateLayer::VkOperateLayer(/* args */) {
     setUBOSize(sizeof(TexOperateParamet), true);
-    onUpdateParamet();
+    updateUBO(&paramet);
 }
 
 VkOperateLayer::~VkOperateLayer() {}

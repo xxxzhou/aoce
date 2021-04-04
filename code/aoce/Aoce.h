@@ -104,7 +104,7 @@ enum class CameraType {
 };
 
 // aoce外部接收图像暂时就包含这几种
-enum class ImageType {    
+enum class ImageType {
     other = 0,
     r8,
     rgba8,
@@ -220,6 +220,10 @@ struct MapChannel {
     int32_t green = 1;
     int32_t blue = 2;
     int32_t alpha = 3;
+    inline bool operator==(const MapChannel &right) {
+        return this->red == right.red && this->green == right.green &&
+               this->blue == right.blue && this->alpha == right.alpha;
+    }
 };
 
 // 方便C#交互不做额外设置，以及GPU参数结构对应,bool全用int表示
@@ -229,12 +233,20 @@ struct Operate {
     int32_t bFlipY = false;
     // 调整亮度
     float gamma = 1.f;
+    inline bool operator==(const Operate &right) {
+        return this->bFlipX == right.bFlipX && this->bFlipY == right.bFlipY &&
+               this->gamma == right.gamma;
+    }
 };
 
 // 纹理些基本操作
 struct TexOperateParamet {
     MapChannel mapChannel = {};
     Operate operate = {};
+    inline bool operator==(const TexOperateParamet &right) {
+        return this->mapChannel == right.mapChannel &&
+               this->operate == right.operate;
+    }
 };
 
 // 纹理混合
@@ -258,6 +270,9 @@ struct TransposeParamet {
     // 是否X倒转
     int32_t bFlipX = false;
     int32_t bFlipY = false;
+    inline bool operator==(const TransposeParamet &right) {
+        return this->bFlipX == right.bFlipX && this->bFlipY == right.bFlipY;
+    }
 };
 
 struct ReSizeParamet {
@@ -275,12 +290,14 @@ struct vec3 {
     float x = 0;
     float y = 0;
     float z = 0;
+    inline bool operator==(const vec3 &right) {
+        return this->x == right.x && this->y == right.y && this->z == right.z;
+    }
 };
 
 }  // namespace aoce
 
 extern "C" {
-
 ACOE_EXPORT void setLogAction(logEventAction action);
 ACOE_EXPORT void setLogHandle(logEventHandle action);
 

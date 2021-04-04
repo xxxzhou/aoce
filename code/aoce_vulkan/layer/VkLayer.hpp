@@ -19,6 +19,9 @@ typedef std::shared_ptr<VulkanTexture> VulkanTexturePtr;
    protected:                                                          \
     virtual inline void onUpdateParamet() override {                   \
         if (bParametMatch) {                                           \
+            if (paramet == oldParamet) {                               \
+                return;                                                \
+            }                                                          \
             if (constBufCpu.size() == sizeof(paramet)) {               \
                 memcpy(constBufCpu.data(), &paramet, sizeof(paramet)); \
             }                                                          \

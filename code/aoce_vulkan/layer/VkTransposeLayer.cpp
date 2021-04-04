@@ -7,7 +7,7 @@ namespace layer {
 VkTransposeLayer::VkTransposeLayer(/* args */) {
     glslPath = "glsl/transpose.comp.spv";
     setUBOSize(sizeof(TransposeParamet), true);
-    onUpdateParamet();    
+    updateUBO(&paramet);
 }
 
 VkTransposeLayer::~VkTransposeLayer() {}

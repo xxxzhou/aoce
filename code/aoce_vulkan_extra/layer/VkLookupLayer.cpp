@@ -15,8 +15,6 @@ bool VkLookupLayer::getSampled(int inIndex) {
     return false;
 }
 
-bool VkLookupLayer::sampledNearest(int32_t inIndex) { return true; }
-
 void VkLookupLayer::onInitLayer() {
     VkLayer::onInitLayer();
     if (inFormats[1].width != 512 || inFormats[1].height != 512) {

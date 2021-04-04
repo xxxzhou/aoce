@@ -9,16 +9,18 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkLookupLayer : public VkLayer {
+class VkBulgeDistortionLayer : public VkLayer,
+                               public ITLayer<BulgeDistortionParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkBulgeDistortionLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
    private:
     /* data */
    public:
-    VkLookupLayer(/* args */);
-    virtual ~VkLookupLayer();
+    VkBulgeDistortionLayer(/* args */);
+    virtual ~VkBulgeDistortionLayer();
 
    protected:
     virtual bool getSampled(int inIndex) override;
-    virtual void onInitLayer() override;
 };
 
 }  // namespace layer

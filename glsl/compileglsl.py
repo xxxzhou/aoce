@@ -15,7 +15,7 @@ class fileNode():
 
 files = []
 # glslindexcurrent glslindex glsl_a_c
-glslIndex = 'glsl_a_c.txt'
+glslIndex = 'glslindexcurrent.txt'
 with open(os.path.join(path, glslIndex), 'r') as lines:
     for line in lines:
         nodes = line.strip().split(" ")

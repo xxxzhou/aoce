@@ -15,7 +15,7 @@ class VkBilateralLayer : public VkLayer, public ITLayer<BilateralParamet> {
     /* data */
    public:
     VkBilateralLayer(/* args */);
-    ~VkBilateralLayer();
+    virtual ~VkBilateralLayer();
 
    private:
     void transformParamet();
