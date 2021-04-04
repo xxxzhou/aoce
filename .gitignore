@@ -2,6 +2,7 @@
 /thirdparty/
 code/aoce_agora/
 code/aoce_talkto/
+code/aoce/AoceBuildSettings.h
 samples/talktotest/
 android/base/CMakeFiles/
 android/base/cmake_install.cmake
@@ -44,3 +45,5 @@ CSharp/AoceWrapper/Swig
 out/
 .vs/
 $tf/
+code/aoce/AoceBuildSettings.h
+code/aoce/AoceBuildSettings.h
