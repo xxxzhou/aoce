@@ -1,8 +1,8 @@
 
-find_package(FFmpeg REQUIRED)
+find_package(FFmpeg)
 
 if(NOT FFmpeg_FOUND)
-    message(FATAL_ERROR "FFmpeg not find.")
+    message(FATAL_ERROR "FFmpeg not find.please set option AOCE_INSTALL_FFMPEG false")
 endif()
 
 include_directories(${FFMPEG_INCLUDE_DIRS} ${AOCE_HEADER_DIR})
