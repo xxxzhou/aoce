@@ -26,9 +26,10 @@ void VkSeparableLayer::updateBuffer(std::vector<float> data) {
     updateUBO(ubo.data());
 
     kernelBuffer = std::make_unique<VulkanBuffer>();
-    kernelBuffer->initResoure(BufferUsage::onestore, size * sizeof(float),
-                              VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                              (uint8_t*)data.data());
+    kernelBuffer->initResoure(
+        BufferUsage::onestore, size * sizeof(float),
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+        (uint8_t*)data.data());
 }
 
 void VkSeparableLayer::onInitGraph() {
@@ -129,8 +130,7 @@ void VkBoxBlurSLayer::onInitLayer() {
 }
 
 VkGaussianBlurSLayer::VkGaussianBlurSLayer(ImageType imageType)
-    : VkSeparableLinearLayer(imageType) {
-}
+    : VkSeparableLinearLayer(imageType) {}
 
 VkGaussianBlurSLayer::~VkGaussianBlurSLayer() {}
 
@@ -143,7 +143,7 @@ void VkGaussianBlurSLayer::onUpdateParamet() {
 
 void VkGaussianBlurSLayer::onInitLayer() {
     VkSeparableLinearLayer::onInitLayer();
-    int ksize = paramet.blurRadius * 2 + 1;   
+    int ksize = paramet.blurRadius * 2 + 1;
     if (paramet.sigma <= 0.0f) {
         paramet.sigma = ((ksize - 1) * 0.5 - 1) * 0.3 + 0.8;
     }

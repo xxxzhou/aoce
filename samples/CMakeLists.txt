@@ -50,8 +50,9 @@ function(sample)
     endforeach()
 endfunction(sample) 
 
-if(WIN32)    
-    include_directories("../code")
+include_directories("../code")
+
+if(WIN32)
     include_directories(${AOCE_HEADER_DIR} ${OpenCV_INCLUDE_DIRS} ${AOCE_VULKAN_HEADER_DIR} ${Vulkan_INCLUDE_DIR})
     sample()    
 
@@ -61,14 +62,13 @@ if(WIN32)
     if(OpenCV_FOUND)
         generate(08_vulkanextra TRUE FALSE aoce aoce_vulkan aoce_vulkan_extra)
     endif()
-    if(AOCE_INSTALL_TALKTO)
+    if(AOCE_TALKTO_EXIST)
         generate(talktotest TRUE FALSE aoce_talkto)
     endif()
     # add_subdirectory(mathtest)
 endif()
 
-if(ANDROID)
-    include_directories("../code") 
+if(ANDROID)    
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue ${AOCE_HEADER_DIR} ${AOCE_VULKAN_HEADER_DIR} ${Vulkan_INCLUDE_DIR})
@@ -91,7 +91,11 @@ endif()
 
 add_subdirectory(vulkanextratest)
 
-if(AOCE_INSTALL_TALKTO)
+if(AOCE_TALKTO_EXIST)
+    add_subdirectory(talkto_live_test)
+endif() 
+
+if(AOCE_CUDA_MODULE)
     add_subdirectory(cudatest)
 endif() 
 

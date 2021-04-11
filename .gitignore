@@ -4,6 +4,7 @@ code/aoce_agora/
 code/aoce_talkto/
 code/aoce/AoceBuildSettings.h
 samples/talktotest/
+samples/talkto_live_test/
 android/base/CMakeFiles/
 android/base/cmake_install.cmake
 android/build
@@ -47,3 +48,4 @@ out/
 $tf/
 $tf1/
 code/aoce/AoceBuildSettings.*
+.tfignore

@@ -15,7 +15,7 @@ using namespace aoce::win;
 
 #if USE_CAMERA
 static int index = 0;
-static int formatIndex = 0;// 29;
+static int formatIndex = 0;  // 29;
 #else
 static HINSTANCE instance = nullptr;
 static MediaPlayer *player = nullptr;
@@ -24,13 +24,13 @@ static std::string uri = "rtmp://58.200.131.2:1935/livetv/hunantv";
 #endif
 
 static std::unique_ptr<Dx11Window> window = nullptr;
-static std::unique_ptr<VideoViewGraph> viewGraph = nullptr;
+static std::unique_ptr<VideoView> viewGraph = nullptr;
 
 // cuda/vulkan 分别对接不同的DX11输出
 static GpuType gpuType = GpuType::cuda;
 
-static void* dx11Device = nullptr;
-static void* dx11Tex = nullptr;
+static void *dx11Device = nullptr;
+static void *dx11Tex = nullptr;
 
 static void onTick(void *dx11, void *tex) {
     std::string msg;
@@ -38,8 +38,8 @@ static void onTick(void *dx11, void *tex) {
     logMessage(LogLevel::info, msg);
     dx11Device = dx11;
     dx11Tex = tex;
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));  
-    viewGraph->getOutputLayer()->outDx11GpuTex(dx11, dx11Tex);  
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    viewGraph->getOutputLayer()->outDx11GpuTex(dx11, dx11Tex);
 }
 
 #if USE_CAMERA
@@ -56,7 +56,7 @@ class TestMediaPlay : public IMediaPlayerObserver {
     virtual ~TestMediaPlay() override{};
 
    public:
-    virtual void onPrepared() override {        
+    virtual void onPrepared() override {
         logMessage(LogLevel::info, "start");
         player->start();
     }
@@ -91,10 +91,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     std::cout << "deivce count:" << deviceList.size() << std::endl;
     VideoDevicePtr video = deviceList[index];
     video->setVideoFrameHandle(onDrawFrame);
-    std::wstring name((wchar_t *)video->getName().data());
-    std::wstring id((wchar_t *)video->getId().data());
-    std::wcout << "name: " << name << std::endl;
-    std::wcout << "id: " << id << std::endl;
+    std::string name = video->getName();
+    std::string id = video->getId();
+    std::cout << "name: " << name << std::endl;
+    std::cout << "id: " << id << std::endl;
     auto &formats = video->getFormats();
     std::wcout << "formats count: " << formats.size() << std::endl;
     for (const auto &vf : formats) {
@@ -102,7 +102,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
                   << " hight:" << vf.height << " fps:" << vf.fps
                   << " format:" << to_string(vf.videoType) << std::endl;
     }
-    formatIndex = video->findFormatIndex(1280,720);
+    formatIndex = video->findFormatIndex(1280, 720);
     video->setFormat(formatIndex);
     auto &selectFormat = video->getSelectFormat();
     VideoType videoType = selectFormat.videoType;
@@ -112,17 +112,17 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     }
 #else
     instance = hInstance;
-    player = AoceManager::Get().getMediaPlayerFactory(MediaPlayType::ffmpeg)->createPlay();
+    player = AoceManager::Get()
+                 .getMediaPlayerFactory(MediaPlayType::ffmpeg)
+                 ->createPlay();
     testPlay = new TestMediaPlay();
     player->setDataSource(uri.c_str());
     player->setObserver(testPlay);
     VideoType videoType = VideoType::yuv420P;
 #endif
 
-    viewGraph = std::make_unique<VideoViewGraph>();
-    viewGraph->initGraph(gpuType);
-    viewGraph->updateParamet({videoType}, {true, false}, {true, true});
-
+    viewGraph = std::make_unique<VideoView>(gpuType);
+    viewGraph->getOutputLayer()->updateParamet({true, true});
 #if USE_CAMERA
     // 打开摄像机
     video->open();

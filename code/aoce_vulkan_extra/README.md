@@ -106,14 +106,38 @@ genType step(float edge,genType x),step generates a step function by comparing x
 
 颜色对应就很简单了,原图的蓝色确定是那二个格子(浮点数需要二个格子平均),红色找到对应格子的水平方向,绿色是垂直方向.
 
-## AverageLuminanceThreshold
+### AverageLuminanceThreshold
 
 不同于GPUImage,先平均缩少3*3倍,然后读到CPU中计算平均亮度,然后再给下一层计算.
 
-这步回读会浪费大量时间,我之前在GPU测试过,1080P的回读大约在2ms左右,就算少了9倍,也需要0.2ms,再加上,回读CPU需要同步vulkan的cmd执行线程,早早的vkQueueSubmit,同步等待的时间根据运行层的复杂度可能会比上面更长.
+这步回读会浪费大量时间,我之前在GPU测试过,1080P的回读大约在2ms左右,就算少了9倍数据量,也需要0.2ms,再加上,回读CPU需要同步vulkan的cmd执行线程,早早的vkQueueSubmit,中断流程所导致的同步时间根据运行层的复杂度可能会比上面更长.
 
-因为在这里,不考虑GPUImage的这种实现方式,全GPU流程处理,使用Reduce方式算图像的聚合数据(min/max/sum)等,然后保存结果到1x1的纹理中,现在实现效果在2070下1080P下需要0.08ms,比一般的普通计算层更短.
+因此在这里,不考虑GPUImage的这种实现方式,全GPU流程处理,使用Reduce方式算图像的聚合数据(min/max/sum)等,然后保存结果到1x1的纹理中,现在实现效果在2070下1080P下需要0.08ms,比一般的普通计算层更短.
 
-## 双边滤波bilateralFilter
+不过对于图像流(视频,拉流)来说,可以考虑在当前graph执行完vkQueueSubmit,然后VkReduceLayer层输出的1x1的结果,类似输出层,然后在需要用这结果的层,在下一桢之前把这个结果写入UNIFORM_BUFFER中,可能相比取纹理值更快,这样不会打断执行流程,也不需要同步,唯一问题是当前桢的参数是前面的桢的运行结果.
+
+### 双边滤波bilateralFilter
 
 [双边滤波bilateralFilter](https://zhuanlan.zhihu.com/p/127023952)
+
+### CannyEdgeDetection
+
+[Canny Edge Detection Canny边缘检测](https://blog.csdn.net/kathrynlala/article/details/82902254)
+
+逻辑有点同HarrisCornerDetection,由多层构成.
+
+其中第四层4.Hysteresis Thresholding正确实现方法逻辑应该类似:opencv_cudaimgproc canny.cpp/canny.cu里edgesHysteresis,不过逻辑现有些复杂,后面有时间修改成这种逻辑.
+
+现暂时使用GPUImage里的简化逻辑.
+
+### CGAColorspace CGA滤镜
+
+[Color Graphics Adapter](https://en.wikipedia.org/wiki/Color_Graphics_Adapter)
+
+[色彩调整之灰度、替换、深褐色、CGA滤镜](https://blog.csdn.net/h2282802627/article/details/114112435)
+
+GPUImageCGAColorspaceFilter CGA滤镜。CGA全称是:Color Graphics Adapter，彩色图形适配器(关于CGA的更多资料请访问Color Graphics Adapter)。在320x200标准图形模式下，可以选择3种固定的调色板:
+
+1.CGA 320×200 in 4 colors palette 0 (red, yellow, green, black background)
+2.CGA 320×200 in 4 colors palette 1 (cyan, magenta, white, black background)
+3.CGA 320×200 in 4 colors 3rd palette (tweaked), (cyan, red, white, black background)

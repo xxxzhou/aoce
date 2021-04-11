@@ -1,0 +1,44 @@
+
+float dilate(vec2 uv, vec2 size, int radius) {
+    vec2 invSize = 1.0 / size;
+    float invKR = 1.0 / float(radius);
+    float acc = 0.0;
+    float w = 0.0;
+    for(int i = -radius; i <= radius; ++i) {
+        for(int j = -radius; j <= radius; ++j) {
+            vec2 rxy = vec2(ivec2(i, j));
+            vec2 kuv = rxy * invKR;
+            vec2 texOffset = uv + rxy * invSize;
+            float kernel = texture(iChannel1, vec2(0.5f) + kuv).x;
+            float tex = texture(iChannel0, texOffset).x;
+            float v = tex + kernel;
+            if(v > acc) {
+                acc = v;
+                w = kernel;
+            }
+    	}
+    }
+    return acc - w;
+}
+
+float erose(vec2 uv, vec2 size, int radius) {
+    vec2 invSize = 1.0 / size;
+    float invKR = 1.0 / float(radius);
+    float acc = 1.0;
+    float w = 0.0;
+    for(int i = -radius; i <= radius; ++i) {
+        for(int j = -radius; j <= radius; ++j) {
+            vec2 rxy = vec2(ivec2(i, j));
+            vec2 kuv = rxy * invKR;
+            vec2 texOffset = uv + rxy * invSize;
+            float kernel = texture(iChannel1, vec2(0.5f) + kuv).x;
+            float tex = texture(iChannel0, texOffset).x;
+            float v = tex - kernel;
+            if(v < acc) {
+                acc = v;
+                w = kernel;
+            }
+    	}
+    }
+    return acc + w;
+}

@@ -1,0 +1,43 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+    vec2 sampleDivisor = vec2(1.0 / 200.0, 1.0 / 320.0);
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);   
+    
+    vec2 samplePos = suv - mod(suv, sampleDivisor);
+    vec4 color = textureLod(inSampler, samplePos,0)
+
+    vec4 colorCyan = vec4(85.0 / 255.0, 1.0, 1.0, 1.0);
+    vec4 colorMagenta = vec4(1.0, 85.0 / 255.0, 1.0, 1.0);
+    vec4 colorWhite = vec4(1.0, 1.0, 1.0, 1.0);
+    vec4 colorBlack = vec4(0.0, 0.0, 0.0, 1.0);    
+    
+    float blackDistance = distance(color, colorBlack);
+    float whiteDistance = distance(color, colorWhite);
+    float magentaDistance = distance(color, colorMagenta);
+    float cyanDistance = distance(color, colorCyan);
+    
+    vec4 finalColor = colorMagenta;
+    
+    float colorDistance = min(magentaDistance, cyanDistance);
+    colorDistance = min(colorDistance, whiteDistance);
+    colorDistance = min(colorDistance, blackDistance);
+    
+    if (colorDistance == blackDistance) {
+        finalColor = colorBlack;
+    } else if (colorDistance == whiteDistance) {
+        finalColor = colorWhite;
+    } else if (colorDistance == cyanDistance) {
+        finalColor = colorCyan;
+    } 
+    imageStore(outTex,uv,finalColor);     
+}

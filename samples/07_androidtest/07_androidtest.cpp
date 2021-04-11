@@ -14,7 +14,7 @@ static int index = 0;
 static int formatIndex = 0;
 static VideoDevicePtr video = nullptr;
 static std::unique_ptr<VulkanWindow> window = nullptr;
-static std::unique_ptr<VideoViewGraph> viewGraph = nullptr;
+static std::unique_ptr<VideoView> viewGraph = nullptr;
 
 static void onDrawFrame(VideoFrame frame) {
     std::string msg;
@@ -57,12 +57,12 @@ void android_main(struct android_app* app) {
     logMessage(LogLevel::info, "device count:" + deviceList.size());
 
     VideoDevicePtr video = deviceList[index];
-    std::wstring name((wchar_t*)video->getName().data());
-    std::wstring id((wchar_t*)video->getId().data());
-    std::wcout << "name: " << name << std::endl;
-    std::wcout << "id: " << id << std::endl;
+    std::string name = video->getName();
+    std::string id = video->getId();
+    std::cout << "name: " << name << std::endl;
+    std::cout << "id: " << id << std::endl;
     auto& formats = video->getFormats();
-    std::wcout << "formats count: " << formats.size() << std::endl;
+    std::cout << "formats count: " << formats.size() << std::endl;
     for (const auto& vf : formats) {
         std::string msg;
         string_format(msg, "index:", vf.index, " width: ", vf.width,
@@ -93,8 +93,7 @@ Java_aoce_samples_androidtest_MainActivity_initEngine(JNIEnv* env,
     AoceManager::Get().initAndroid(andEnv);
     loadAoce();
 
-    viewGraph = std::make_unique<VideoViewGraph>();
-    viewGraph->initGraph();
+    viewGraph = std::make_unique<VideoView>();
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -140,6 +139,6 @@ Java_aoce_samples_androidtest_MainActivity_openCamera(JNIEnv* env, jobject thiz,
     video->setFormat(formatIndex);
     auto& selectFormat = video->getSelectFormat();
     VideoType videoType = selectFormat.videoType;
-    viewGraph->updateParamet({videoType}, {true, false}, {false, true});
+    viewGraph->getOutputLayer()->updateParamet({false,true});
     video->open();
 }

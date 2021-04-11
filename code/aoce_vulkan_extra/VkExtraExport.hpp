@@ -101,6 +101,12 @@ struct HarrisCornerDetectionParamet {
     float threshold = 0.2f;
 };
 
+struct CannyEdgeDetectionParamet {
+    GaussianBlurParamet blueParamet = {4, 0.0f};
+    float minThreshold = 0.1f;
+    float maxThreshold = 0.4f;
+};
+
 struct BilateralParamet {
     // 模糊周边的半径(圆形)
     int32_t kernelSize = 5;
@@ -118,7 +124,7 @@ struct BilateralParamet {
 };
 
 struct BulgeDistortionParamet {
-    float aspectRatio = 1920.0f / 1080.0f;
+    float aspectRatio = 1.0f;
     float centerX = 0.5f;
     float centerY = 0.5f;
     float radius = 0.25f;
@@ -154,6 +160,21 @@ createHarrisCornerDetectionLayer();
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<float>* createAverageLuminanceThresholdLayer();
 
 AOCE_VULKAN_EXTRA_EXPORT ITLayer<BilateralParamet>* createBilateralLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createAddBlendLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<float>* createAlphaBlendLayer();
+
+// 二输入,第一输入原始图像,第二输入512*512的lookup图
+AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createLookupLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<float>* createBrightnessLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<BulgeDistortionParamet>*
+createBulgeDistortionLayer();
+
+AOCE_VULKAN_EXTRA_EXPORT ITLayer<CannyEdgeDetectionParamet>*
+createCannyEdgeDetectionLayer();
 
 AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createLuminanceLayer();
 

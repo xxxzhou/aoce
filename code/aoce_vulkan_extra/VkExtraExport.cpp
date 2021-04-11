@@ -1,12 +1,17 @@
 #include "VkExtraExport.hpp"
 
 #include "layer/VkAdaptiveThresholdLayer.hpp"
+#include "layer/VkAlphaBlendLayer.hpp"
 #include "layer/VkAlphaShowLayer.hpp"
 #include "layer/VkBilateralLayer.hpp"
+#include "layer/VkBrightnessLayer.hpp"
+#include "layer/VkBulgeDistortionLayer.hpp"
+#include "layer/VkCannyEdgeDetectionLayer.hpp"
 #include "layer/VkChromKeyLayer.hpp"
 #include "layer/VkGuidedLayer.hpp"
 #include "layer/VkHarrisCornerDetectionLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
+#include "layer/VkLookupLayer.hpp"
 #include "layer/VkLuminanceLayer.hpp"
 #include "layer/VkReduceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
@@ -59,6 +64,36 @@ ITLayer<float>* createAverageLuminanceThresholdLayer() {
 
 ITLayer<BilateralParamet>* createBilateralLayer() {
     VkBilateralLayer* layer = new VkBilateralLayer();
+    return layer;
+}
+
+BaseLayer* createAddBlendLayer() {
+    VkAddBlendLayer* layer = new VkAddBlendLayer();
+    return layer;
+}
+
+ITLayer<float>* createAlphaBlendLayer() {
+    VkAlphaBlendLayer* layer = new VkAlphaBlendLayer();
+    return layer;
+}
+
+BaseLayer* createLookupLayer() {
+    VkLookupLayer* layer = new VkLookupLayer();
+    return layer;
+}
+
+ITLayer<float>* createBrightnessLayer() {
+    VkBrightnessLayer* layer = new VkBrightnessLayer();
+    return layer;
+}
+
+ITLayer<BulgeDistortionParamet>* createBulgeDistortionLayer() {
+    VkBulgeDistortionLayer* layer = new VkBulgeDistortionLayer();
+    return layer;
+}
+
+ITLayer<CannyEdgeDetectionParamet>* createCannyEdgeDetectionLayer() {
+    VkCannyEdgeDetectionLayer* layer = new VkCannyEdgeDetectionLayer();
     return layer;
 }
 

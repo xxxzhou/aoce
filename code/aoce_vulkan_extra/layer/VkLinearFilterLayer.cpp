@@ -79,7 +79,8 @@ void VkBoxBlurLayer::onInitVkBuffer() {
     kernelBuffer->initResoure(
         BufferUsage::onestore,
         paramet.kernelSizeX * paramet.kernelSizeY * sizeof(float),
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+        (uint8_t*)karray.data());
 }
 
 VkGaussianBlurLayer::VkGaussianBlurLayer(ImageType imageType)
@@ -119,7 +120,8 @@ void VkGaussianBlurLayer::onInitVkBuffer() {
     kernelBuffer = std::make_unique<VulkanBuffer>();
     kernelBuffer->initResoure(
         BufferUsage::onestore, karray.size() * sizeof(float),
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, (uint8_t*)karray.data());
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+        (uint8_t*)karray.data());
     std::vector<int32_t> ubo = {ksize, ksize, paramet.blurRadius,
                                 paramet.blurRadius};
     updateUBO(ubo.data());

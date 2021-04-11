@@ -3,6 +3,9 @@
 # project(aoce_cuda LANGUAGES CXX CUDA)
 enable_language(CUDA)
 find_package(CUDAToolkit REQUIRED)
+if(NOT CUDAToolkit_FOUND)
+    message(FATAL_ERROR "cuda toolkit not find.please set option AOCE_CUDA_MODULE false")
+endif()
 # 在使用CUDA_COMPILE cmake宏构建cuda之前使用cmake中的命令清除所有编译器标志
 # set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "" )
 

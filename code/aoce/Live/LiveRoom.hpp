@@ -5,9 +5,9 @@
 namespace aoce {
 
 struct PushSetting {
-    // 是否拉取声音
+    // 是否推声音
     int32_t bAudio = 1;
-    // 是否拉取视频
+    // 是否推视频
     int32_t bVideo = 1;
     // 视频信息
     VideoStream videoStream = {};

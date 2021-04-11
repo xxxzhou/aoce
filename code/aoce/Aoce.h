@@ -210,7 +210,7 @@ struct AudioFrame {
 };
 
 struct YUVParamet {
-    VideoType type = VideoType::nv12;
+    VideoType type = VideoType::other;
     int32_t special = 0;
 };
 

@@ -16,7 +16,7 @@ static InputLayer* inputLayer;
 static OutputLayer* outputLayer;
 static YUV2RGBALayer* yuv2rgbLayer;
 
-// cuda也可测试 
+// cuda也可测试
 static GpuType gpuType = GpuType::vulkan;
 
 static void onDrawFrame(VideoFrame frame) {
@@ -29,7 +29,8 @@ static void onImageProcessHandle(uint8_t* data, ImageFormat format,
     // std::cout << "data:" << (int)data[10000] << std::endl;
     // std::vector<float> vecf(width*height * 4);
     // memcpy(vecf.data(), data, width * height * elementSize);
-    memcpy(show->ptr<char>(0), data, format.width * format.height * getImageTypeSize(format.imageType));
+    memcpy(show->ptr<char>(0), data,
+           format.width * format.height * getImageTypeSize(format.imageType));
 }
 
 int main() {
@@ -39,10 +40,10 @@ int main() {
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
     std::cout << "deivce count:" << deviceList.size() << std::endl;
     VideoDevicePtr video = deviceList[index];
-    std::wstring name((wchar_t*)video->getName().data());
-    std::wstring id((wchar_t*)video->getId().data());
-    std::wcout << "name: " << name << std::endl;
-    std::wcout << "id: " << id << std::endl;
+    std::string name = video->getName();
+    std::string id = video->getId();
+    std::cout << "name: " << name << std::endl;
+    std::cout << "id: " << id << std::endl;
     auto& formats = video->getFormats();
     std::wcout << "formats count: " << formats.size() << std::endl;
     for (const auto& vf : formats) {
@@ -89,7 +90,7 @@ int main() {
             video->close();
         } else if (key == 'o') {
             video->open();
-        }else if(key == 'p'){
+        } else if (key == 'p') {
             vkGraph->reset();
         }
     }

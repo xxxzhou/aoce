@@ -27,10 +27,10 @@ int main() {
         index = 1;
     }
     VideoDevicePtr video = deviceList[index];
-    std::wstring name((wchar_t*)video->getName().data());
-    std::wstring id((wchar_t*)video->getId().data());
-    std::wcout << "name: " << name << std::endl;
-    std::wcout << "id: " << id << std::endl;
+    std::string name = video->getName();
+    std::string id = video->getId();
+    std::cout << "name: " << name << std::endl;
+    std::cout << "id: " << id << std::endl;
     auto& formats = video->getFormats();
     std::wcout << "formats count: " << formats.size() << std::endl;
     for (const auto& vf : formats) {

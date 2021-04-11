@@ -112,6 +112,8 @@ class ACOE_EXPORT ILayer {
 
    public:
     class PipeNode* getLayerNode();
+
+    operator BaseLayer*() { return getLayer(); };
 };
 
 // 分离导致层不同参数的差异(AOCE_LAYER_QUERYINTERFACE)

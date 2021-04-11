@@ -68,8 +68,8 @@ class ACOE_EXPORT AoceManager {
     // 必需在主线程或是附加主线程里调用
     JNIEnv *getEnv(bool &bAttach);
     // initAndroid里保存了一个env,如果在initAndroid线程里,不需要传入env
-    jobject getActivityApplication(jobject activity,JNIEnv *env = nullptr);
-    std::string getObjClassName(jobject obj,JNIEnv *env = nullptr);
+    jobject getActivityApplication(jobject activity, JNIEnv *env = nullptr);
+    std::string getObjClassName(jobject obj, JNIEnv *env = nullptr);
 
     // 如果在线程拿过JNIEnv,退出时请调用
     void detachThread();

@@ -4,7 +4,7 @@
 
 #include "Aoce.hpp"
 #include "AoceManager.hpp"
-#include "FixGraph/VideoViewGraph.hpp"
+#include "FixGraph/VideoView.hpp"
 #include "Layer/LayerFactory.hpp"
 #include "Layer/PipeGraph.hpp"
 #include "Live/LiveRoom.hpp"

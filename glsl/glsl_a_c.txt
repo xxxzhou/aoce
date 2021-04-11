@@ -1,2 +1,0 @@
-bilateral.comp bilateral.comp CHANNEL_RGBA=1
-bilateral.comp bilateralC1.comp CHANNEL_R8=1

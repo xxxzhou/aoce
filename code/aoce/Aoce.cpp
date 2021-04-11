@@ -482,14 +482,11 @@ void loadAoce() {
     ModuleManager::Get().regAndLoad("aoce_android");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
-    ModuleManager::Get().regAndLoad("aoce_agora");
+    ModuleManager::Get().regAndLoad("aoce_agora");ModuleManager::Get().regAndLoad("aoce_talkto");
 #endif
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().regAndLoad("aoce_ffmpeg");
-#endif
-#if defined(AOCE_INSTALL_TALKTO)
-    ModuleManager::Get().regAndLoad("aoce_talkto");
-#endif
+#endif    
 }
 
 void unloadAoce() {
@@ -505,12 +502,9 @@ void unloadAoce() {
     ModuleManager::Get().unloadModule("aoce_android");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
-    ModuleManager::Get().unloadModule("aoce_agora");
+    ModuleManager::Get().unloadModule("aoce_agora");ModuleManager::Get().unloadModule("aoce_talkto");
 #endif
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().unloadModule("aoce_ffmpeg");
-#endif
-#if defined(AOCE_INSTALL_TALKTO)
-    ModuleManager::Get().unloadModule("aoce_talkto");
 #endif
 }

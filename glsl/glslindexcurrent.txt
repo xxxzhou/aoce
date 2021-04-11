@@ -1,2 +1,1 @@
-brightness.comp
-bulgeDistortion.comp
+cgaColorspace.comp

@@ -234,8 +234,9 @@ bool AVideoDevice::close() {
 
 bool AVideoDevice::init(ACameraManager* manager, const char* id) {
     cameraManager = manager;
-    mid = id;
-    copycharstr(this->id.data(), id, AOCE_VIDEO_MAX_NAME);
+    this->id = id;
+    this->name = id;
+    // copycharstr(this->id.data(), id, AOCE_VIDEO_MAX_NAME);
 
     ACameraManager_getCameraCharacteristics(cameraManager, id, &metadata);
     ACameraMetadata_const_entry entry = {};

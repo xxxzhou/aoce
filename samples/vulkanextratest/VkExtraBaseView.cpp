@@ -64,7 +64,7 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst,
 
 void VkExtraBaseView::openDevice(int32_t id) {
 #if WIN32
-    CameraType cameraType = CameraType::win_mf;  // realsense win_mf
+    CameraType cameraType = CameraType::realsense;  // realsense win_mf
 #elif __ANDROID__
     CameraType cameraType = CameraType::and_camera2;
 #endif
@@ -100,9 +100,9 @@ void VkExtraBaseView::closeDevice() {
 }
 
 void VkExtraBaseView::enableLayer(bool bEnable) {
-    // if (layerNode) {
-    //     layerNode->setVisable(bEnable);
-    // }
+    if (layerNode) {
+        layerNode->setVisable(bEnable);
+    }
 }
 
 void VkExtraBaseView::onFrame(VideoFrame frame) {

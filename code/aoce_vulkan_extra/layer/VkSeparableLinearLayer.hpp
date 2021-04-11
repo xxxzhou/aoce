@@ -12,7 +12,7 @@ namespace layer {
 // 边框默认使用REPLICATE模式
 class VkSeparableLayer : public VkLayer {
    protected:
-    /* data */    
+    /* data */
     ImageType imageType = ImageType::rgba8;
     std::unique_ptr<VulkanBuffer> kernelBuffer;
 
@@ -70,6 +70,7 @@ class VkGaussianBlurSLayer : public VkSeparableLinearLayer,
     virtual void onUpdateParamet() override;
     virtual void onInitLayer() override;
 };
+
 
 }  // namespace layer
 }  // namespace vulkan

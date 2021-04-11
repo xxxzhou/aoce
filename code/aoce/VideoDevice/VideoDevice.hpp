@@ -32,8 +32,8 @@ class ACOE_EXPORT VideoDevice {
     /* data */
     int32_t selectIndex = 0;
     // 还不清楚编码,交给外面UI部分处理
-    std::vector<char> name;
-    std::vector<char> id;
+    std::string name = "";
+    std::string id = "";
 
     deviceHandle onDeviceEvent = nullptr;
     videoFrameHandle onVideoFrameEvent = nullptr;
@@ -59,12 +59,12 @@ class ACOE_EXPORT VideoDevice {
 
    public:
     // 支持是否自己设置长宽
-    bool bSetFormat() { return false; }
-    const std::vector<VideoFormat>& getFormats() { return formats; };
+    inline bool bSetFormat() { return false; }
+    inline const std::vector<VideoFormat>& getFormats() { return formats; };
 
-    const std::vector<char>& getName() { return name; };
-    const std::vector<char>& getId() { return id; };
-    const VideoFormat& getSelectFormat() { return selectFormat; }
+    inline const char* getName() { return name.c_str(); };
+    inline const char* getId() { return id.c_str(); };
+    inline const VideoFormat& getSelectFormat() { return selectFormat; }
 
     bool back() { return isBack; }
     bool bDepth() { return isDepth; }
@@ -72,7 +72,8 @@ class ACOE_EXPORT VideoDevice {
     // 选择一个最优解
     int32_t findFormatIndex(int32_t width, int32_t height, int32_t fps = 30);
     // 选择第一个满足width/height/filter的索引,否则为-1
-    int32_t findFormatIndex(int32_t width, int32_t height,std::function<bool(VideoFormat)> filter);
+    int32_t findFormatIndex(int32_t width, int32_t height,
+                            std::function<bool(VideoFormat)> filter);
 
    public:
     virtual void setVideoFrameHandle(videoFrameHandle handle);

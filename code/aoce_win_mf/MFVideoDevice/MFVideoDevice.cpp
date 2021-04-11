@@ -52,8 +52,10 @@ bool MFVideoDevice::init(IMFActivate* pActivate) {
                                            &wpname, nullptr);
     hr = activate->GetAllocatedString(
         MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, &wid, nullptr);
-    copywcharstr((wchar_t*)name.data(), wpname, AOCE_VIDEO_MAX_NAME / 2);
-    copywcharstr((wchar_t*)id.data(), wid, AOCE_VIDEO_MAX_NAME / 2);
+    name = utf8TString(wpname);
+    id = utf8TString(wid);
+    // copycharstr(name.data(), swpname.c_str(), AOCE_VIDEO_MAX_NAME);
+    // copycharstr(id.data(), swid.c_str(), AOCE_VIDEO_MAX_NAME);
     CoTaskMemFree(wpname);
     CoTaskMemFree(wid);
     //很多采集设备可以进这步，但是MF读不了，不需要给出错误信息
@@ -264,6 +266,10 @@ HRESULT MFVideoDevice::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
             VideoFrame frame = {};
             frame.data[0] = data;
             frame.videoType = selectFormat.videoType;
+            // mjpg会自动转化成YUV2P格式
+            if (selectFormat.videoType == VideoType::mjpg) {
+                selectFormat.videoType = VideoType::yuy2P;
+            }
             frame.width = selectFormat.width;
             frame.height = selectFormat.height;
             frame.timeStamp = getNowTimeStamp();

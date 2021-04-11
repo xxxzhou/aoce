@@ -1,0 +1,42 @@
+#version 450
+
+// 检查是否梯度方向的相邻最大值
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+// rgba32f
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1, r32f) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {
+    float minThreshold;
+    float maxThreshold;
+} ubo;
+
+vec2 normDirection(vec2 dxy){
+    vec2 normalizedDirection = normalize(dxy);
+    // Offset by 1-sin(pi/8) to set to 0 if near axis, 1 if away
+    normalizedDirection = sign(normalizedDirection) * floor(abs(normalizedDirection) + 0.617316); 
+    // Place -1.0 - 1.0 within 0 - 1.0
+    // normalizedDirection = (normalizedDirection + 1.0) * 0.5; 
+    return normalizedDirection;
+} 
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }  
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);
+    vec3 gradinetAndDirection = textureLod(inSampler, suv,0).rgb;
+    vec2 direction = normDirection(gradinetAndDirection.gb)/vec2(size);  
+    float firstGradientMagnitude = textureLod(inSampler, suv + direction,0).r;	
+    float secondGradientMagnitude = textureLod(inSampler, suv - direction,0).r;	
+
+    float multiplier = step(firstGradientMagnitude,gradinetAndDirection.r);
+    multiplier = multiplier * step(secondGradientMagnitude,gradinetAndDirection.r);
+
+    float thresholdCompliance = smoothstep(ubo.minThreshold, ubo.maxThreshold, gradinetAndDirection.r);
+    multiplier = multiplier * thresholdCompliance;   
+    imageStore(outTex,uv,vec4(multiplier));
+}

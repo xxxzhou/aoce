@@ -8,7 +8,6 @@
 \build
 \thirdparty\
 \code\aoce\AoceBuildSettings.h
-\samples\talktotest\
 \android\base\CMakeFiles\
 \android\base\cmake_install.cmake
 \android\build

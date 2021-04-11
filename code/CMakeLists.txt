@@ -11,7 +11,7 @@ if(WIN32)
     # dx11
     add_subdirectory(aoce_win) 
     add_subdirectory(aoce_win_mf)
-    if(CUDA_ENABLE)
+    if(AOCE_CUDA_MODULE)
         add_subdirectory(aoce_cuda)    
     endif()
 elseif(ANDROID)
@@ -26,7 +26,7 @@ if(AOCE_INSTALL_FFMPEG)
     add_subdirectory(aoce_ffmpeg)
 endif()
 
-if(AOCE_INSTALL_TALKTO AND AOCE_TALKTO_EXIST)
+if(AOCE_TALKTO_EXIST)
     add_subdirectory(aoce_talkto)
 endif()
 

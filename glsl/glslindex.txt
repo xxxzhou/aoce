@@ -44,3 +44,7 @@ reduce.comp reduce_sumC1.comp REDUCE_SUM=1 CHANNEL_R8=1
 reduce2.comp reduce2_sumF4.comp REDUCE_SUM=1 CHANNEL_RGBA32F=1
 reduce2.comp reduce2_sumF1.comp REDUCE_SUM=1 CHANNEL_R32F=1
 averageLuminanceThreshold.comp
+bilateral.comp bilateral.comp CHANNEL_RGBA=1
+bilateral.comp bilateralC1.comp CHANNEL_R8=1
+brightness.comp
+bulgeDistortion.comp

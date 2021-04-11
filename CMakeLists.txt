@@ -80,8 +80,8 @@ endif()
 
 set(AOCE_SET_STATIC 0)
 option(AOCE_INSTALL_FFMPEG "install ffmpeg module" TRUE)
+cmake_dependent_option(AOCE_CUDA_MODULE "install cuda module" TRUE "WIN32" FALSE)
 cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGORA_EXIST" FALSE) #FALSE
-cmake_dependent_option(AOCE_INSTALL_TALKTO "install talkto module" TRUE "WIN32;AOCE_TALKTO_EXIST" FALSE)
 
 # 配置联系cmake/c++
 configure_file(${CMAKE_SOURCE_DIR}/cmake/AoceBuildSettings.h.in ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h @ONLY)

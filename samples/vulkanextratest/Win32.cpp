@@ -25,6 +25,8 @@ static ITLayer<KernelSizeParamet>* boxFilterLayer1 = nullptr;
 // 亮度平均阈值
 static ITLayer<float>* averageLT = nullptr;
 static ITLayer<BilateralParamet>* bilateralLayer = nullptr;
+static ITLayer<BulgeDistortionParamet>* bdLayer = nullptr;
+static ITLayer<CannyEdgeDetectionParamet>* cedLayer = nullptr;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -34,7 +36,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     boxFilterLayer->updateParamet({4, 4});
 
     gaussianLayer = createGaussianBlurLayer();
-    gaussianLayer->updateParamet({10, 5.0f});
+    gaussianLayer->updateParamet({10, 20.0f});
 
     chromKeyLayer = createChromKeyLayer();
     ChromKeyParamet keyParamet = {};
@@ -81,12 +83,23 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     averageLT = createAverageLuminanceThresholdLayer();
 
     bilateralLayer = createBilateralLayer();
-    bilateralLayer->updateParamet({10, 10.f, 40.f});
+    bilateralLayer->updateParamet({10, 10.0f, 10.0f});
+
+    bdLayer = createBulgeDistortionLayer();
+    BulgeDistortionParamet bdParamet = {};
+    bdLayer->updateParamet(bdParamet);
 
     guidedLayer = createGuidedLayer();
     guidedLayer->updateParamet({20, 0.000001f});
+
+    cedLayer = createCannyEdgeDetectionLayer();
+    CannyEdgeDetectionParamet cedParamet = {};
+    cedLayer->updateParamet(cedParamet);
+
     std::vector<BaseLayer*> layers;
     bool bAutoIn = false;
+    // 高斯模糊
+    // layers.push_back(gaussianLayer->getLayer());
     // 检测resize效果
     // layers.push_back(resizeLayer->getLayer());
     // layers.push_back(resizeLayer2->getLayer());
@@ -108,9 +121,20 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(alphaShowLayer);
     // 双边滤波
     layers.push_back(bilateralLayer->getLayer());
+    // 凸起失真，鱼眼效果
+    layers.push_back(bdLayer->getLayer());
+    // canny边缘检测
+    // layers.push_back(cedLayer->getLayer());
+    // layers.push_back(alphaShowLayer);
 
     view->initGraph(layers, hInstance, bAutoIn);
     view->openDevice();
+
+    // std::thread trd([&]() {
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    //     view->enableLayer(false);
+    // });
+
     view->run();
     unloadAoce();
 }

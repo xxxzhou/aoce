@@ -116,7 +116,6 @@ void PipeGraph::validNode() {
     }
     // 检查节点自身的输入输出线是否正确(注意,可能一个接点有多个输入,配合后面disable检查去掉相应)
     for (auto& node : nodes) {
-        // 检查输入节点
         if (!node->bDisable && !node->layer->bInput) {
             auto& tns = toLines[node->graphIndex];
             uint32_t tmask = 0;
@@ -125,56 +124,60 @@ void PipeGraph::validNode() {
                 tmask |= maskIndex;
             }
             int32_t inCount = node->layer->inCount;
-            // 输入节点差
+            // 输入节点是否全部配齐
             if (tmask != (std::pow(2, inCount) - 1)) {
                 node->bDisable = true;
             }
         }
-        // 检查输出结点,要检查输出节点吗?
     }
-    // 检查有效链路
+    // 检查有效链路,保存到validLines
     for (auto& node : nodes) {
+        // 从可用的输入节点向下深度优先搜索
         if (!node->bDisable && !node->bInvisible && node->layer->bInput) {
             std::stack<int32_t> inputNodes;
             inputNodes.push(node->graphIndex);
             // 查找所有有效链路
             while (!inputNodes.empty()) {
-                int32_t inputNode = inputNodes.top();
-                inputNodes.pop();  // stack深度优先搜索
-                auto& nextLines = formLines[inputNode];
+                // stack深度优先搜索
+                int32_t currentIndex = inputNodes.top();
+                inputNodes.pop();
+                // 当前节点向下连接
+                auto& nextLines = formLines[currentIndex];
+                // 验证这些连接是否有效
                 for (auto line : nextLines) {
-                    if (nodes[line->toNode]->bDisable) {
+                    // 如果当前节点不可用,这条线就不可用了
+                    int toNode = line->toNode;
+                    if (nodes[toNode]->bDisable) {
                         continue;
                     }
                     // 当前连接节点不可见的话,尝试自动去掉当前节点链接下一节点
                     // 需要注意,下一节点/下下节点也可能没有启用
-                    int toNode = line->toNode;
                     if (nodes[toNode]->bInvisible) {
+                        // 当前节点的输入节点数
                         int32_t toSize = toLines[toNode].size();
+                        // 当前节点的输出节点数
                         int32_t formSize = formLines[toNode].size();
-                        if (toSize != 1 || formSize != 1) {
-                            std::string message;
-                            string_format(message,
-                                          "layer is visible,but more input or "
-                                          "output,node: ",
-                                          toNode);
-                            logMessage(LogLevel::warn, message);
-                            // if (toSize != 1) {
-                            //     continue;
-                            // }
+                        // 输入或者是输出层,不可用直接丢弃
+                        if (toSize == 0 || formSize == 0) {
+                            continue;
                         }
                         PipeLinePtr nline(new PipeLine());
-                        // 新线取当前节点的输入线
+                        // 新线取当前节点的输入节点与位置
                         nline->fromNode = toLines[toNode][0]->fromNode;
                         nline->fromOutIndex = toLines[toNode][0]->fromOutIndex;
                         bool bfind = true;
-                        // 取下一个可见节点
+                        // 当前节点的第一个输出节点
                         toNode = formLines[line->toNode][0]->toNode;
+                        // 继续检查这个节点是否可用
                         while (nodes[toNode]->bInvisible) {
                             int32_t toSize = toLines[toNode].size();
                             int32_t formSize = formLines[toNode].size();
-                            // 只支持一对一的
-                            if (toSize != 1 || formSize != 1) {
+                            // 没有输入或是没有输出,这条线不用了
+                            if (toSize == 0 || formSize == 0) {
+                                continue;
+                            }
+                            // 多个输入输出,只会自动尝试连接第一个输入输出
+                            if (toSize > 1 || formSize > 1) {
                                 std::string message;
                                 string_format(
                                     message,
@@ -183,9 +186,6 @@ void PipeGraph::validNode() {
                                     toNode);
                                 logMessage(LogLevel::warn, message);
                                 bfind = false;
-                                // if (toSize != 1) {
-                                //     break;
-                                // }
                             }
                             toNode = formLines[toNode][0]->toNode;
                         }
@@ -199,7 +199,7 @@ void PipeGraph::validNode() {
                         }
                         continue;
                     }
-                    // 这个链路已经检查过,不需要在检查
+                    // 正常情况,检查是否已经搜索过.
                     if (std::find(validLines.begin(), validLines.end(), line) ==
                         validLines.end()) {
                         validLines.push_back(line);
