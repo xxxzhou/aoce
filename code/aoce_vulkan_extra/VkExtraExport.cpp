@@ -6,13 +6,19 @@
 #include "layer/VkBilateralLayer.hpp"
 #include "layer/VkBrightnessLayer.hpp"
 #include "layer/VkBulgeDistortionLayer.hpp"
+#include "layer/VkCGAColorspaceLayer.hpp"
 #include "layer/VkCannyEdgeDetectionLayer.hpp"
 #include "layer/VkChromKeyLayer.hpp"
+#include "layer/VkColorBlendLayer.hpp"
+#include "layer/VkColorMatrixLayer.hpp"
+#include "layer/VkColourFASTFeatureDetector.hpp"
+#include "layer/VkCropLayer.hpp"
 #include "layer/VkGuidedLayer.hpp"
 #include "layer/VkHarrisCornerDetectionLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
 #include "layer/VkLookupLayer.hpp"
 #include "layer/VkLuminanceLayer.hpp"
+#include "layer/VkMorphLayer.hpp"
 #include "layer/VkReduceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
 
@@ -94,6 +100,71 @@ ITLayer<BulgeDistortionParamet>* createBulgeDistortionLayer() {
 
 ITLayer<CannyEdgeDetectionParamet>* createCannyEdgeDetectionLayer() {
     VkCannyEdgeDetectionLayer* layer = new VkCannyEdgeDetectionLayer();
+    return layer;
+}
+
+BaseLayer* createCGAColorspaceLayer() {
+    VkCGAColorspaceLayer* layer = new VkCGAColorspaceLayer();
+    return layer;
+}
+
+ITLayer<int>* createDilationLayer() {
+    VkDilationLayer* layer = new VkDilationLayer();
+    return layer;
+}
+
+ITLayer<int>* createErosionLayer() {
+    VkErosionLayer* layer = new VkErosionLayer();
+    return layer;
+}
+
+BaseLayer* createColorBlendLayer() {
+    VkColorBlendLayer* layer = new VkColorBlendLayer();
+    return layer;
+}
+
+BaseLayer* createColorBurnBlendLayer() {
+    VkColorBurnBlendLayer* layer = new VkColorBurnBlendLayer();
+    return layer;
+}
+
+BaseLayer* createColorDodgeBlendLayer() {
+    VkColorDodgeBlendLayer* layer = new VkColorDodgeBlendLayer();
+    return layer;
+}
+
+BaseLayer* createColorInvertLayer() {
+    VkColorInvertLayer* layer = new VkColorInvertLayer();
+    return layer;
+}
+
+BaseLayer* createColorLBPLayer() {
+    VkColorLBPLayer* layer = new VkColorLBPLayer();
+    return layer;
+}
+
+ITLayer<float>* createContrastLayer() {
+    VkContrastLayer* layer = new VkContrastLayer();
+    return layer;
+}
+
+ITLayer<CrosshatchParamet>* createCrosshatchLayer() {
+    VkCrosshatchLayer* layer = new VkCrosshatchLayer();
+    return layer;
+}
+
+ITLayer<ColorMatrixParamet>* createColorMatrixLayer() {
+    VkColorMatrixLayer* layer = new VkColorMatrixLayer();
+    return layer;
+}
+
+ITLayer<float>* createColourFASTFeatureDetector() {
+    VkColourFASTFeatureDetector* layer = new VkColourFASTFeatureDetector();
+    return layer;
+}
+
+ITLayer<CropParamet>* createCropLayer() {
+    VkCropLayer* layer = new VkCropLayer();
     return layer;
 }
 

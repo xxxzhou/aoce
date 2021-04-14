@@ -20,15 +20,16 @@ endif()
 
 if(AOCE_INSTALL_AGORA AND AOCE_AGORA_EXIST)
     add_subdirectory(aoce_agora)
+    if(AOCE_TALKTO_EXIST)
+        add_subdirectory(aoce_talkto)
+    endif()    
 endif()
 
 if(AOCE_INSTALL_FFMPEG)
     add_subdirectory(aoce_ffmpeg)
 endif()
 
-if(AOCE_TALKTO_EXIST)
-    add_subdirectory(aoce_talkto)
-endif()
+
 
 
 

@@ -6,10 +6,6 @@ layout (binding = 1, r8) uniform image2D outTex;
 
 const vec3 W = vec3(0.2125, 0.7154, 0.0721);
 
-vec4 make_vec4(float r){
-    return vec4(r,r,r,r);
-}
-
 void main(){
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
     ivec2 size = imageSize(outTex);

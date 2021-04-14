@@ -17,3 +17,7 @@ aoce_vulkan模块.
 2 后期由参数最先决定使用那个Compute shader,由这shader分析输入输出个数,自动创建PipeLayout等各种资料.
 
 3 由参数变动分为三个级别,一是改变输出大小,重置整个graph,二是改变shader/自身buffer,重置自己,三是改变UBO,每桢运行前更新UBO就可.
+
+aoce 模块.
+
+PipeNode类接口不公开,所有接口全隐藏,相应接口通过BaseLayer转接.

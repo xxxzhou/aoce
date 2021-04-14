@@ -48,3 +48,18 @@ bilateral.comp bilateral.comp CHANNEL_RGBA=1
 bilateral.comp bilateralC1.comp CHANNEL_R8=1
 brightness.comp
 bulgeDistortion.comp
+cgaColorspace.comp
+morph1.comp morph1_erosion.comp EROSION=1 IS_SHARED=1
+morph1.comp morph1_dilation.comp DILATION=1 IS_SHARED=1
+morph2.comp morph2_erosion.comp EROSION=1 IS_SHARED=1
+morph2.comp morph2_dilation.comp DILATION=1 IS_SHARED=1
+colorBlend.comp
+colorBurnBlend.comp
+colorDodgeBlend.comp
+colorInvert.comp
+colorLocalBinaryPattern.comp
+fastFeatureDetector.comp
+colorMatrix.comp
+contrast.comp
+cropFilter.comp
+crosshatch.comp

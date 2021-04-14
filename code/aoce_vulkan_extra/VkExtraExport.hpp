@@ -5,12 +5,12 @@
 
 #ifdef _WIN32
 #if defined(AOCE_VULKAN_EXTRA_EXPORT_DEFINE)
-#define AOCE_VULKAN_EXTRA_EXPORT __declspec(dllexport)
+#define AOCE_VE_EXPORT __declspec(dllexport)
 #else
-#define AOCE_VULKAN_EXTRA_EXPORT __declspec(dllimport)
+#define AOCE_VE_EXPORT __declspec(dllimport)
 #endif
 #else
-#define AOCE_VULKAN_EXTRA_EXPORT
+#define AOCE_VE_EXPORT
 #endif
 
 namespace aoce {
@@ -138,51 +138,112 @@ struct BulgeDistortionParamet {
     }
 };
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer(
+struct ColorMatrixParamet {
+    float intensity = 1.0f;
+    vec4 col0 = {1.0, 0.0, 0.0, 0.0};
+    vec4 col1 = {0.0, 1.0, 0.0, 0.0};
+    vec4 col2 = {0.0, 0.0, 1.0, 0.0};
+    vec4 col3 = {0.0, 0.0, 0.0, 1.0};
+
+    inline bool operator==(const ColorMatrixParamet& right) {
+        return this->intensity == right.intensity && this->col0 == right.col0 &&
+               this->col1 == right.col1 && this->col2 == right.col2 &&
+               this->col3 == right.col3;
+    }
+};
+
+struct CropParamet {
+    float centerX = 0.5f;
+    float centerY = 0.5f;
+    float width = 0.5f;
+    float height = 0.5f;
+
+    inline bool operator==(const CropParamet& right) {
+        return this->centerX == right.centerX &&
+               this->centerY == right.centerY && this->width == right.width &&
+               this->height == right.height;
+    }
+};
+
+struct CrosshatchParamet {
+    float crossHatchSpacing = 0.03f;
+    float lineWidth = 0.003f;
+    inline bool operator==(const CrosshatchParamet& right) {
+        return this->crossHatchSpacing == right.crossHatchSpacing &&
+               this->lineWidth == right.lineWidth;
+    }
+};
+
+AOCE_VE_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer(
     ImageType imageType = ImageType::rgba8);
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<GaussianBlurParamet>* createGaussianBlurLayer(
+AOCE_VE_EXPORT ITLayer<GaussianBlurParamet>* createGaussianBlurLayer(
     ImageType imageType = ImageType::rgba8);
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<ChromKeyParamet>* createChromKeyLayer();
+AOCE_VE_EXPORT ITLayer<ChromKeyParamet>* createChromKeyLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<AdaptiveThresholdParamet>*
+AOCE_VE_EXPORT ITLayer<AdaptiveThresholdParamet>*
 createAdaptiveThresholdLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<GuidedParamet>* createGuidedLayer();
+AOCE_VE_EXPORT ITLayer<GuidedParamet>* createGuidedLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<ReSizeParamet>* createResizeLayer(
+AOCE_VE_EXPORT ITLayer<ReSizeParamet>* createResizeLayer(
     ImageType imageType = ImageType::rgba8);
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<HarrisCornerDetectionParamet>*
+AOCE_VE_EXPORT ITLayer<HarrisCornerDetectionParamet>*
 createHarrisCornerDetectionLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<float>* createAverageLuminanceThresholdLayer();
+AOCE_VE_EXPORT ITLayer<float>* createAverageLuminanceThresholdLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<BilateralParamet>* createBilateralLayer();
+AOCE_VE_EXPORT ITLayer<BilateralParamet>* createBilateralLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createAddBlendLayer();
+AOCE_VE_EXPORT BaseLayer* createAddBlendLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<float>* createAlphaBlendLayer();
+AOCE_VE_EXPORT ITLayer<float>* createAlphaBlendLayer();
 
 // 二输入,第一输入原始图像,第二输入512*512的lookup图
-AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createLookupLayer();
+AOCE_VE_EXPORT BaseLayer* createLookupLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<float>* createBrightnessLayer();
+AOCE_VE_EXPORT ITLayer<float>* createBrightnessLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<BulgeDistortionParamet>*
-createBulgeDistortionLayer();
+AOCE_VE_EXPORT ITLayer<BulgeDistortionParamet>* createBulgeDistortionLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT ITLayer<CannyEdgeDetectionParamet>*
+AOCE_VE_EXPORT ITLayer<CannyEdgeDetectionParamet>*
 createCannyEdgeDetectionLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createLuminanceLayer();
+AOCE_VE_EXPORT BaseLayer* createCGAColorspaceLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createAlphaShowLayer();
+AOCE_VE_EXPORT ITLayer<int>* createDilationLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createAlphaShow2Layer();
+AOCE_VE_EXPORT ITLayer<int>* createErosionLayer();
 
-AOCE_VULKAN_EXTRA_EXPORT BaseLayer* createConvertImageLayer();
+AOCE_VE_EXPORT BaseLayer* createColorBlendLayer();
+
+AOCE_VE_EXPORT BaseLayer* createColorBurnBlendLayer();
+
+AOCE_VE_EXPORT BaseLayer* createColorDodgeBlendLayer();
+
+AOCE_VE_EXPORT BaseLayer* createColorInvertLayer();
+
+AOCE_VE_EXPORT BaseLayer* createColorLBPLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createContrastLayer();
+
+AOCE_VE_EXPORT ITLayer<CrosshatchParamet>* createCrosshatchLayer();
+
+AOCE_VE_EXPORT ITLayer<ColorMatrixParamet>* createColorMatrixLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createColourFASTFeatureDetector();
+
+AOCE_VE_EXPORT ITLayer<CropParamet>* createCropLayer();
+
+AOCE_VE_EXPORT BaseLayer* createLuminanceLayer();
+
+AOCE_VE_EXPORT BaseLayer* createAlphaShowLayer();
+
+AOCE_VE_EXPORT BaseLayer* createAlphaShow2Layer();
+
+AOCE_VE_EXPORT BaseLayer* createConvertImageLayer();
 
 }  // namespace vulkan
 }  // namespace aoce

@@ -1,0 +1,67 @@
+#version 450
+
+// #define IS_SHARED 1
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, r8) uniform readonly image2D inTex;
+layout (binding = 1, r8) uniform image2D outTex;
+
+layout (binding = 2) uniform UBO {
+	int ksize;	    
+} ubo;
+
+#if EROSION 
+    #define OPERATE min
+    #define INIT_VUL 1.0f
+#endif
+
+#if DILATION 
+    #define OPERATE max
+    #define INIT_VUL 0.0f
+#endif
+
+#if IS_SHARED
+// 限定最大核为32
+shared float row_shared[16*3][16];
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+    ivec2 locId = ivec2(gl_LocalInvocationID.xy);
+    for(int i = 0; i < 3; i++){
+        uint gIdy = max(0,min(uv.y+(i-1)*16,size.y-1));
+        row_shared[locId.y + i*16][locId.x] = imageLoad(inTex,ivec2(uv.x,gIdy)).r;      
+    }
+    memoryBarrierShared();
+	barrier();
+    float result = INIT_VUL;
+    for(int i =0; i < ubo.ksize; i++){
+        int iy = locId.y - ubo.ksize/2 + i;
+        float fr = row_shared[16 + iy][locId.x];
+        result = OPERATE(fr,result);
+    }
+    imageStore(outTex, uv, vec4(result)); 
+}
+
+#else
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+    float result = INIT_VUL;
+    for(int i = 0; i< ubo.ksize; ++i){
+        int y = uv.y-ubo.ksize/2+i;
+        y = max(0,min(y,size.y-1));
+        float r = imageLoad(inTex,ivec2(uv.x,y)).r;
+        result = OPERATE(result,r);
+    }
+    imageStore(outTex, uv, vec4(result));     
+}
+
+#endif
+

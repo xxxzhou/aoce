@@ -15,8 +15,6 @@ class VkOperateLayer : public VkLayer, public TexOperateLayer {
     VkOperateLayer(/* args */);
     ~VkOperateLayer();
 
-   protected:
-    virtual void onInitGraph() override;
 };
 
 }  // namespace layer

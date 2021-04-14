@@ -1,0 +1,36 @@
+#version 450
+
+// LBP(Local Binary Patterns)特征检测
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+// Right pixel is the most significant bit, traveling clockwise to get to the upper right, which is the least significant
+// If the external pixel is greater than or equal to the center, set to 1, otherwise 0
+//
+// 2 1 0
+// 3   7
+// 4 5 6
+
+const ivec2 circle[8] = {ivec2(1,-1),ivec2(0,-1),ivec2(-1,-1),ivec2(-1,0),ivec2(-1,1),ivec2(0,1),ivec2(1,1),ivec2(1,0)};
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }
+    vec4 rgba = imageLoad(inTex,uv);
+    ivec4 sum = ivec4(0);
+    for(int i =0;i<8;i++){
+        ivec2 cuv = uv+circle[0];
+        cuv.x = max(0,min(cuv.x,size.x-1));
+        cuv.y = max(0,min(cuv.x,size.y-1));
+        vec4 crgba = imageLoad(inTex,cuv);
+        ivec4 cstep = ivec4(step(rgba,crgba));
+        ivec4 bitFlag = ivec4(1<<i);
+        sum += cstep*bitFlag;
+    }
+    vec4 result = vec4(sum/255.0);
+    imageStore(outTex, uv, result); 
+}

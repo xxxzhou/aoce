@@ -61,10 +61,11 @@ if(WIN32)
     endif()
     if(OpenCV_FOUND)
         generate(08_vulkanextra TRUE FALSE aoce aoce_vulkan aoce_vulkan_extra)
+        if(AOCE_TALKTO_EXIST)
+            generate(talktotest TRUE FALSE aoce_talkto)
+        endif()
     endif()
-    if(AOCE_TALKTO_EXIST)
-        generate(talktotest TRUE FALSE aoce_talkto)
-    endif()
+
     # add_subdirectory(mathtest)
 endif()
 
@@ -91,11 +92,11 @@ endif()
 
 add_subdirectory(vulkanextratest)
 
-if(AOCE_TALKTO_EXIST)
+if(AOCE_INSTALL_AGORA)
     add_subdirectory(talkto_live_test)
 endif() 
 
-if(AOCE_CUDA_MODULE)
+if(AOCE_CUDA_MODULE AND OpenCV_FOUND)
     add_subdirectory(cudatest)
 endif() 
 

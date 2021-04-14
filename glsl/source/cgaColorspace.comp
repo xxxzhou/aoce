@@ -6,7 +6,7 @@ layout (binding = 1, rgba8) uniform image2D outTex;
 
 void main(){
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
-    ivec2 size = imageSize(inTex);
+    ivec2 size = imageSize(outTex);
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     } 
@@ -14,8 +14,8 @@ void main(){
     vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);   
     
     vec2 samplePos = suv - mod(suv, sampleDivisor);
-    vec4 color = textureLod(inSampler, samplePos,0)
-
+    vec4 color = textureLod(inSampler, samplePos,0);
+    
     vec4 colorCyan = vec4(85.0 / 255.0, 1.0, 1.0, 1.0);
     vec4 colorMagenta = vec4(1.0, 85.0 / 255.0, 1.0, 1.0);
     vec4 colorWhite = vec4(1.0, 1.0, 1.0, 1.0);

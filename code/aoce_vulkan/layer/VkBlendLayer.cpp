@@ -9,9 +9,11 @@ namespace vulkan {
 namespace layer {
 
 VkBlendLayer::VkBlendLayer(/* args */) {
+    glslPath = "glsl/resize.comp.spv";
     setUBOSize(sizeof(VkBlendParamet));
     inCount = 2;
     outCount = 1;
+    parametTransform();
 }
 
 VkBlendLayer::~VkBlendLayer() {}
@@ -23,19 +25,6 @@ void VkBlendLayer::onUpdateParamet() {
     parametTransform();
     // 运行时更新UBO
     bParametChange = true;
-}
-
-void VkBlendLayer::onInitGraph() {
-    std::string path = "glsl/resize.comp.spv";
-    shader->loadShaderModule(context->device, path);
-    // VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
-    std::vector<UBOLayoutItem> items = {
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
-        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
-        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT}};
-    layout->addSetLayout(items);
-    layout->generateLayout();
 }
 
 void VkBlendLayer::parametTransform() {
@@ -51,22 +40,7 @@ void VkBlendLayer::parametTransform() {
     updateUBO(&vkParamet);
 }
 
-void VkBlendLayer::onInitPipe() {
-    // 更新一次UBO
-    parametTransform();
-    // 更新
-    inTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    inTexs[1]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
-    inTexs[1]->descInfo.sampler = context->linearSampler;
-    layout->updateSetLayout(0, 0, &inTexs[0]->descInfo, &inTexs[1]->descInfo,
-                            &outTexs[0]->descInfo, &constBuf->descInfo);
-    auto computePipelineInfo = VulkanPipeline::createComputePipelineInfo(
-        layout->pipelineLayout, shader->shaderStage);
-    VK_CHECK_RESULT(vkCreateComputePipelines(
-        context->device, context->pipelineCache, 1, &computePipelineInfo,
-        nullptr, &computerPipeline));
-}
+bool VkBlendLayer::getSampled(int inIndex) { return inIndex == 1; }
 
 }  // namespace layer
 }  // namespace vulkan

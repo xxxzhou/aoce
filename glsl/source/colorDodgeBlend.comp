@@ -1,0 +1,29 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform readonly image2D inTex1;
+layout (binding = 2, rgba8) uniform image2D outTex;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }    
+	vec4 base = imageLoad(inTex,uv);
+    vec4 overlay = imageLoad(inTex1,uv);
+
+    vec3 baseOverlayAlphaProduct = vec3(overlay.a * base.a);
+    vec3 rightHandProduct = overlay.rgb * (1.0 - base.a) + base.rgb * (1.0 - overlay.a);
+    
+    vec3 firstBlendColor = baseOverlayAlphaProduct + rightHandProduct;
+    vec3 overlayRGB = clamp((overlay.rgb / clamp(overlay.a, 0.01, 1.0)) * step(0.0, overlay.a), 0.0, 0.99);
+    
+    vec3 secondBlendColor = (base.rgb * overlay.a) / (1.0 - overlayRGB) + rightHandProduct;
+    
+    vec3 colorChoice = step((overlay.rgb * base.a + base.rgb * overlay.a), baseOverlayAlphaProduct);
+
+    vec4 result =  vec4(mix(firstBlendColor, secondBlendColor, colorChoice), 1.0);
+    imageStore(outTex, uv, result); 
+}

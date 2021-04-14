@@ -18,7 +18,7 @@ class VkSeparableLayer : public VkLayer {
 
    public:
     VkSeparableLayer(ImageType imageType = ImageType::rgba8);
-    ~VkSeparableLayer();
+    virtual ~VkSeparableLayer();
 
     void updateBuffer(std::vector<float> data);
 
@@ -34,7 +34,7 @@ class VkSeparableLinearLayer : public VkSeparableLayer {
 
    public:
     VkSeparableLinearLayer(ImageType imageType = ImageType::rgba8);
-    ~VkSeparableLinearLayer();
+    virtual ~VkSeparableLinearLayer();
 
    protected:
     virtual void onInitGraph() override;

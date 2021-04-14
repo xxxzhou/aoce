@@ -1,1 +1,10 @@
-cgaColorspace.comp
+colorBlend.comp
+colorBurnBlend.comp
+colorDodgeBlend.comp
+colorInvert.comp
+colorLocalBinaryPattern.comp
+fastFeatureDetector.comp
+colorMatrix.comp
+contrast.comp
+cropFilter.comp
+crosshatch.comp

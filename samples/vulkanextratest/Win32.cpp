@@ -27,6 +27,9 @@ static ITLayer<float>* averageLT = nullptr;
 static ITLayer<BilateralParamet>* bilateralLayer = nullptr;
 static ITLayer<BulgeDistortionParamet>* bdLayer = nullptr;
 static ITLayer<CannyEdgeDetectionParamet>* cedLayer = nullptr;
+static BaseLayer* cgaLayer = nullptr;
+static ITLayer<int>* dilationLayer = nullptr;
+static ITLayer<int>* erosionLayer = nullptr;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -96,36 +99,51 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     CannyEdgeDetectionParamet cedParamet = {};
     cedLayer->updateParamet(cedParamet);
 
+    cgaLayer = createCGAColorspaceLayer();
+
+    dilationLayer = createDilationLayer();
+    // dilationLayer->updateParamet(10);
+
+    erosionLayer = createErosionLayer();
+    // erosionLayer->updateParamet(20);
+
     std::vector<BaseLayer*> layers;
     bool bAutoIn = false;
-    // 高斯模糊
+    // ---高斯模糊
     // layers.push_back(gaussianLayer->getLayer());
     // 检测resize效果
     // layers.push_back(resizeLayer->getLayer());
     // layers.push_back(resizeLayer2->getLayer());
-    // 查看自适应阈值化效果
+    // ---查看自适应阈值化效果
     // layers.push_back(adaptiveLayer->getLayer());
     // layers.push_back(alphaShowLayer);
-    // 查看Harris 角点检测
+    // ---查看Harris 角点检测
     // bAutoIn = true;
     // layers.push_back(luminanceLayer);
     // layers.push_back(hcdLayer->getLayer());
     // layers.push_back(boxFilterLayer1->getLayer());
     // layers.push_back(alphaShow2Layer);
-    // 查看导向滤波效果
+    // ---查看导向滤波效果
     // layers.push_back(chromKeyLayer->getLayer());
     // layers.push_back(guidedLayer->getLayer());
     // layers.push_back(alphaShowLayer);
-    // 平均亮度调整阈值
+    // ---平均亮度调整阈值
     // layers.push_back(averageLT->getLayer());
     // layers.push_back(alphaShowLayer);
-    // 双边滤波
-    layers.push_back(bilateralLayer->getLayer());
-    // 凸起失真，鱼眼效果
-    layers.push_back(bdLayer->getLayer());
+    // ---双边滤波
+    // layers.push_back(bilateralLayer->getLayer());
+    // ---凸起失真，鱼眼效果
+    // layers.push_back(bdLayer->getLayer());
     // canny边缘检测
     // layers.push_back(cedLayer->getLayer());
     // layers.push_back(alphaShowLayer);
+    // ---CGAColorspace效果
+    // layers.push_back(cgaLayer);
+    // ---dilation/erosion
+    layers.push_back(cedLayer->getLayer());
+    layers.push_back(dilationLayer->getLayer());
+    layers.push_back(erosionLayer->getLayer());
+    layers.push_back(alphaShowLayer);
 
     view->initGraph(layers, hInstance, bAutoIn);
     view->openDevice();
