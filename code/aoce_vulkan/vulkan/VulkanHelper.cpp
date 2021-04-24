@@ -192,7 +192,31 @@ std::string physicalDeviceTypeString(VkPhysicalDeviceType type) {
     }
 }
 
-VkResult createInstance(VkInstance& instance, const char* appName) {
+static bool checkValidationLayerSupport(
+    std::vector<const char*> validationLayers) {
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for (const char* layerName : validationLayers) {
+        bool layerFound = false;
+        for (const auto& layerProperties : availableLayers) {
+            if (strcmp(layerName, layerProperties.layerName) == 0) {
+                layerFound = true;
+                break;
+            }
+        }
+        if (!layerFound) {
+            return false;
+        }
+    }
+    return true;
+}
+
+VkResult createInstance(VkInstance& instance, const char* appName,
+                        bool bDebugMsg) {
     VkApplicationInfo appInfo = {};
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = appName;
@@ -231,13 +255,16 @@ VkResult createInstance(VkInstance& instance, const char* appName) {
 #elif defined(VK_USE_PLATFORM_MACOS_MVK)
     instanceExtensions.push_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
 #endif
-
-#if defined(DEBUG)
+    VkInstanceCreateInfo instInfo = {};
+#if AOCE_DEBUG_TYPE
     instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     instanceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+    std::vector<const char*> enableLayers = {"VK_LAYER_KHRONOS_validation"};
+    if (bDebugMsg && checkValidationLayerSupport(enableLayers)) {
+        instInfo.enabledLayerCount = static_cast<uint32_t>(enableLayers.size());
+        instInfo.ppEnabledLayerNames = enableLayers.data();
+    }
 #endif
-
-    VkInstanceCreateInfo instInfo = {};
     instInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instInfo.pNext = NULL;
     instInfo.flags = 0;
@@ -245,7 +272,8 @@ VkResult createInstance(VkInstance& instance, const char* appName) {
     instInfo.enabledExtensionCount = (uint32_t)instanceExtensions.size();
     instInfo.ppEnabledExtensionNames = instanceExtensions.data();
     // validation
-    return vkCreateInstance(&instInfo, nullptr, &instance);
+    VkResult vkResult = vkCreateInstance(&instInfo, nullptr, &instance);
+    return vkResult;
 }
 
 VkResult enumerateDevice(VkInstance instance,

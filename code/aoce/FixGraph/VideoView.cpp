@@ -38,7 +38,7 @@ void VideoView::runFrame(const VideoFrame &frame, bool special) {
     } else {
         yuv2rgbLayer->getLayerNode()->setVisable(false);
     }
-    inputLayer->inputCpuData(frame, 0);
+    inputLayer->inputCpuData(frame);
     graph->run();
 }
 

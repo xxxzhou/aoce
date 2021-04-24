@@ -34,7 +34,7 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst,
     for (auto& layer : layers) {
         layerNode = layerNode->addNode(layer);
     }
-    if (layerNode->getLayer()->getInCount() == 2) {
+    if (bAutoIn) {
         yuvNode->addLine(layerNode, 0, 1);
     }
 #if _WIN32
@@ -106,16 +106,13 @@ void VkExtraBaseView::enableLayer(bool bEnable) {
 }
 
 void VkExtraBaseView::onFrame(VideoFrame frame) {
-    if (getYuvIndex(frame.videoType) < 0) {
-        if (layerNode->getLayer()->getInCount() == 2 && bAutoIn) {
-            inputLayer->getLayerNode()->addLine(layerNode, 0, 1);
-        }
+    if (getYuvIndex(frame.videoType) < 0) {        
         yuvNode->setVisable(false);
     } else if (yuv2rgbLayer->getParamet().type != frame.videoType) {
         yuvNode->setVisable(true);
         yuv2rgbLayer->updateParamet({frame.videoType});
     }
-    inputLayer->inputCpuData(frame, 0);
+    inputLayer->inputCpuData(frame);
     vkGraph->run();
 #if __ANDROID
     if (window) {

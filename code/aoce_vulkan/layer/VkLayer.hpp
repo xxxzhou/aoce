@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Layer/BaseLayer.hpp>
+#include <Aoce/Layer/BaseLayer.hpp>
+#include <Aoce/Math/AMath.hpp>
 
 #include "../vulkan/VulkanContext.hpp"
 #include "../vulkan/VulkanPipeline.hpp"
@@ -75,8 +76,9 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
 
    protected:
     // 初始化时请指定
-    void setUBOSize(int size, bool bMatchParamet = false);
+    void setUBOSize(int32_t size, bool bMatchParamet = false);
     void createOutTexs();
+    void clearColor(vec4 color = {0.0, 0.0, 0.0, 1.0});
 
    public:
     void generateLayout();
@@ -86,7 +88,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
    protected:
     // 只发生在附加PipeGraph时,特定VK一些实现,如果要特定实现onInitGraph
     virtual void onInit() final;
-    // 每次PipeGraph调用Reset时发生,此时知道输入层
+    // 每次PipeGraph调用Reset时发生,此时知道输入层大小
     virtual void onInitLayer() override;
     // VK自动根据输入初始化相应的信息,如果要修改,请在PipeGraph实现
     virtual void onInitBuffer() final;

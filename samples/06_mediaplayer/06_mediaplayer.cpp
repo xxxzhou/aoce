@@ -67,7 +67,7 @@ class TestMediaPlay : public IMediaPlayerObserver {
             inputLayer->setImage(format);
             yuv2rgbLayer->updateParamet({format.videoType});
         }
-        inputLayer->inputCpuData(frame, 0);
+        inputLayer->inputCpuData(frame);
         vkGraph->run();
 #if __ANDROID__
         if (window) {

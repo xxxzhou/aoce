@@ -19,6 +19,63 @@ class VkBrightnessLayer : public VkLayer, public ITLayer<float> {
     virtual ~VkBrightnessLayer();
 };
 
+// Exposure ranges from -10.0 to 10.0, with 0.0 as the normal level
+class VkExposureLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkExposureLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkExposureLayer(/* args */);
+    virtual ~VkExposureLayer();
+};
+
+// Gamma ranges from 0.0 to 3.0, with 1.0 as the normal level
+class VkGammaLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkGammaLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkGammaLayer(/* args */);
+    ~VkGammaLayer();
+};
+
+// 去雾
+class VkHazeLayer : public VkLayer, public ITLayer<HazeParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkHazeLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkHazeLayer(/* args */);
+    ~VkHazeLayer();
+};
+
+// 调整图像的阴影和高光
+class VKHighlightShadowLayer : public VkLayer,
+                               public ITLayer<HighlightShadowParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VKHighlightShadowLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VKHighlightShadowLayer(/* args */);
+    ~VKHighlightShadowLayer();
+};
+
+// 允许您使用颜色和强度独立地着色图像的阴影和高光
+class VKHighlightShadowTintLayer : public VkLayer,
+                                   public ITLayer<HighlightShadowTintParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VKHighlightShadowTintLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VKHighlightShadowTintLayer(/* args */);
+    ~VKHighlightShadowTintLayer();
+};
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

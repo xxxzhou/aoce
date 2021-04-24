@@ -1,0 +1,27 @@
+#version 450
+
+// 调整图像的对比度
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {
+    float hazeDistance;
+    float slope;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }   
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);  
+    float d = suv.y*ubo.slope + ubo.hazeDistance;
+    vec4 c = imageLoad(inTex,uv);
+    vec4 color = vec4(1.0); 
+    c = (c-d*color)/(1.0-d);
+    imageStore(outTex,uv,c);
+}

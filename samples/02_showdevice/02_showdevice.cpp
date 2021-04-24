@@ -1,9 +1,9 @@
+#include <Aoce.hpp>
 #include <AoceManager.hpp>
 #include <Module/ModuleManager.hpp>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <string>
-
 
 using namespace aoce;
 using namespace cv;
@@ -38,12 +38,23 @@ int main() {
                   << " hight:" << vf.height << " fps:" << vf.fps
                   << " format:" << to_string(vf.videoType) << std::endl;
     }
-    formatIndex = video->findFormatIndex(1920,1080);   
+    formatIndex = video->findFormatIndex(1920, 1080);
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();
     video->setVideoFrameHandle(onDrawFrame);
     show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
+
+    // std::string aocePath = getAocePath();
+    // std::string imgPathI =
+    //     aocePath + "/images/lookup_amatorka.png";  // lookup_amatorka  toy.bmp
+    // std::string imgPathP = aocePath + "/images/toy-mask.bmp";
+    // cv::Mat I = cv::imread(imgPathI.c_str(), IMREAD_COLOR);
+    // cv::cvtColor(I, I, cv::COLOR_BGR2RGB);
+    // std::wstring spath =
+    //     utf8TWstring(aocePath + "/images/lookup_amatorka.binary");
+    // saveFileBinary(spath.c_str(), (void*)I.data, 512 * 512 * 3);
+
     while (int key = cv::waitKey(20)) {
         cv::imshow("a", *show);
         if (key == 'q') {

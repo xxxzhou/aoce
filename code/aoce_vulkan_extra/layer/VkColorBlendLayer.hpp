@@ -14,7 +14,7 @@ class VkColorBlendLayer : public VkLayer {
     /* data */
    public:
     VkColorBlendLayer(/* args */);
-    ~VkColorBlendLayer();
+    virtual ~VkColorBlendLayer();
 };
 
 class VkColorBurnBlendLayer : public VkLayer {
@@ -22,7 +22,7 @@ class VkColorBurnBlendLayer : public VkLayer {
     /* data */
    public:
     VkColorBurnBlendLayer(/* args */);
-    ~VkColorBurnBlendLayer();
+    virtual ~VkColorBurnBlendLayer();
 };
 
 class VkColorDodgeBlendLayer : public VkLayer {
@@ -30,7 +30,7 @@ class VkColorDodgeBlendLayer : public VkLayer {
     /* data */
    public:
     VkColorDodgeBlendLayer(/* args */);
-    ~VkColorDodgeBlendLayer();
+    virtual ~VkColorDodgeBlendLayer();
 };
 
 class VkColorInvertLayer : public VkLayer {
@@ -38,7 +38,7 @@ class VkColorInvertLayer : public VkLayer {
     /* data */
    public:
     VkColorInvertLayer(/* args */);
-    ~VkColorInvertLayer();
+    virtual ~VkColorInvertLayer();
 };
 
 class VkColorLBPLayer : public VkLayer {
@@ -46,7 +46,7 @@ class VkColorLBPLayer : public VkLayer {
     /* data */
    public:
     VkColorLBPLayer(/* args */);
-    ~VkColorLBPLayer();
+    virtual ~VkColorLBPLayer();
 };
 
 class VkContrastLayer : public VkLayer, public ITLayer<float> {
@@ -56,7 +56,7 @@ class VkContrastLayer : public VkLayer, public ITLayer<float> {
     /* data */
    public:
     VkContrastLayer(/* args */);
-    ~VkContrastLayer();
+    virtual ~VkContrastLayer();
 };
 
 class VkCrosshatchLayer : public VkLayer, public ITLayer<CrosshatchParamet> {
@@ -66,7 +66,25 @@ class VkCrosshatchLayer : public VkLayer, public ITLayer<CrosshatchParamet> {
     /* data */
    public:
     VkCrosshatchLayer(/* args */);
-    ~VkCrosshatchLayer();
+    virtual ~VkCrosshatchLayer();
+};
+
+class VkExclusionBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkExclusionBlendLayer(/* args */);
+    ~VkExclusionBlendLayer();
+};
+
+class VkFalseColorLayer : public VkLayer, public ITLayer<FalseColorParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkFalseColorLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkFalseColorLayer(/* args */);
+    ~VkFalseColorLayer();
 };
 
 

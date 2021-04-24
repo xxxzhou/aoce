@@ -5,10 +5,12 @@ namespace layer {
 
 VkInputLayer::VkInputLayer(/* args */) {
     bInput = true;
-    setUBOSize(12);
+    // setUBOSize(12);
 }
 
 VkInputLayer::~VkInputLayer() {}
+
+void VkInputLayer::onDataReady() { bDateUpdate = true; }
 
 void VkInputLayer::onInitGraph() {
     std::vector<UBOLayoutItem> items = {
@@ -53,9 +55,9 @@ void VkInputLayer::onInitVkBuffer() {
             inBufferX->initResoure(BufferUsage::program, imageSize * 4,
                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT |
                                        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
-        } 
+        }
         size = inBufferX->getBufferSize();
-    }   
+    }
     assert(size > 0);
     inBuffer = std::make_unique<VulkanBuffer>();
     inBuffer->initResoure(BufferUsage::store, size,
@@ -100,7 +102,10 @@ void VkInputLayer::onPreCmd() {
 
 bool VkInputLayer::onFrame() {
     if (inBuffer) {
-        inBuffer->upload(frameData);
+        if (bDateUpdate) {
+            inBuffer->upload(frameData);
+            bDateUpdate = false;
+        }
         // inBuffer->submit();
         return true;
     }

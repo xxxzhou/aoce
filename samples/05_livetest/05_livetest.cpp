@@ -104,7 +104,7 @@ class TestLive : public ILiveObserver {
         if (yuv2rgbLayer->getParamet().type != videoFrame.videoType) {
             yuv2rgbLayer->updateParamet({videoFrame.videoType, true});
         }
-        inputLayer->inputCpuData(videoFrame, 0);
+        inputLayer->inputCpuData(videoFrame);
         vkGraph->run();
 #if __ANDROID__
         if (window) {

@@ -10,6 +10,10 @@ layout (binding = 0, r8) uniform readonly image2D inTex;
 layout (binding = 0, rgba32f) uniform readonly image2D inTex;
 #elif CHANNEL_R32F
 layout (binding = 0, r32f) uniform image2D inTex;
+#elif CHANNEL_R32I
+layout (binding = 0, r32i) uniform iimage2D inTex;
+#elif CHANNEL_RGBA32I
+layout (binding = 0, rgba32i) uniform iimage2D inTex;
 #endif
 
 layout (binding = 1, rgba8) uniform image2D outTex;
@@ -23,8 +27,17 @@ void main(){
     #if CHANNEL_R8 || CHANNEL_R32F
         float alpha = imageLoad(inTex,uv).r;     
         imageStore(outTex,uv,vec4(alpha)); 
-    #else
+    #elif CHANNEL_RGBA || CHANNEL_RGBA32F
         vec4 color = imageLoad(inTex,uv);     
         imageStore(outTex,uv,vec4(color.w)); 
+    #elif CHANNEL_RGBA32I 
+        float total = size.x*size.y*256;
+        vec4 color = imageLoad(inTex,uv) / total;     
+        imageStore(outTex,uv,vec4(color));
+    #elif CHANNEL_R32I 
+        float total = size.x*size.y*256;
+        float alpha = imageLoad(inTex,uv).r/total;     
+        imageStore(outTex,uv,vec4(alpha));
     #endif
+
 }

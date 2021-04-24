@@ -1,0 +1,18 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform readonly image2D inTex1;
+layout (binding = 2, rgba8) uniform image2D outTex;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }    
+	vec4 base = imageLoad(inTex,uv);
+    vec4 overlay = imageLoad(inTex1,uv); 
+    vec4 result =  vec4((overlay.rgb * base.a + base.rgb * overlay.a - 2.0 * overlay.rgb * base.rgb) + overlay.rgb * (1.0 - base.a) + base.rgb * (1.0 - overlay.a), base.a);
+    imageStore(outTex, uv, result);  
+}

@@ -17,5 +17,5 @@ void main(){
     }   
     vec4 color = imageLoad(inTex,uv);
     vec4 result = color + vec4(vec3(ubo.brightness),0.0f);       
-    imageStore(outTex,uv,color);
+    imageStore(outTex,uv,result);
 }

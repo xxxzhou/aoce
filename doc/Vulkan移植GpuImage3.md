@@ -212,6 +212,12 @@ void main(){
 
 逻辑有点同HarrisCornerDetection,由多层构成,按上面链接来看,其中第四层Hysteresis Thresholding正确实现方法逻辑应该类似:opencv_cudaimgproc canny.cpp/canny.cu里edgesHysteresis,不过逻辑现有些复杂,后面有时间修改成这种逻辑,现暂时使用GPUImage里的这种逻辑.
 
+其中GPUImageDirectionalSobelEdgeDetectionFilter/GPUImageDirectionalNonMaximumSuppressionFilter是GPUImageCannyEdgeDetectionFilter里的二个子运算组件,其GPUImageDirectionalSobelEdgeDetectionFilter先把梯度,normalize后的ddx,ddy传入GPUImageDirectionalNonMaximumSuppressionFilter.
+
+在本项目中,上面二层分别对应VkCannyEdgeDetectionLayer里的VkSobelEdgeDetectionLayer/VkDirectionalNMS,VkSobelEdgeDetectionLayer里计算梯度,ddx,ddy,其在VkDirectionalNMS里normalize对应ddx/ddy.
+
+其第四层GPUImageWeakPixelInclusionFilter对应VkCannyEdgeDetectionLayer里的canny.comp里的实现.
+
 下面的CGAColorspace是常规处理,ChromaKey前面移植过[UE4 Matting](https://www.unrealengine.com/en-US/tech-blog/setting-up-a-chroma-key-material-in-ue4)的扣像处理,这个里面还考虑到整合当前环境光的处理,暂时还没看到ChromaKeyBlend/ChromaKey有更高明的实现逻辑,就不移植了.
 
 ## Closing(膨胀(Dilation)和腐蚀(Erosion))

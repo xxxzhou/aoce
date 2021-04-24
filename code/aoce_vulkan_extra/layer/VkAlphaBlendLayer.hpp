@@ -27,6 +27,16 @@ class VkAlphaBlendLayer : public VkLayer, public ITLayer<float> {
     virtual ~VkAlphaBlendLayer();
 };
 
+class VkHardLightBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkHardLightBlendLayer(/* args */);
+    ~VkHardLightBlendLayer();
+};
+
+
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

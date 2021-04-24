@@ -26,7 +26,8 @@ AOCE_VULKAN_EXPORT std::string physicalDeviceTypeString(
     VkPhysicalDeviceType type);
 // 创建一个vulkan实例
 AOCE_VULKAN_EXPORT VkResult createInstance(VkInstance& instance,
-                                           const char* appName);
+                                           const char* appName,
+                                           bool bDebugMsg = false);
 // 得到所有物理显卡
 AOCE_VULKAN_EXPORT VkResult enumerateDevice(
     VkInstance instance, std::vector<PhysicalDevicePtr>& physicalDevices);
@@ -34,7 +35,7 @@ AOCE_VULKAN_EXPORT VkResult enumerateDevice(
 AOCE_VULKAN_EXPORT bool getMemoryTypeIndex(uint32_t typeBits,
                                            VkFlags quirementsMaks,
                                            uint32_t& index);
-                                           
+
 AOCE_VULKAN_EXPORT int32_t getByteSize(VkFormat format);
 // Load a SPIR-V shader (binary)
 #if defined(__ANDROID__)

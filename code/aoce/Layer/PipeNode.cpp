@@ -9,9 +9,11 @@ PipeNode::PipeNode(BaseLayer* _layer) {
     }
     assert(_layer != nullptr);
     this->layer = _layer;
+    endNodeIndex = -1;
+    startNodes.resize(this->layer->inCount);
 }
 
-PipeNode::~PipeNode() {}
+PipeNode::~PipeNode() { startNodes.clear(); }
 
 void PipeNode::setVisable(bool bvisable) {
     if (bInvisible == bvisable) {
@@ -27,21 +29,32 @@ void PipeNode::setEnable(bool benable) {
     }
 }
 
-void PipeNode::setStartNode(PipeNodePtr node) { startNode = node; }
-void PipeNode::setEndNode(PipeNodePtr node) { endNode = node; }
-
-PipeNodePtr PipeNode::getStartNode() {
-    if (startNode.expired()) {
-        return nullptr;
+// index表示输入节点索引,node表示层内层节点,toInIndex表示对应层内层输入位置
+// 简单来说,index对应本身node,toInIndex对应toNode
+void PipeNode::setStartNode(PipeNodePtr node, int32_t index,
+                            int32_t toInIndex) {
+    if (toInIndex >= node->startNodes.size()) {
+        return;
     }
-    return startNode.lock();
+    // 自身为前置节点
+    if (this->getNodeIndex() == node->getNodeIndex()) {
+        startNodes[index].push_back({node->getNodeIndex(), toInIndex});
+        return;
+    }
+    const auto& nodes = node->startNodes[toInIndex];
+    // 如果当前组件也有头部
+    if (nodes.size() > 0) {
+        for (const auto& node : nodes) {
+            PipeNodePtr ptr = layer->getGraph()->getNode(node.nodeIndex);
+            setStartNode(ptr, index, node.inIndex);
+        }
+    } else {
+        startNodes[index].push_back({node->getNodeIndex(), toInIndex});
+    }
 }
 
-PipeNodePtr PipeNode::getEndNode() {
-    if (endNode.expired()) {
-        return nullptr;
-    }
-    return endNode.lock();
+void PipeNode::setEndNode(PipeNodePtr node) {
+    endNodeIndex = node->getNodeIndex();
 }
 
 PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
@@ -59,15 +72,22 @@ PipeNodePtr PipeNode::addNode(ILayer* layer) {
 }
 
 PipeNodePtr PipeNode::addLine(PipeNodePtr to, int32_t formOut, int32_t toIn) {
+    assert(toIn < to->layer->inCount);
+    assert(formOut < layer->outCount);
     int toIndex = to->graphIndex;
-    auto start = to->getStartNode();
-    if (start) {
-        toIndex = start->graphIndex;
+    // 节点如果有多组输入toIn,一个输入可以有多个输出
+    if (to->startNodes[toIn].size() > 0) {
+        for (const auto& startNode : to->startNodes[toIn]) {
+            layer->pipeGraph->addLine(this->graphIndex, startNode.nodeIndex,
+                                      formOut, startNode.inIndex);
+        }
+    } else {
+        layer->pipeGraph->addLine(this->graphIndex, toIndex, formOut, toIn);
     }
-    layer->pipeGraph->addLine(this->graphIndex, toIndex, formOut, toIn);
-    auto end = to->getEndNode();
-    if (end) {
-        return end;
+    if (to->endNodeIndex >= 0) {        
+        PipeNodePtr result = layer->getGraph()->getNode(to->endNodeIndex);
+        assert(result);
+        return result;
     }
     return to;
 }

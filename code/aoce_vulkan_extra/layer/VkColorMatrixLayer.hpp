@@ -16,7 +16,7 @@ class VkColorMatrixLayer : public VkLayer, public ITLayer<ColorMatrixParamet> {
     /* data */
    public:
     VkColorMatrixLayer(/* args */);
-    ~VkColorMatrixLayer();
+    virtual ~VkColorMatrixLayer();
 };
 
 }  // namespace layer

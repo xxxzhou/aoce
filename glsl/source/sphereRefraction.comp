@@ -1,0 +1,40 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO{
+    float aspectRatio;
+    float centerX;
+    float centerY;
+    float radius;
+    float refractiveIndex;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);  
+    vec2 center = vec2(ubo.centerX,ubo.centerY);
+    vec2 coord = vec2(suv.x,(suv.y-0.5)*ubo.aspectRatio+0.5);
+    // 和球心距离
+    float dist = distance(center,coord);
+    // 球心内为0,球外为1
+    float withinSphere = step(dist,ubo.radius);
+    // 圈内半径0-1,外圈半径1以上
+    dist = dist / ubo.radius;
+    // 球内半径深度,圆心最大
+    float normDepth = ubo.radius * sqrt(1.0-dist*dist);
+    // 球形坐标系的坐标
+    vec3 sphereNormal = normalize(vec3(coord-center,normDepth));
+    // 球形表面反射对应的环境坐标,refractiveIndex折射
+    vec3 refractVector = refract(vec3(0.0,0.0,-1.0),sphereNormal,ubo.refractiveIndex);
+   
+    // 转化为纹理坐标的范围
+    vec4 color = textureLod(inSampler, ((refractVector.xy+1.0)*0.5),0);
+    imageStore(outTex,uv,color*withinSphere);
+}

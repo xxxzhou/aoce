@@ -6,6 +6,10 @@
 
 [GPUImage解析（二）](https://www.jianshu.com/p/39674568245b)
 
+[最全GPUImage 滤镜详解 (附Demo以及效果图)](https://sg.jianshu.io/u/ad37ff88cca4)
+
+[GPUImage built-in filter parsing](https://www.programmersought.com/article/64452194941/)
+
 ## opengl/cuda computer shader 线程
 
 gl_NumWorkGroups/gridDim: 所有线程块的多少.
@@ -185,3 +189,25 @@ With an image of 1280x1024 and a radio ranging from 2 to 15:
 [FAST特征检测器FastFeatureDetector](https://blog.csdn.net/qq_30815237/article/details/87284573)
 
 ### CrosshairGenerator 什么效果?
+
+### SphereRefraction 环境映射
+
+[环境映射技术漫谈](https://zhuanlan.zhihu.com/p/144438588)
+
+### GPUImageLowPassFilter 低通滤镜
+
+这个滤境有点特殊,需要保存上一桢的传入图像,然后比较当前桢与上一桢.
+
+运行图使用的有向无循环图,中间可以自动排除不可用节点并自动链接下层,所以不能有回环线,保存一桢然后使用构成回环,定义这层为bInput = true,告诉外面不需要自动连接别层输入,在相应接口手动连接相关纹理.
+
+本身加一层VkSaveFrameLayer,里面直接调用vkCmdCopyImage发现一是结果不正确,二是在Nsight显示占用0.3ms-0.7ms左右的时间,从逻辑上来说,应该不可能啊,这个copy应该比最简单的运算层占去的时间要小才对,于是我测试了二种方案,对应参数bUserPipe,表示用不用管线,用管线控制到0.2ms内,用vkCmdCopyImage在0.3ms以上,后面找下资料看看是什么问题.
+
+### 直方图
+
+线程组定成256个,然后使用数值对应索引位置+1,结果就是索引上的数值表示对应值的个数.
+
+有二种方式,保存到临时buffer,二是用原子集合(int/uint),这里因为int满足,使用原子集合.
+
+保存到临时buffer,我在开始四通道时使用类似reduce2分二段,不用原子操作的方式,但是效果并不好,一是第一次把16*16块的方式转换成对应的一个个直方图,模块并没的缩小,导致第二块把这一个直方图通过for加在一起需要循环1920/16x1080/16(假设是1080P的图),这个会花费超过2ms,这种方式就pass掉,我直接使用原子操作导出四个图然后再结合都比这个快.
+
+一通道在0.18ms左右,四通道在0.52ms+0.01ms,比0.18*4快些.

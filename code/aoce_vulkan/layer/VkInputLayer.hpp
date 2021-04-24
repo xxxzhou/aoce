@@ -9,7 +9,7 @@ namespace layer {
 
 // 把各种VideoFormat转化成ImageFormat,主要二种,R8/RGBA8
 // InputLayer相对别的层,在
-class VkInputLayer : public InputLayer, public VkLayer {
+class AOCE_VULKAN_EXPORT VkInputLayer : public InputLayer, public VkLayer {
     AOCE_LAYER_QUERYINTERFACE(VkInputLayer)
    private:
     std::unique_ptr<VulkanBuffer> inBuffer;
@@ -17,6 +17,7 @@ class VkInputLayer : public InputLayer, public VkLayer {
     std::unique_ptr<VulkanBuffer> inBufferX;
     // 是否需要GPU计算
     bool bUsePipe = false;
+    bool bDateUpdate = false;
 
    public:
     VkInputLayer(/* args */);
@@ -24,7 +25,7 @@ class VkInputLayer : public InputLayer, public VkLayer {
 
     // InputLayer
    public:
-    virtual void onDataReady() override{};
+    virtual void onDataReady() override;
     // VkLayer
    protected:
     virtual void onInitGraph() override;

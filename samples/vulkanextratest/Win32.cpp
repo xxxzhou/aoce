@@ -28,8 +28,18 @@ static ITLayer<BilateralParamet>* bilateralLayer = nullptr;
 static ITLayer<BulgeDistortionParamet>* bdLayer = nullptr;
 static ITLayer<CannyEdgeDetectionParamet>* cedLayer = nullptr;
 static BaseLayer* cgaLayer = nullptr;
+static LookupLayer* lutLayer = nullptr;
 static ITLayer<int>* dilationLayer = nullptr;
 static ITLayer<int>* erosionLayer = nullptr;
+static ITLayer<int>* closingLayer = nullptr;
+static ITLayer<BlurSelectiveParamet>* blurSelectiveLayer = nullptr;
+static ITLayer<BulrPositionParamet>* blurPositionLayer = nullptr;
+static ITLayer<SphereRefractionParamet>* srLayer = nullptr;
+static ITLayer<PixellateParamet>* halftoneLayer = nullptr;
+static ITLayer<float>* lowPassLayer = nullptr;
+static ITLayer<float>* highPassLayer = nullptr;
+static BaseLayer* histogramLayer = nullptr;
+static BaseLayer* histogramLayer2 = nullptr;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -90,6 +100,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     bdLayer = createBulgeDistortionLayer();
     BulgeDistortionParamet bdParamet = {};
+    bdParamet.aspectRatio = 1080.0 / 1920.0;
     bdLayer->updateParamet(bdParamet);
 
     guidedLayer = createGuidedLayer();
@@ -107,7 +118,32 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     erosionLayer = createErosionLayer();
     // erosionLayer->updateParamet(20);
 
+    closingLayer = createClosingLayer();
+
+    blurSelectiveLayer = createBlurSelectiveLayer();
+    BlurSelectiveParamet bsp = {};
+    bsp.gaussian.blurRadius = 20;
+    blurSelectiveLayer->updateParamet(bsp);
+
+    blurPositionLayer = createBlurPositionLayer();
+    BulrPositionParamet bpp = {};
+    bpp.gaussian.blurRadius = 20;
+    blurPositionLayer->updateParamet(bpp);
+
+    srLayer = createSphereRefractionLayer();
+
+    halftoneLayer = createHalftoneLayer();
+
+    lowPassLayer = createLowPassLayer();
+
+    highPassLayer = createHighPassLayer();
+
+    histogramLayer = createHistogramLayer(true);
+    histogramLayer2 = createHistogramLayer(false);
+
+    std::vector<uint8_t> lutData;
     std::vector<BaseLayer*> layers;
+    // 如果为true,层需要二个输入,用原始图像做第二个输入
     bool bAutoIn = false;
     // ---高斯模糊
     // layers.push_back(gaussianLayer->getLayer());
@@ -130,6 +166,15 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---平均亮度调整阈值
     // layers.push_back(averageLT->getLayer());
     // layers.push_back(alphaShowLayer);
+    // --- LUT颜色表映射
+    // std::string aocePath = getAocePath();
+    // std::wstring spath =
+    //     utf8TWstring(aocePath + "/images/lookup_amatorka.binary");
+    // if (existsFile(spath.c_str())) {
+    //     loadFileBinary(spath.c_str(), lutData);
+    //     lutLayer = createLookupLayer();
+    //     layers.push_back(lutLayer->getLayer());
+    // }
     // ---双边滤波
     // layers.push_back(bilateralLayer->getLayer());
     // ---凸起失真，鱼眼效果
@@ -140,12 +185,45 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---CGAColorspace效果
     // layers.push_back(cgaLayer);
     // ---dilation/erosion
-    layers.push_back(cedLayer->getLayer());
-    layers.push_back(dilationLayer->getLayer());
-    layers.push_back(erosionLayer->getLayer());
+    // layers.push_back(cedLayer->getLayer());
+    // // layers.push_back(dilationLayer->getLayer());
+    // // layers.push_back(erosionLayer->getLayer());
+    // layers.push_back(closingLayer->getLayer());
+    // layers.push_back(alphaShowLayer);
+    // ---高斯选择模糊1
+    // layers.push_back(blurSelectiveLayer->getLayer());
+    // ---高斯选择模糊2
+    // layers.push_back(blurPositionLayer->getLayer());
+    // ---球形映射,图像倒立
+    // layers.push_back(srLayer->getLayer());
+    // ---半色调效果，如新闻打印
+    // layers.push_back(halftoneLayer->getLayer());
+    // ---低通滤波器
+    // layers.push_back(lowPassLayer->getLayer());
+    // ---高通滤波器
+    // bAutoIn = true;
+    // layers.push_back(highPassLayer->getLayer());
+    // ---直方图 1通道 luminanceLayer cedLayer->getLayer()
+    // layers.push_back(luminanceLayer);
+    // layers.push_back(histogramLayer);
+    // layers.push_back(alphaShowLayer);
+    // ---直方图 4通道
+    layers.push_back(histogramLayer2);
     layers.push_back(alphaShowLayer);
 
+    Mat4x4 a = {};
+    Mat4x4 b = {};
+    b.col2.x = 3;
+    int32_t y = 0;
+    int32_t x = 0;
+    b[y][x] = 4;
+    a = b;
+
     view->initGraph(layers, hInstance, bAutoIn);
+    // 如果有LUT,需要在initGraph后,加载Lut表格数据
+    if (lutLayer != nullptr && lutData.size() > 0) {
+        lutLayer->loadLookUp(lutData.data(), lutData.size());
+    }
     view->openDevice();
 
     // std::thread trd([&]() {

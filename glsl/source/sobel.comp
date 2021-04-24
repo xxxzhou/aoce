@@ -9,7 +9,7 @@ layout (binding = 2) uniform UBO {
 	float edgeStrength;
 } ubo;
 
-const float horizontKernel[9] = {1.0f,0.0f,-1.0f,2.0f,0.0f,-2.0f,1.0f,0.0f,-1.0f,};
+const float horizontKernel[9] = {1.0f,0.0f,-1.0f,2.0f,0.0f,-2.0f,1.0f,0.0f,-1.0f};
 const float verticalKernel[9] = {1.0f,2.0f,1.0f,0.0f,0.0f,0.0f,-1.0f,-2.0f,-1.0f};
 
 void main(){

@@ -1,0 +1,32 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1) uniform sampler2D inSampler1;
+layout (binding = 2, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 3) uniform UBO{
+    float aspectRatio;
+    float centerX;
+    float centerY;
+    float radius;
+    float size;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);  
+    vec2 center = vec2(ubo.centerX,ubo.centerY);
+    vec2 coord = vec2(suv.x,(suv.y-0.5)*ubo.aspectRatio+0.5);
+    float dist = distance(center,coord);
+    vec4 color = textureLod(inSampler, suv,0);  
+    vec4 color1 = textureLod(inSampler1, suv,0);  
+    // smoothstep(x,y,a) a<0 return 0,a>y return 1,y>a>x return 3a^2-2a^3
+    // >radius,全blur
+    vec4 result = mix(color, color1, smoothstep(ubo.radius - ubo.size, ubo.radius, dist));
+    imageStore(outTex,uv,result);
+}

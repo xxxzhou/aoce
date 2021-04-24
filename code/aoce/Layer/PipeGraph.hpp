@@ -22,7 +22,7 @@ class ACOE_EXPORT PipeGraph {
 
    private:
     bool checkHaveValid(PipeLinePtr ptr);
-    // friend class BaseLayer;
+    // friend class BaseLayer;    
     void validNode();
 
    protected:
@@ -46,7 +46,7 @@ class ACOE_EXPORT PipeGraph {
     // 引发resetGraphr执行,但是不一定与当前执行同线程
     void reset() { bReset = true; }
 
-    PipeNodePtr getLastNode();
+    PipeNodePtr getNode(int32_t index);
     PipeNodePtr addNode(BaseLayer* layer);
     PipeNodePtr addNode(ILayer* layer);
     bool addLine(int32_t from, int32_t to, int32_t formOut = 0,

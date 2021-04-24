@@ -1,5 +1,7 @@
 #include "VkAlphaShowLayer.hpp"
 
+#include "aoce/Layer/PipeGraph.hpp"
+
 namespace aoce {
 namespace vulkan {
 namespace layer {
@@ -19,6 +21,10 @@ void VkAlphaShowLayer::onInitLayer() {
         glslPath = "glsl/alphaShowF4.comp.spv";
     } else if (inFormats[0].imageType == ImageType::r32f) {
         glslPath = "glsl/alphaShowF1.comp.spv";
+    } else if (inFormats[0].imageType == ImageType::r32) {
+        glslPath = "glsl/alphaShowSI1.comp.spv";
+    } else if (inFormats[0].imageType == ImageType::rgba32) {
+        glslPath = "glsl/alphaShowSI4.comp.spv";
     }
     // 加载shader
     onInitGraph();

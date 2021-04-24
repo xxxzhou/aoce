@@ -2,6 +2,7 @@
 
 #include "Aoce/Aoce.hpp"
 #include "Aoce/Layer/BaseLayer.hpp"
+#include "Aoce/Math/AMath.hpp"
 
 #ifdef _WIN32
 #if defined(AOCE_VULKAN_EXTRA_EXPORT_DEFINE)
@@ -138,17 +139,73 @@ struct BulgeDistortionParamet {
     }
 };
 
+struct BulrPosition {
+    float aspectRatio = 1.0f;
+    float centerX = 0.5f;
+    float centerY = 0.5f;
+    float radius = 0.25f;
+
+    inline bool operator==(const BulrPosition& right) {
+        return this->aspectRatio == right.aspectRatio &&
+               this->centerX == right.centerX &&
+               this->centerY == right.centerY && this->radius == right.radius;
+    }
+};
+
+struct BulrPositionParamet {
+    GaussianBlurParamet gaussian = {};
+    BulrPosition bulrPosition = {};
+};
+
+struct BlurSelective {
+    float aspectRatio = 1.0f;
+    float centerX = 0.5f;
+    float centerY = 0.5f;
+    float radius = 0.25f;
+    float size = 0.125f;
+    inline bool operator==(const BlurSelective& right) {
+        return this->aspectRatio == right.aspectRatio &&
+               this->centerX == right.centerX &&
+               this->centerY == right.centerY && this->radius == right.radius &&
+               this->size == size;
+    }
+};
+
+struct SphereRefractionParamet {
+    float aspectRatio = 1.0f;
+    float centerX = 0.5f;
+    float centerY = 0.5f;
+    float radius = 0.25f;
+    float refractiveIndex = 0.71f;
+    inline bool operator==(const SphereRefractionParamet& right) {
+        return this->aspectRatio == right.aspectRatio &&
+               this->centerX == right.centerX &&
+               this->centerY == right.centerY && this->radius == right.radius &&
+               this->refractiveIndex == refractiveIndex;
+    }
+};
+
+// 马赛克
+struct PixellateParamet {
+    float fractionalWidthOfPixel = 0.01f;
+    float aspectRatio = 1.0f;
+    inline bool operator==(const PixellateParamet& right) {
+        return this->fractionalWidthOfPixel == right.fractionalWidthOfPixel &&
+               this->aspectRatio == right.aspectRatio;
+    }
+};
+
+struct BlurSelectiveParamet {
+    GaussianBlurParamet gaussian = {};
+    BlurSelective bulrPosition = {};
+};
+
 struct ColorMatrixParamet {
     float intensity = 1.0f;
-    vec4 col0 = {1.0, 0.0, 0.0, 0.0};
-    vec4 col1 = {0.0, 1.0, 0.0, 0.0};
-    vec4 col2 = {0.0, 0.0, 1.0, 0.0};
-    vec4 col3 = {0.0, 0.0, 0.0, 1.0};
+    Mat4x4 mat = {};
 
     inline bool operator==(const ColorMatrixParamet& right) {
-        return this->intensity == right.intensity && this->col0 == right.col0 &&
-               this->col1 == right.col1 && this->col2 == right.col2 &&
-               this->col3 == right.col3;
+        return this->intensity == right.intensity && this->mat == right.mat;
     }
 };
 
@@ -172,6 +229,57 @@ struct CrosshatchParamet {
         return this->crossHatchSpacing == right.crossHatchSpacing &&
                this->lineWidth == right.lineWidth;
     }
+};
+
+struct FalseColorParamet {
+    vec3 firstColor = {0.0f, 0.0f, 0.5f};
+    vec3 secondColor = {1.0f, 0.0f, 0.0f};
+    inline bool operator==(const FalseColorParamet& right) {
+        return this->firstColor == right.firstColor &&
+               this->secondColor == right.secondColor;
+    }
+};
+
+// 去雾
+struct HazeParamet {
+    // Strength of the color applied. Values between -.3 and .3 are best
+    float distance = 0.0f;
+    // Amount of color change. Values between -.3 and .3 are best
+    float slope = 0.0f;
+    inline bool operator==(const HazeParamet& right) {
+        return this->distance == right.distance && this->slope == right.slope;
+    }
+};
+
+// 调整图像的阴影和高光
+struct HighlightShadowParamet {
+    // 0 - 1, increase to lighten shadows.
+    float shadows = 0.0f;
+    // 0 - 1, decrease to darken highlights.
+    float highlights = 1.0f;
+    inline bool operator==(const HighlightShadowParamet& right) {
+        return this->shadows == right.shadows &&
+               this->highlights == right.highlights;
+    }
+};
+
+// 允许您使用颜色和强度独立地着色图像的阴影和高光
+struct HighlightShadowTintParamet {
+    float shadowTintIntensity = 0.0f;
+    vec3 shadowTintColor = {1.0f, 0.0f, 0.0f};
+    float highlightTintIntensity = 1.0f;
+    vec3 highlightTintColor = {0.0f, 0.0f, 1.0f};
+    inline bool operator==(const HighlightShadowTintParamet& right) {
+        return this->shadowTintIntensity == right.shadowTintIntensity &&
+               this->shadowTintColor == right.shadowTintColor &&
+               this->highlightTintIntensity == right.highlightTintIntensity &&
+               this->highlightTintColor == right.highlightTintColor;
+    }
+};
+
+class LookupLayer : public ILayer {
+   public:
+    virtual void loadLookUp(uint8_t* data, int32_t size) = 0;
 };
 
 AOCE_VE_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer(
@@ -202,7 +310,7 @@ AOCE_VE_EXPORT BaseLayer* createAddBlendLayer();
 AOCE_VE_EXPORT ITLayer<float>* createAlphaBlendLayer();
 
 // 二输入,第一输入原始图像,第二输入512*512的lookup图
-AOCE_VE_EXPORT BaseLayer* createLookupLayer();
+AOCE_VE_EXPORT LookupLayer* createLookupLayer();
 
 AOCE_VE_EXPORT ITLayer<float>* createBrightnessLayer();
 
@@ -216,6 +324,8 @@ AOCE_VE_EXPORT BaseLayer* createCGAColorspaceLayer();
 AOCE_VE_EXPORT ITLayer<int>* createDilationLayer();
 
 AOCE_VE_EXPORT ITLayer<int>* createErosionLayer();
+
+AOCE_VE_EXPORT ITLayer<int>* createClosingLayer();
 
 AOCE_VE_EXPORT BaseLayer* createColorBlendLayer();
 
@@ -237,6 +347,22 @@ AOCE_VE_EXPORT ITLayer<float>* createColourFASTFeatureDetector();
 
 AOCE_VE_EXPORT ITLayer<CropParamet>* createCropLayer();
 
+AOCE_VE_EXPORT ITLayer<BulrPositionParamet>* createBlurPositionLayer();
+
+AOCE_VE_EXPORT ITLayer<BlurSelectiveParamet>* createBlurSelectiveLayer();
+
+AOCE_VE_EXPORT ITLayer<SphereRefractionParamet>* createSphereRefractionLayer();
+
+AOCE_VE_EXPORT ITLayer<SphereRefractionParamet>* createGlassSphereLayer();
+
+AOCE_VE_EXPORT ITLayer<PixellateParamet>* createHalftoneLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createLowPassLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createHighPassLayer();
+
+AOCE_VE_EXPORT BaseLayer* createHistogramLayer(bool bSignal = true);
+
 AOCE_VE_EXPORT BaseLayer* createLuminanceLayer();
 
 AOCE_VE_EXPORT BaseLayer* createAlphaShowLayer();
@@ -247,3 +373,22 @@ AOCE_VE_EXPORT BaseLayer* createConvertImageLayer();
 
 }  // namespace vulkan
 }  // namespace aoce
+
+// struct SphereGlassParamet {
+//     float aspectRatio = 1.0f;
+//     float centerX = 0.5f;
+//     float centerY = 0.5f;
+//     float radius = 0.25f;
+//     float refractiveIndex = 0.71f;
+//     vec3 lightPosition = {-0.5, 0.5, 1.0};
+//     vec3 ambientLightPosition = {0.0, 0.0, 1.0};
+//     inline bool operator==(const SphereGlassParamet& right) {
+//         return this->aspectRatio == right.aspectRatio &&
+//                this->centerX == right.centerX &&
+//                this->centerY == right.centerY && this->radius ==
+//                right.radius
+//                && this->refractiveIndex == refractiveIndex &&
+//                this->lightPosition == right.lightPosition &&
+//                this->ambientLightPosition == right.ambientLightPosition;
+//     }
+// };

@@ -15,12 +15,16 @@
 #include "layer/VkCropLayer.hpp"
 #include "layer/VkGuidedLayer.hpp"
 #include "layer/VkHarrisCornerDetectionLayer.hpp"
+#include "layer/VkHistogramLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
 #include "layer/VkLookupLayer.hpp"
+#include "layer/VkLowPassLayer.hpp"
 #include "layer/VkLuminanceLayer.hpp"
 #include "layer/VkMorphLayer.hpp"
+#include "layer/VkPixellateLayer.hpp"
 #include "layer/VkReduceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
+#include "layer/VkSphereLayer.hpp"
 
 using namespace aoce::vulkan::layer;
 
@@ -83,7 +87,7 @@ ITLayer<float>* createAlphaBlendLayer() {
     return layer;
 }
 
-BaseLayer* createLookupLayer() {
+LookupLayer* createLookupLayer() {
     VkLookupLayer* layer = new VkLookupLayer();
     return layer;
 }
@@ -115,6 +119,11 @@ ITLayer<int>* createDilationLayer() {
 
 ITLayer<int>* createErosionLayer() {
     VkErosionLayer* layer = new VkErosionLayer();
+    return layer;
+}
+
+ITLayer<int>* createClosingLayer() {
+    VkClosingLayer* layer = new VkClosingLayer();
     return layer;
 }
 
@@ -166,6 +175,48 @@ ITLayer<float>* createColourFASTFeatureDetector() {
 ITLayer<CropParamet>* createCropLayer() {
     VkCropLayer* layer = new VkCropLayer();
     return layer;
+}
+
+ITLayer<BulrPositionParamet>* createBlurPositionLayer() {
+    VkGaussianBlurPositionLayer* layer = new VkGaussianBlurPositionLayer();
+    return layer;
+}
+
+ITLayer<BlurSelectiveParamet>* createBlurSelectiveLayer() {
+    VkGaussianBlurSelectiveLayer* layer = new VkGaussianBlurSelectiveLayer();
+    return layer;
+}
+
+ITLayer<SphereRefractionParamet>* createSphereRefractionLayer() {
+    VkSphereRefractionLayer* layer = new VkSphereRefractionLayer();
+    return layer;
+}
+
+ITLayer<SphereRefractionParamet>* createGlassSphereLayer() {
+    VkGlassSphereLayer* layer = new VkGlassSphereLayer();
+    return layer;
+}
+
+ITLayer<PixellateParamet>* createHalftoneLayer() {
+    VkHalftoneLayer* layer = new VkHalftoneLayer();
+    return layer;
+}
+
+ITLayer<float>* createLowPassLayer() {
+    VkLowPassLayer* layer = new VkLowPassLayer();
+    return layer;
+}
+
+ITLayer<float>* createHighPassLayer() {
+    VkHighPassLayer* layer = new VkHighPassLayer();
+    return layer;
+}
+
+BaseLayer* createHistogramLayer(bool bSignal) {
+    if (bSignal) {
+        return new VkHistogramLayer(true);
+    }
+    return new VkHistogramC4Layer();
 }
 
 BaseLayer* createLuminanceLayer() {

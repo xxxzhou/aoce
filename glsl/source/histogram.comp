@@ -1,0 +1,55 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+layout (binding = 0, r8) uniform readonly image2D inTex;
+layout (binding = 1, r32i) uniform iimage2D outTexR;
+#if CHANNEL_RGBA
+layout (binding = 2, r32i) uniform iimage2D outTexG;
+layout (binding = 3, r32i) uniform iimage2D outTexB;
+layout (binding = 4, r32i) uniform iimage2D outTexA;
+#endif
+
+shared int data_sharedR[256];
+#if CHANNEL_RGBA
+shared int data_sharedG[256];
+shared int data_sharedB[256];
+shared int data_sharedA[256];
+#endif
+
+void main(){
+    ivec2 size = imageSize(inTex);  
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);  
+    // 组内线程一维索引
+    int tid = int(gl_LocalInvocationIndex); 
+    // 放大小检查上是用了全置0,不影响后面结果
+    data_sharedR[tid] = 0; 
+#if CHANNEL_RGBA
+    data_sharedG[tid] = 0; 
+    data_sharedB[tid] = 0; 
+    data_sharedA[tid] = 0; 
+#endif
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }  
+    memoryBarrierShared();
+    barrier();
+    // 数值对应索引位置+1,结果就是索引上的数值表示对应值的个数
+    ivec4 rgba = ivec4(imageLoad(inTex,uv) * 255.0f);
+    atomicAdd(data_sharedR[rgba.r],1);
+#if CHANNEL_RGBA
+    atomicAdd(data_sharedG[rgba.g],1);
+    atomicAdd(data_sharedB[rgba.b],1);
+    atomicAdd(data_sharedA[rgba.a],1);
+#endif
+    memoryBarrierShared();
+    barrier();
+    // 有二种方式,保存到临时buffer,二是用原子集合(int/uint)
+    // 这里因为int满足,使用原子集合
+    imageAtomicAdd(outTexR,ivec2(tid, 0),data_sharedR[tid]);
+#if CHANNEL_RGBA
+    imageAtomicAdd(outTexG,ivec2(tid, 0),data_sharedG[tid]);
+    imageAtomicAdd(outTexB,ivec2(tid, 0),data_sharedB[tid]);
+    imageAtomicAdd(outTexA,ivec2(tid, 0),data_sharedA[tid]);
+#endif
+}

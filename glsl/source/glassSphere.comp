@@ -1,0 +1,46 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO{
+    float aspectRatio;
+    float centerX;
+    float centerY;
+    float radius;
+    float refractiveIndex;    
+} ubo;
+
+ const vec3 lightPosition = vec3(-0.5, 0.5, 1.0);
+ const vec3 ambientLightPosition = vec3(0.0, 0.0, 1.0);
+ 
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);  
+    vec2 center = vec2(ubo.centerX,ubo.centerY);
+    vec2 coord = vec2(suv.x,(suv.y-0.5)*ubo.aspectRatio+0.5);
+    float dist = distance(center,coord);
+    float withinSphere = step(dist,ubo.radius);
+    dist = dist / ubo.radius;
+    float normDepth = ubo.radius * sqrt(1.0-dist*dist);
+    vec3 sphereNormal = normalize(vec3(coord-center,normDepth));
+    vec3 refractVector = 2.0*refract(vec3(0.0,0.0,-1.0),sphereNormal,ubo.refractiveIndex);
+    refractVector.xy = -refractVector.xy;
+    vec3 color = textureLod(inSampler, ((refractVector.xy+1.0)*0.5),0).rgb;
+
+    // Grazing angle lighting
+    float lightingIntensity = 2.5 * (1.0 - pow(clamp(dot(ambientLightPosition, sphereNormal), 0.0, 1.0), 0.25));
+    color += lightingIntensity;
+     
+    // Specular lighting
+    lightingIntensity = clamp(dot(normalize(lightPosition), sphereNormal), 0.0, 1.0);
+    lightingIntensity = pow(lightingIntensity, 15.0);
+    color += vec3(0.8, 0.8, 0.8) * lightingIntensity;
+
+    imageStore(outTex,uv,vec4(color,1.0)*withinSphere);
+}

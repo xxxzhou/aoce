@@ -19,6 +19,10 @@ VkFormat ImageFormat2Vk(ImageType imageType) {
             return VK_FORMAT_R32G32B32A32_SFLOAT;
         case ImageType::r32f:
             return VK_FORMAT_R32_SFLOAT;
+        case ImageType::r32:
+            return VK_FORMAT_R32_SINT;
+        case ImageType::rgba32:
+            return VK_FORMAT_R32G32B32A32_SINT;
         default:
             return VK_FORMAT_UNDEFINED;
     }

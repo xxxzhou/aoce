@@ -36,9 +36,6 @@ void main(){
         iy = size.y - 1 - iy;
     }
     vec4 rgba = imageLoad(inTex,ivec2(ix,iy));
-    float r = clamp(pow(rgba[ubo.red],ubo.gamma),0.0,1.0);
-    float g = clamp(pow(rgba[ubo.green],ubo.gamma),0.0,1.0);
-    float b = clamp(pow(rgba[ubo.blue],ubo.gamma),0.0,1.0);
-    float a = clamp(pow(rgba[ubo.alpha],ubo.gamma),0.0,1.0);
-    imageStore(outTex, uv,vec4(r,g,b,a)); 
+    vec4 result = clamp(pow(vec4(rgba[ubo.red],rgba[ubo.green],rgba[ubo.blue],rgba[ubo.alpha]),vec4(ubo.gamma)),0.0,1.0);
+    imageStore(outTex, uv,result); 
 }

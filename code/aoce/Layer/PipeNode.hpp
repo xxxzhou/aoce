@@ -10,11 +10,17 @@ namespace aoce {
 
 typedef std::shared_ptr<class PipeNode> PipeNodePtr;
 
+struct StartNode {
+    int32_t nodeIndex = 0;
+    int32_t inIndex = 0;
+};
+
 // 对应layer,管理layer的连接
 class ACOE_EXPORT PipeNode {
    private:
     /* data */
     friend class PipeGraph;
+    friend class PipeNode;
     BaseLayer* layer = nullptr;
     // 如果为true,当前节点不使用
     bool bInvisible = false;
@@ -22,23 +28,29 @@ class ACOE_EXPORT PipeNode {
     bool bDisable = false;
     // 在graph的索引
     int32_t graphIndex = 0;
-    std::weak_ptr<PipeNode> startNode;
-    std::weak_ptr<PipeNode> endNode;
+    // 对应输入连接不同的内部层,现都假设只连内部层的第一个输入
+    std::vector<std::vector<StartNode>> startNodes;
+    int32_t endNodeIndex = -1;
+    // std::vector<std::weak_ptr<PipeNode>> endNodes;
     // PipeNode* startNode = nullptr;
 
    public:
     PipeNode(BaseLayer* _layer);
     virtual ~PipeNode();
 
+   protected:
+    // StartNode getStartNode(int32_t index = 0);    
+
    public:
     void setVisable(bool bvisable);
     void setEnable(bool benable);
     inline BaseLayer* getLayer() { return layer; };
     inline int32_t getNodeIndex() { return graphIndex; };
-    void setStartNode(PipeNodePtr node);
+    // 如果层有多个输入,可能不同输入对应不同层内不同层
+    // index表示输入节点索引,node表示层内层节点,toInIndex表示对应层内层输入位置
+    void setStartNode(PipeNodePtr node, int32_t index = 0,
+                      int32_t toInIndex = 0);
     void setEndNode(PipeNodePtr node);
-    PipeNodePtr getStartNode();
-    PipeNodePtr getEndNode();
 
    public:
     // 有一个隐藏的line关系,当前节点第一个输出连接下一节点的第一个输入

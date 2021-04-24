@@ -64,6 +64,12 @@ bool VkPipeGraph::getMustSampled(int32_t node, int32_t inIndex) {
     return vkLayer->getSampled(inIndex);
 }
 
+bool VkPipeGraph::bOutLayer(int32_t node) {
+    assert(node < nodes.size());
+    VkLayer* vkLayer = static_cast<VkLayer*>(nodes[node]->getLayer());
+    return vkLayer->bOutput;
+}
+
 bool VkPipeGraph::resourceReady() {
     // 资源是否已经重新生成
     auto res = vkGetEventStatus(context->device, outEvent);
@@ -71,12 +77,6 @@ bool VkPipeGraph::resourceReady() {
 }
 
 void VkPipeGraph::onReset() {
-// while (vkGetFenceStatus(context->device, computerFence) == VK_NOT_READY)
-// {
-//     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-// }
-// auto res = vkGetEventStatus(context->device, outEvent);
-// assert(res != VK_EVENT_RESET);
 // 告诉别的线程,需要等待资源重新生成
 #if WIN32
     // outMemorys.clear();
@@ -114,6 +114,7 @@ bool VkPipeGraph::onInitBuffers() {
 }
 
 bool VkPipeGraph::executeOut() {
+    // 等等信号
     vkWaitForFences(context->device, 1, &computerFence, VK_TRUE,
                     UINT64_MAX);  // UINT64_MAX
 #if WIN32
@@ -121,6 +122,7 @@ bool VkPipeGraph::executeOut() {
         winImage->vkCopyTemp(device);
     }
 #endif
+    // 重置无信号
     vkResetFences(context->device, 1, &computerFence);
     // 运行输出层
     for (auto* layer : vkOutputLayers) {

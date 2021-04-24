@@ -40,6 +40,7 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     int32_t computeIndex = -1;
     bool bAloneCompute = false;
     bool bInterpDx11 = false;
+    bool bDebugMsg = false;
 
    public:
     PhysicalDevicePtr physical = nullptr;
@@ -50,6 +51,9 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     VkQueue graphicsQueue = VK_NULL_HANDLE;
 #if __ANDROID__
     bool bAndroidHardware = false;
+#endif
+#if AOCE_DEBUG_TYPE
+    VkDebugUtilsMessengerEXT debugMessenger = VK_NULL_HANDLE;
 #endif
 };
 

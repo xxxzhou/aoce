@@ -4,15 +4,13 @@
 #include <algorithm>
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <memory>
+
 #include "Aoce.h"
 
-// #include "Module/IModule.hpp"
-// #include "VideoDevice/VideoManager.hpp"
-// #include "PipeGraph/PipeGraph.hpp"
 
 // 如果列表的顺序无关,可以尝试如下三种的快速删除,不需要move数据
 template <typename T>
@@ -104,6 +102,11 @@ ACOE_EXPORT void copycharstr(char* dest, const char* source, int32_t maxlength);
 ACOE_EXPORT aoce::ImageType videoType2ImageType(
     const aoce::VideoType& videoType);
 
+// 原则上,应该只由VideoType转ImageType
+// ImageType转VideoType,只有bgra8/r16/rgba8三种有意义
+ACOE_EXPORT aoce::VideoType imageType2VideoType(
+    const aoce::ImageType& imageType);
+
 ACOE_EXPORT int32_t getYuvIndex(const aoce::VideoType& videoType);
 
 ACOE_EXPORT aoce::ImageFormat videoFormat2ImageFormat(
@@ -120,8 +123,10 @@ ACOE_EXPORT std::string getAocePath();
 #if WIN32
 ACOE_EXPORT bool existsFile(const wchar_t* filePath);
 
-ACOE_EXPORT bool loadFileBinary(const wchar_t* filePath,std::vector<uint8_t>& data,int32_t& lenght);
+ACOE_EXPORT bool loadFileBinary(const wchar_t* filePath,
+                                std::vector<uint8_t>& data);
 
 // 默认文件不存在 则建立新文件 文件存在则直接清空文件内容
-ACOE_EXPORT bool saveFileBinary(const wchar_t* filePath,void* data,int32_t lenght);
+ACOE_EXPORT bool saveFileBinary(const wchar_t* filePath, void* data,
+                                int32_t lenght);
 #endif

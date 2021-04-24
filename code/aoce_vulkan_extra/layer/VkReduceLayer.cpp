@@ -77,7 +77,7 @@ void VkReduceLayer::onInitNode() {
 }
 
 void VkReduceLayer::onInitLayer() {
-    sizeX = divUp(inFormats[0].width, 256);
+    sizeX = 1;  // divUp(inFormats[0].width, 256);
     sizeY = 1;
     outFormats[0].width = 1;
     outFormats[0].height = 1;

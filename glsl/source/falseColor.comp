@@ -1,0 +1,32 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {    
+    float firstColorX;
+    float firstColorY;
+    float firstColorZ;
+    float secondColorX;
+    float secondColorY;
+    float secondColorZ;
+} ubo;
+
+const vec3 luminanceWeighting = vec3(0.2125, 0.7154, 0.0721);
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }   
+    vec4 color = imageLoad(inTex,uv);
+    vec3 firstColor = vec3(ubo.firstColorX,ubo.firstColorY,ubo.firstColorZ);
+    vec3 secondColor = vec3(ubo.secondColorX,ubo.secondColorY,ubo.secondColorZ);
+    float luminance = dot(color.rgb, luminanceWeighting);
+    vec4 result = vec4( mix(firstColor, secondColor, luminance), color.a);
+     
+    imageStore(outTex,uv,result);
+}

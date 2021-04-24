@@ -1,0 +1,29 @@
+#version 450
+
+// 调整图像的对比度
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+#if CHANNEL_RGBA
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+#elif CHANNEL_R16UI
+layout (binding = 0, r16ui) uniform readonly uimage2D inTex;
+layout (binding = 1, r16ui) uniform uimage2D outTex;
+#endif
+
+layout (std140, binding = 2) uniform UBO {
+    float mvalue;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+#if CHANNEL_RGBA
+    imageStore(outTex,uv,vec4(ubo.mvalue));
+#elif CHANNEL_R16UI
+    imageStore(outTex,uv,uvec4(ubo.mvalue));
+#endif
+}

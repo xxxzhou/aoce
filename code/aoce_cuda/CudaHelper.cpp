@@ -17,6 +17,10 @@ int32_t ImageFormat2Cuda(ImageType imageType) {
             return AOCE_CV_32FC4;
         case ImageType::r32f:
             return AOCE_CV_32FC1;
+        case ImageType::r32:
+            return AOCE_CV_32SC1;
+        case ImageType::rgba32:
+            return AOCE_CV_32SC4;
         default:
             return AOCE_CV_8UC1;
     }

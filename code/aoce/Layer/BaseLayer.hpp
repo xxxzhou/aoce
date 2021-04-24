@@ -37,6 +37,7 @@ class ACOE_EXPORT BaseLayer {
     friend class PipeGraph;
     friend class InputLayer;
     friend class GroupLayer;
+    friend class BaseLayer;
     // ITLayer类的所有实例化, 都为BaseLayer的友元
     template <typename T>
     friend class ITLayer;
@@ -57,8 +58,10 @@ class ACOE_EXPORT BaseLayer {
     bool bInput = false;
     // 输出层
     bool bOutput = false;
-    // 是否自动拿上一层的ImageType
+    // 是否自动适配上层ImageType
     bool bAutoImageType = false;
+    // 自身是否不包含运算
+    bool bNoCompute = false;
 
     // 每个输入节点对应一个输入
     std::vector<NodeIndex> inLayers;
@@ -104,6 +107,19 @@ class ACOE_EXPORT BaseLayer {
     virtual bool onFrame() = 0;
 };
 
+// GroupLayer自身不处理任何运算,只是组合运算层
+class ACOE_EXPORT GroupLayer : public BaseLayer {
+   public:
+    GroupLayer();
+    virtual ~GroupLayer();
+
+   protected:
+    virtual void onInit() override{};
+    // 实现层内子层的连接顺序
+    virtual void onInitNode() = 0;
+    virtual bool onFrame() override { return true; };
+};
+
 // 实现层(非抽像层)不会单独从ILayer继承,还一个继承路径应该从BaseLayer来
 class ACOE_EXPORT ILayer {
    public:
@@ -114,6 +130,7 @@ class ACOE_EXPORT ILayer {
     class PipeNode* getLayerNode();
 
     operator BaseLayer*() { return getLayer(); };
+    // BaseLayer* operator->() const noexcept { return getLayer(); }
 };
 
 // 分离导致层不同参数的差异(AOCE_LAYER_QUERYINTERFACE)
@@ -142,14 +159,5 @@ typedef ITLayer<TransposeParamet> TransposeLayer;
 typedef ITLayer<ReSizeParamet> ReSizeLayer;
 typedef ITLayer<BlendParamet> BlendLayer;
 typedef ITLayer<YUVParamet> YUV2RGBALayer;
-
-// // YUV 2 RGBA 转换
-// class YUV2RGBALayer : public ITLayer<YUVParamet> {};
-// // RGBA 2 YUV 转换
-// class RGBA2YUVLayer : public ITLayer<YUVParamet> {};
-// class TexOperateLayer : public ITLayer<TexOperateParamet> {};
-// class TransposeLayer : public ITLayer<TransposeParamet> {};
-// class ReSizeLayer : public ITLayer<ReSizeParamet> {};
-// class BlendLayer : public ITLayer<BlendParamet> {};
 
 }  // namespace aoce

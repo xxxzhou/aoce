@@ -48,11 +48,26 @@ VkContrastLayer::~VkContrastLayer() {}
 
 VkCrosshatchLayer::VkCrosshatchLayer(/* args */) {
     glslPath = "glsl/crosshatch.comp.spv";
-    setUBOSize(sizeof(paramet), true);  
+    setUBOSize(sizeof(paramet), true);
     updateUBO(&paramet);
 }
 
 VkCrosshatchLayer::~VkCrosshatchLayer() {}
+
+VkExclusionBlendLayer::VkExclusionBlendLayer(/* args */) {
+    glslPath = "glsl/exclusionBlend.comp.spv";
+    inCount = 2;
+}
+
+VkExclusionBlendLayer::~VkExclusionBlendLayer() {}
+
+VkFalseColorLayer::VkFalseColorLayer(/* args */) {
+    glslPath = "glsl/falseColor.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    updateUBO(&paramet);
+}
+
+VkFalseColorLayer::~VkFalseColorLayer() {}
 
 }  // namespace layer
 }  // namespace vulkan

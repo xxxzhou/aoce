@@ -49,3 +49,6 @@ $tf/
 $tf1/
 code/aoce/AoceBuildSettings.*
 .tfignore
+glsl/source/tt_*.comp
+glsl/target/tt_*.spv
+glsl/glsl_tt.txt

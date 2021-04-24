@@ -246,6 +246,22 @@ aoce::ImageType videoType2ImageType(const aoce::VideoType& videoType) {
     }
 }
 
+aoce::VideoType imageType2VideoType(const aoce::ImageType& imageType) {
+    switch (imageType) {
+        case ImageType::bgra8:
+            return VideoType::bgra8;
+        case ImageType::r16:
+            return VideoType::depth16u;
+        case ImageType::rgba8:
+            return VideoType::rgba8;
+        case ImageType::rgba32f:
+        case ImageType::r32f:
+        case ImageType::r8:
+        default:
+            return VideoType::other;
+    }
+}
+
 int32_t getYuvIndex(const aoce::VideoType& videoType) {
     switch (videoType) {
         case VideoType::nv12:
@@ -416,10 +432,8 @@ bool existsFile(const wchar_t* filePath) {
     return std::tr2::sys::exists(filePath);
 }
 
-bool loadFileBinary(const wchar_t* filePath, std::vector<uint8_t>& data,
-                    int32_t& lenght) {
-    lenght = 0;
-    if (!existsFile(filePath)) {
+bool loadFileBinary(const wchar_t* filePath, std::vector<uint8_t>& data) {
+       if (!existsFile(filePath)) {
         std::string message;
         string_format(message, "no file path: ", filePath);
         logMessage(LogLevel::warn, message);
@@ -429,7 +443,7 @@ bool loadFileBinary(const wchar_t* filePath, std::vector<uint8_t>& data,
         std::ifstream is(filePath,
                          std::ios::binary | std::ios::in | std::ios::ate);
         if (is.is_open()) {
-            lenght = is.tellg();
+            int32_t lenght = is.tellg();
             is.seekg(0, std::ios::beg);
             data.resize(lenght);
             is.read((char*)data.data(), lenght);
@@ -482,11 +496,12 @@ void loadAoce() {
     ModuleManager::Get().regAndLoad("aoce_android");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
-    ModuleManager::Get().regAndLoad("aoce_agora");ModuleManager::Get().regAndLoad("aoce_talkto");
+    ModuleManager::Get().regAndLoad("aoce_agora");
+    ModuleManager::Get().regAndLoad("aoce_talkto");
 #endif
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().regAndLoad("aoce_ffmpeg");
-#endif    
+#endif
 }
 
 void unloadAoce() {
@@ -502,7 +517,8 @@ void unloadAoce() {
     ModuleManager::Get().unloadModule("aoce_android");
 #endif
 #if defined(AOCE_INSTALL_AGORA)
-    ModuleManager::Get().unloadModule("aoce_agora");ModuleManager::Get().unloadModule("aoce_talkto");
+    ModuleManager::Get().unloadModule("aoce_agora");
+    ModuleManager::Get().unloadModule("aoce_talkto");
 #endif
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().unloadModule("aoce_ffmpeg");

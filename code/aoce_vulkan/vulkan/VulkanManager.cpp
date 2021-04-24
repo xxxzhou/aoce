@@ -9,6 +9,40 @@
 namespace aoce {
 namespace vulkan {
 
+static VKAPI_ATTR VkBool32 VKAPI_CALL
+debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+              VkDebugUtilsMessageTypeFlagsEXT messageType,
+              const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+              void* pUserData) {
+    if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
+        logMessage(LogLevel::error, pCallbackData->pMessage);
+    }
+    return VK_FALSE;
+}
+
+static VkResult CreateDebugUtilsMessengerEXT(
+    VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+    const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pDebugMessenger) {
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+        instance, "vkCreateDebugUtilsMessengerEXT");
+    if (func != nullptr) {
+        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+    } else {
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
+    }
+}
+
+void DestroyDebugUtilsMessengerEXT(VkInstance instance,
+                                   VkDebugUtilsMessengerEXT debugMessenger,
+                                   const VkAllocationCallbacks* pAllocator) {
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
+        instance, "vkDestroyDebugUtilsMessengerEXT");
+    if (func != nullptr) {
+        func(instance, debugMessenger, pAllocator);
+    }
+}
+
 VulkanManager* VulkanManager::instance = nullptr;
 VulkanManager::VulkanManager(/* args */) {}
 
@@ -24,6 +58,11 @@ VulkanManager::~VulkanManager() {
         vkDestroyDevice(device, nullptr);
         device = VK_NULL_HANDLE;
     }
+#if AOCE_DEBUG_TYPE
+    if (debugMessenger) {
+        DestroyDebugUtilsMessengerEXT(instace, debugMessenger, nullptr);
+    }
+#endif
     if (instace) {
         vkDestroyInstance(instace, nullptr);
         instace = VK_NULL_HANDLE;
@@ -38,7 +77,27 @@ bool VulkanManager::createInstance(const char* appName) {
         return false;
     }
 #endif
-    aoce::vulkan::createInstance(instace, appName);
+    aoce::vulkan::createInstance(instace, appName, bDebugMsg);
+#if AOCE_DEBUG_TYPE
+    if (bDebugMsg) {
+        VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
+        createInfo.sType =
+            VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        createInfo.messageSeverity =
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        createInfo.messageType =
+            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        createInfo.pfnUserCallback = debugCallback;
+        if (CreateDebugUtilsMessengerEXT(instace, &createInfo, nullptr,
+                                         &debugMessenger) != VK_SUCCESS) {
+            logMessage(LogLevel::warn, "not create vk debug utils message.");
+        }
+    }
+#endif
     std::vector<PhysicalDevicePtr> physicalDevices;
     enumerateDevice(instace, physicalDevices);
     if (physicalDevices.empty()) {
@@ -137,7 +196,7 @@ bool VulkanManager::createDevice(bool bAloneCompute) {
     deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
-#elif __ANDROID_API__ >= 26 //__ANDROID__
+#elif __ANDROID_API__ >= 26  //__ANDROID__
     // 和android里的AHardwareBuffer交互,没有的话,相关vkGetDeviceProcAddr获取不到对应函数
     deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
     deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
@@ -258,9 +317,8 @@ void VulkanManager::copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
     copyRegion.extent.height = src->height;
     copyRegion.extent.depth = 1;
 
-    vkCmdCopyImage(cmd, src->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                   dest, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
-                   &copyRegion);
+    vkCmdCopyImage(cmd, src->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dest,
+                   VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 }
 
 }  // namespace vulkan

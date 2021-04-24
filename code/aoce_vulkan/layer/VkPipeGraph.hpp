@@ -47,6 +47,7 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
     inline VulkanContext* getContext() { return context.get(); };
     VulkanTexturePtr getOutTex(int32_t node, int32_t outIndex);
     bool getMustSampled(int32_t node, int32_t inIndex);
+    bool bOutLayer(int32_t node);
     bool resourceReady();
 
 #if WIN32

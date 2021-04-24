@@ -113,6 +113,8 @@ enum class ImageType {
     bgra8,
     rgba32f,
     r32f,
+    r32,
+    rgba32,
 };
 
 enum class VideoCodec {
@@ -283,26 +285,6 @@ struct ReSizeParamet {
         return this->newWidth == right.newWidth &&
                this->newHeight == right.newHeight &&
                this->bLinear == right.bLinear;
-    }
-};
-
-struct vec3 {
-    float x = 0;
-    float y = 0;
-    float z = 0;
-    inline bool operator==(const vec3 &right) {
-        return this->x == right.x && this->y == right.y && this->z == right.z;
-    }
-};
-
-struct vec4 {
-    float x = 0;
-    float y = 0;
-    float z = 0;
-    float w = 0;
-    inline bool operator==(const vec4 &right) {
-        return this->x == right.x && this->y == right.y && this->z == right.z &&
-                   this->w == right.w;
     }
 };
 

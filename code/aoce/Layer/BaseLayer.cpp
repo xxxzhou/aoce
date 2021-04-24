@@ -10,11 +10,11 @@ BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
 
 BaseLayer::~BaseLayer() {}
 
-void BaseLayer::onInit() {    
-    inFormats.resize(inCount);    
-    outFormats.resize(outCount);    
-    inLayers.resize(inCount);    
-    outLayers.resize(outCount);    
+void BaseLayer::onInit() {
+    inFormats.resize(inCount);
+    outFormats.resize(outCount);
+    inLayers.resize(inCount);
+    outLayers.resize(outCount);
     // 默认imagetype
     for (auto& format : inFormats) {
         format.imageType = ImageType::rgba8;
@@ -108,6 +108,10 @@ bool BaseLayer::getInFormat(ImageFormat& format, int32_t index) {
     }
     return false;
 }
+
+GroupLayer::GroupLayer() { bNoCompute = true; }
+
+GroupLayer::~GroupLayer() {}
 
 PipeNode* ILayer::getLayerNode() {
     assert(getLayer());

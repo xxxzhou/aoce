@@ -12,10 +12,10 @@ PipeGraph::PipeGraph(/* args */) {}
 
 PipeGraph::~PipeGraph() {}
 
-PipeNodePtr PipeGraph::getLastNode() {
+PipeNodePtr PipeGraph::getNode(int32_t index) {
     int32_t count = (int32_t)nodes.size();
-    if (count > 0) {
-        return nodes[count - 1];
+    if (index >= 0 && index < count) {
+        return nodes[index];
     }
     return nullptr;
 }
@@ -25,10 +25,12 @@ PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
         logMessage(LogLevel::error, "node layer can not be empty");
     }
     assert(layer != nullptr);
-    if (this->gpu != layer->gpu) {
-        logMessage(LogLevel::error, "node layer gpu type no equal graph");
+    if (!layer->bNoCompute) {
+        if (this->gpu != layer->gpu) {
+            logMessage(LogLevel::error, "node layer gpu type no equal graph");
+        }
+        assert(this->gpu == layer->gpu);        
     }
-    assert(this->gpu == layer->gpu);
     layer->pipeGraph = this;
     layer->onInit();
     PipeNodePtr ptr(new PipeNode(layer));
@@ -124,7 +126,7 @@ void PipeGraph::validNode() {
                 tmask |= maskIndex;
             }
             int32_t inCount = node->layer->inCount;
-            // 输入节点是否全部配齐
+            // 节点的输入是否全部配齐
             if (tmask != (std::pow(2, inCount) - 1)) {
                 node->bDisable = true;
             }
@@ -134,15 +136,20 @@ void PipeGraph::validNode() {
     for (auto& node : nodes) {
         // 从可用的输入节点向下深度优先搜索
         if (!node->bDisable && !node->bInvisible && node->layer->bInput) {
+            // stack深度优先搜索
             std::stack<int32_t> inputNodes;
             inputNodes.push(node->graphIndex);
+            int32_t nodeIndex = node->graphIndex;
             // 查找所有有效链路
             while (!inputNodes.empty()) {
-                // stack深度优先搜索
                 int32_t currentIndex = inputNodes.top();
                 inputNodes.pop();
                 // 当前节点向下连接
                 auto& nextLines = formLines[currentIndex];
+                // 当前节点不可用,继续用上一个可用节点
+                if (!nodes[currentIndex]->bInvisible) {
+                    nodeIndex = currentIndex;
+                }
                 // 验证这些连接是否有效
                 for (auto line : nextLines) {
                     // 如果当前节点不可用,这条线就不可用了
@@ -151,59 +158,19 @@ void PipeGraph::validNode() {
                         continue;
                     }
                     // 当前连接节点不可见的话,尝试自动去掉当前节点链接下一节点
-                    // 需要注意,下一节点/下下节点也可能没有启用
                     if (nodes[toNode]->bInvisible) {
-                        // 当前节点的输入节点数
-                        int32_t toSize = toLines[toNode].size();
-                        // 当前节点的输出节点数
-                        int32_t formSize = formLines[toNode].size();
-                        // 输入或者是输出层,不可用直接丢弃
-                        if (toSize == 0 || formSize == 0) {
-                            continue;
-                        }
-                        PipeLinePtr nline(new PipeLine());
-                        // 新线取当前节点的输入节点与位置
-                        nline->fromNode = toLines[toNode][0]->fromNode;
-                        nline->fromOutIndex = toLines[toNode][0]->fromOutIndex;
-                        bool bfind = true;
-                        // 当前节点的第一个输出节点
-                        toNode = formLines[line->toNode][0]->toNode;
-                        // 继续检查这个节点是否可用
-                        while (nodes[toNode]->bInvisible) {
-                            int32_t toSize = toLines[toNode].size();
-                            int32_t formSize = formLines[toNode].size();
-                            // 没有输入或是没有输出,这条线不用了
-                            if (toSize == 0 || formSize == 0) {
-                                continue;
-                            }
-                            // 多个输入输出,只会自动尝试连接第一个输入输出
-                            if (toSize > 1 || formSize > 1) {
-                                std::string message;
-                                string_format(
-                                    message,
-                                    "layer is visible,but more input or "
-                                    "output,node: ",
-                                    toNode);
-                                logMessage(LogLevel::warn, message);
-                                bfind = false;
-                            }
-                            toNode = formLines[toNode][0]->toNode;
-                        }
-                        nline->toNode = toNode;
-                        nline->toInIndex = formLines[toNode][0]->toInIndex;
-                        if (bfind) {
-                            if (!checkHaveValid(nline)) {
-                                validLines.push_back(nline);
-                                inputNodes.push(toNode);
-                            }
-                        }
+                        inputNodes.push(line->toNode);
                         continue;
                     }
+                    PipeLinePtr nline(new PipeLine());
+                    nline->fromNode = nodeIndex;
+                    nline->fromOutIndex = line->fromOutIndex;
+                    nline->toNode = toNode;
+                    nline->toInIndex = line->toInIndex;
                     // 正常情况,检查是否已经搜索过.
-                    if (std::find(validLines.begin(), validLines.end(), line) ==
-                        validLines.end()) {
-                        validLines.push_back(line);
-                        inputNodes.push(line->toNode);
+                    if (!checkHaveValid(nline)) {
+                        validLines.push_back(nline);
+                        inputNodes.push(toNode);
                     }
                 }
             }
@@ -214,7 +181,8 @@ void PipeGraph::validNode() {
 bool PipeGraph::resetGraph() {
     // 1. 得到节点的enable/visable验证过的lines
     validNode();
-    // 2. 得到有效节点的前置节点  如:2[1] 3[2] 4[1] 5[3,4] (2需要1),(5需要3,4)
+    // 2. 得到有效节点的前置节点  如:2[1] 3[2] 4[1] 5[3,4]
+    // (2需要1),(5需要3,4)
     std::vector<std::vector<int>> reqNodes(nodes.size());
     // 需要确定顺序的节点
     std::queue<int32_t> tempQueue;

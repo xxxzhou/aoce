@@ -22,6 +22,14 @@ VkAlphaBlendLayer::VkAlphaBlendLayer(/* args */) {
 
 VkAlphaBlendLayer::~VkAlphaBlendLayer() {}
 
+VkHardLightBlendLayer::VkHardLightBlendLayer(/* args */) {
+    glslPath = "glsl/hardLightBlend.comp.spv";
+    inCount = 2;
+    outCount = 1;
+}
+
+VkHardLightBlendLayer::~VkHardLightBlendLayer() {}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

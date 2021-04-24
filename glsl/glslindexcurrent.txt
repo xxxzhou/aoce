@@ -1,10 +1,10 @@
-colorBlend.comp
-colorBurnBlend.comp
-colorDodgeBlend.comp
-colorInvert.comp
-colorLocalBinaryPattern.comp
-fastFeatureDetector.comp
-colorMatrix.comp
-contrast.comp
-cropFilter.comp
-crosshatch.comp
+halftone.comp
+hardLightBlend.comp
+haze.comp
+highlightShadow.comp
+highlightShadowTint.comp
+copyImage.comp
+dissolveBlend.comp
+histogram.comp histogram.comp CHANNEL_RGBA=1
+histogram.comp histogramC1.comp 
+histogramCombin.comp

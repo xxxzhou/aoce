@@ -98,6 +98,28 @@ void VkErosionLayer::onInitNode() {
     getNode()->setStartNode(preLayer->getNode());
 }
 
+VkClosingLayer::VkClosingLayer() {
+    dilationLayer = std::make_unique<VkDilationLayer>();
+    erosionLayer = std::make_unique<VkErosionLayer>();
+}
+
+VkClosingLayer::~VkClosingLayer() {}
+
+void VkClosingLayer::onUpdateParamet() {
+    if (paramet == oldParamet) {
+        return;
+    }
+    dilationLayer->updateParamet(paramet);
+    erosionLayer->updateParamet(paramet);
+}
+
+void VkClosingLayer::onInitNode() {
+    pipeGraph->addNode(dilationLayer->getLayer())
+        ->addNode(erosionLayer->getLayer());
+    getNode()->setStartNode(dilationLayer->getNode());
+    getNode()->setEndNode(erosionLayer->getNode());
+}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce
