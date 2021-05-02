@@ -1,0 +1,136 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+#if CHANNEL_RGBA
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+#elif CHANNEL_R8
+layout (binding = 0, r8) uniform readonly image2D inTex;
+layout (binding = 1, r8) uniform image2D outTex;
+#endif
+
+// https://zhuanlan.zhihu.com/p/355266029
+
+#if KSIZE3
+
+// 排序并返回中值
+void sortRef(inout vec4 a1,inout vec4 a2,inout vec4 a3){     
+    vec4 minV = min(min(a1,a2),a3);
+    vec4 maxV = max(max(a1,a2),a3);
+    vec4 midV = a1 + a2 + a3 - minV - maxV;
+    a1 = minV;
+    a2 = midV;
+    a3 = maxV;     
+}
+
+vec4 mid(vec4 a1,vec4 a2,vec4 a3){     
+    vec4 minV = min(min(a1,a2),a3);
+    vec4 maxV = max(max(a1,a2),a3);
+    return a1 + a2 + a3 - minV - maxV;   
+}
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }
+    vec4 sortVec[3][3];
+    // 分别对每行排序
+    for(int i = 0; i< 3; ++i){
+        for(int j= 0; j< 3; ++j){
+            int x = uv.x - 1 + j;
+            int y = uv.y - 1 + i;
+            // REPLICATE border
+            x = max(0,min(x,size.x-1));
+            y = max(0,min(y,size.y-1));            
+            sortVec[i][j] = imageLoad(inTex,ivec2(x,y));
+        }
+        sortRef(sortVec[i][0],sortVec[i][1],sortVec[i][2]);
+    }   
+    // 分别对每列排序    
+    vec4 minMaxV = max(max(sortVec[0][0],sortVec[1][0]),sortVec[2][0]);
+    vec4 midV = mid(sortVec[0][1],sortVec[1][1],sortVec[2][1]);
+    vec4 maxMinV = min(min(sortVec[0][2],sortVec[1][2]),sortVec[2][2]);
+    vec4 result = mid(minMaxV,midV,maxMinV);
+    imageStore(outTex, uv, result); 
+}
+#else
+
+layout (binding = 2) uniform UBO {
+	int ksize;
+} ubo;
+
+shared uint data_shared[16*3][16*3];
+const float UINT82FLOAT = 0.00392156862745f;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    ivec2 locId = ivec2(gl_LocalInvocationID.xy);
+    // data_shared如果没置空,就需要设置值,在uv<size之前,保证data_shared全有值
+    for(int i = 0; i < 3; i++){
+        uint gIdy = max(0,min(uv.y+(i-1)*16,size.y-1));
+        for(int j = 0; j < 3; j++){
+            uint gIdx = max(0,min(uv.x+(j-1)*16,size.x-1));
+            data_shared[locId.y+i*16][locId.x + j*16] = packUnorm4x8(imageLoad(inTex,ivec2(gIdx,gIdy)));      
+        }
+    }
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+    memoryBarrierShared();
+	barrier();
+    // 同奇偶,ksize<=16
+    int radius = ubo.ksize/2;
+    int halfWSize = (radius*2+1)*(radius*2+1)/2;
+    uint hist[256];
+    for(int i=0;i<256;i++){
+        hist[i] = 0;
+    }
+    for(int i= -radius; i <= radius; ++i){
+        for(int j= -radius; j <= radius; ++j){
+            uint sd = data_shared[locId.y+16+i][locId.x+16+j];
+            uvec4 color = uvec4(unpackUnorm4x8(sd) * 255.0);
+            // 32字节前8字节
+            hist[color.r] = hist[color.r] + 1;
+#if CHANNEL_RGBA           
+            // 32字节半前8字节
+            hist[color.g] = hist[color.g] + (1<<8); 
+            // 32字节半后8字节
+            hist[color.b] = hist[color.b] + (1<<16);
+            // 32字节后8字节
+            hist[color.a] = hist[color.a] + (1<<24);  
+#endif             
+        }
+    }
+    uvec4 mid = uvec4(0);
+    vec4 result = vec4(0);    
+    for (int i = 0; i < 256; i++) {            
+        mid.r += (hist[i] & 0x000000FF);
+#if CHANNEL_RGBA 
+        mid.g += ((hist[i] & 0x0000FF00) >> 8); 
+        mid.b += ((hist[i] & 0x00FF0000) >> 16); 
+        mid.a += ((hist[i] & 0xFF000000) >> 24);  
+#endif        
+        if(result.r == 0 && mid.r >= halfWSize){
+            result.r = i*UINT82FLOAT; 
+#if CHANNEL_R8
+            break;
+#endif          
+        } 
+#if CHANNEL_RGBA 
+        if(result.g == 0 && mid.g >= halfWSize){
+            result.g = i*UINT82FLOAT;           
+        } 
+        if(result.b == 0 && mid.b >= halfWSize){
+            result.b = i*UINT82FLOAT;           
+        } 
+        if(result.a == 0 && mid.a >= halfWSize){
+            result.a = i*UINT82FLOAT;           
+        } 
+#endif         
+    }   
+    imageStore(outTex, uv, result); 
+}
+#endif

@@ -152,7 +152,7 @@ bool AVideoDevice::open() {
         .onError = onError,
     };
     camera_status_t status = ACameraManager_openCamera(
-        cameraManager, mid.c_str(), &cameraDeviceCallbacks, &ndkDevice);
+        cameraManager, id.c_str(), &cameraDeviceCallbacks, &ndkDevice);
     if (status == ACAMERA_OK) {
         status = ACameraDevice_createCaptureRequest(ndkDevice, TEMPLATE_PREVIEW,
                                                     &request);
@@ -253,6 +253,7 @@ bool AVideoDevice::init(ACameraManager* manager, const char* id) {
         videoFormat.width = entry.data.i32[i + 1];
         videoFormat.height = entry.data.i32[i + 2];
         videoFormat.videoType = getVideoType(format);
+        videoFormat.index = formats.size();
         if (videoFormat.videoType != VideoType::other) {
             formats.push_back(videoFormat);
         }

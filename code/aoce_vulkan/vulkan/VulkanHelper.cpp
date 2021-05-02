@@ -256,7 +256,7 @@ VkResult createInstance(VkInstance& instance, const char* appName,
     instanceExtensions.push_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
 #endif
     VkInstanceCreateInfo instInfo = {};
-#if AOCE_DEBUG_TYPE
+#if AOCE_DEBUG_TYPE && WIN32
     instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     instanceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
     std::vector<const char*> enableLayers = {"VK_LAYER_KHRONOS_validation"};

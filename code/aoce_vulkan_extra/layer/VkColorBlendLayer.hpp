@@ -74,7 +74,7 @@ class VkExclusionBlendLayer : public VkLayer {
     /* data */
    public:
     VkExclusionBlendLayer(/* args */);
-    ~VkExclusionBlendLayer();
+    virtual ~VkExclusionBlendLayer();
 };
 
 class VkFalseColorLayer : public VkLayer, public ITLayer<FalseColorParamet> {
@@ -84,7 +84,71 @@ class VkFalseColorLayer : public VkLayer, public ITLayer<FalseColorParamet> {
     /* data */
    public:
     VkFalseColorLayer(/* args */);
-    ~VkFalseColorLayer();
+    virtual ~VkFalseColorLayer();
+};
+
+class VkHueBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkHueBlendLayer(/* args */);
+    virtual ~VkHueBlendLayer();
+};
+
+class VkHueLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkHueLayer)
+   private:
+    /* data */
+   public:
+    VkHueLayer(/* args */);
+    virtual ~VkHueLayer();
+
+   private:
+    void transformParamet();
+
+   protected:
+    virtual void onUpdateParamet() override;
+};
+
+class VkLevelsLayer : public VkLayer, public ITLayer<LevelsParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkLevelsLayer)
+   private:
+    /* data */
+   public:
+    VkLevelsLayer(/* args */);
+    virtual ~VkLevelsLayer();
+};
+
+class VkLightenBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkLightenBlendLayer(/* args */);
+    virtual ~VkLightenBlendLayer();
+};
+
+class VkLinearBurnBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkLinearBurnBlendLayer(/* args */);
+    virtual ~VkLinearBurnBlendLayer();
+};
+
+class VkLuminosityBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkLuminosityBlendLayer(/* args */);
+    virtual ~VkLuminosityBlendLayer();
+};
+
+class VkMaskLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkMaskLayer(/* args */);
+    ~VkMaskLayer();
 };
 
 

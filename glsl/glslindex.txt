@@ -74,3 +74,23 @@ blurSelective.comp
 bulrPosition.comp
 sphereRefraction.comp
 glassSphere.comp
+halftone.comp
+hardLightBlend.comp
+haze.comp
+highlightShadow.comp
+highlightShadowTint.comp
+copyImage.comp
+dissolveBlend.comp
+histogram.comp histogram.comp CHANNEL_RGBA=1
+histogram.comp histogramC1.comp 
+histogramCombin.comp
+luminanceRange.comp
+luminanceThreshold.comp
+saturation.comp
+fastFeatureDetector.comp
+kuwahara.comp
+filterMat3x3.comp
+levels.comp
+lightenBlend.comp
+linearBurnBlend.comp
+luminosityBlend.comp

@@ -24,7 +24,7 @@ class AVideoDevice : public VideoDevice {
     ACaptureSessionOutputContainer* outputContainer = nullptr;
     ACaptureSessionOutput* sessionOutput = nullptr;
     ACameraCaptureSession* session = nullptr;
-    std::string mid ="";
+    // std::string mid ="";
 
     friend void imageCallback(void* context, AImageReader* reader);
     friend void onDisconnected(void* context, ACameraDevice* device);

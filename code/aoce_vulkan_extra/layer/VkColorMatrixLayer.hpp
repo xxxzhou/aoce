@@ -19,6 +19,26 @@ class VkColorMatrixLayer : public VkLayer, public ITLayer<ColorMatrixParamet> {
     virtual ~VkColorMatrixLayer();
 };
 
+class VkHSBLayer : public VkLayer, public HSBLayer {
+    AOCE_LAYER_QUERYINTERFACE(VkHSBLayer)
+   private:
+    /* data */
+    ColorMatrixParamet paramet = {};
+
+   public:
+    VkHSBLayer(/* args */);
+    ~VkHSBLayer();
+
+   private:
+    void parametTransform();
+
+   public:
+    virtual void reset();
+    virtual void rotateHue(const float& h);
+    virtual void adjustSaturation(const float& h);
+    virtual void adjustBrightness(const float& h);
+};
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

@@ -28,6 +28,7 @@ static ITLayer<BilateralParamet>* bilateralLayer = nullptr;
 static ITLayer<BulgeDistortionParamet>* bdLayer = nullptr;
 static ITLayer<CannyEdgeDetectionParamet>* cedLayer = nullptr;
 static BaseLayer* cgaLayer = nullptr;
+static ITLayer<FASTFeatureParamet>* fastLayer = nullptr;
 static LookupLayer* lutLayer = nullptr;
 static ITLayer<int>* dilationLayer = nullptr;
 static ITLayer<int>* erosionLayer = nullptr;
@@ -40,6 +41,11 @@ static ITLayer<float>* lowPassLayer = nullptr;
 static ITLayer<float>* highPassLayer = nullptr;
 static BaseLayer* histogramLayer = nullptr;
 static BaseLayer* histogramLayer2 = nullptr;
+static ITLayer<IOSBlurParamet>* iosBlurLayer = nullptr;
+static ITLayer<uint32_t>* kuwaharaLayer = nullptr;
+static BaseLayer* lapLayer = nullptr;
+static ITLayer<uint32_t>* medianLayer = nullptr;
+static BaseLayer* medianK3Layer = nullptr;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -141,6 +147,20 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     histogramLayer = createHistogramLayer(true);
     histogramLayer2 = createHistogramLayer(false);
 
+    iosBlurLayer = createIOSBlurLayer();
+
+    fastLayer = createColourFASTFeatureDetector();
+
+    kuwaharaLayer = createKuwaharaLayer();
+    kuwaharaLayer->updateParamet(10);
+
+    lapLayer = createLaplacianLayer(false);
+
+    medianLayer = createMedianLayer(true);
+    medianLayer->updateParamet(10);
+
+    medianK3Layer = createMedianK3Layer(false);
+
     std::vector<uint8_t> lutData;
     std::vector<BaseLayer*> layers;
     // 如果为true,层需要二个输入,用原始图像做第二个输入
@@ -178,7 +198,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---双边滤波
     // layers.push_back(bilateralLayer->getLayer());
     // ---凸起失真，鱼眼效果
-    // layers.push_back(bdLayer->getLayer());
+    layers.push_back(bdLayer->getLayer());
     // canny边缘检测
     // layers.push_back(cedLayer->getLayer());
     // layers.push_back(alphaShowLayer);
@@ -208,16 +228,22 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(histogramLayer);
     // layers.push_back(alphaShowLayer);
     // ---直方图 4通道
-    layers.push_back(histogramLayer2);
-    layers.push_back(alphaShowLayer);
-
-    Mat4x4 a = {};
-    Mat4x4 b = {};
-    b.col2.x = 3;
-    int32_t y = 0;
-    int32_t x = 0;
-    b[y][x] = 4;
-    a = b;
+    // layers.push_back(histogramLayer2);
+    // layers.push_back(alphaShowLayer);
+    // ---IOS Blur
+    // layers.push_back(iosBlurLayer->getLayer());
+    // --- fast feature detection
+    // layers.push_back(fastLayer->getLayer());
+    // --- Kuwahara
+    // layers.push_back(kuwaharaLayer->getLayer());
+    // ---Laplacian
+    // layers.push_back(lapLayer);
+    // ---中值滤波
+    // layers.push_back(luminanceLayer);
+    // layers.push_back(medianLayer->getLayer());
+    // layers.push_back(alphaShowLayer);
+    // ---中值滤波K3
+    // layers.push_back(medianK3Layer);
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据

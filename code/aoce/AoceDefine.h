@@ -64,6 +64,10 @@
 
 #define NOMINMAX 1
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846 /* pi */
+#endif
+
 // 采用opencv里的数据描述,前三BIT表示类型，后三BIT表示通道个数
 #pragma region opencv
 #define AOCE_CV_CN_MAX 512
@@ -163,4 +167,3 @@
 //日志回调
 typedef void (*logEventAction)(int32_t level, const char* message);
 typedef std::function<void(int32_t level, const char* message)> logEventHandle;
-

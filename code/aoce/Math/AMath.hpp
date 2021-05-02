@@ -79,6 +79,24 @@ struct vec4 {
     }
 };
 
+struct Mat3x3 {
+    vec3 col0 = {1.0, 0.0, 0.0};
+    vec3 col1 = {0.0, 1.0, 0.0};
+    vec3 col2 = {0.0, 0.0, 1.0};
+    inline bool operator==(const Mat3x3 &right) {
+        return this->col0 == right.col0 && this->col1 == right.col1 &&
+               this->col2 == right.col2;
+    }
+    inline vec3 &operator[](int32_t idx) {
+        assert(idx >= 0 && idx < 3);
+        return *(&col0 + idx);
+    }
+    inline const vec3 &operator[](int32_t idx) const {
+        assert(idx >= 0 && idx < 3);
+        return *(&col0 + idx);
+    }
+};
+
 struct Mat4x4 {
     vec4 col0 = {1.0, 0.0, 0.0, 0.0};
     vec4 col1 = {0.0, 1.0, 0.0, 0.0};
@@ -109,5 +127,20 @@ ACOE_EXPORT Mat4x4 scaleIdentMat(const vec3 &scale);
 ACOE_EXPORT Mat4x4 scaleMat(const Mat4x4 &mat, const vec3 &scale);
 
 ACOE_EXPORT Mat4x4 saturateMat(const Mat4x4 &mat, const float &saturate);
+
+ACOE_EXPORT Mat4x4 xrotateMat(const Mat4x4 &mat, const float &rs,
+                              const float &rc);
+
+ACOE_EXPORT Mat4x4 yrotateMat(const Mat4x4 &mat, const float &rs,
+                              const float &rc);
+
+ACOE_EXPORT Mat4x4 zrotateMat(const Mat4x4 &mat, const float &rs,
+                              const float &rc);
+
+ACOE_EXPORT Mat4x4 zshearMat(const Mat4x4 &mat, const float &dx,
+                             const float &dy);
+
+// rotate the hue, while maintaining luminance.
+ACOE_EXPORT Mat4x4 huerotateMat(const Mat4x4 &mat, const float &rot);
 
 }  // namespace aoce

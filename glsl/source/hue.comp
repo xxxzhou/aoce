@@ -1,0 +1,50 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {
+    float hueAdjust;
+} ubo;
+
+ const vec4  kRGBToYPrime = vec4 (0.299, 0.587, 0.114, 0.0);
+ const vec4  kRGBToI     = vec4 (0.595716, -0.274453, -0.321263, 0.0);
+ const vec4  kRGBToQ     = vec4 (0.211456, -0.522591, 0.31135, 0.0);
+ 
+ const vec4  kYIQToR   = vec4 (1.0, 0.9563, 0.6210, 0.0);
+ const vec4  kYIQToG   = vec4 (1.0, -0.2721, -0.6474, 0.0);
+ const vec4  kYIQToB   = vec4 (1.0, -1.1070, 1.7046, 0.0);
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }   
+    vec4 color = imageLoad(inTex,uv);
+
+    float   YPrime  = dot (color, kRGBToYPrime);
+    float   I      = dot (color, kRGBToI);
+    float   Q      = dot (color, kRGBToQ);
+    
+    // Calculate the hue and chroma
+    float   hue     = atan (Q, I);
+    float   chroma  = sqrt (I * I + Q * Q);
+    
+    // Make the user's adjustments
+    hue += (-ubo.hueAdjust); //why negative rotation?
+    
+    // Convert back to YIQ
+    Q = chroma * sin (hue);
+    I = chroma * cos (hue);
+    
+    // Convert back to RGB
+    vec4    yIQ   = vec4 (YPrime, I, Q, 0.0);
+    color.r = dot (yIQ, kYIQToR);
+    color.g = dot (yIQ, kYIQToG);
+    color.b = dot (yIQ, kYIQToB);
+          
+    imageStore(outTex,uv,color);
+}

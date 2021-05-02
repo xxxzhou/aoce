@@ -58,7 +58,7 @@ void PipeNode::setEndNode(PipeNodePtr node) {
 }
 
 PipeNodePtr PipeNode::addNode(BaseLayer* layer) {
-    if (this->layer->gpu != layer->gpu) {
+    if (!layer->bNoCompute && this->layer->gpu != layer->gpu) {
         logMessage(LogLevel::error, "layer gpu not equal node");
         // return nullptr;
     }
@@ -84,7 +84,7 @@ PipeNodePtr PipeNode::addLine(PipeNodePtr to, int32_t formOut, int32_t toIn) {
     } else {
         layer->pipeGraph->addLine(this->graphIndex, toIndex, formOut, toIn);
     }
-    if (to->endNodeIndex >= 0) {        
+    if (to->endNodeIndex >= 0) {
         PipeNodePtr result = layer->getGraph()->getNode(to->endNodeIndex);
         assert(result);
         return result;

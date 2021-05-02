@@ -11,8 +11,8 @@ void main(){
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     } 
-    vec4 overlay = imageLoad(inTex,uv);  
-    vec4 base = imageLoad(inTex1,uv);      
+    vec4 base = imageLoad(inTex,uv);  
+    vec4 overlay = imageLoad(inTex1,uv); 
     
     float balpha = base.a * overlay.a;
     vec3 color = vec3(overlay.rgb*base.a + base.rgb*overlay.a);

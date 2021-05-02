@@ -76,6 +76,30 @@ class VKHighlightShadowTintLayer : public VkLayer,
     ~VKHighlightShadowTintLayer();
 };
 
+// Saturation ranges from 0.0 (fully desaturated) to 2.0 (max saturation),
+// with 1.0 as the normal level
+class VkSaturationLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkSaturationLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkSaturationLayer(/* args */);
+    ~VkSaturationLayer();
+};
+
+class VkMonochromeLayer : public VkLayer, public ITLayer<MonochromeParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkMonochromeLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkMonochromeLayer(/* args */);
+    ~VkMonochromeLayer();
+};
+
+
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

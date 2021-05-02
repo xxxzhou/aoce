@@ -110,6 +110,8 @@
 
 11 直方图,单通道大部分聚合算使用的是原子操作,也算是一个代表.
 
+[glsl](../glsl/source/histogram.comp)
+
 ![avatar](../images/cs_time_11.png "atiom")
 
 我在开始四通道时使用类似reduce2分二段,不用原子操作的方式,但是效果并不好,一是第一次把16*16块的方式转换成对应的一个个直方图,模块并没的缩小,导致第二块把这一个直方图通过for加在一起需要循环1920/16x1080/16(假设是1080P的图),这个会花费超过2ms,这种方式就pass掉,我直接使用原子操作导出四个图然后再结合都比这个快.
@@ -119,6 +121,48 @@
 可以看到,在这之前,我们要先vkCmdClearColorImage,几乎不消费时间,我也是这样理解的,但是为什么vkCmdCopyImage会导致那么大的时间了?
 
 时间差不多在0.2ms左右,不过随机的亮度图,亮度比较分散,后面使用只有0,1的二种图看看会不会影响这个时间.
+
+12 Kuwahara 因其算法特点,卷积分离没有使用,只使用了局部共享内部优化.
+
+[glsl](../glsl/source/kuwahara.comp)
+
+5*5的核,3.3ms,很有点高了.
+
+![avatar](../images/cs_time_13.png "Kuwahara")
+
+10*10的核,9.7ms.
+
+![avatar](../images/cs_time_14.png "Kuwahara")
+
+在手机Redmi 10X Pro 在720P下非常流畅,可以实时运行.
+
+13 Median 中值滤波,算法和kuwahara类似,但是中间需要排序,所以导致时间很高
+
+[glsl](../glsl/source/median.comp)
+
+10*10的核,4通道,76ms.
+
+![avatar](../images/cs_time_15.png "Kuwahara")
+
+5*5的核,4通道,27ms.
+
+![avatar](../images/cs_time_16.png "Kuwahara")
+
+10*10的核,1通道,28ms,奇怪了,为什么1通道与4通道相差这么多?我写法有问题?
+
+![avatar](../images/cs_time_17.png "Kuwahara")
+
+5*5的核,1通道,12ms.
+
+![avatar](../images/cs_time_18.png "Kuwahara")
+
+3*3的核,GPUImage里的方式,4通道,0.3ms.
+
+![avatar](../images/cs_time_19.png "Kuwahara")
+
+总结,优化了个寂寞,虽然核大会导致排序也是指数增长,但是这次优化明显不成功,只能说是暂时可用大于3核的情况,后续找找更多的资料试试改进.
+
+看了下相关opencv cuda里的median里的写法,在前面会声明一个图像元素*256的buffer?嗯,这个buffer是为了替换里面单个线程uint hist[256]?在CS里,一个线程声明大堆栈数据会导致性能问题吗?先暂停,opencv cuda这个算法写的太麻烦了,后面有时间研究.
 
 ## 分析
 

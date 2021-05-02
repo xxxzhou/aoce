@@ -211,3 +211,45 @@ With an image of 1280x1024 and a radio ranging from 2 to 15:
 保存到临时buffer,我在开始四通道时使用类似reduce2分二段,不用原子操作的方式,但是效果并不好,一是第一次把16*16块的方式转换成对应的一个个直方图,模块并没的缩小,导致第二块把这一个直方图通过for加在一起需要循环1920/16x1080/16(假设是1080P的图),这个会花费超过2ms,这种方式就pass掉,我直接使用原子操作导出四个图然后再结合都比这个快.
 
 一通道在0.18ms左右,四通道在0.52ms+0.01ms,比0.18*4快些.
+
+### IOS Blur
+
+先降分辨率,调整饱和度,高斯模糊,降低亮度,升分辨率
+
+### JFA Voronoi
+
+[JumpFloodAlgorithm生成Voronoi和距离场贴图](https://zhuanlan.zhihu.com/p/222901923)
+
+[在Unity中实时计算Voronoi图](https://zhuanlan.zhihu.com/p/111105219)
+
+需要CPU循环次数,其中UV与颜色对应的一部分代码还需要理解下,先放着,后期移植.
+
+### Kuwahara
+
+[kuwahara filter 实现](https://blog.csdn.net/skelking/article/details/44618963)
+
+因其算法特点,卷积分离没有使用,只使用了局部共享内部优化,在PC 2070N卡1080P下,半径5需要3.3ms,半径10需要9.7ms,测试在手机Redmi 10X Pro 用半径3在720P下非常流畅,可以满足30fps运行.
+
+### Lanczos Resampling
+
+[Lanczos resampling](https://en.wikipedia.org/wiki/Lanczos_resampling)
+
+GPUImage的实现好像和原理差别有点大,应该是特化实现,暂不移植.
+
+### Laplacian
+
+普通的像素与一个特定3x3矩阵的结果,单独拿出来说,是因为在ubo中,直接使用mat3/mat4,在CPU中使用类似的的Mat3x3,Mat4x4对齐会有问题,并且我在Nsight查看到对应的UBO里放着正确的mat3对应数据,但是结果就是不对.最不容易出错的方法就是在ubo中全使用单个float表示类似vec3/vec4/mat3/mat4,在CPU端不需要特殊说明,和ubo一样顺序就行,这样最不容易出现CPU-GPU中的UBO对齐问题.
+
+### LineGenerator
+
+暂时还没找到比较好的方法,暂不移植.
+
+### Luminosity
+
+求亮度平均值,GPUImage用的先降低分辨率然后CPU求,本框架用GPU Reduce完成,CPU不参与.
+
+### Median
+
+[中值滤波原理及其C++实现与CUDA优化](https://zhuanlan.zhihu.com/p/355266029)
+
+和Kuwahara类似算法,添加排序,5x5的核,需要25ms.

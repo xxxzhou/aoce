@@ -69,7 +69,7 @@ if(WIN32)
     # add_subdirectory(mathtest)
 endif()
 
-if(ANDROID)    
+if(ANDROID)
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     # set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate")
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue ${AOCE_HEADER_DIR} ${AOCE_VULKAN_HEADER_DIR} ${Vulkan_INCLUDE_DIR})
@@ -92,12 +92,14 @@ endif()
 
 add_subdirectory(vulkanextratest)
 
-if(AOCE_INSTALL_AGORA)
+if(AOCE_INSTALL_AGORA AND WIN32)
     add_subdirectory(talkto_live_test)
 endif() 
 
-if(AOCE_CUDA_MODULE AND OpenCV_FOUND)
+if(AOCE_CUDA_MODULE AND OpenCV_FOUND AND WIN32)
     add_subdirectory(cudatest)
 endif() 
 
-add_subdirectory(mathtest)
+if(WIN32)
+    add_subdirectory(mathtest)
+endif()

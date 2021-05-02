@@ -108,6 +108,11 @@ struct CannyEdgeDetectionParamet {
     float maxThreshold = 0.4f;
 };
 
+struct FASTFeatureParamet {
+    int32_t boxSize = 5;
+    float offset = 1.0f;
+};
+
 struct BilateralParamet {
     // 模糊周边的半径(圆形)
     int32_t kernelSize = 5;
@@ -277,9 +282,41 @@ struct HighlightShadowTintParamet {
     }
 };
 
+struct IOSBlurParamet {
+    float sacle = 4.0f;
+    GaussianBlurParamet blurParamet = {12, 0.0f};
+    float saturation = 0.8f;
+    float range = 0.6f;
+};
+
+struct LevelsParamet {
+    vec3 minVec = {0.0, 0.0, 0.0};
+    vec3 gammaVec = {1.0, 1.0, 1.0};
+    vec3 maxVec = {1.0, 1.0, 1.0};
+    vec3 minOut = {0.0, 0.0, 0.0};
+    vec3 maxOunt = {1.0, 1.0, 1.0};
+};
+
+struct MonochromeParamet {
+    float intensity = 1.0f;
+    vec3 color = {0.6f, 0.45f, 0.3f};
+    inline bool operator==(const MonochromeParamet& right) {
+        return this->intensity == right.intensity &&
+               this->color == right.color;
+    }
+};
+
 class LookupLayer : public ILayer {
    public:
     virtual void loadLookUp(uint8_t* data, int32_t size) = 0;
+};
+
+class HSBLayer : public ILayer {
+   public:
+    virtual void reset() = 0;
+    virtual void rotateHue(const float& h) = 0;
+    virtual void adjustSaturation(const float& h) = 0;
+    virtual void adjustBrightness(const float& h) = 0;
 };
 
 AOCE_VE_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer(
@@ -343,7 +380,7 @@ AOCE_VE_EXPORT ITLayer<CrosshatchParamet>* createCrosshatchLayer();
 
 AOCE_VE_EXPORT ITLayer<ColorMatrixParamet>* createColorMatrixLayer();
 
-AOCE_VE_EXPORT ITLayer<float>* createColourFASTFeatureDetector();
+AOCE_VE_EXPORT ITLayer<FASTFeatureParamet>* createColourFASTFeatureDetector();
 
 AOCE_VE_EXPORT ITLayer<CropParamet>* createCropLayer();
 
@@ -351,19 +388,74 @@ AOCE_VE_EXPORT ITLayer<BulrPositionParamet>* createBlurPositionLayer();
 
 AOCE_VE_EXPORT ITLayer<BlurSelectiveParamet>* createBlurSelectiveLayer();
 
+AOCE_VE_EXPORT BaseLayer* createDarkenBlendLayer();
+
+AOCE_VE_EXPORT BaseLayer* createDifferenceBlendLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createDissolveBlendLayer();
+
+AOCE_VE_EXPORT BaseLayer* createDivideBlendLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createEmbossLayer();
+
+AOCE_VE_EXPORT BaseLayer* createExclusionBlendLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createExposureLayer();
+
+AOCE_VE_EXPORT ITLayer<FalseColorParamet>* createFalseColorLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createGammaLayer();
+
 AOCE_VE_EXPORT ITLayer<SphereRefractionParamet>* createSphereRefractionLayer();
 
 AOCE_VE_EXPORT ITLayer<SphereRefractionParamet>* createGlassSphereLayer();
 
 AOCE_VE_EXPORT ITLayer<PixellateParamet>* createHalftoneLayer();
 
+AOCE_VE_EXPORT BaseLayer* createHardLightBlendLayer();
+
+AOCE_VE_EXPORT ITLayer<HazeParamet>* createHazeLayer();
+
 AOCE_VE_EXPORT ITLayer<float>* createLowPassLayer();
 
 AOCE_VE_EXPORT ITLayer<float>* createHighPassLayer();
 
-AOCE_VE_EXPORT BaseLayer* createHistogramLayer(bool bSignal = true);
+AOCE_VE_EXPORT HSBLayer* createHSBLayer();
+
+AOCE_VE_EXPORT BaseLayer* createHueBlendLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createHueLayer();
+
+AOCE_VE_EXPORT ITLayer<HighlightShadowParamet>* createHighlightShadowLayer();
+
+AOCE_VE_EXPORT ITLayer<HighlightShadowTintParamet>*
+createHighlightShadowTintLayer();
+
+AOCE_VE_EXPORT BaseLayer* createHistogramLayer(bool bSingle = true);
+
+AOCE_VE_EXPORT ITLayer<IOSBlurParamet>* createIOSBlurLayer();
+
+AOCE_VE_EXPORT ITLayer<uint32_t>* createKuwaharaLayer();
+
+AOCE_VE_EXPORT BaseLayer* createLaplacianLayer(bool bsamll);
+
+AOCE_VE_EXPORT ITLayer<LevelsParamet>* createLevelsLayer();
+
+AOCE_VE_EXPORT BaseLayer* createLightenBlendLayer();
+
+AOCE_VE_EXPORT BaseLayer* createLinearBurnBlendLayer();
+
+AOCE_VE_EXPORT BaseLayer* createLuminosityBlendLayer();
 
 AOCE_VE_EXPORT BaseLayer* createLuminanceLayer();
+
+AOCE_VE_EXPORT BaseLayer* createMaskLayer();
+
+AOCE_VE_EXPORT ITLayer<uint32_t>* createMedianLayer(bool bSingle = true);
+
+AOCE_VE_EXPORT BaseLayer* createMedianK3Layer(bool bSingle = true);
+
+AOCE_VE_EXPORT ITLayer<MonochromeParamet>* createMonochromeLayer();
 
 AOCE_VE_EXPORT BaseLayer* createAlphaShowLayer();
 

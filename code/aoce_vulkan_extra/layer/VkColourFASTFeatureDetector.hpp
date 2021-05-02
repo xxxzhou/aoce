@@ -14,9 +14,9 @@ namespace layer {
 // 然后把box blur纹理给VkColourFASTFeatureDetector第二个输入.
 // 但是实际上在fastFeatureDetector中第二纹理并没参与任何事情.
 
-class VkColourFASTFeatureDetector : public VkLayer, public ITLayer<float> {
+class VkColourFASTFeatureDetector : public VkLayer,
+                                    public ITLayer<FASTFeatureParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkColourFASTFeatureDetector)
-    AOCE_VULKAN_PARAMETUPDATE()
    private:
     /* data */
     std::unique_ptr<VkBoxBlurSLayer> boxBlur = nullptr;
@@ -26,9 +26,10 @@ class VkColourFASTFeatureDetector : public VkLayer, public ITLayer<float> {
     ~VkColourFASTFeatureDetector();
 
    protected:
+    virtual void onUpdateParamet() override;
     virtual bool getSampled(int inIndex) override;
-    // virtual void onInitGraph() override;
-    // virtual void onInitNode() override;
+    virtual void onInitGraph() override;
+    virtual void onInitNode() override;
 };
 
 }  // namespace layer

@@ -2,9 +2,10 @@
 
 layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
 layout (binding = 0) uniform sampler2D inSampler;
-layout (binding = 1, rgba8) uniform image2D outTex;
+layout (binding = 1) uniform sampler2D inSampler1;
+layout (binding = 2, rgba8) uniform image2D outTex;
 
-layout (std140, binding = 2) uniform UBO {
+layout (std140, binding = 3) uniform UBO {
     float offset;    
 } ubo;
 
@@ -32,7 +33,7 @@ void main(){
     vec3 dirY = vec3(0.0);
     for(int i=0;i<8;i++){
         vec2 csuv = (vec2(uv)+vec2(centerT[i].xy*ubo.offset)+vec2(0.5f))/vec2(size); 
-        vec3 ccolor = textureLod(inSampler, csuv,0).rgb;
+        vec3 ccolor = textureLod(inSampler1, csuv,0).rgb;
         sum += ccolor;
         dirX += ccolor * centerT[i].z;
         dirY += ccolor * centerT[i].w;

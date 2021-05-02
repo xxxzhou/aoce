@@ -26,6 +26,26 @@ class AOCE_VULKAN_EXPORT VkResizeLayer : public VkLayer, public ReSizeLayer {
     virtual void onInitLayer() override;
 };
 
+class AOCE_VULKAN_EXPORT VkSizeScaleLayer : public VkLayer,
+                                            public ITLayer<SizeScaleParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkSizeScaleLayer)
+   private:
+    /* data */
+    ImageType imageType = ImageType::rgba8;
+
+   public:
+    VkSizeScaleLayer();
+    VkSizeScaleLayer(ImageType imageType);
+    ~VkSizeScaleLayer();
+
+   protected:
+    virtual bool getSampled(int inIndex) override;
+    virtual bool sampledNearest(int32_t inIndex) override;
+    virtual void onUpdateParamet() override;
+    virtual void onInitGraph() override;
+    virtual void onInitLayer() override;
+};
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

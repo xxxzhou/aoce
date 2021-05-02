@@ -288,6 +288,16 @@ struct ReSizeParamet {
     }
 };
 
+struct SizeScaleParamet {
+    int32_t bLinear = 1;
+    float fx = 1.f;
+    float fy = 1.f;
+    inline bool operator==(const SizeScaleParamet &right) {
+        return this->fx == right.fx && this->fy == right.fy &&
+               this->bLinear == right.bLinear;
+    }
+};
+
 }  // namespace aoce
 
 extern "C" {

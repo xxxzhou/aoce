@@ -2,14 +2,6 @@
 
 #include "aoce/Layer/PipeGraph.hpp"
 
-// MSVC _USE_MATH_DEFINES 才包含M_PI等值
-#define _USE_MATH_DEFINES 1
-#include <math.h>
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846 /* pi */
-#endif
-
 namespace aoce {
 namespace vulkan {
 namespace layer {

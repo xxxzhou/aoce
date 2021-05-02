@@ -4,7 +4,7 @@ android/window 多媒体与游戏引擎交互.
 
 ## 配置项目
 
-本项目尽量不引入第三方库,暂时只有aoce_ffmpeg需要引入ffmpeg.其中有些samples需要引入opencv显示画面,但是项目本身是不需要opencv做为第三方库,详细情况请转入[samples](samples/README.md).
+本项目尽量不引入第三方库,暂时只有aoce_ffmpeg模块需要引入ffmpeg.其中有些samples需要引入opencv显示画面,但是项目本身是不需要opencv做为第三方库,详细情况请转入[samples](samples/README.md).
 
 本项目编写主要使用vscode,配合相应插件C++/CMake。用anroid studio完成anroid平台特定功能与测试等。visual studio 2019配合Nsight调试CUDA相关代码。通过CMake使vscode/android studio/visual studio针对项目文件统一修改。
 
@@ -75,9 +75,13 @@ win平台下aoce图像获取设备的Media Foundation实现
 
 [Vulkan与DX11交互](doc/Vulkan与DX11交互.md)
 
+[PC平台Vulkan运算层时间记录](doc/PC平台Vulkan运算层时间记录.md)
+
 [Vulkan移植GpuImage(一)高斯模糊与自适应阈值](doc/Vulkan移植GpuImage1.md)
 
 [Vulkan移植GpuImage(二)Harris角点检测与导向滤波](doc/Vulkan移植GpuImage2.md)
+
+[Vulkan移植GpuImage(三)从A到C的滤镜](doc/Vulkan移植GpuImage3.md)
 
 ## [GPUImage移植模块](code/aoce_vulkan_extra)
 

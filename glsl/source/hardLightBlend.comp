@@ -11,9 +11,9 @@ void main(){
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     } 
-    vec4 overlay = imageLoad(inTex,uv);  
-    vec4 base = imageLoad(inTex1,uv);      
-
+    vec4 base = imageLoad(inTex,uv);  
+    vec4 overlay = imageLoad(inTex1,uv); 
+    
     vec3 color = overlay.rgb*base.rgb*2.0+overlay.rgb*(1.0-base.a)+base.rgb*(1.0-overlay.a);    
     vec3 tcolor = vec3(overlay.a*base.a) - 2.0*(vec3(base.a)-base.rgb)*(vec3(overlay.a)-overlay.rgb)+overlay.rgb*(1.0-overlay.a);
     vec3 cstep = step(overlay.rgb*2.0,vec3(overlay.a));

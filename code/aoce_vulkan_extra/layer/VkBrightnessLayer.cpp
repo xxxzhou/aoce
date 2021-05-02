@@ -55,6 +55,23 @@ VKHighlightShadowTintLayer::VKHighlightShadowTintLayer(/* args */) {
 
 VKHighlightShadowTintLayer::~VKHighlightShadowTintLayer() {}
 
+VkSaturationLayer::VkSaturationLayer(/* args */) {
+    glslPath = "glsl/saturation.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    paramet = 1.0f;
+    updateUBO(&paramet);
+}
+
+VkSaturationLayer::~VkSaturationLayer() {}
+
+VkMonochromeLayer::VkMonochromeLayer(/* args */) {
+    glslPath = "glsl/monochrome.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    updateUBO(&paramet);
+}
+
+VkMonochromeLayer::~VkMonochromeLayer() {}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

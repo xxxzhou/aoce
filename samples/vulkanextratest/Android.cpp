@@ -25,6 +25,7 @@ static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
 static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
 static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
 static ITLayer<KernelSizeParamet>* boxFilterLayer1 = nullptr;
+static ITLayer<uint32_t>* kuwaharaLayer = nullptr;
 
 static ChromKeyParamet keyParamet = {};
 extern "C" JNIEXPORT void JNICALL
@@ -65,15 +66,25 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     alphaShow2Layer = createAlphaShow2Layer();
     luminanceLayer = createLuminanceLayer();
 
+    kuwaharaLayer = createKuwaharaLayer();
+    kuwaharaLayer->updateParamet(10);
+
     std::vector<BaseLayer*> layers;
     // // 导向滤波
     // layers.push_back(chromKeyLayer->getLayer());
     // layers.push_back(guidedLayer->getLayer());
     // 查看Harris 角点检测
-    layers.push_back(luminanceLayer);
-    layers.push_back(hcdLayer->getLayer());
-    layers.push_back(boxFilterLayer1->getLayer());
-    layers.push_back(alphaShow2Layer);
+    // layers.push_back(luminanceLayer);
+    // layers.push_back(hcdLayer->getLayer());
+    // layers.push_back(boxFilterLayer1->getLayer());
+    // layers.push_back(alphaShow2Layer);
+    // ---IOS Blur
+    // layers.push_back(iosBlurLayer->getLayer());
+    // --- fast feature detection
+    // layers.push_back(fastLayer->getLayer());
+    // --- Kuwahara
+    layers.push_back(kuwaharaLayer->getLayer());
+
     view->initGraph(layers, nullptr);
 }
 

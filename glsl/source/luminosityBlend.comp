@@ -1,0 +1,49 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform readonly image2D inTex1;
+layout (binding = 2, rgba8) uniform image2D outTex;
+
+float lum(vec3 c) {
+    return dot(c, vec3(0.3, 0.59, 0.11));
+}
+
+vec3 clipcolor(vec3 c) {
+    float l = lum(c);
+    float n = min(min(c.r, c.g), c.b);
+    float x = max(max(c.r, c.g), c.b);
+    
+    if (n < 0.0) {
+        c.r = l + ((c.r - l) * l) / (l - n);
+        c.g = l + ((c.g - l) * l) / (l - n);
+        c.b = l + ((c.b - l) * l) / (l - n);
+    }
+    if (x > 1.0) {
+        c.r = l + ((c.r - l) * (1.0 - l)) / (x - l);
+        c.g = l + ((c.g - l) * (1.0 - l)) / (x - l);
+        c.b = l + ((c.b - l) * (1.0 - l)) / (x - l);
+    }
+    
+    return c;
+}
+
+ vec3 setlum(vec3 c, float l) {
+     float d = l - lum(c);
+     c = c + vec3(d);
+     return clipcolor(c);
+ }
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }
+    vec4 base = imageLoad(inTex,uv);    
+    vec4 overlay = imageLoad(inTex1,uv); 
+    
+    vec4 result = vec4(base.rgb * (1.0 - overlay.a) + setlum(base.rgb, lum(overlay.rgb)) * overlay.a, base.a);
+
+    imageStore(outTex,uv,result);     
+}

@@ -11,7 +11,7 @@ else()
 endif() 
 
 if(WIN32) 
-    message(STATUS "using find_package to locate vulkan")
+    message(STATUS "using find_package to locate vulkan") 
     find_package(Vulkan)
     message(STATUS "vulkan found = ${Vulkan_FOUND}")  
     message(STATUS "vulkan include = ${Vulkan_INCLUDE_DIR}")  
