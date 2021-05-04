@@ -99,19 +99,19 @@ void VkGuidedLayer::onInitGraph() {
 }
 
 void VkGuidedLayer::onInitNode() {
-    resizeLayer->getNode()->addLine(box1Layer->getNode(), 0, 0);
-    toMatLayer->getNode()->addLine(box2Layer->getNode(), 0, 0);
-    toMatLayer->getNode()->addLine(box3Layer->getNode(), 1, 0);
-    toMatLayer->getNode()->addLine(box4Layer->getNode(), 2, 0);
-    box1Layer->getNode()->addLine(guidedSlayerLayer->getNode(), 0, 0);
-    box2Layer->getNode()->addLine(guidedSlayerLayer->getNode(), 0, 1);
-    box3Layer->getNode()->addLine(guidedSlayerLayer->getNode(), 0, 2);
-    box4Layer->getNode()->addLine(guidedSlayerLayer->getNode(), 0, 3);
-    guidedSlayerLayer->getNode()->addLine(box5Layer->getNode());
-    box5Layer->getNode()->addLine(resize1Layer->getNode());
-    convertLayer->getNode()->addLine(getNode(), 0, 0);
-    resize1Layer->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(convertLayer->getNode());
+    resizeLayer->addLine(box1Layer, 0, 0);
+    toMatLayer->addLine(box2Layer, 0, 0);
+    toMatLayer->addLine(box3Layer, 1, 0);
+    toMatLayer->addLine(box4Layer, 2, 0);
+    box1Layer->addLine(guidedSlayerLayer, 0, 0);
+    box2Layer->addLine(guidedSlayerLayer, 0, 1);
+    box3Layer->addLine(guidedSlayerLayer, 0, 2);
+    box4Layer->addLine(guidedSlayerLayer, 0, 3);
+    guidedSlayerLayer->addLine(box5Layer);
+    box5Layer->addLine(resize1Layer);
+    convertLayer->addLine(this, 0, 0);
+    resize1Layer->addLine(this, 0, 1);
+    setStartNode(convertLayer);
 }
 ```
 

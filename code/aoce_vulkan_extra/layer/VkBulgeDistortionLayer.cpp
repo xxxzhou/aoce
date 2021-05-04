@@ -53,9 +53,9 @@ void VkGaussianBlurPositionLayer::onInitGraph() {
 }
 
 void VkGaussianBlurPositionLayer::onInitNode() {
-    blurLayer->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(blurLayer->getNode());
-    getNode()->setStartNode(getNode());
+    blurLayer->addLine(this, 0, 1);
+    setStartNode(blurLayer.get());
+    setStartNode(this);
 }
 
 VkGaussianBlurSelectiveLayer::VkGaussianBlurSelectiveLayer(/* args */) {
@@ -90,9 +90,9 @@ void VkGaussianBlurSelectiveLayer::onInitGraph() {
 }
 
 void VkGaussianBlurSelectiveLayer::onInitNode() {
-    blurLayer->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(blurLayer->getNode());
-    getNode()->setStartNode(getNode());
+    blurLayer->addLine(this, 0, 1);
+    setStartNode(blurLayer.get());
+    setStartNode(this);
 }
 
 }  // namespace layer

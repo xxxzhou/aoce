@@ -1,7 +1,7 @@
 #include "VkHarrisCornerDetectionLayer.hpp"
 
 #include "aoce/Layer/PipeGraph.hpp"
-#include "aoce/Layer/PipeNode.hpp"
+
 namespace aoce {
 namespace vulkan {
 namespace layer {
@@ -85,11 +85,17 @@ void VkHarrisCornerDetectionLayer::onInitGraph() {
 }
 
 void VkHarrisCornerDetectionLayer::onInitNode() {
-    blurLayer->getNode()->addLine(getNode(), 0, 0);
-    getNode()->addLine(thresholdNMSLayer->getNode(), 0, 0);
-    getNode()->setStartNode(xyDerivativeLayer->getNode());
-    getNode()->setEndNode(thresholdNMSLayer->getNode());
+    blurLayer->addLine(this, 0, 0);
+    addLine(thresholdNMSLayer.get(), 0, 0);
+    setStartNode(xyDerivativeLayer.get());
+    setEndNode(thresholdNMSLayer.get());
 }
+
+VkNobleCornerDetectionLayer::VkNobleCornerDetectionLayer(/* args */) {
+    glslPath = "glsl/nobleCornerDetection.comp.spv";
+}
+
+VkNobleCornerDetectionLayer::~VkNobleCornerDetectionLayer() {}
 
 }  // namespace layer
 }  // namespace vulkan

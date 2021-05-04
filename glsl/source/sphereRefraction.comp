@@ -23,7 +23,7 @@ void main(){
     vec2 coord = vec2(suv.x,(suv.y-0.5)*ubo.aspectRatio+0.5);
     // 和球心距离
     float dist = distance(center,coord);
-    // 球心内为0,球外为1
+    // 球心内为1,球外为0
     float withinSphere = step(dist,ubo.radius);
     // 圈内半径0-1,外圈半径1以上
     dist = dist / ubo.radius;

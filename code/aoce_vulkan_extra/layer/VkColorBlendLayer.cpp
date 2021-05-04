@@ -134,6 +134,27 @@ VkMaskLayer::VkMaskLayer(/* args */) {
 
 VkMaskLayer::~VkMaskLayer() {}
 
+VkMultiplyBlendLayer::VkMultiplyBlendLayer(/* args */) {
+    glslPath = "glsl/multiplyBlend.comp.spv";
+    inCount = 2;
+}
+
+VkMultiplyBlendLayer::~VkMultiplyBlendLayer() {}
+
+VkNormalBlendLayer::VkNormalBlendLayer(/* args */) {
+    glslPath = "glsl/normalBlend.comp.spv";
+    inCount = 2;
+}
+
+VkNormalBlendLayer::~VkNormalBlendLayer() {}
+
+VkOverlayBlendLayer::VkOverlayBlendLayer(/* args */) {
+    glslPath = "glsl/overlayBlend.comp.spv";
+    inCount = 2;
+}
+
+VkOverlayBlendLayer::~VkOverlayBlendLayer() {}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

@@ -16,11 +16,13 @@ struct StartNode {
 };
 
 // 对应layer,管理layer的连接
-class ACOE_EXPORT PipeNode {
+// PipeNode修改为对外模块不可见,所有接口全由BaseLayer转,减少复杂度
+class PipeNode {
    private:
     /* data */
     friend class PipeGraph;
     friend class PipeNode;
+    friend class BaseLayer;
     BaseLayer* layer = nullptr;
     // 如果为true,当前节点不使用
     bool bInvisible = false;
@@ -38,27 +40,17 @@ class ACOE_EXPORT PipeNode {
     PipeNode(BaseLayer* _layer);
     virtual ~PipeNode();
 
-   protected:
-    // StartNode getStartNode(int32_t index = 0);    
-
    public:
+    inline BaseLayer* getLayer() { return layer; };
+
+   private:
     void setVisable(bool bvisable);
     void setEnable(bool benable);
-    inline BaseLayer* getLayer() { return layer; };
-    inline int32_t getNodeIndex() { return graphIndex; };
     // 如果层有多个输入,可能不同输入对应不同层内不同层
     // index表示输入节点索引,node表示层内层节点,toInIndex表示对应层内层输入位置
-    void setStartNode(PipeNodePtr node, int32_t index = 0,
+    void setStartNode(BaseLayer* node, int32_t index = 0,
                       int32_t toInIndex = 0);
-    void setEndNode(PipeNodePtr node);
-
-   public:
-    // 有一个隐藏的line关系,当前节点第一个输出连接下一节点的第一个输入
-    PipeNodePtr addNode(BaseLayer* layer);
-
-    PipeNodePtr addNode(ILayer* layer);
-
-    PipeNodePtr addLine(PipeNodePtr to, int32_t formOut = 0, int32_t toIn = 0);
+    void setEndNode(BaseLayer* node);
 };
 
 template <typename T>

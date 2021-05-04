@@ -46,7 +46,7 @@ void VkLookupLayer::onInitGraph() {
 }
 
 void VkLookupLayer::onInitNode() {
-    lookupLayer->getLayerNode()->addLine(getNode(), 0, 1);
+    lookupLayer->getLayer()->addLine(this, 0, 1);
 }
 
 }  // namespace layer

@@ -29,6 +29,18 @@ class VkLookupLayer : public VkLayer, public LookupLayer {
     virtual void onInitNode() override;
 };
 
+// class VkMosaicLayer : public VkLayer {
+//    private:
+//     /* data */
+//    public:
+//     VkMosaicLaye(/* args */);
+//     ~VkMosaicLaye();
+// };
+
+// VkMosaicLayer::VkMosaicLaye(/* args */) {}
+
+// VkMosaicLayer::~VkMosaicLaye() {}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

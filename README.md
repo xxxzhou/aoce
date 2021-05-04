@@ -83,6 +83,8 @@ win平台下aoce图像获取设备的Media Foundation实现
 
 [Vulkan移植GpuImage(三)从A到C的滤镜](doc/Vulkan移植GpuImage3.md)
 
+[Vulkan移植GpuImage(三)从D到M的滤镜](doc/Vulkan移植GpuImage4.md)
+
 ## [GPUImage移植模块](code/aoce_vulkan_extra)
 
 ## [glsl代码](glsl)

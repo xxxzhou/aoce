@@ -1,7 +1,7 @@
 #include "VkLowPassLayer.hpp"
 
-#include <aoce_vulkan/layer/VkPipeGraph.hpp>
-#include <aoce_vulkan/vulkan/VulkanManager.hpp>
+#include "aoce_vulkan/layer/VkPipeGraph.hpp"
+#include "aoce_vulkan/vulkan/VulkanManager.hpp"
 
 namespace aoce {
 namespace vulkan {
@@ -55,12 +55,12 @@ void VkLowPassLayer::onInitGraph() {
 }
 
 void VkLowPassLayer::onInitNode() {
-    saveLayer->getNode()->addLine(getNode(), 0, 1);
+    saveLayer->addLine(this, 0, 1);
 }
 
 void VkLowPassLayer::onInitLayer() {
     VkLayer::onInitLayer();
-    saveLayer->setImageFormat(inFormats[0], getNode()->getNodeIndex(), 0);
+    saveLayer->setImageFormat(inFormats[0], getGraphIndex(), 0);
 }
 
 VkHighPassLayer::VkHighPassLayer(/* args */) {
@@ -79,9 +79,9 @@ void VkHighPassLayer::onInitGraph() {
 }
 
 void VkHighPassLayer::onInitNode() {
-    lowLayer->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(getNode(), 0);
-    getNode()->setStartNode(lowLayer->getNode(), 1);
+    lowLayer->addLine(this, 0, 1);
+    setStartNode(this, 0);
+    setStartNode(lowLayer.get(), 1);
 }
 
 }  // namespace layer

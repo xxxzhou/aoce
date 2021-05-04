@@ -38,7 +38,7 @@ class VkGammaLayer : public VkLayer, public ITLayer<float> {
     /* data */
    public:
     VkGammaLayer(/* args */);
-    ~VkGammaLayer();
+    virtual ~VkGammaLayer();
 };
 
 // 去雾
@@ -49,7 +49,7 @@ class VkHazeLayer : public VkLayer, public ITLayer<HazeParamet> {
     /* data */
    public:
     VkHazeLayer(/* args */);
-    ~VkHazeLayer();
+    virtual ~VkHazeLayer();
 };
 
 // 调整图像的阴影和高光
@@ -61,7 +61,7 @@ class VKHighlightShadowLayer : public VkLayer,
     /* data */
    public:
     VKHighlightShadowLayer(/* args */);
-    ~VKHighlightShadowLayer();
+    virtual ~VKHighlightShadowLayer();
 };
 
 // 允许您使用颜色和强度独立地着色图像的阴影和高光
@@ -73,7 +73,7 @@ class VKHighlightShadowTintLayer : public VkLayer,
     /* data */
    public:
     VKHighlightShadowTintLayer(/* args */);
-    ~VKHighlightShadowTintLayer();
+    virtual ~VKHighlightShadowTintLayer();
 };
 
 // Saturation ranges from 0.0 (fully desaturated) to 2.0 (max saturation),
@@ -85,7 +85,7 @@ class VkSaturationLayer : public VkLayer, public ITLayer<float> {
     /* data */
    public:
     VkSaturationLayer(/* args */);
-    ~VkSaturationLayer();
+    virtual ~VkSaturationLayer();
 };
 
 class VkMonochromeLayer : public VkLayer, public ITLayer<MonochromeParamet> {
@@ -95,7 +95,17 @@ class VkMonochromeLayer : public VkLayer, public ITLayer<MonochromeParamet> {
     /* data */
    public:
     VkMonochromeLayer(/* args */);
-    ~VkMonochromeLayer();
+    virtual ~VkMonochromeLayer();
+};
+
+class VkOpacityLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkOpacityLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkOpacityLayer(/* args */);
+    virtual ~VkOpacityLayer();
 };
 
 

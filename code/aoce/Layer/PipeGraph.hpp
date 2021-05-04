@@ -2,12 +2,12 @@
 
 #include <list>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "../Aoce.hpp"
 #include "InputLayer.hpp"
 #include "PipeNode.hpp"
-#include <mutex>
 
 namespace aoce {
 
@@ -22,7 +22,7 @@ class ACOE_EXPORT PipeGraph {
 
    private:
     bool checkHaveValid(PipeLinePtr ptr);
-    // friend class BaseLayer;    
+    // friend class BaseLayer;
     void validNode();
 
    protected:
@@ -31,7 +31,7 @@ class ACOE_EXPORT PipeGraph {
     std::vector<PipeLinePtr> validLines;
     std::vector<PipeNodePtr> nodes;
     // 需要重新reset.
-    bool bReset = false;    
+    bool bReset = false;
     // 图表的执行顺序
     std::vector<int32_t> nodeExcs;
     std::mutex mtx;
@@ -46,16 +46,18 @@ class ACOE_EXPORT PipeGraph {
     // 引发resetGraphr执行,但是不一定与当前执行同线程
     void reset() { bReset = true; }
 
-    PipeNodePtr getNode(int32_t index);
-    PipeNodePtr addNode(BaseLayer* layer);
-    PipeNodePtr addNode(ILayer* layer);
+    BaseLayer* getNode(int32_t index);
+    BaseLayer* addNode(BaseLayer* layer);
+    BaseLayer* addNode(ILayer* layer);
     bool addLine(int32_t from, int32_t to, int32_t formOut = 0,
                  int32_t toIn = 0);
-    bool addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut = 0,
+    bool addLine(BaseLayer* from, BaseLayer* to, int32_t formOut = 0,
                  int32_t toIn = 0);
 
-    void getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
-                           ImageFormat& format,bool bOutput = false);
+    bool getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
+                           ImageFormat& format, bool bOutput = false);
+    bool getLayerInFormat(int32_t nodeIndex, int32_t inputIndex,
+                          ImageFormat& format);
 
     // 清除连线(当逻辑变更导致执行列表重组)
     void clearLines();

@@ -1,7 +1,7 @@
 #include "VkCannyEdgeDetectionLayer.hpp"
 
 #include "aoce/Layer/PipeGraph.hpp"
-#include "aoce/Layer/PipeNode.hpp"
+
 
 namespace aoce {
 namespace vulkan {
@@ -71,8 +71,8 @@ void VkCannyEdgeDetectionLayer::onInitGraph() {
         ->addNode(directNMSLayer->getLayer());
 }
 void VkCannyEdgeDetectionLayer::onInitNode() {
-    directNMSLayer->getNode()->addLine(getNode(), 0, 0);
-    getNode()->setStartNode(luminanceLayer->getNode());
+    directNMSLayer->addLine(this, 0, 0);
+    setStartNode(luminanceLayer.get());
 }
 
 }  // namespace layer

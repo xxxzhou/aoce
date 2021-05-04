@@ -1,7 +1,6 @@
 #include "VideoView.hpp"
 
 #include "../AoceManager.hpp"
-#include "../Layer/PipeNode.hpp"
 
 namespace aoce {
 
@@ -31,12 +30,12 @@ VideoView::~VideoView() {}
 
 void VideoView::runFrame(const VideoFrame &frame, bool special) {
     if (getYuvIndex(frame.videoType) >= 0) {
-        yuv2rgbLayer->getLayerNode()->setVisable(true);
+        yuv2rgbLayer->getLayer()->setVisable(true);
         if (yuv2rgbLayer->getParamet().type != frame.videoType) {
             yuv2rgbLayer->updateParamet({frame.videoType, special});
         }
     } else {
-        yuv2rgbLayer->getLayerNode()->setVisable(false);
+        yuv2rgbLayer->getLayer()->setVisable(false);
     }
     inputLayer->inputCpuData(frame);
     graph->run();

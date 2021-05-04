@@ -29,13 +29,12 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst,
     operateLayer = layerFactory->createTexOperate();
     resizeLayer = layerFactory->createSize();
     resizeLayer->updateParamet({1, 240, 120});
-    yuvNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
-    layerNode = yuvNode;
+    layerNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);    
     for (auto& layer : layers) {
         layerNode = layerNode->addNode(layer);
     }
     if (bAutoIn) {
-        yuvNode->addLine(layerNode, 0, 1);
+        yuv2rgbLayer->getLayer()->addLine(layerNode, 0, 1);
     }
 #if _WIN32
     TexOperateParamet texParamet = {};
@@ -107,9 +106,9 @@ void VkExtraBaseView::enableLayer(bool bEnable) {
 
 void VkExtraBaseView::onFrame(VideoFrame frame) {
     if (getYuvIndex(frame.videoType) < 0) {        
-        yuvNode->setVisable(false);
+        yuv2rgbLayer->getLayer()->setVisable(false);
     } else if (yuv2rgbLayer->getParamet().type != frame.videoType) {
-        yuvNode->setVisable(true);
+        yuv2rgbLayer->getLayer()->setVisable(true);
         yuv2rgbLayer->updateParamet({frame.videoType});
     }
     inputLayer->inputCpuData(frame);

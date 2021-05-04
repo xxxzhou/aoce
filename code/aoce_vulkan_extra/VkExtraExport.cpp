@@ -26,6 +26,7 @@
 #include "layer/VkLuminanceLayer.hpp"
 #include "layer/VkMedianLayer.hpp"
 #include "layer/VkMorphLayer.hpp"
+#include "layer/VkMotionBlurLayer.hpp"
 #include "layer/VkPixellateLayer.hpp"
 #include "layer/VkReduceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
@@ -117,18 +118,23 @@ BaseLayer* createCGAColorspaceLayer() {
     return layer;
 }
 
-ITLayer<int>* createDilationLayer() {
+ITLayer<int32_t>* createDilationLayer() {
     VkDilationLayer* layer = new VkDilationLayer();
     return layer;
 }
 
-ITLayer<int>* createErosionLayer() {
+ITLayer<int32_t>* createErosionLayer() {
     VkErosionLayer* layer = new VkErosionLayer();
     return layer;
 }
 
-ITLayer<int>* createClosingLayer() {
+ITLayer<int32_t>* createClosingLayer() {
     VkClosingLayer* layer = new VkClosingLayer();
+    return layer;
+}
+
+ITLayer<int32_t>* createOpeningLayer() {
+    VkOpeningLayer* layer = new VkOpeningLayer();
     return layer;
 }
 
@@ -252,6 +258,11 @@ ITLayer<PixellateParamet>* createHalftoneLayer() {
     return layer;
 }
 
+ITLayer<PixellateParamet>* createPixellateLayer() {
+    VkPixellateLayer* layer = new VkPixellateLayer();
+    return layer;
+}
+
 BaseLayer* createHardLightBlendLayer() {
     VkHardLightBlendLayer* layer = new VkHardLightBlendLayer();
     return layer;
@@ -361,6 +372,41 @@ BaseLayer* createMedianK3Layer(bool bSingle) {
 
 ITLayer<MonochromeParamet>* createMonochromeLayer() {
     VkMonochromeLayer* layer = new VkMonochromeLayer();
+    return layer;
+}
+
+ITLayer<MotionBlurParamet>* createMotionBlurLayer() {
+    VkMotionBlurLayer* layer = new VkMotionBlurLayer();
+    return layer;
+}
+
+MotionDetectorLayer* createMotionDetectorLayer() {
+    VkMotionDetectorLayer* layer = new VkMotionDetectorLayer();
+    return layer;
+}
+
+BaseLayer* createMultiplyBlendLayer() {
+    VkMultiplyBlendLayer* layer = new VkMultiplyBlendLayer();
+    return layer;
+}
+
+ITLayer<HarrisCornerDetectionParamet>* createNobleCornerDetectionLayer() {
+    VkNobleCornerDetectionLayer* layer = new VkNobleCornerDetectionLayer();
+    return layer;
+}
+
+BaseLayer* createNormalBlendLayer() {
+    VkNormalBlendLayer* layer = new VkNormalBlendLayer();
+    return layer;
+}
+
+ITLayer<float>* createOpacityLayer() {
+    VkOpacityLayer* layer = new VkOpacityLayer();
+    return layer;
+}
+
+BaseLayer* createOverlayBlendLayer() {
+    VkOverlayBlendLayer* layer = new VkOverlayBlendLayer();
     return layer;
 }
 

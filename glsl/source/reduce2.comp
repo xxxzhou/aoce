@@ -43,7 +43,8 @@ void main(){
     memoryBarrierShared(); 
     barrier();
     // 因为只分配一个线程组，所以我们需要算出需要几个线程组
-    int count = (size+1)/int(gl_WorkGroupSize.x);
+    int groupSize = int(gl_WorkGroupSize.x);
+    int count = (size+groupSize.x-1)/groupSize;
     // 把所有值算入分配的唯一一个线程组内
     for(int i=0;i<count;i++){        
         int id = i * int(gl_WorkGroupSize.x) + tid;

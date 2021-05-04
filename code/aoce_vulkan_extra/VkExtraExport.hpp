@@ -301,8 +301,16 @@ struct MonochromeParamet {
     float intensity = 1.0f;
     vec3 color = {0.6f, 0.45f, 0.3f};
     inline bool operator==(const MonochromeParamet& right) {
-        return this->intensity == right.intensity &&
-               this->color == right.color;
+        return this->intensity == right.intensity && this->color == right.color;
+    }
+};
+
+struct MotionBlurParamet {
+    float blurSize = 1.0f;
+    float blurAngle = 0.0f;
+    inline bool operator==(const MotionBlurParamet& right) {
+        return this->blurSize == right.blurSize &&
+               this->blurAngle == right.blurAngle;
     }
 };
 
@@ -317,6 +325,16 @@ class HSBLayer : public ILayer {
     virtual void rotateHue(const float& h) = 0;
     virtual void adjustSaturation(const float& h) = 0;
     virtual void adjustBrightness(const float& h) = 0;
+};
+
+typedef std::function<void(vec4 motion)> motionHandle;
+
+class MotionDetectorLayer : public ITLayer<float> {
+   protected:
+    motionHandle onMotionEvent;
+
+   public:
+    inline void setMotionHandle(motionHandle handle) { onMotionEvent = handle; }
 };
 
 AOCE_VE_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer(
@@ -358,11 +376,13 @@ createCannyEdgeDetectionLayer();
 
 AOCE_VE_EXPORT BaseLayer* createCGAColorspaceLayer();
 
-AOCE_VE_EXPORT ITLayer<int>* createDilationLayer();
+AOCE_VE_EXPORT ITLayer<int32_t>* createDilationLayer();
 
-AOCE_VE_EXPORT ITLayer<int>* createErosionLayer();
+AOCE_VE_EXPORT ITLayer<int32_t>* createErosionLayer();
 
-AOCE_VE_EXPORT ITLayer<int>* createClosingLayer();
+AOCE_VE_EXPORT ITLayer<int32_t>* createClosingLayer();
+
+AOCE_VE_EXPORT ITLayer<int32_t>* createOpeningLayer();
 
 AOCE_VE_EXPORT BaseLayer* createColorBlendLayer();
 
@@ -412,6 +432,8 @@ AOCE_VE_EXPORT ITLayer<SphereRefractionParamet>* createGlassSphereLayer();
 
 AOCE_VE_EXPORT ITLayer<PixellateParamet>* createHalftoneLayer();
 
+AOCE_VE_EXPORT ITLayer<PixellateParamet>* createPixellateLayer();
+
 AOCE_VE_EXPORT BaseLayer* createHardLightBlendLayer();
 
 AOCE_VE_EXPORT ITLayer<HazeParamet>* createHazeLayer();
@@ -456,6 +478,21 @@ AOCE_VE_EXPORT ITLayer<uint32_t>* createMedianLayer(bool bSingle = true);
 AOCE_VE_EXPORT BaseLayer* createMedianK3Layer(bool bSingle = true);
 
 AOCE_VE_EXPORT ITLayer<MonochromeParamet>* createMonochromeLayer();
+
+AOCE_VE_EXPORT ITLayer<MotionBlurParamet>* createMotionBlurLayer();
+
+AOCE_VE_EXPORT MotionDetectorLayer* createMotionDetectorLayer();
+
+AOCE_VE_EXPORT BaseLayer* createMultiplyBlendLayer();
+
+AOCE_VE_EXPORT ITLayer<HarrisCornerDetectionParamet>*
+createNobleCornerDetectionLayer();
+
+AOCE_VE_EXPORT BaseLayer* createNormalBlendLayer();
+
+AOCE_VE_EXPORT ITLayer<float>* createOpacityLayer();
+
+AOCE_VE_EXPORT BaseLayer* createOverlayBlendLayer();
 
 AOCE_VE_EXPORT BaseLayer* createAlphaShowLayer();
 

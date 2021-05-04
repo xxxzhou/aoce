@@ -1,7 +1,7 @@
 #include "VkReduceLayer.hpp"
 
 #include "aoce/Layer/PipeGraph.hpp"
-#include "aoce/Layer/PipeNode.hpp"
+
 
 // 一个线程处理每行PATCH_SIZE_X个元素
 const int PATCH_SIZE_X = 4;
@@ -72,8 +72,8 @@ void VkReduceLayer::onInitGraph() {
 }
 
 void VkReduceLayer::onInitNode() {
-    preLayer->getNode()->addLine(getNode(), 0, 0);
-    getNode()->setStartNode(preLayer->getNode());
+    preLayer->addLine(this, 0, 0);
+    setStartNode(preLayer.get());
 }
 
 void VkReduceLayer::onInitLayer() {
@@ -108,9 +108,9 @@ void VkAverageLuminanceThresholdLayer::onInitGraph() {
 }
 
 void VkAverageLuminanceThresholdLayer::onInitNode() {
-    luminanceLayer->getNode()->addLine(getNode(), 0, 0);
-    reduceLayer->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(luminanceLayer->getNode());
+    luminanceLayer->addLine(this, 0, 0);
+    reduceLayer->addLine(this, 0, 1);
+    setStartNode(luminanceLayer.get());
 }
 
 }  // namespace layer

@@ -253,3 +253,15 @@ GPUImage的实现好像和原理差别有点大,应该是特化实现,暂不移�
 [中值滤波原理及其C++实现与CUDA优化](https://zhuanlan.zhihu.com/p/355266029)
 
 和Kuwahara类似算法,添加排序,5x5的核,需要25ms.
+
+### MotionBlur
+
+计算一个方向,向指定方向模糊.连个前后桢比较都没,这种运动模糊不好说.
+
+### MotionDetector
+
+和高通类似,但是有个后续聚合平均计算输出给外面.
+
+### NobleCornerDetection
+
+和HarrisCornerDetection唯一区别,就是角点的计算细节不同.

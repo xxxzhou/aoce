@@ -72,6 +72,15 @@ VkMonochromeLayer::VkMonochromeLayer(/* args */) {
 
 VkMonochromeLayer::~VkMonochromeLayer() {}
 
+VkOpacityLayer::VkOpacityLayer(/* args */) {
+    glslPath = "glsl/opacity.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    paramet = 1.0f;
+    updateUBO(&paramet);
+}
+
+VkOpacityLayer::~VkOpacityLayer() {}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

@@ -1,6 +1,7 @@
-mask.comp
-median.comp median.comp CHANNEL_RGBA=1
-median.comp medianC1.comp CHANNEL_R8=1
-median.comp medianK3.comp CHANNEL_RGBA=1 KSIZE3=1
-median.comp medianK3C1.comp CHANNEL_R8=1 KSIZE3=1
-monochrome.comp
+nobleCornerDetection.comp
+normalBlend.comp
+opacity.comp
+overlayBlend.comp
+pixellate.comp
+reduce2.comp reduce2_sumF4.comp REDUCE_SUM=1 CHANNEL_RGBA32F=1
+reduce2.comp reduce2_sumF1.comp REDUCE_SUM=1 CHANNEL_R32F=1

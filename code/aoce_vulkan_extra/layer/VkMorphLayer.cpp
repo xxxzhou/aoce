@@ -48,8 +48,8 @@ void VkDilationLayer::onInitGraph() {
 }
 
 void VkDilationLayer::onInitNode() {
-    preLayer->getNode()->addLine(getNode(), 0, 0);
-    getNode()->setStartNode(preLayer->getNode());
+    preLayer->addLine(this, 0, 0);
+    setStartNode(preLayer.get());
 }
 
 VkPreErosionLayer::VkPreErosionLayer() {
@@ -94,8 +94,8 @@ void VkErosionLayer::onInitGraph() {
 }
 
 void VkErosionLayer::onInitNode() {
-    preLayer->getNode()->addLine(getNode(), 0, 0);
-    getNode()->setStartNode(preLayer->getNode());
+    preLayer->addLine(this, 0, 0);
+    setStartNode(preLayer.get());
 }
 
 VkClosingLayer::VkClosingLayer() {
@@ -116,8 +116,30 @@ void VkClosingLayer::onUpdateParamet() {
 void VkClosingLayer::onInitNode() {
     pipeGraph->addNode(dilationLayer->getLayer())
         ->addNode(erosionLayer->getLayer());
-    getNode()->setStartNode(dilationLayer->getNode());
-    getNode()->setEndNode(erosionLayer->getNode());
+    setStartNode(dilationLayer.get());
+    setEndNode(erosionLayer.get());
+}
+
+VkOpeningLayer::VkOpeningLayer() {
+    dilationLayer = std::make_unique<VkDilationLayer>();
+    erosionLayer = std::make_unique<VkErosionLayer>();
+}
+
+VkOpeningLayer::~VkOpeningLayer() {}
+
+void VkOpeningLayer::onUpdateParamet() {
+    if (paramet == oldParamet) {
+        return;
+    }
+    dilationLayer->updateParamet(paramet);
+    erosionLayer->updateParamet(paramet);
+}
+
+void VkOpeningLayer::onInitNode() {
+    pipeGraph->addNode(erosionLayer->getLayer())
+        ->addNode(dilationLayer->getLayer());
+    setStartNode(erosionLayer.get());
+    setEndNode(dilationLayer.get());
 }
 
 }  // namespace layer

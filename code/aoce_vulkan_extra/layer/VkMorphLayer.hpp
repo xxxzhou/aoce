@@ -84,6 +84,23 @@ class VkClosingLayer : public GroupLayer, public ITLayer<int32_t> {
     virtual void onInitNode() override;
 };
 
+// Opening 先erosion后dilation
+class VkOpeningLayer : public GroupLayer, public ITLayer<int32_t> {
+    AOCE_LAYER_QUERYINTERFACE(VkOpeningLayer)
+   public:
+    VkOpeningLayer();
+    virtual ~VkOpeningLayer();
+
+   protected:
+    std::unique_ptr<VkDilationLayer> dilationLayer = nullptr;
+    std::unique_ptr<VkErosionLayer> erosionLayer = nullptr;
+
+   protected:
+    virtual void onUpdateParamet() override;
+
+    virtual void onInitNode() override;
+};
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

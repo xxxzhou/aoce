@@ -56,6 +56,17 @@ class VkHarrisCornerDetectionLayer
     virtual void onInitNode() override;
 };
 
+class VkNobleCornerDetectionLayer : public VkHarrisCornerDetectionLayer {
+    AOCE_LAYER_QUERYINTERFACE(VkNobleCornerDetectionLayer)
+   private:
+    /* data */
+   public:
+    VkNobleCornerDetectionLayer(/* args */);
+    virtual ~VkNobleCornerDetectionLayer();
+};
+
+
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

@@ -21,6 +21,7 @@ static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
 static ITLayer<ReSizeParamet>* resizeLayer2 = nullptr;
 static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
 static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
+static ITLayer<HarrisCornerDetectionParamet>* ncdLayer = nullptr;
 static ITLayer<KernelSizeParamet>* boxFilterLayer1 = nullptr;
 // 亮度平均阈值
 static ITLayer<float>* averageLT = nullptr;
@@ -36,6 +37,7 @@ static ITLayer<int>* closingLayer = nullptr;
 static ITLayer<BlurSelectiveParamet>* blurSelectiveLayer = nullptr;
 static ITLayer<BulrPositionParamet>* blurPositionLayer = nullptr;
 static ITLayer<SphereRefractionParamet>* srLayer = nullptr;
+static ITLayer<PixellateParamet>* ppLayer = nullptr;
 static ITLayer<PixellateParamet>* halftoneLayer = nullptr;
 static ITLayer<float>* lowPassLayer = nullptr;
 static ITLayer<float>* highPassLayer = nullptr;
@@ -46,6 +48,13 @@ static ITLayer<uint32_t>* kuwaharaLayer = nullptr;
 static BaseLayer* lapLayer = nullptr;
 static ITLayer<uint32_t>* medianLayer = nullptr;
 static BaseLayer* medianK3Layer = nullptr;
+static ITLayer<MotionBlurParamet>* motionBlurLayer = nullptr;
+static MotionDetectorLayer* motionDetectorLayer = nullptr;
+
+void showMotion(vec4 motion) {
+    std::cout << "x: " << motion.x << " y: " << motion.y << " z: " << motion.z
+              << " w: " << motion.w << std::endl;
+}
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -86,8 +95,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     hcdParamet.harris = 0.04f;
     hcdParamet.edgeStrength = 1.0f;
     hcdParamet.blueParamet = {5, 0.0f};
-
     hcdLayer->updateParamet(hcdParamet);
+
+    ncdLayer = createNobleCornerDetectionLayer();
+    ncdLayer->updateParamet(hcdParamet);
 
     boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);
     boxFilterLayer1->updateParamet({5, 5});
@@ -138,6 +149,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     srLayer = createSphereRefractionLayer();
 
+    ppLayer = createPixellateLayer();
+
     halftoneLayer = createHalftoneLayer();
 
     lowPassLayer = createLowPassLayer();
@@ -161,6 +174,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     medianK3Layer = createMedianK3Layer(false);
 
+    motionBlurLayer = createMotionBlurLayer();
+    motionBlurLayer->updateParamet({2.0f, 45.0});
+
+    motionDetectorLayer = createMotionDetectorLayer();
+    motionDetectorLayer->setMotionHandle(showMotion);
+
     std::vector<uint8_t> lutData;
     std::vector<BaseLayer*> layers;
     // 如果为true,层需要二个输入,用原始图像做第二个输入
@@ -176,7 +195,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---查看Harris 角点检测
     // bAutoIn = true;
     // layers.push_back(luminanceLayer);
-    // layers.push_back(hcdLayer->getLayer());
+    // layers.push_back(hcdLayer->getLayer());//hcdLayer ncdLayer
     // layers.push_back(boxFilterLayer1->getLayer());
     // layers.push_back(alphaShow2Layer);
     // ---查看导向滤波效果
@@ -198,7 +217,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---双边滤波
     // layers.push_back(bilateralLayer->getLayer());
     // ---凸起失真，鱼眼效果
-    layers.push_back(bdLayer->getLayer());
+    // layers.push_back(bdLayer->getLayer());
     // canny边缘检测
     // layers.push_back(cedLayer->getLayer());
     // layers.push_back(alphaShowLayer);
@@ -216,6 +235,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(blurPositionLayer->getLayer());
     // ---球形映射,图像倒立
     // layers.push_back(srLayer->getLayer());
+    // ---马赛克
+    // layers.push_back(ppLayer->getLayer());
     // ---半色调效果，如新闻打印
     // layers.push_back(halftoneLayer->getLayer());
     // ---低通滤波器
@@ -244,6 +265,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(alphaShowLayer);
     // ---中值滤波K3
     // layers.push_back(medianK3Layer);
+    // ---运动模糊
+    // layers.push_back(motionBlurLayer->getLayer());
+    // ---运动检测
+    layers.push_back(motionDetectorLayer->getLayer());
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据

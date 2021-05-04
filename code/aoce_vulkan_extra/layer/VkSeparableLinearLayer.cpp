@@ -85,8 +85,8 @@ void VkSeparableLinearLayer::onInitGraph() {
 }
 
 void VkSeparableLinearLayer::onInitNode() {
-    rowLayer->getNode()->addLine(getNode(), 0, 0);
-    getNode()->setStartNode(rowLayer->getNode());
+    rowLayer->addLine(this, 0, 0);
+    setStartNode(rowLayer.get());
 }
 
 void VkSeparableLinearLayer::onInitLayer() {

@@ -11,7 +11,7 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkOutputLayer : public OutputLayer, public VkLayer {
+class AOCE_VULKAN_EXPORT VkOutputLayer : public OutputLayer, public VkLayer {
     AOCE_LAYER_QUERYINTERFACE(VkOutputLayer)
    private:
     // CPU输出使用

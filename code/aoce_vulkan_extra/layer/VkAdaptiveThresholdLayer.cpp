@@ -1,7 +1,6 @@
 #include "VkAdaptiveThresholdLayer.hpp"
 
 #include "aoce/Layer/PipeGraph.hpp"
-#include "aoce/Layer/PipeNode.hpp"
 
 namespace aoce {
 namespace vulkan {
@@ -43,9 +42,9 @@ void VkAdaptiveThresholdLayer::onInitGraph() {
 }
 
 void VkAdaptiveThresholdLayer::onInitNode() {
-    luminance->getNode()->addLine(getNode(), 0, 0);
-    boxBlur->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(luminance->getNode());
+    luminance->addLine(getLayer(), 0, 0);
+    boxBlur->addLine(getLayer(), 0, 1);
+    setStartNode(luminance.get());
 }
 
 }  // namespace layer

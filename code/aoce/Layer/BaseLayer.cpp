@@ -36,6 +36,58 @@ PipeNodePtr BaseLayer::getNode() {
 int32_t BaseLayer::getInCount() { return inCount; };
 int32_t BaseLayer::getOutCount() { return outCount; };
 
+void BaseLayer::setVisable(bool bvisable) {
+    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    getNode()->setVisable(bvisable);
+}
+void BaseLayer::setEnable(bool benable) {
+    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    getNode()->setEnable(benable);
+}
+int32_t BaseLayer::getGraphIndex() {
+    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    return getNode()->graphIndex;
+}
+void BaseLayer::setStartNode(BaseLayer* node, int32_t index,
+                             int32_t toInIndex) {
+    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    return getNode()->setStartNode(node, index, toInIndex);
+}
+void BaseLayer::setEndNode(BaseLayer* node) {
+    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    return getNode()->setEndNode(node);
+}
+BaseLayer* BaseLayer::addNode(BaseLayer* layer) {
+    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    BaseLayer* ptr = pipeGraph->addNode(layer);
+    return addLine(ptr, 0, 0);
+}
+BaseLayer* BaseLayer::addNode(ILayer* layer) {
+    return addNode(layer->getLayer());
+}
+BaseLayer* BaseLayer::addLine(BaseLayer* to, int32_t formOut, int32_t toIn) {
+    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    assert(toIn < to->inCount);
+    assert(formOut < outCount);
+    int toIndex = to->getGraphIndex();
+    // 节点如果有多组输入toIn,一个输入可以有多个输出
+    if (to->getNode()->startNodes[toIn].size() > 0) {
+        for (const auto& startNode : to->getNode()->startNodes[toIn]) {
+            pipeGraph->addLine(getGraphIndex(), startNode.nodeIndex, formOut,
+                               startNode.inIndex);
+        }
+    } else {
+        pipeGraph->addLine(getGraphIndex(), toIndex, formOut, toIn);
+    }
+    if (to->getNode()->endNodeIndex >= 0) {
+        BaseLayer* result = pipeGraph->getNode(to->getNode()->endNodeIndex);
+        assert(result);
+        return result;
+    }
+    return to;
+    // return getNode()->addLine(to, formOut, toIn);
+}
+
 bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,
                            int32_t outputIndex) {
     if (inIndex >= inCount) {
@@ -113,9 +165,9 @@ GroupLayer::GroupLayer() { bNoCompute = true; }
 
 GroupLayer::~GroupLayer() {}
 
-PipeNode* ILayer::getLayerNode() {
-    assert(getLayer());
-    return getLayer()->getNode().get();
-}
+// PipeNode* ILayer::getLayerNode() {
+//     assert(getLayer());
+//     return getLayer()->getNode().get();
+// }
 
 }  // namespace aoce

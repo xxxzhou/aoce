@@ -25,8 +25,7 @@ class VkExtraBaseView {
     ReSizeLayer* resizeLayer = nullptr;
     ILayer* extraLayer = nullptr;
 
-    PipeNodePtr yuvNode = nullptr;
-    PipeNodePtr layerNode = nullptr;
+    BaseLayer* layerNode = nullptr;
     VideoDevicePtr video = nullptr;
 
     GpuType gpuType = GpuType::vulkan;

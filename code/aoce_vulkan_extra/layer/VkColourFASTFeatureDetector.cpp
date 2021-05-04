@@ -1,7 +1,7 @@
 #include "VkColourFASTFeatureDetector.hpp"
 
 #include "aoce/Layer/PipeGraph.hpp"
-#include "aoce/Layer/PipeNode.hpp"
+
 
 namespace aoce {
 namespace vulkan {
@@ -38,9 +38,9 @@ void VkColourFASTFeatureDetector::onInitGraph() {
     pipeGraph->addNode(boxBlur->getLayer());
 }
 void VkColourFASTFeatureDetector::onInitNode() {
-    boxBlur->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(getNode(), 0, 0);
-    getNode()->setStartNode(boxBlur->getNode(), 0, 0);
+    boxBlur->addLine(this, 0, 1);
+    setStartNode(this, 0, 0);
+    setStartNode(boxBlur.get(), 0, 0);
 }
 
 }  // namespace layer

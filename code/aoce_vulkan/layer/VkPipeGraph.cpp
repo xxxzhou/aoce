@@ -138,12 +138,6 @@ bool VkPipeGraph::onRun() {
     for (auto* layer : vkLayers) {
         layer->onPreFrame();
     }
-    // 除开输出层,运行所有层
-    for (auto* layer : vkLayers) {
-        if (!layer->onFrame()) {
-            return false;
-        }
-    }
     // 等待上一桢执行完成,这种模式会导致当前桢输出的是上一桢的数据
     // 这样不需要等待当前GPU运行这桢数据完成.
     if (delayGpu) {
@@ -158,6 +152,12 @@ bool VkPipeGraph::onRun() {
     // 同步当前桢完成并输出
     if (!delayGpu) {
         executeOut();
+    }
+    // 除开输出层,运行所有层
+    for (auto* layer : vkLayers) {
+        if (!layer->onFrame()) {
+            return false;
+        }
     }
     return true;
 }

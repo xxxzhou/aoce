@@ -18,6 +18,9 @@ class VkPixellateLayer : public VkLayer, public ITLayer<PixellateParamet> {
    public:
     VkPixellateLayer(/* args */);
     virtual ~VkPixellateLayer();
+
+   protected:
+    virtual bool getSampled(int32_t inIndex) override;
 };
 
 // 半色调效果，如新闻打印

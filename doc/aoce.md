@@ -20,4 +20,6 @@ aoce_vulkan模块.
 
 aoce 模块.
 
-PipeNode类接口不公开,所有接口全隐藏,相应接口通过BaseLayer转接.
+PipeNode类接口不公开,所有接口全隐藏,相应接口通过BaseLayer转接(已完成).
+
+现在一个baselayer只能给一个pipegraph使用,能不能考虑抽离baselayer里的inFormats/outFormats,inLayers/outLayers分给pipenode,做到节点与pipegraph抽离附加一对一关系.

@@ -148,7 +148,31 @@ class VkMaskLayer : public VkLayer {
     /* data */
    public:
     VkMaskLayer(/* args */);
-    ~VkMaskLayer();
+    virtual ~VkMaskLayer();
+};
+
+class VkMultiplyBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkMultiplyBlendLayer(/* args */);
+    virtual ~VkMultiplyBlendLayer();
+};
+
+class VkNormalBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkNormalBlendLayer(/* args */);
+    ~VkNormalBlendLayer();
+};
+
+class VkOverlayBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkOverlayBlendLayer(/* args */);
+    ~VkOverlayBlendLayer();
 };
 
 

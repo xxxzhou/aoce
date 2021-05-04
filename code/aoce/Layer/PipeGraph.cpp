@@ -12,15 +12,15 @@ PipeGraph::PipeGraph(/* args */) {}
 
 PipeGraph::~PipeGraph() {}
 
-PipeNodePtr PipeGraph::getNode(int32_t index) {
+BaseLayer* PipeGraph::getNode(int32_t index) {
     int32_t count = (int32_t)nodes.size();
     if (index >= 0 && index < count) {
-        return nodes[index];
+        return nodes[index]->layer;
     }
     return nullptr;
 }
 
-PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
+BaseLayer* PipeGraph::addNode(BaseLayer* layer) {
     if (layer == nullptr) {
         logMessage(LogLevel::error, "node layer can not be empty");
     }
@@ -29,7 +29,7 @@ PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
         if (this->gpu != layer->gpu) {
             logMessage(LogLevel::error, "node layer gpu type no equal graph");
         }
-        assert(this->gpu == layer->gpu);        
+        assert(this->gpu == layer->gpu);
     }
     layer->pipeGraph = this;
     layer->onInit();
@@ -38,10 +38,10 @@ PipeNodePtr PipeGraph::addNode(BaseLayer* layer) {
     layer->pipeNode = ptr;
     nodes.push_back(ptr);
     layer->onInitNode();
-    return ptr;
+    return layer;
 }
 
-PipeNodePtr PipeGraph::addNode(ILayer* layer) {
+BaseLayer* PipeGraph::addNode(ILayer* layer) {
     assert(layer != nullptr);
     return addNode(layer->getLayer());
 }
@@ -67,12 +67,12 @@ bool PipeGraph::addLine(int32_t from, int32_t to, int32_t formOut,
     return false;
 }
 
-bool PipeGraph::addLine(PipeNodePtr from, PipeNodePtr to, int32_t formOut,
+bool PipeGraph::addLine(BaseLayer* from, BaseLayer* to, int32_t formOut,
                         int32_t toIn) {
-    return addLine(from->graphIndex, to->graphIndex, formOut, toIn);
+    return addLine(from->getGraphIndex(), to->getGraphIndex(), formOut, toIn);
 }
 
-void PipeGraph::getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
+bool PipeGraph::getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
                                   ImageFormat& format, bool bOutput) {
     if (nodeIndex < nodes.size() &&
         outputIndex < nodes[nodeIndex]->layer->outFormats.size()) {
@@ -82,7 +82,22 @@ void PipeGraph::getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
         if (bOutput) {
             format.imageType = tempFormat.imageType;
         }
+        return true;
     }
+    return false;
+}
+
+bool PipeGraph::getLayerInFormat(int32_t nodeIndex, int32_t inputIndex,
+                                 ImageFormat& format) {
+    if (nodeIndex < nodes.size() &&
+        inputIndex < nodes[nodeIndex]->layer->inFormats.size()) {
+        auto& tempFormat = nodes[nodeIndex]->layer->inFormats[inputIndex];
+        format.width = tempFormat.width;
+        format.height = tempFormat.height;
+        format.imageType = tempFormat.imageType;
+        return true;
+    }
+    return false;
 }
 
 void PipeGraph::clearLines() {
@@ -267,7 +282,7 @@ bool PipeGraph::resetGraph() {
 }
 
 bool PipeGraph::run() {
-    // 保证一次只处理一桢(MF 异步模式每次读取的数据可能并不在同一线程上)
+    // 保证PipeGraph对象一次只处理一桢(MF 异步模式每次读取的数据可能并不在同一线程上)
     std::lock_guard<std::mutex> mtx_locker(mtx);
     if (bReset) {
         logMessage(LogLevel::info, "start build graph.");

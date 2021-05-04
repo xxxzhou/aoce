@@ -243,9 +243,9 @@ void VkAdaptiveThresholdLayer::onInitGraph() {
 }
 
 void VkAdaptiveThresholdLayer::onInitNode() {
-    luminance->getNode()->addLine(getNode(), 0, 0);
-    boxBlur->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(luminance->getNode());
+    luminance->addLine(this, 0, 0);
+    boxBlur->addLine(this, 0, 1);
+    setStartNode(luminance);
 }
 ```
 

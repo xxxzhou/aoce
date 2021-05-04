@@ -37,7 +37,7 @@ class VkGuidedSolveLayer : public VkLayer, public ITLayer<float> {
 };
 
 class VkGuidedLayer : public VkLayer, public ITLayer<GuidedParamet> {
-    AOCE_LAYER_QUERYINTERFACE(VkGuidedLayer)
+    AOCE_LAYER_QUERYINTERFACE(VkGuidedLayer)    
    private:
     /* data */
     std::unique_ptr<VkConvertImageLayer> convertLayer;
@@ -48,10 +48,10 @@ class VkGuidedLayer : public VkLayer, public ITLayer<GuidedParamet> {
     std::unique_ptr<VkBoxBlurSLayer> box3Layer;
     std::unique_ptr<VkBoxBlurSLayer> box4Layer;
     std::unique_ptr<VkGuidedSolveLayer> guidedSlayerLayer;
-    std::unique_ptr<VkBoxBlurSLayer> box5Layer;    
+    std::unique_ptr<VkBoxBlurSLayer> box5Layer;
     std::unique_ptr<VkResizeLayer> resize1Layer;
 
-    const int32_t zoom = 8;
+    const int32_t zoom = 8;    
 
    public:
     VkGuidedLayer(/* args */);
@@ -63,7 +63,6 @@ class VkGuidedLayer : public VkLayer, public ITLayer<GuidedParamet> {
     virtual void onInitNode() override;
     virtual void onInitLayer() override;
 };
-
 
 }  // namespace layer
 }  // namespace vulkan

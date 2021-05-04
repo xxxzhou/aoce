@@ -32,8 +32,8 @@ void VkIOSBlurLayer::onInitNode() {
         ->addNode(blurLayer->getLayer())
         ->addNode(lumRangeLayer->getLayer())
         ->addNode(upLayer->getLayer());
-    getNode()->setStartNode(downLayer->getNode());
-    getNode()->setEndNode(upLayer->getNode());
+    setStartNode(downLayer.get());
+    setEndNode(upLayer.get());
 }
 
 }  // namespace layer

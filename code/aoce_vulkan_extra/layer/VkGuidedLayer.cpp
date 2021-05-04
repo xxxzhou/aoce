@@ -1,7 +1,6 @@
 #include "VkGuidedLayer.hpp"
 
 #include "aoce/Layer/PipeGraph.hpp"
-#include "aoce/Layer/PipeNode.hpp"
 
 namespace aoce {
 namespace vulkan {
@@ -50,7 +49,7 @@ VkGuidedLayer::VkGuidedLayer(/* args */) {
     outCount = 1;
     //
     convertLayer = std::make_unique<VkConvertImageLayer>();
-    resizeLayer = std::make_unique<VkResizeLayer>(ImageType::rgba32f);    
+    resizeLayer = std::make_unique<VkResizeLayer>(ImageType::rgba32f);
     toMatLayer = std::make_unique<VkToMatLayer>();
     box1Layer = std::make_unique<VkBoxBlurSLayer>(ImageType::rgba32f);
     box2Layer = std::make_unique<VkBoxBlurSLayer>(ImageType::rgba32f);
@@ -58,8 +57,8 @@ VkGuidedLayer::VkGuidedLayer(/* args */) {
     box4Layer = std::make_unique<VkBoxBlurSLayer>(ImageType::rgba32f);
     guidedSlayerLayer = std::make_unique<VkGuidedSolveLayer>();
     box5Layer = std::make_unique<VkBoxBlurSLayer>(ImageType::rgba32f);
-    resize1Layer = std::make_unique<VkResizeLayer>(ImageType::rgba32f);    
-    //box1Layer->updateParamet({paramet.boxSize, paramet.boxSize});
+    resize1Layer = std::make_unique<VkResizeLayer>(ImageType::rgba32f);
+    // box1Layer->updateParamet({paramet.boxSize, paramet.boxSize});
     resizeLayer->updateParamet({false, 1920 / 8, 1080 / 8});
     box2Layer->updateParamet({paramet.boxSize, paramet.boxSize});
     box3Layer->updateParamet({paramet.boxSize, paramet.boxSize});
@@ -101,32 +100,33 @@ void VkGuidedLayer::onInitGraph() {
 }
 
 void VkGuidedLayer::onInitNode() {
-    resizeLayer->getNode()->addLine(box1Layer->getNode(), 0, 0);
-    toMatLayer->getNode()->addLine(box2Layer->getNode(), 0, 0);
-    toMatLayer->getNode()->addLine(box3Layer->getNode(), 1, 0);
-    toMatLayer->getNode()->addLine(box4Layer->getNode(), 2, 0);
-    box1Layer->getNode()->addLine(guidedSlayerLayer->getNode(), 0, 0);
-    box2Layer->getNode()->addLine(guidedSlayerLayer->getNode(), 0, 1);
-    box3Layer->getNode()->addLine(guidedSlayerLayer->getNode(), 0, 2);
-    box4Layer->getNode()->addLine(guidedSlayerLayer->getNode(), 0, 3);
-    guidedSlayerLayer->getNode()->addLine(box5Layer->getNode());
-    box5Layer->getNode()->addLine(resize1Layer->getNode());
-    convertLayer->getNode()->addLine(getNode(), 0, 0);
-    resize1Layer->getNode()->addLine(getNode(), 0, 1);
-    getNode()->setStartNode(convertLayer->getNode());
+    resizeLayer->addLine(box1Layer.get(), 0, 0);
+    toMatLayer->addLine(box2Layer.get(), 0, 0);
+    toMatLayer->addLine(box3Layer.get(), 1, 0);
+    toMatLayer->addLine(box4Layer.get(), 2, 0);
+    box1Layer->addLine(guidedSlayerLayer.get(), 0, 0);
+    box2Layer->addLine(guidedSlayerLayer.get(), 0, 1);
+    box3Layer->addLine(guidedSlayerLayer.get(), 0, 2);
+    box4Layer->addLine(guidedSlayerLayer.get(), 0, 3);
+    guidedSlayerLayer->addLine(box5Layer.get());
+    box5Layer->addLine(resize1Layer.get());
+    convertLayer->addLine(this, 0, 0);
+    resize1Layer->addLine(this, 0, 1);
+    setStartNode(convertLayer.get());
 }
 
 void VkGuidedLayer::onInitLayer() {
     VkLayer::onInitLayer();
     ImageFormat format = {};
-    logAssert(resizeLayer->getInFormat(format),
-              "guider layer get error image format");
+    bool bGet =
+        pipeGraph->getLayerInFormat(resizeLayer->getGraphIndex(), 0, format);
+    logAssert(bGet, "guider layer get error image format");
     int32_t width = format.width;
     int32_t height = format.height;
     int32_t scaleWidth = divUp(width, zoom);
     int32_t scaleHeight = divUp(height, zoom);
     resizeLayer->updateParamet({false, scaleWidth, scaleHeight});
-    resize1Layer->updateParamet({true, width, height});    
+    resize1Layer->updateParamet({true, width, height});
 }
 
 VkGuidedLayer::~VkGuidedLayer() {}

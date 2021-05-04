@@ -76,19 +76,31 @@ class ACOE_EXPORT BaseLayer {
    public:
     // 附加到那个图表上
     class PipeGraph* getGraph();
-    // 附加到图表上的节点
-    std::shared_ptr<class PipeNode> getNode();
     int32_t getInCount();
     int32_t getOutCount();
 
+    // 如下所有公共方法全是转接PipeNode,需要附加到PipeGraph后才可以调用
+   public:
+    void setVisable(bool bvisable);
+    void setEnable(bool benable);
+    int32_t getGraphIndex();
+    // 如果层有多个输入,可能不同输入对应不同层内不同层
+    // index表示输入节点索引,node表示层内层节点,toInIndex表示对应层内层输入位置
+    void setStartNode(BaseLayer* node, int32_t index = 0,
+                      int32_t toInIndex = 0);
+    void setEndNode(BaseLayer* node);
+    BaseLayer* addNode(BaseLayer* layer);
+    BaseLayer* addNode(class ILayer* layer);
+    BaseLayer* addLine(BaseLayer* to, int32_t formOut = 0, int32_t toIn = 0);
+
    protected:
+    // 附加到图表上的节点
+    std::shared_ptr<class PipeNode> getNode();
     bool addInLayer(int32_t inIndex, int32_t nodeIndex, int32_t outputIndex);
     bool addOutLayer(int32_t outIndex, int32_t nodeIndex, int32_t inIndex);
     bool vaildInLayers();
     void initLayer();
     void resetGraph();
-
-   public:
     bool getInFormat(ImageFormat& format, int32_t index = 0);
 
    protected:
@@ -125,12 +137,6 @@ class ACOE_EXPORT ILayer {
    public:
     // 请看上面宏AOCE_LAYER_QUERYINTERFACE提供的默认实现
     virtual BaseLayer* getLayer() = 0;
-
-   public:
-    class PipeNode* getLayerNode();
-
-    operator BaseLayer*() { return getLayer(); };
-    // BaseLayer* operator->() const noexcept { return getLayer(); }
 };
 
 // 分离导致层不同参数的差异(AOCE_LAYER_QUERYINTERFACE)

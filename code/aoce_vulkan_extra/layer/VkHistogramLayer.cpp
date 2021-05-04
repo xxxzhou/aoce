@@ -61,11 +61,11 @@ void VkHistogramC4Layer::onInitGraph() {
 }
 
 void VkHistogramC4Layer::onInitNode() {
-    preLayer->getNode()->addLine(getNode(), 0, 0);
-    preLayer->getNode()->addLine(getNode(), 1, 1);
-    preLayer->getNode()->addLine(getNode(), 2, 2);
-    preLayer->getNode()->addLine(getNode(), 3, 3);
-    getNode()->setStartNode(preLayer->getNode());
+    preLayer->addLine(this, 0, 0);
+    preLayer->addLine(this, 1, 1);
+    preLayer->addLine(this, 2, 2);
+    preLayer->addLine(this, 3, 3);
+    setStartNode(preLayer.get());
 }
 
 void VkHistogramC4Layer::onInitLayer() {

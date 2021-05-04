@@ -10,6 +10,28 @@
 
 namespace aoce {
 
+struct vec2 {
+    float x = 0;
+    float y = 0;
+    inline bool operator==(const vec2 &right) {
+        return this->x == right.x && this->y == right.y;
+    }
+    inline float &operator[](int32_t idx) {
+        assert(idx >= 0 && idx < 2);
+        return *(&x + idx);
+    }
+    inline const float &operator[](int32_t idx) const {
+        assert(idx >= 0 && idx < 2);
+        return *(&x + idx);
+    }
+    inline vec2 operator*(const float &scale) {
+        vec2 temp = {};
+        temp.x = this->x * scale;
+        temp.y = this->y * scale;
+        return temp;
+    }
+};
+
 struct vec3 {
     float x = 0;
     float y = 0;

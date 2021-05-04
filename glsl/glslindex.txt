@@ -94,3 +94,17 @@ levels.comp
 lightenBlend.comp
 linearBurnBlend.comp
 luminosityBlend.comp
+mask.comp
+median.comp median.comp CHANNEL_RGBA=1
+median.comp medianC1.comp CHANNEL_R8=1
+median.comp medianK3.comp CHANNEL_RGBA=1 KSIZE3=1
+median.comp medianK3C1.comp CHANNEL_R8=1 KSIZE3=1
+monochrome.comp
+motionBlur.comp
+motionDetector.comp
+multiplyBlend.comp
+nobleCornerDetection.comp
+normalBlend.comp
+opacity.comp
+overlayBlend.comp
+pixellate.comp
