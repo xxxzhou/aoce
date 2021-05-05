@@ -48,7 +48,8 @@ class PipeNode {
     void setEnable(bool benable);
     // 如果层有多个输入,可能不同输入对应不同层内不同层
     // index表示输入节点索引,node表示层内层节点,toInIndex表示对应层内层输入位置
-    void setStartNode(BaseLayer* node, int32_t index = 0,
+    // 简单来说,index对应本身node,toInIndex对应toNode
+    void setStartNode(BaseLayer* toNode, int32_t index = 0,
                       int32_t toInIndex = 0);
     void setEndNode(BaseLayer* node);
 };

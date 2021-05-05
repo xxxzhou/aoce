@@ -23,7 +23,6 @@ void VkLookupLayer::loadLookUp(uint8_t* data, int32_t size) {
         vtype = VideoType::rgb8;
     } else {
         logAssert(vtype != VideoType::other, "look up table image error");
-        assert(vtype != VideoType::other);
     }
     VideoFormat vformat = {};
     vformat.width = 512;

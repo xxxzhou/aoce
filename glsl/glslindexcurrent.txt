@@ -1,7 +1,1 @@
-nobleCornerDetection.comp
-normalBlend.comp
-opacity.comp
-overlayBlend.comp
-pixellate.comp
-reduce2.comp reduce2_sumF4.comp REDUCE_SUM=1 CHANNEL_RGBA32F=1
-reduce2.comp reduce2_sumF1.comp REDUCE_SUM=1 CHANNEL_R32F=1
+poissonBlend.comp

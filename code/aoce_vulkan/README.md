@@ -36,9 +36,13 @@ VkPipeGraph 提供延迟运行方式，由delayGpu控制,如果为true,则输出
 
 如果层内包含别的处理层逻辑,请在这添上别的处理层.
 
+参看[VkGuidedLayer](../aoce_vulkan_extra/layer/VkGuidedLayer.cpp).
+
 3 onInitNode,当onInitGraph后被添加到PipeGraph后调用.
 
-当层内包含别的层时,用来指定层内之间的数据如何链接.
+本身layer在onInitGraph后,onInitNode前添加到PipeGraph了,当层内包含别的层时,用来指定层内之间的数据如何链接.
+
+参看[VkGuidedLayer](../aoce_vulkan_extra/layer/VkGuidedLayer.cpp).
 
 4 onInitLayer,当PipeGraph根据连接线重新构建正确的执行顺序后.
 
@@ -46,25 +50,37 @@ VkPipeGraph 提供延迟运行方式，由delayGpu控制,如果为true,则输出
 
 当前层的输入大小默认等于第0个输入层的输出大小,并指定线程组的分配大小,如果逻辑需要变化,请在这里修改.
 
+参看[VkReSizeLayer](layer/VkResizeLayer.cpp).
+
 5 onInitBuffer,当所有有效层执行完后onInitLayer后,各层开始调用.
 
 自动查找到输入层的输出Texture,并生成本层的输出Texture给当前层的输出层使用.
 
-如果自己有Vulkan BUFFER需要处理,请在onInitVkBuffer里处理.参看VkBoxBlurLayer.
+如果自己有Vulkan BUFFER需要处理,请在onInitVkBuffer里处理.
+
+参看[VkInputLayer](layer/VkInputLayer.cpp) [VkOutputLayer](layer/VkOutputLayer.cpp) [VkSeparableLinearLayer](../aoce_vulkan_extra/layer/VkSeparableLinearLayer.cpp).
 
 6 onInitPipe,当本层执行完onInitVkBuffer后调用.
 
 在这里,根据输入与输出的Texture自动更新VkWriteDescriptorSet,并且生成ComputePipeline.如果有自己的逻辑,请override实现.
 
+参看[VkInputLayer](layer/VkInputLayer.cpp) [VkSeparableLinearLayer](../aoce_vulkan_extra/layer/VkSeparableLinearLayer.cpp) [VkSaveFrameLayer](../aoce_vulkan_extra/layer/VkLowPassLayer.hpp)
+
 7 onPreCmd 当所有层执行完onInitBuffer后.
 
 填充vkCommandBuffer,vkCmdBindPipeline/vkCmdBindDescriptorSets/vkCmdDispatch 三件套.
+
+参看[VkInputLayer](layer/VkInputLayer.cpp) [VkHistogramLayer](../aoce_vulkan_extra/layer/VkHistogramLayer.cpp)
 
 8 onFrame 每桢处理时调用.
 
 一般来说,只有输入层或输出层override处理,用于把vulkan texture交给CPU/opengl es/dx11等等.
 
+参看[VkInputLayer](layer/VkInputLayer.cpp) [VkOutputLayer](layer/VkOutputLayer.cpp)
+
 9 onUpdateParamet 独立上面的时间线,由用户更新层的参数时会调用.
+
+但是实现并不会马上更新到GPU中,会改变状态,由GPU的运行Command线程发现状态变化后更新到UBO BUFFER中,避免一些BUG.
 
 一般来说,根据情况设置不同逻辑,请看下面章节UBO.
 

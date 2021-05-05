@@ -4,13 +4,13 @@
 
 ## GaussianBlurPosition 指定区域高斯模糊
 
-没有按照GPUImage里的方式实现,按照类似GaussianSelectiveBlur方式实现,一张高斯模糊图,一张原图,二图进行混合,这种实现方式更灵活(模糊半径等参数),并且并不会降低性能.
+没有按照GPUImage里的方式实现,按照类似GaussianSelectiveBlur方式实现,一张高斯模糊图,一张原图,二图进行混合,这种实现方式更灵活(模糊半径等参数),并且并不会降低性能(单独的高斯模糊更容易优化).
 
 ## SphereRefraction 环境映射
 
 [环境映射技术漫谈](https://zhuanlan.zhihu.com/p/144438588)
 
-和GlassSphere一样,主要就是球形坐标系与UV坐标转化,刚开始完成后,我测试效果,发现圈外在闪烁,后面发现没把圈外置0,withinSphere表示圈外圈内.
+和GlassSphere一样,主要就是球形坐标系与UV坐标系的转化,刚开始完成后,我测试效果,发现圈外在闪烁,后面发现没把圈外置0,其中withinSphere表示圈外圈内.
 
 ## Halftone 半色调效果,类似新闻打印
 
@@ -20,13 +20,13 @@
 
 实现这个类,首先要实现LowPass,这个滤境有点特殊,需要保存上一桢的传入图像,然后比较当前桢与上一桢.
 
-我设定运行图使用的有向无循环图,中间可以自动排除不可用节点并自动链接下层,所以不能有回环线,从一层保存一桢然后使用再拿回来使用,这样构成回环,所以我定义VkSaveFrameLayer层为bInput = true,告诉外面不需要自动连接别层输入,在相应接口手动指定别的层需要保存的纹理.
+我设定运行图使用的有向无循环图,中间可以根据需求自动排除不可用节点并自动链接下层,所以不能有回环线,从一层保存一桢然后再拿回来使用,这样构成回环,所以我定义VkSaveFrameLayer层为bInput = true,当作输入层,告诉外面不需要自动连接别层输入,在相应接口手动指定别的层需要保存的纹理.
 
 最开始我直接调用vkCmdCopyImage,发现在Nsight显示占用0.3ms-0.7ms左右的时间,从逻辑上来说,应该不可能啊,这个copy应该比最简单的运算层占去的时间要更少才对,于是我测试了二种方案,对应参数bUserPipe,表示用不用管线,用管线控制到0.2ms内,用vkCmdCopyImage在0.3ms以上,以后找下资料看看是什么问题.
 
 LowPass有二个输入,然后就是第一输入节点是上层,第二个输入节点是SaveFrameLayer,在LowPass运行前,SaveFrameLayer提供输入,在LowPass后(混合前后桢,可以去掉类似摩尔纹的东东),把结果又保存在SaveFrameLayer里.
 
-HighPass就是比较与LowPass的差异,可用来显示突示变化的像素.
+HighPass就是比较与LowPass的差异,可用来显示变化大的像素.
 
 相应源码,有兴趣可以自己查看[VkLowPassLayer](../code/aoce_vulkan_extra/layer/VkLowPassLayer.cpp)
 
@@ -40,27 +40,37 @@ GPUImage通过回读到CPU然后计算,这种方式直接放弃,查看相应open
 
 保存到临时buffer,我在开始四通道时使用类似reduce2分二段,不用原子操作的方式,但是效果并不好,一是第一次把16*16块的方式转换成对应的一个个直方图,模块并没的缩小,导致第二块把这一个直方图通过for加在一起需要循环1920/16x1080/16(假设是1080P的图),这个会花费超过2ms,这种方式就pass掉,我直接使用原子操作导出四个图然后再结合都比这个快.
 
+![avatar](../images/cs_time_12.png "atiom")
+
+可以看到,在这之前,要先vkCmdClearColorImage结果,几乎不消费时间,我也是这样理解的,但是为什么vkCmdCopyImage会导致那么大的时间等待了?
+
+时间差不多在0.2ms左右,不过随机的亮度图,亮度比较分散,后面使用只有0,1的二种图看看会不会影响这个时间.
+
 一通道在0.18ms左右,四通道在0.52ms+0.01ms,比0.18*4快些.
 
 直方图的显示可以使用VkAlphaShow2Layer显示,没有用GPUImage里的显示方式,其对应输出分别为256x1x(R32UI/RGBA32UI)纹理,自己用glsl显示各种需求应该更方便.要输出到CPU的话,直接接一个VkOutputLayer也方便.
 
 ## iOSBlur 一种特定模糊实现
 
-组合downSampler/saturation/gaussian blur/luminance range/upSampler几个层的输出效果就是.
+把原来的几个已经实现的层downSampling/saturation/gaussian blur/luminance range/upSampling组合一下输出效果就是.
 
 ## Kuwahara 实现类似油画风格效果
 
-在GPUImage上最开始就说了,只适合静止图像,因为很耗性能.原理比较简单,查找当前像素周边四个方向区域最小的区域.
+[kuwahara filter 实现](https://blog.csdn.net/skelking/article/details/44618963)
+
+在GPUImage上最开始就说了,只适合静止图像,因为很耗性能.原理比较简单,查找当前像素周边四个方向区域方差最小的区域.
 
 因其算法特点,卷积分离没有使用,只使用了局部共享显存优化,在PC 2070N卡1080P下,半径5需要3.3ms,半径10需要9.7ms.
 
 测试在手机Redmi 10X Pro 用半径3在720P下非常流畅,可以满足30fps运行.
 
-下面专门优化的Kuwahara3x3就没用了,不可能比得了使用局部共享显存优化方案.
+[PC平台Vulkan运算层时间记录](https://github.com/xxxzhou/aoce/tree/master/doc/PC平台Vulkan运算层时间记录.md)里可以看到,3x3时使用局部共享显存并不一定会占优,但是只要核大于3x3,使用局部共享显存的方案就一定会提速,核越大提速越多.
+
+Kuwahara3x3因为算法特性,需要4x4x4,与8x8相当,就算专门去掉重复的那几行,也要读取49个数据,相当于7x7,所以下面专门优化的Kuwahara3x3就没用了.
 
 ## Laplacian 使用拉普拉斯算子查找边缘
 
-比较常见,一个像素与一个特定3x3矩阵的结果,单独拿出来说,是因为在ubo中,直接使用mat3/mat4,在CPU中使用类似的的Mat3x3,Mat4x4对齐会有问题,并且我在Nsight查看到对应的UBO里放着正确的mat3对应数据,但是结果就是不对.最不容易出错的方法就是在ubo中全使用单个float+std140表示类似vec3/vec4/mat3/mat4,在CPU端不需要特殊处理结构,和ubo一样顺序就行,这样最不容易出现CPU-GPU中的UBO对齐问题.
+比较常见,一个像素与一个特定3x3矩阵的结果,单独拿出来说,是因为在ubo中,直接使用mat3/mat4,在CPU中使用类似的的Mat3x3,Mat4x4对齐会有问题,并且我在Nsight查看到对应的UBO里放着正确的mat3对应数据,但是结果就是不对.最不容易出错的方法就是在ubo中全使用单个float+std140表示类似vec3/vec4/mat3/mat4结构,在CPU端就不需要特殊处理结构,和ubo一样顺序就行,这样最不容易出现CPU-GPU中的UBO对齐问题.
 
 ## Lookup 颜色查找表
 
@@ -80,7 +90,7 @@ GPUImage通过回读到CPU然后计算,这种方式直接放弃,查看相应open
 
 ## MotionBlur 运动模糊
 
-在没看GPUImage实现前,我还在想HighPass很像运动模糊,但是其在GPUImage里,就是简单的给定一个方向,然后由这个方向模糊,并没有前后桢的叠加比较,因其实现简单,所以也移植了.
+在没看GPUImage实现前,我还在想HighPass就有点运动模糊的味道,但是其在GPUImage实现里,就是简单的给定一个方向,然后由这个方向模糊,并没有前后桢的叠加比较,因其实现简单,所以也移植了.
 
 ## MotionDetector 运动检测
 
@@ -152,7 +162,7 @@ void VkMotionDetectorLayer::onInitNode() {
 }
 ```
 
-顺便还通过CPU的输出,查到了一个reduce2.comp里divup的低级错误.
+顺便还通过CPU的输出,查到了一个reduce2.comp里divup误写导致的低级错误.
 
 ## NobleCornerDetection Noble角点检测
 
@@ -160,7 +170,7 @@ void VkMotionDetectorLayer::onInitNode() {
 
 ## Opening 开运算,先侵蚀后膨胀
 
-由侵蚀与膨胀,专门提供一个类GroupLayer,本身不提供任何计算,只组合别的运算层.
+和Closing一样,由侵蚀与膨胀组合,专门提供一个类GroupLayer,本身不提供任何计算,只组合别的运算层.
 
 ## 中间没有移植的滤镜统计
 
@@ -172,6 +182,8 @@ void VkMotionDetectorLayer::onInitNode() {
 
 4. LineGenerator这个现在还没想到如何能在GPGPU中高效画多条线,普通的渲染管线方式倒是方便实现,后面查找资料确定移植方法.
 
-5. 直方图的显示,其在VkHistogramLayer里会输出分别为256x1x(R32UI/RGBA32UI)纹理,自己根据你的需求去写相应glsl显示更合适.
+5. MosaicFilter没找到具体显示效果,看到显示效果应该就可以马上移植了.
 
-其中从D到O的因为前面实现一些层的时候,有一些已经实现过,也不在本文里说明,现在GPUImager移植进度大约有60%,相应的效果可以在[vulkanextratest](../samples/vulkanextratest),win端修改Win32.cpp,android修改Android.cpp查看对应平台效果,等所有效果移植完成后会写配套专门的UI界面查看.
+6. 直方图的显示,现框架实现的VkHistogramLayer里会输出分别为256x1x(R32UI/RGBA32UI)纹理,自己根据你的需求去写相应glsl显示更合适.
+
+其中从D到O的处理,有一部分因为前面实现别的层时,有一些已经实现过,也不在本文里说明,现在GPUImager移植进度大约有60%,相应的效果可以在[vulkanextratest](../samples/vulkanextratest),win端修改Win32.cpp,android修改Android.cpp查看对应平台效果,等所有效果移植完成后会写配套专门的UI界面查看.

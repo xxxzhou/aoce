@@ -265,3 +265,9 @@ GPUImage的实现好像和原理差别有点大,应该是特化实现,暂不移�
 ### NobleCornerDetection
 
 和HarrisCornerDetection唯一区别,就是角点的计算细节不同.
+
+### PoissonBlend 泊松融合
+
+[图像融合之泊松编辑(Poisson Editing)(2)](https://blog.csdn.net/u011534057/article/details/68922319)
+
+[cuda poisson](https://github.com/3cHeLoN/cupoisson)

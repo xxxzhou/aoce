@@ -81,6 +81,7 @@ class ACOE_EXPORT BaseLayer {
 
     // 如下所有公共方法全是转接PipeNode,需要附加到PipeGraph后才可以调用
    public:
+    bool bAttachGraph();
     void setVisable(bool bvisable);
     void setEnable(bool benable);
     int32_t getGraphIndex();
@@ -96,6 +97,7 @@ class ACOE_EXPORT BaseLayer {
    protected:
     // 附加到图表上的节点
     std::shared_ptr<class PipeNode> getNode();
+    void cheackAttachGraph();
     bool addInLayer(int32_t inIndex, int32_t nodeIndex, int32_t outputIndex);
     bool addOutLayer(int32_t outIndex, int32_t nodeIndex, int32_t inIndex);
     bool vaildInLayers();
@@ -145,6 +147,10 @@ class ITLayer : public ILayer {
    protected:
     T oldParamet = {};
     T paramet = {};
+
+   public:
+    ITLayer(){};
+    virtual ~ITLayer(){};
 
    public:
     void updateParamet(const T& t) {

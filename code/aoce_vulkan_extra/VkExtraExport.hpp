@@ -334,6 +334,10 @@ class MotionDetectorLayer : public ITLayer<float> {
     motionHandle onMotionEvent;
 
    public:
+    MotionDetectorLayer(){};
+    virtual ~MotionDetectorLayer(){};
+
+   public:
     inline void setMotionHandle(motionHandle handle) { onMotionEvent = handle; }
 };
 

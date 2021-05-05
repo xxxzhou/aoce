@@ -15,6 +15,7 @@ namespace layer {
 // 定义这层为bInput = true,告诉外面不需要自动连接别层输入,手动连接
 class VkSaveFrameLayer : public VkLayer {
    private:
+    // 是否自己使用ComputeShader复制
     bool bUserPipe = true;
 
    public:
@@ -22,8 +23,10 @@ class VkSaveFrameLayer : public VkLayer {
     ~VkSaveFrameLayer();
 
    public:
-    void setImageFormat(const ImageFormat& imageFormat, int32_t nodeIndex,
-                        int32_t outNodeIndex);
+    // 手动设定需要保存的纹理,需要保存层在onInitLayer调用
+    // 这个时候层知道了纹理大小,层在graph的位置,然后下一时间onPreCmd可以汇总信息
+    void saveImageInfo(const ImageFormat& imageFormat, int32_t nodeIndex,
+                       int32_t outNodeIndex);
 
    protected:
     // 比较特殊,在这个时间,可能还拿不到inTexs数据,交给onPreCmd

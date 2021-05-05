@@ -8,7 +8,9 @@ GPUImageTwoInputFilter: 说明有二个输入文件.
 
 GPUImage3x3ConvolutionFilter/GPUImage3x3TextureSamplingFilter: 给3*3个UV坐标.
 
-GPUImageFilter: 最基本的一输入一输出一pass处理.
+GPUImageFilter: 最基本的一输入一输出一pass处理,UV就是自己.
+
+GPUImageTwoInputCrossTextureSamplingFilter: 拿到前后,左右,包含自己的UV给FS.
 
 ## 移植类说明
 

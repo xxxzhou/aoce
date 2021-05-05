@@ -15,7 +15,7 @@ namespace layer {
 
 VkLayer::VkLayer(/* args */) { gpu = GpuType::vulkan; }
 
-VkLayer::~VkLayer() {}
+VkLayer::~VkLayer() { constBufCpu.clear(); }
 
 void VkLayer::setUBOSize(int size, bool bMatchParamet) {
     conBufSize = size;
@@ -97,8 +97,9 @@ void VkLayer::createOutTexs() {
         // VkMemoryPropertyFlags
         VkMemoryPropertyFlags texFlags = VK_IMAGE_USAGE_STORAGE_BIT;
         auto& outLayer = this->outLayers[i];
-        // 需要检测当前层的输出层是否需要当前层的纹理需要纹理
+        // 需要检测当前层的输出层是否需要当前层的纹理需要采样
         bool bMustSampled = false;
+        // 是否需要输出
         bool bMustOutput = false;
         for (int32_t i = 0; i < outLayer.size(); i++) {
             if (vkPipeGraph->getMustSampled(outLayer[i].nodeIndex,
@@ -113,6 +114,7 @@ void VkLayer::createOutTexs() {
         if (bMustSampled) {
             texFlags = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
         }
+        // 输入与输出都给传输位
         if (bInput || bMustOutput) {
             texFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
             texFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
@@ -171,6 +173,7 @@ void VkLayer::onInitPipe() {
     std::vector<void*> bufferInfos;
     for (int i = 0; i < inCount; i++) {
         inTexs[i]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+        // 需要采样就提供,否则不提供
         if (getSampled(i)) {
             VkSampler sampler = context->linearSampler;
             if (sampledNearest(i)) {

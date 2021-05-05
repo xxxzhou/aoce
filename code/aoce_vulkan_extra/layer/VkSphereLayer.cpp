@@ -16,11 +16,6 @@ bool VkSphereRefractionLayer::getSampled(int32_t inIndex) {
     return inIndex == 0;
 }
 
-void VkSphereRefractionLayer::onPreCmd() {
-    // clearColor({1.0, 0.0, 0.0, 1.0});
-    VkLayer::onPreCmd();
-}
-
 VkGlassSphereLayer::VkGlassSphereLayer(/* args */) {
     glslPath = "glsl/glassSphere.comp.spv";
     setUBOSize(sizeof(paramet), true);

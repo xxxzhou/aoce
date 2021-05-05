@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Aoce/Layer/BaseLayer.hpp"
-#include "Aoce/Math/AMath.hpp"
-
 #include "../vulkan/VulkanContext.hpp"
 #include "../vulkan/VulkanPipeline.hpp"
 #include "../vulkan/VulkanShader.hpp"
+#include "Aoce/Layer/BaseLayer.hpp"
+#include "Aoce/Math/AMath.hpp"
 #include "VkHelper.hpp"
 
 namespace aoce {
@@ -36,13 +35,9 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
 
    protected:
     // groupX/groupY 一定要与CS里的线程组划分对应,否则出现奇怪的问题
-#if WIN32
-    int32_t groupX = 16;
-    int32_t groupY = 16;
-#else
-    int32_t groupX = 16;
-    int32_t groupY = 16;
-#endif
+    // 不要改动,相应的comp文件全部分对应的这二个数值
+    const int32_t groupX = 16;
+    const int32_t groupY = 16;
     // int32_t groupZ = 1;
     int32_t sizeX = 1;
     int32_t sizeY = 1;

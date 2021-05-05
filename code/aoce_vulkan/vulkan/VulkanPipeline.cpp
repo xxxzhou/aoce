@@ -15,13 +15,16 @@ UBOLayout::~UBOLayout() {
         auto size = items.size();
         for (auto i = 0; i < size; i++) {
             vkDestroyDescriptorSetLayout(device, descSetLayouts[i], nullptr);
+            descSetLayouts[i] = VK_NULL_HANDLE;
             items[i].clear();
         }
         if (descPool) {
             vkDestroyDescriptorPool(device, descPool, nullptr);
+            descPool = VK_NULL_HANDLE;
         }
         if (pipelineLayout) {
             vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+            pipelineLayout = VK_NULL_HANDLE;
         }
         // vkFreeDescriptorSets
         items.clear();
@@ -190,7 +193,7 @@ void UBOLayout::updateSetLayout(uint32_t groupIndex, uint32_t setIndex,
                     static_cast<VkBufferView*>(bufferInfos[i]);
             default:
                 break;
-        }        
+        }
         write.descriptorCount = 1;
         writes.push_back(write);
     }

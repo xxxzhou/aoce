@@ -62,6 +62,7 @@
     }
 #endif
 
+// 关闭window平台的自定义的相关min/max
 #define NOMINMAX 1
 
 #ifndef M_PI

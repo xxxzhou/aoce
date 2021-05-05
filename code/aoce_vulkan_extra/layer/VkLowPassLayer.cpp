@@ -8,6 +8,7 @@ namespace vulkan {
 namespace layer {
 
 VkSaveFrameLayer::VkSaveFrameLayer(/* args */) {
+    // 是否自己使用ComputeShader复制
     bUserPipe = true;
     // 告诉外面,不需要自动连接别层输入
     bInput = true;
@@ -16,7 +17,7 @@ VkSaveFrameLayer::VkSaveFrameLayer(/* args */) {
 
 VkSaveFrameLayer::~VkSaveFrameLayer() {}
 
-void VkSaveFrameLayer::setImageFormat(const ImageFormat& imageFormat,
+void VkSaveFrameLayer::saveImageInfo(const ImageFormat& imageFormat,
                                       int32_t nodeIndex, int32_t outNodeIndex) {
     inFormats[0] = imageFormat;
     outFormats[0] = imageFormat;
@@ -60,7 +61,7 @@ void VkLowPassLayer::onInitNode() {
 
 void VkLowPassLayer::onInitLayer() {
     VkLayer::onInitLayer();
-    saveLayer->setImageFormat(inFormats[0], getGraphIndex(), 0);
+    saveLayer->saveImageInfo(inFormats[0], getGraphIndex(), 0);
 }
 
 VkHighPassLayer::VkHighPassLayer(/* args */) {

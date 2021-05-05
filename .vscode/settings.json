@@ -85,7 +85,9 @@
         "mediaplayer.hpp": "c",
         "clocale": "cpp",
         "optional": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "aoce.hpp": "c",
+        "aocedefine.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,

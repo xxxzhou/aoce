@@ -89,6 +89,7 @@ void string_format(std::string& msg, Args... args) {
 
 ACOE_EXPORT void logMessage(aoce::LogLevel level, const std::string& message);
 
+// 如果结果不正确,先输出提示,然后assert
 ACOE_EXPORT void logAssert(bool expression, const std::string& message);
 
 ACOE_EXPORT std::wstring utf8TWstring(const std::string& str);

@@ -1,8 +1,6 @@
 #include "VkBlendLayer.hpp"
 
-#include <math.h>
-
-#include "VkPipeGraph.hpp"
+#include <algorithm>
 
 namespace aoce {
 namespace vulkan {

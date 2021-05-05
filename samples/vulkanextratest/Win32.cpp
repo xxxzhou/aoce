@@ -85,7 +85,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     adaParamet.offset = 0.01f;
     adaptiveLayer->updateParamet(adaParamet);
 
-    alphaShowLayer = createAlphaShowLayer();
+    alphaShowLayer = createAlphaShowLayer();   
     alphaShow2Layer = createAlphaShow2Layer();
     luminanceLayer = createLuminanceLayer();
 
@@ -98,10 +98,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     hcdLayer->updateParamet(hcdParamet);
 
     ncdLayer = createNobleCornerDetectionLayer();
-    ncdLayer->updateParamet(hcdParamet);
+    ncdLayer->updateParamet(hcdParamet);	
 
     boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);
-    boxFilterLayer1->updateParamet({5, 5});
+    boxFilterLayer1->updateParamet({5, 5});    
 
     resizeLayer = createResizeLayer(ImageType::rgba8);
     resizeLayer->updateParamet({true, 1920 / 8, 1080 / 8});
@@ -147,7 +147,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     bpp.gaussian.blurRadius = 20;
     blurPositionLayer->updateParamet(bpp);
 
-    srLayer = createSphereRefractionLayer();
+    srLayer = createSphereRefractionLayer();   
 
     ppLayer = createPixellateLayer();
 
@@ -240,7 +240,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---半色调效果，如新闻打印
     // layers.push_back(halftoneLayer->getLayer());
     // ---低通滤波器
-    // layers.push_back(lowPassLayer->getLayer());
+    layers.push_back(lowPassLayer->getLayer());
     // ---高通滤波器
     // bAutoIn = true;
     // layers.push_back(highPassLayer->getLayer());
@@ -268,7 +268,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---运动模糊
     // layers.push_back(motionBlurLayer->getLayer());
     // ---运动检测
-    layers.push_back(motionDetectorLayer->getLayer());
+    // layers.push_back(motionDetectorLayer->getLayer());
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据

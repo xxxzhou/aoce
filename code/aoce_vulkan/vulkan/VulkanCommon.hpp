@@ -1,13 +1,15 @@
 #pragma once
-#include <assert.h>
 
 #include <iostream>
 #include <string>
 #include <vector>
-#ifdef _WIN32
-#elif defined(VK_USE_PLATFORM_WIN32_KHR)
-#include <windows.h>
-#elif defined(VK_USE_PLATFORM_ANDROID_KHR)
+
+#include "aoce/Aoce.hpp"
+
+#if defined(VK_USE_PLATFORM_WIN32_KHR)
+#endif
+
+#if defined(VK_USE_PLATFORM_ANDROID_KHR)
 #include <android/asset_manager.h>
 #include <android/log.h>
 #include <android/native_activity.h>
@@ -16,6 +18,7 @@
 // vulkan_wrapper需在vulkan之前,否则许多函数指针会重定义
 #include "../android/vulkan_wrapper.h"
 #endif
+
 #include <vulkan/vulkan.h>
 
 #ifdef _WIN32

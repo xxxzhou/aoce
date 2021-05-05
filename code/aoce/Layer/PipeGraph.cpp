@@ -21,15 +21,18 @@ BaseLayer* PipeGraph::getNode(int32_t index) {
 }
 
 BaseLayer* PipeGraph::addNode(BaseLayer* layer) {
-    if (layer == nullptr) {
-        logMessage(LogLevel::error, "node layer can not be empty");
-    }
-    assert(layer != nullptr);
+    logAssert(layer != nullptr, "node layer can not be empty");
     if (!layer->bNoCompute) {
-        if (this->gpu != layer->gpu) {
-            logMessage(LogLevel::error, "node layer gpu type no equal graph");
-        }
-        assert(this->gpu == layer->gpu);
+        logAssert(this->gpu == layer->gpu,
+                  "node layer gpu type no equal graph");
+    }
+    if (layer->pipeGraph != nullptr) {
+        logAssert(layer->pipeGraph != this, "layer have attach other graph.");
+        std::string message;
+        string_format(
+            message,
+            "layer already in graph,may generate problems,node:", nodes.size());
+        logMessage(LogLevel::error, message);
     }
     layer->pipeGraph = this;
     layer->onInit();
@@ -108,6 +111,11 @@ void PipeGraph::clearLines() {
 
 void PipeGraph::clear() {
     clearLines();
+    // 置空,免指向野指针
+    for (auto& node : nodes) {
+        node->getLayer()->pipeGraph = nullptr;
+    }
+    // layer weak_ptr node,故node清空后,layer的node指向自动不可用
     nodes.clear();
     nodeExcs.clear();
     bReset = true;
@@ -282,7 +290,8 @@ bool PipeGraph::resetGraph() {
 }
 
 bool PipeGraph::run() {
-    // 保证PipeGraph对象一次只处理一桢(MF 异步模式每次读取的数据可能并不在同一线程上)
+    // 保证PipeGraph对象一次只处理一桢(MF
+    // 异步模式每次读取的数据可能并不在同一线程上)
     std::lock_guard<std::mutex> mtx_locker(mtx);
     if (bReset) {
         logMessage(LogLevel::info, "start build graph.");
@@ -291,6 +300,8 @@ bool PipeGraph::run() {
         if (!resetGraph()) {
             logMessage(LogLevel::warn, "build graph failed.");
             return false;
+        } else {
+            logMessage(LogLevel::info, "build graph success.");
         }
     }
     return onRun();

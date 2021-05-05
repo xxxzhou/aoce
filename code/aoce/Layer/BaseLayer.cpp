@@ -36,29 +36,31 @@ PipeNodePtr BaseLayer::getNode() {
 int32_t BaseLayer::getInCount() { return inCount; };
 int32_t BaseLayer::getOutCount() { return outCount; };
 
+bool BaseLayer::bAttachGraph() { return !pipeNode.expired(); }
+
 void BaseLayer::setVisable(bool bvisable) {
-    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    cheackAttachGraph();
     getNode()->setVisable(bvisable);
 }
 void BaseLayer::setEnable(bool benable) {
-    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    cheackAttachGraph();
     getNode()->setEnable(benable);
 }
 int32_t BaseLayer::getGraphIndex() {
-    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    cheackAttachGraph();
     return getNode()->graphIndex;
 }
 void BaseLayer::setStartNode(BaseLayer* node, int32_t index,
                              int32_t toInIndex) {
-    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    cheackAttachGraph();
     return getNode()->setStartNode(node, index, toInIndex);
 }
 void BaseLayer::setEndNode(BaseLayer* node) {
-    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    cheackAttachGraph();
     return getNode()->setEndNode(node);
 }
 BaseLayer* BaseLayer::addNode(BaseLayer* layer) {
-    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    cheackAttachGraph();
     BaseLayer* ptr = pipeGraph->addNode(layer);
     return addLine(ptr, 0, 0);
 }
@@ -66,13 +68,15 @@ BaseLayer* BaseLayer::addNode(ILayer* layer) {
     return addNode(layer->getLayer());
 }
 BaseLayer* BaseLayer::addLine(BaseLayer* to, int32_t formOut, int32_t toIn) {
-    logAssert(!pipeNode.expired(), "please attach to the PipeGraph first.");
+    cheackAttachGraph();
+    to->cheackAttachGraph();
     assert(toIn < to->inCount);
     assert(formOut < outCount);
     int toIndex = to->getGraphIndex();
     // 节点如果有多组输入toIn,一个输入可以有多个输出
-    if (to->getNode()->startNodes[toIn].size() > 0) {
-        for (const auto& startNode : to->getNode()->startNodes[toIn]) {
+    const auto& toStartNodes = to->getNode()->startNodes[toIn];
+    if (toStartNodes.size() > 0) {
+        for (const auto& startNode : toStartNodes) {
             pipeGraph->addLine(getGraphIndex(), startNode.nodeIndex, formOut,
                                startNode.inIndex);
         }
@@ -84,8 +88,11 @@ BaseLayer* BaseLayer::addLine(BaseLayer* to, int32_t formOut, int32_t toIn) {
         assert(result);
         return result;
     }
-    return to;
-    // return getNode()->addLine(to, formOut, toIn);
+    return to;    
+}
+
+void BaseLayer::cheackAttachGraph() {
+    logAssert(!pipeNode.expired(), "please attach to the graph first.");
 }
 
 bool BaseLayer::addInLayer(int32_t inIndex, int32_t nodeIndex,

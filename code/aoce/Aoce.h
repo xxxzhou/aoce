@@ -304,6 +304,8 @@ extern "C" {
 ACOE_EXPORT void setLogAction(logEventAction action);
 ACOE_EXPORT void setLogHandle(logEventHandle action);
 
+ACOE_EXPORT const char *getLogLevel(AOCE_LOG_LEVEL level);
+
 ACOE_EXPORT void logMessage(AOCE_LOG_LEVEL level, const char *message);
 
 ACOE_EXPORT uint32_t divUp(int32_t x, int32_t y);

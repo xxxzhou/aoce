@@ -60,7 +60,7 @@ class AOCE_VULKAN_EXPORT UBOLayout {
     std::vector<int32_t> groupSize;
     std::map<VkDescriptorType, uint32_t> descripts;
     // 确定所有UBO不同descriptorType的总结
-    VkDescriptorPool descPool;
+    VkDescriptorPool descPool = VK_NULL_HANDLE;
     // 根据groupIndex分组生成不同VkDescriptorSetLayout
     std::vector<VkDescriptorSetLayout> descSetLayouts;
 

@@ -21,10 +21,29 @@
 
 using namespace aoce;
 
+const char* infoAoceLevel = "info";
+const char* warnAoceLevel = "warn";
+const char* errorAoceLevel = "error";
+const char* debugAoceLevel = "debug";
+
 static logEventHandle logHandle = nullptr;
 
 void setLogAction(logEventAction action) { logHandle = action; }
 void setLogHandle(logEventHandle action) { logHandle = action; }
+
+const char* getLogLevel(AOCE_LOG_LEVEL level) {
+    switch (level) {
+        case AOCE_LOG_INFO:
+            return infoAoceLevel;
+        case AOCE_LOG_WARN:
+            return warnAoceLevel;
+        case AOCE_LOG_ERROR:
+            return errorAoceLevel;
+        case AOCE_LOG_DEBUG:
+            return debugAoceLevel;
+    }
+    return nullptr;
+}
 
 void logMessage(AOCE_LOG_LEVEL level, const char* message) {
 #if !DEBUG
@@ -41,8 +60,8 @@ void logMessage(AOCE_LOG_LEVEL level, const char* message) {
         struct tm t;
         localtime_s(&t, &now);
         // 用std::cout有可能会导致UE4烘陪失败,记录下
-        std::wcout << std::put_time(&t, L"%Y-%m-%d %X") << " Level: " << level
-                   << L" " << message << std::endl;
+        std::wcout << std::put_time(&t, L"%Y-%m-%d %X") << " level("
+                   << getLogLevel(level) << "): " << message << std::endl;
         // << "\" in " << __FILE__ << " at line " << __LINE__
 #elif __ANDROID__
         switch (level) {
@@ -75,6 +94,7 @@ void logMessage(aoce::LogLevel level, const std::string& message) {
 void logAssert(bool expression, const std::string& message) {
     if (!expression) {
         logMessage(LogLevel::error, message);
+        assert(expression);
     }
 }
 
@@ -433,7 +453,7 @@ bool existsFile(const wchar_t* filePath) {
 }
 
 bool loadFileBinary(const wchar_t* filePath, std::vector<uint8_t>& data) {
-       if (!existsFile(filePath)) {
+    if (!existsFile(filePath)) {
         std::string message;
         string_format(message, "no file path: ", filePath);
         logMessage(LogLevel::warn, message);

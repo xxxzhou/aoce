@@ -67,7 +67,7 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     luminanceLayer = createLuminanceLayer();
 
     kuwaharaLayer = createKuwaharaLayer();
-    kuwaharaLayer->updateParamet(10);
+    // kuwaharaLayer->updateParamet(5);
 
     std::vector<BaseLayer*> layers;
     // // 导向滤波

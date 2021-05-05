@@ -21,8 +21,6 @@ class VkSphereRefractionLayer : public VkLayer,
 
    protected:
     virtual bool getSampled(int32_t inIndex) override;
-
-    virtual void onPreCmd() override;
 };
 
 class VkGlassSphereLayer : public VkLayer,

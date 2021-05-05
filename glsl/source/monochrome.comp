@@ -22,7 +22,7 @@ void main(){
     vec4 rgba = imageLoad(inTex,uv);
     float luminance = dot(rgba.rgb, W);
     vec4 desat = vec4(vec3(luminance), 1.0);
-    vec3 filterColor = vec3(ubo.filterColorX,ubo.filterColorY,ubo.filterColorZ);
+    vec3 filterColor = vec3(ubo.filterColorX,ubo.filterColorY,ubo.filterColorZ);     
     vec4 outputColor = vec4(
         (desat.r < 0.5 ? (2.0 * desat.r * filterColor.r) : (1.0 - 2.0 * (1.0 - desat.r) * (1.0 - filterColor.r))),
         (desat.g < 0.5 ? (2.0 * desat.g * filterColor.g) : (1.0 - 2.0 * (1.0 - desat.g) * (1.0 - filterColor.g))),

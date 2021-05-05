@@ -34,8 +34,9 @@ void MediaPlayer::setObserver(IMediaPlayerObserver* observer) {
 }
 
 void MediaPlayer::setDataSource(const char* path) {
-    logAssert(status == PlayStatus::idle,
-              "media play current status is not idle");
+    if (status != PlayStatus::idle) {
+        logMessage(LogLevel::error, "media play current status is not idle");
+    }
     uri = path;
     mediaType = getMediaType(uri);
     onSetDataSource();
