@@ -1,4 +1,4 @@
-# Vulkan移植GpuImage(三)从D到O的滤镜
+# Vulkan移植GpuImage(四)从D到O的滤镜
 
 现把D到O的大部分滤镜用vulkan的ComputeShader实现了,列举其中一些有点特殊的说明.
 
