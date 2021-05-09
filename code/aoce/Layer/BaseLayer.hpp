@@ -13,13 +13,18 @@ enum class GpuBit {
     // dx11 = 4,
 };
 
+#define AOCE_LAYER_GETNAME(CLASS) \
+   public:                        \
+    virtual const char* getName() override { return #CLASS; }
+
 // 每个从继承ILayer的类,请在类头文件里添加这个宏,或是自己实现
 #define AOCE_LAYER_QUERYINTERFACE(OBJCLASS)           \
    public:                                            \
     virtual inline BaseLayer* getLayer() override {   \
         OBJCLASS* obj = static_cast<OBJCLASS*>(this); \
         return static_cast<BaseLayer*>(obj);          \
-    }
+    }                                                 \
+    AOCE_LAYER_GETNAME(OBJCLASS)
 
 // BaseLayer定义可以在外部new,这样可以外接插件只管处理逻辑
 // layer知道自己的gpu类型.设计分为二种
@@ -67,6 +72,8 @@ class ACOE_EXPORT BaseLayer {
     std::vector<NodeIndex> inLayers;
     // 每个输出节点可以对应多个输出
     std::vector<std::vector<NodeIndex>> outLayers;
+
+    std::string markStr = "";
 
    public:
     BaseLayer(/* args */) : BaseLayer(1, 1){};
@@ -119,6 +126,10 @@ class ACOE_EXPORT BaseLayer {
     // 更新参数,子类会有updateParamet(T t)保存参数,等到运行前提交执行
     virtual void onUpdateParamet(){};
     virtual bool onFrame() = 0;
+
+   public:
+    virtual const char* getName();
+    const char* getMark();
 };
 
 // GroupLayer自身不处理任何运算,只是组合运算层

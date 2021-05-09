@@ -14,8 +14,8 @@ VkColorMatrixLayer::~VkColorMatrixLayer() {}
 
 VkHSBLayer::VkHSBLayer(/* args */) {
     glslPath = "glsl/colorMatrix.comp.spv";
-    paramet.intensity = 1.0f;
     setUBOSize(sizeof(paramet));
+    paramet.intensity = 1.0f;
     updateUBO(&paramet);
 }
 
@@ -45,6 +45,19 @@ void VkHSBLayer::adjustBrightness(const float& b) {
     paramet.mat = scaleMat(paramet.mat, {b, b, b});
     parametTransform();
 }
+
+VkSepiaLayer::VkSepiaLayer(/* args */) {
+    glslPath = "glsl/colorMatrix.comp.spv";
+    setUBOSize(sizeof(paramet));
+    paramet.intensity = 1.0f;
+    paramet.mat = {{0.3588, 0.7044, 0.1368, 0.0},
+                   {0.2990, 0.5870, 0.1140, 0.0},
+                   {0.2392, 0.4696, 0.0912, 0.0},
+                   {0, 0, 0, 1.0}};
+    updateUBO(&paramet);
+}
+
+VkSepiaLayer::~VkSepiaLayer() {}
 
 }  // namespace layer
 }  // namespace vulkan

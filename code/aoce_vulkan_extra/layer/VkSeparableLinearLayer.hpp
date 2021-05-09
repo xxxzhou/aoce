@@ -11,6 +11,7 @@ namespace layer {
 
 // 边框默认使用REPLICATE模式
 class VkSeparableLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkSeparableLayer)
    protected:
     /* data */
     ImageType imageType = ImageType::rgba8;
@@ -29,6 +30,7 @@ class VkSeparableLayer : public VkLayer {
 };
 
 class VkSeparableLinearLayer : public VkSeparableLayer {
+    AOCE_LAYER_GETNAME(VkSeparableLinearLayer)
    protected:
     std::unique_ptr<VkSeparableLayer> rowLayer;
 

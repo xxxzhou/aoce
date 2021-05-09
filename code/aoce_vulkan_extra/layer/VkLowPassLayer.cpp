@@ -25,14 +25,14 @@ void VkSaveFrameLayer::saveImageInfo(const ImageFormat& imageFormat,
     inLayers[0].siteIndex = outNodeIndex;
 }
 
-void VkSaveFrameLayer::onPreCmd() {
+void VkSaveFrameLayer::onCommand() {
     inTexs.clear();
     inTexs.push_back(
         vkPipeGraph->getOutTex(inLayers[0].nodeIndex, inLayers[0].siteIndex));
     if (bUserPipe) {
         VkLayer::onInitLayer();
         VkLayer::onInitPipe();
-        VkLayer::onPreCmd();
+        VkLayer::onCommand();
     } else {
         inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                               VK_PIPELINE_STAGE_TRANSFER_BIT,

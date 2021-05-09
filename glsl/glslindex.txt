@@ -51,10 +51,6 @@ bilateral.comp bilateralC1.comp CHANNEL_R8=1
 brightness.comp
 bulgeDistortion.comp
 cgaColorspace.comp
-morph1.comp morph1_erosion.comp EROSION=1 IS_SHARED=1
-morph1.comp morph1_dilation.comp DILATION=1 IS_SHARED=1
-morph2.comp morph2_erosion.comp EROSION=1 IS_SHARED=1
-morph2.comp morph2_dilation.comp DILATION=1 IS_SHARED=1
 colorBlend.comp
 colorBurnBlend.comp
 colorDodgeBlend.comp
@@ -108,3 +104,21 @@ normalBlend.comp
 opacity.comp
 overlayBlend.comp
 pixellate.comp
+poissonBlend.comp
+perlinNoise.comp
+pinchDistortion.comp
+pixellatePosition.comp
+polarPixellate.comp
+posterize.comp
+polkaDot.comp
+xyDerivative.comp
+prewittEdge.comp
+directionalSobel.comp
+morph1.comp morph1_erosion.comp EROSION=1 IS_SHARED=1 CHANNEL_RGBA=1
+morph1.comp morph1_dilation.comp DILATION=1 IS_SHARED=1 CHANNEL_RGBA=1
+morph2.comp morph2_erosion.comp EROSION=1 IS_SHARED=1 CHANNEL_RGBA=1
+morph2.comp morph2_dilation.comp DILATION=1 IS_SHARED=1 CHANNEL_RGBA=1
+morph1.comp morph1_erosionC1.comp EROSION=1 IS_SHARED=1 CHANNEL_R8=1
+morph1.comp morph1_dilationC1.comp DILATION=1 IS_SHARED=1 CHANNEL_R8=1
+morph2.comp morph2_erosionC1.comp EROSION=1 IS_SHARED=1 CHANNEL_R8=1
+morph2.comp morph2_dilationC1.comp DILATION=1 IS_SHARED=1 CHANNEL_R8=1

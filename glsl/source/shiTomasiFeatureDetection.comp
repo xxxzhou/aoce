@@ -1,0 +1,29 @@
+#version 450
+
+// https://www.jianshu.com/p/ebf813c62974
+// 应该返回R32f,看平台支持情况,否则用unpackUnorm4x8+floatBitsToUint替代
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba32f) uniform readonly image2D inTex;
+layout (binding = 1, r32f) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {    
+    float sensitivity;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }  
+    vec3 derivativeElements = imageLoad(inTex,uv).rgb;  
+    float derivativeDifference = derivativeElements.x - derivativeElements.y;     
+    float zElement = (derivativeElements.z * 2.0) - 1.0;     
+    // R = Ix^2 + Iy^2 - sqrt( (Ix^2 - Iy^2)^2 + 4 * Ixy * Ixy)
+    float cornerness = derivativeElements.x + derivativeElements.y - sqrt(derivativeDifference * derivativeDifference + 4.0 * zElement * zElement);
+
+    cornerness = cornerness*ubo.sensitivity;
+    // vec4 rgba = unpackUnorm4x8(floatBitsToUint(cornerness));
+    imageStore(outTex,uv,vec4(cornerness));
+}

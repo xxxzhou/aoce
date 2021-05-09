@@ -11,14 +11,14 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkSobelEdgeDetectionLayer : public VkLayer, public ITLayer<float> {
-    AOCE_LAYER_QUERYINTERFACE(VkSobelEdgeDetectionLayer)
+class VkDirectionalSobelEdgeDetectionLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkDirectionalSobelEdgeDetectionLayer)
     AOCE_VULKAN_PARAMETUPDATE()
    private:
     /* data */
    public:
-    VkSobelEdgeDetectionLayer(/* args */);
-    ~VkSobelEdgeDetectionLayer();
+    VkDirectionalSobelEdgeDetectionLayer(/* args */);
+    ~VkDirectionalSobelEdgeDetectionLayer();
 
    protected:
     virtual void onInitGraph() override;
@@ -55,7 +55,7 @@ class VkCannyEdgeDetectionLayer : public VkLayer,
     /* data */
     std::unique_ptr<VkLuminanceLayer> luminanceLayer = nullptr;
     std::unique_ptr<VkGaussianBlurSLayer> gaussianBlurLayer = nullptr;
-    std::unique_ptr<VkSobelEdgeDetectionLayer> sobelEDLayer = nullptr;
+    std::unique_ptr<VkDirectionalSobelEdgeDetectionLayer> sobelEDLayer = nullptr;
     std::unique_ptr<VkDirectionalNMS> directNMSLayer = nullptr;
 
    public:

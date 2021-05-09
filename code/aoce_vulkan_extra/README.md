@@ -10,7 +10,7 @@
 
 [GPUImage built-in filter parsing](https://www.programmersought.com/article/64452194941/)
 
-## opengl/cuda computer shader 线程
+## glsl computer shader/cuda 线程
 
 gl_NumWorkGroups/gridDim: 所有线程块的多少.
 gl_WorkGroupSize/blockDim: 本身线程块的大小.
@@ -134,6 +134,8 @@ GPUImage的实现,先平均缩少3*3倍,然后读到CPU中计算平均亮度,然
 逻辑有点同HarrisCornerDetection,由多层构成.
 
 其中第四层4.Hysteresis Thresholding正确实现方法逻辑应该类似:opencv_cudaimgproc canny.cpp/canny.cu里edgesHysteresis,不过逻辑现有些复杂,后面有时间修改成这种逻辑.
+
+其中把GPUImageDirectionalSobelEdgeDetectionFilter里的normalizedDirection计算的逻辑移到VkDirectionalNMS里,在VkSobelEdgeDetectionLayer保存原始的dx/dy,这样可以更容易复用到别的位置.
 
 现暂时使用GPUImage里的简化逻辑.
 
@@ -271,3 +273,19 @@ GPUImage的实现好像和原理差别有点大,应该是特化实现,暂不移�
 [图像融合之泊松编辑(Poisson Editing)(2)](https://blog.csdn.net/u011534057/article/details/68922319)
 
 [cuda poisson](https://github.com/3cHeLoN/cupoisson)
+
+[Using cufft to solve Poisson equation](https://forums.developer.nvidia.com/t/using-cufft-to-solve-poisson-equation-c/134744)
+
+先按照GPUImage里来实现,他的实现比较简单,唯一麻烦的,需要一张图用作Ping-pong,不同于前面savefamelayer的实现,他需要在一桢中来回循环读写,刚开始想的是如何把当前索引当做UBO传入shader,但是在一桢中把一个UBO更新多次,首先不知道能否这样实现,就算能,这种实现并不好,在这引入PushConstant的概念,能完美解决这个问题,首先vkCmdPushConstants也是插入到CommandBuffer中,在提交给GPU的时候,也是确定的数值,这样每桢多次循环就可以用PushConstant来表明对应次数.
+
+### 柏林燥声
+
+生成一张柏林燥声图,可以用来当作输入层.
+
+### PolkaDot
+
+实现类似Halftone,区别就是自己指定dotScaling.Halftone根据亮度求的dotScaling.
+
+### Sketch
+
+就是把sobelEdge桢测结果反转下.

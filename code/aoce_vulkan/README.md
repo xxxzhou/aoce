@@ -66,7 +66,7 @@ VkPipeGraph 提供延迟运行方式，由delayGpu控制,如果为true,则输出
 
 参看[VkInputLayer](layer/VkInputLayer.cpp) [VkSeparableLinearLayer](../aoce_vulkan_extra/layer/VkSeparableLinearLayer.cpp) [VkSaveFrameLayer](../aoce_vulkan_extra/layer/VkLowPassLayer.hpp)
 
-7 onPreCmd 当所有层执行完onInitBuffer后.
+7 onCommand 当所有层执行完onInitBuffer后.
 
 填充vkCommandBuffer,vkCmdBindPipeline/vkCmdBindDescriptorSets/vkCmdDispatch 三件套.
 

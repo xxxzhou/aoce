@@ -81,6 +81,31 @@ VkOpacityLayer::VkOpacityLayer(/* args */) {
 
 VkOpacityLayer::~VkOpacityLayer() {}
 
+VkPosterizeLayer::VkPosterizeLayer(/* args */) {
+    glslPath = "glsl/posterize.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    paramet = 10;
+    updateUBO(&paramet);
+}
+
+VkPosterizeLayer::~VkPosterizeLayer() {}
+
+VkSharpenLayer::VkSharpenLayer(/* args */) {
+    glslPath = "glsl/sharpen.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    updateUBO(&paramet);
+}
+
+VkSharpenLayer::~VkSharpenLayer() {}
+
+VkSkinToneLayer::VkSkinToneLayer(/* args */) {
+    glslPath = "glsl/skinTone.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    updateUBO(&paramet);
+}
+
+VkSkinToneLayer::~VkSkinToneLayer() {}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

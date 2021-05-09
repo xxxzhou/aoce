@@ -155,6 +155,20 @@ VkOverlayBlendLayer::VkOverlayBlendLayer(/* args */) {
 
 VkOverlayBlendLayer::~VkOverlayBlendLayer() {}
 
+VkSaturationBlendLayer::VkSaturationBlendLayer(/* args */) {
+    glslPath = "glsl/saturationBlend.comp.spv";
+    inCount = 2;
+}
+
+VkSaturationBlendLayer::~VkSaturationBlendLayer() {}
+
+VkScreenBlendLayer::VkScreenBlendLayer(/* args */) {
+    glslPath = "glsl/screenBlend.comp.spv";
+    inCount = 2;
+}
+
+VkScreenBlendLayer::~VkScreenBlendLayer() {}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

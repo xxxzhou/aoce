@@ -39,6 +39,16 @@ class VkHSBLayer : public VkLayer, public HSBLayer {
     virtual void adjustBrightness(const float& h);
 };
 
+class VkSepiaLayer : public VkLayer {
+   private:
+    /* data */
+    ColorMatrixParamet paramet = {};
+
+   public:
+    VkSepiaLayer(/* args */);
+    ~VkSepiaLayer();
+};
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

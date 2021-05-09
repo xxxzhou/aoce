@@ -40,7 +40,7 @@ int32_t UBOLayout::addSetLayout(std::vector<UBOLayoutItem>& layout,
     return items.size() - 1;
 }
 
-void UBOLayout::generateLayout() {
+void UBOLayout::generateLayout(int32_t constSize) {
     // 最多需要多少个set,一个layout可能有多个set,比如渲染8个相同物体
     uint32_t groupCount = 0;
     auto size = items.size();
@@ -96,12 +96,15 @@ void UBOLayout::generateLayout() {
         VK_CHECK_RESULT(vkCreateDescriptorSetLayout(
             device, &descriptorLayoutInfo, nullptr, &descSetLayouts[x]));
         // 生成VkDescriptorSet
+        std::vector<VkDescriptorSetLayout> layouts(groupSize[x],
+                                                   descSetLayouts[x]);
+
         descSets[x].resize(groupSize[x]);
         VkDescriptorSetAllocateInfo descAllocInfo = {};
         descAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         descAllocInfo.descriptorPool = descPool;
-        descAllocInfo.pSetLayouts = &descSetLayouts[x];
         descAllocInfo.descriptorSetCount = groupSize[x];
+        descAllocInfo.pSetLayouts = layouts.data();
         VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descAllocInfo,
                                                  descSets[x].data()));
     }
@@ -110,7 +113,15 @@ void UBOLayout::generateLayout() {
     pipelineLayoutCreateInfo.sType =
         VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutCreateInfo.setLayoutCount = descSetLayouts.size();
-    pipelineLayoutCreateInfo.pSetLayouts = descSetLayouts.data();
+    pipelineLayoutCreateInfo.pSetLayouts = descSetLayouts.data(); 
+    VkPushConstantRange pushConstant = {};
+    if (constSize > 0) {       
+        pushConstant.stageFlags = items[0][0].shaderStageFlags;
+        pushConstant.offset = 0;
+        pushConstant.size = constSize;
+        pipelineLayoutCreateInfo.pushConstantRangeCount = 1;
+        pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;        
+    }
     VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo,
                                            nullptr, &pipelineLayout));
 }

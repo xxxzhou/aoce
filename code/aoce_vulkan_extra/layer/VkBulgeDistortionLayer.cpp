@@ -95,6 +95,55 @@ void VkGaussianBlurSelectiveLayer::onInitNode() {
     setStartNode(this);
 }
 
+VkPinchDistortionLayer::VkPinchDistortionLayer(/* args */) {
+    glslPath = "glsl/pinchDistortion.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    paramet.radius = 1.0f;
+    paramet.scale = 0.5f;
+    updateUBO(&paramet);
+}
+
+VkPinchDistortionLayer::~VkPinchDistortionLayer() {}
+
+bool VkPinchDistortionLayer::getSampled(int32_t inIndex) {
+    if (inIndex == 0) {
+        return true;
+    }
+    return false;
+}
+
+VkPixellatePositionLayer::VkPixellatePositionLayer(/* args */) {
+    glslPath = "glsl/pixellatePosition.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    paramet.size = 0.05f;
+    paramet.radius = 0.25f;
+    updateUBO(&paramet);
+}
+
+VkPixellatePositionLayer::~VkPixellatePositionLayer() {}
+
+bool VkPixellatePositionLayer::getSampled(int32_t inIndex) {
+    if (inIndex == 0) {
+        return true;
+    }
+    return false;
+}
+
+VkPolarPixellateLayer::VkPolarPixellateLayer(/* args */) {
+    glslPath = "glsl/polarPixellate.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    updateUBO(&paramet);
+}
+
+VkPolarPixellateLayer::~VkPolarPixellateLayer() {}
+
+bool VkPolarPixellateLayer::getSampled(int32_t inIndex) {
+    if (inIndex == 0) {
+        return true;
+    }
+    return false;
+}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

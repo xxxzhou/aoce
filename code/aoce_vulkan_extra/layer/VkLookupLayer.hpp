@@ -14,7 +14,7 @@ class VkLookupLayer : public VkLayer, public LookupLayer {
     AOCE_LAYER_QUERYINTERFACE(VkLookupLayer)
    private:
     /* data */
-    std::unique_ptr<VkInputLayer> lookupLayer;
+    std::unique_ptr<VkInputLayer> lookupLayer = nullptr;
 
    public:
     VkLookupLayer(/* args */);

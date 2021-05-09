@@ -56,7 +56,7 @@ bool VkOutputLayer::onFrame() {
     return true;
 }
 
-void VkOutputLayer::onPreCmd() {
+void VkOutputLayer::onCommand() {
     if (paramet.bCpu) {
         inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                               VK_PIPELINE_STAGE_TRANSFER_BIT,

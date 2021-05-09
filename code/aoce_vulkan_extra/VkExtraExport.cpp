@@ -13,6 +13,7 @@
 #include "layer/VkColorMatrixLayer.hpp"
 #include "layer/VkColourFASTFeatureDetector.hpp"
 #include "layer/VkCropLayer.hpp"
+#include "layer/VkEdgeDetectionLayer.hpp"
 #include "layer/VkEmbossLayer.hpp"
 #include "layer/VkGuidedLayer.hpp"
 #include "layer/VkHarrisCornerDetectionLayer.hpp"
@@ -27,7 +28,9 @@
 #include "layer/VkMedianLayer.hpp"
 #include "layer/VkMorphLayer.hpp"
 #include "layer/VkMotionBlurLayer.hpp"
+#include "layer/VkPerlinNoiseLayer.hpp"
 #include "layer/VkPixellateLayer.hpp"
+#include "layer/VkPoissonBlendLayer.hpp"
 #include "layer/VkReduceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
 #include "layer/VkSphereLayer.hpp"
@@ -103,7 +106,7 @@ ITLayer<float>* createBrightnessLayer() {
     return layer;
 }
 
-ITLayer<BulgeDistortionParamet>* createBulgeDistortionLayer() {
+ITLayer<DistortionParamet>* createBulgeDistortionLayer() {
     VkBulgeDistortionLayer* layer = new VkBulgeDistortionLayer();
     return layer;
 }
@@ -118,23 +121,23 @@ BaseLayer* createCGAColorspaceLayer() {
     return layer;
 }
 
-ITLayer<int32_t>* createDilationLayer() {
-    VkDilationLayer* layer = new VkDilationLayer();
+ITLayer<int32_t>* createDilationLayer(bool bSingle) {
+    VkDilationLayer* layer = new VkDilationLayer(bSingle);
     return layer;
 }
 
-ITLayer<int32_t>* createErosionLayer() {
-    VkErosionLayer* layer = new VkErosionLayer();
+ITLayer<int32_t>* createErosionLayer(bool bSingle) {
+    VkErosionLayer* layer = new VkErosionLayer(bSingle);
     return layer;
 }
 
-ITLayer<int32_t>* createClosingLayer() {
-    VkClosingLayer* layer = new VkClosingLayer();
+ITLayer<int32_t>* createClosingLayer(bool bSingle) {
+    VkClosingLayer* layer = new VkClosingLayer(bSingle);
     return layer;
 }
 
-ITLayer<int32_t>* createOpeningLayer() {
-    VkOpeningLayer* layer = new VkOpeningLayer();
+ITLayer<int32_t>* createOpeningLayer(bool bSingle) {
+    VkOpeningLayer* layer = new VkOpeningLayer(bSingle);
     return layer;
 }
 
@@ -390,7 +393,7 @@ BaseLayer* createMultiplyBlendLayer() {
     return layer;
 }
 
-ITLayer<HarrisCornerDetectionParamet>* createNobleCornerDetectionLayer() {
+ITLayer<NobleCornerDetectionParamet>* createNobleCornerDetectionLayer() {
     VkNobleCornerDetectionLayer* layer = new VkNobleCornerDetectionLayer();
     return layer;
 }
@@ -407,6 +410,46 @@ ITLayer<float>* createOpacityLayer() {
 
 BaseLayer* createOverlayBlendLayer() {
     VkOverlayBlendLayer* layer = new VkOverlayBlendLayer();
+    return layer;
+}
+
+PerlinNoiseLayer* createPerlinNoiseLayer() {
+    VkPerlinNoiseLayer* layer = new VkPerlinNoiseLayer();
+    return layer;
+}
+
+ITLayer<PoissonParamet>* createPoissonBlendLayer() {
+    VkPoissonBlendLayer* layer = new VkPoissonBlendLayer();
+    return layer;
+}
+
+ITLayer<DistortionParamet>* createPinchDistorionLayer() {
+    VkPinchDistortionLayer* layer = new VkPinchDistortionLayer();
+    return layer;
+}
+
+ITLayer<SelectiveParamet>* createPixellatePositionLayer() {
+    VkPixellatePositionLayer* layer = new VkPixellatePositionLayer();
+    return layer;
+}
+
+ITLayer<PolarPixellateParamet>* createPolarPixellateLayer() {
+    VkPolarPixellateLayer* layer = new VkPolarPixellateLayer();
+    return layer;
+}
+
+ITLayer<PolkaDotParamet>* createPolkaDotLayer() {
+    VkPolkaDotLayer* layer = new VkPolkaDotLayer();
+    return layer;
+}
+
+ITLayer<uint32_t>* createPosterizeLayer() {
+    VkPosterizeLayer* layer = new VkPosterizeLayer();
+    return layer;
+}
+
+ITLayer<float>* createPrewittEdgeDetectionLayer() {
+    VkPrewittEdgeDetectionLayer* layer = new VkPrewittEdgeDetectionLayer();
     return layer;
 }
 

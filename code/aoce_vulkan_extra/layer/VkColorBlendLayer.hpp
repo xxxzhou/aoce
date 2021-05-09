@@ -10,6 +10,7 @@ namespace vulkan {
 namespace layer {
 
 class VkColorBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkColorBlendLayer)
    private:
     /* data */
    public:
@@ -18,6 +19,7 @@ class VkColorBlendLayer : public VkLayer {
 };
 
 class VkColorBurnBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkColorBurnBlendLayer)
    private:
     /* data */
    public:
@@ -26,6 +28,7 @@ class VkColorBurnBlendLayer : public VkLayer {
 };
 
 class VkColorDodgeBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkColorDodgeBlendLayer)
    private:
     /* data */
    public:
@@ -34,6 +37,7 @@ class VkColorDodgeBlendLayer : public VkLayer {
 };
 
 class VkColorInvertLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkColorInvertLayer)
    private:
     /* data */
    public:
@@ -42,6 +46,7 @@ class VkColorInvertLayer : public VkLayer {
 };
 
 class VkColorLBPLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkColorLBPLayer)
    private:
     /* data */
    public:
@@ -70,6 +75,7 @@ class VkCrosshatchLayer : public VkLayer, public ITLayer<CrosshatchParamet> {
 };
 
 class VkExclusionBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkExclusionBlendLayer)
    private:
     /* data */
    public:
@@ -88,6 +94,7 @@ class VkFalseColorLayer : public VkLayer, public ITLayer<FalseColorParamet> {
 };
 
 class VkHueBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkHueBlendLayer)
    private:
     /* data */
    public:
@@ -120,6 +127,7 @@ class VkLevelsLayer : public VkLayer, public ITLayer<LevelsParamet> {
 };
 
 class VkLightenBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkLightenBlendLayer)
    private:
     /* data */
    public:
@@ -128,6 +136,7 @@ class VkLightenBlendLayer : public VkLayer {
 };
 
 class VkLinearBurnBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkLinearBurnBlendLayer)
    private:
     /* data */
    public:
@@ -136,6 +145,7 @@ class VkLinearBurnBlendLayer : public VkLayer {
 };
 
 class VkLuminosityBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkLuminosityBlendLayer)
    private:
     /* data */
    public:
@@ -144,6 +154,7 @@ class VkLuminosityBlendLayer : public VkLayer {
 };
 
 class VkMaskLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkMaskLayer)
    private:
     /* data */
    public:
@@ -152,6 +163,7 @@ class VkMaskLayer : public VkLayer {
 };
 
 class VkMultiplyBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkMultiplyBlendLayer)
    private:
     /* data */
    public:
@@ -160,6 +172,7 @@ class VkMultiplyBlendLayer : public VkLayer {
 };
 
 class VkNormalBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkNormalBlendLayer)
    private:
     /* data */
    public:
@@ -168,11 +181,30 @@ class VkNormalBlendLayer : public VkLayer {
 };
 
 class VkOverlayBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkOverlayBlendLayer)
    private:
     /* data */
    public:
     VkOverlayBlendLayer(/* args */);
     ~VkOverlayBlendLayer();
+};
+
+class VkSaturationBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkSaturationBlendLayer)
+   private:
+    /* data */
+   public:
+    VkSaturationBlendLayer(/* args */);
+    ~VkSaturationBlendLayer();
+};
+
+class VkScreenBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkSaturationBlendLayer)
+   private:
+    /* data */
+   public:
+    VkScreenBlendLayer(/* args */);
+    ~VkScreenBlendLayer();
 };
 
 

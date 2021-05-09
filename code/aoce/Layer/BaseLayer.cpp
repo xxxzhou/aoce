@@ -22,6 +22,7 @@ void BaseLayer::onInit() {
     for (auto& format : outFormats) {
         format.imageType = ImageType::rgba8;
     }
+    markStr = "";
 }
 
 PipeGraph* BaseLayer::getGraph() { return pipeGraph; }
@@ -70,25 +71,28 @@ BaseLayer* BaseLayer::addNode(ILayer* layer) {
 BaseLayer* BaseLayer::addLine(BaseLayer* to, int32_t formOut, int32_t toIn) {
     cheackAttachGraph();
     to->cheackAttachGraph();
-    assert(toIn < to->inCount);
-    assert(formOut < outCount);
-    int toIndex = to->getGraphIndex();
-    // 节点如果有多组输入toIn,一个输入可以有多个输出
-    const auto& toStartNodes = to->getNode()->startNodes[toIn];
-    if (toStartNodes.size() > 0) {
-        for (const auto& startNode : toStartNodes) {
-            pipeGraph->addLine(getGraphIndex(), startNode.nodeIndex, formOut,
-                               startNode.inIndex);
+    // 如果是输入层,不能使用addLine的方法给输入层加线,会构成回环
+    if (!to->bInput) {
+        assert(toIn < to->inCount);
+        assert(formOut < outCount);
+        int toIndex = to->getGraphIndex();
+        // 节点如果有多组输入toIn,一个输入可以有多个输出
+        const auto& toStartNodes = to->getNode()->startNodes[toIn];
+        if (toStartNodes.size() > 0) {
+            for (const auto& startNode : toStartNodes) {
+                pipeGraph->addLine(getGraphIndex(), startNode.nodeIndex,
+                                   formOut, startNode.inIndex);
+            }
+        } else {
+            pipeGraph->addLine(getGraphIndex(), toIndex, formOut, toIn);
         }
-    } else {
-        pipeGraph->addLine(getGraphIndex(), toIndex, formOut, toIn);
+        if (to->getNode()->endNodeIndex >= 0) {
+            BaseLayer* result = pipeGraph->getNode(to->getNode()->endNodeIndex);
+            assert(result);
+            return result;
+        }
     }
-    if (to->getNode()->endNodeIndex >= 0) {
-        BaseLayer* result = pipeGraph->getNode(to->getNode()->endNodeIndex);
-        assert(result);
-        return result;
-    }
-    return to;    
+    return to;
 }
 
 void BaseLayer::cheackAttachGraph() {
@@ -166,6 +170,17 @@ bool BaseLayer::getInFormat(ImageFormat& format, int32_t index) {
         return true;
     }
     return false;
+}
+
+const char* BaseLayer::getName() { return "no define name"; }
+
+const char* BaseLayer::getMark() {
+    if (bAttachGraph()) {
+        if (markStr.empty()) {
+            string_format(markStr, "(", getGraphIndex(), ")", getName());
+        }
+        return markStr.c_str();
+    }
 }
 
 GroupLayer::GroupLayer() { bNoCompute = true; }

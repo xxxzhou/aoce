@@ -9,8 +9,8 @@ layout (binding = 2) uniform UBO {
 	float edgeStrength;
 } ubo;
 
-const float horizontKernel[9] = {-1.0f,0.0f,1.0f,-1.0f,0.0f,1.0f,-1.0f,0.0f,1.0f,};
-const float verticalKernel[9] = {-1.0f,-1.0f,-1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f};
+const float horizontKernel[9] = {-1.0f,-2.0f,-1.0f,0.0f,0.0f,0.0f,1.0f,2.0f,1.0f};
+const float verticalKernel[9] = {-1.0f,0.0f,1.0f,-2.0f,0.0f,2.0f,-1.0f,0.0f,1.0f};
 
 void main(){
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
@@ -33,12 +33,13 @@ void main(){
             horizont += value * horizontKernel[index];
         }
     }
-    vertical = vertical * ubo.edgeStrength;
-    horizont = horizont * ubo.edgeStrength;
     vec4 sum = vec4(0.0f);
-    sum.x = horizont* horizont;
-    sum.y = vertical* vertical;
-    sum.z = ((horizont*vertical)+1.0f)/2.0f;
+    // 梯度
+    sum.x = length(vec2(horizont,vertical)) * ubo.edgeStrength;
+    // dx 奇怪了?y/z是否反了,但是GPUImage逻辑确实是这样
+    sum.y = vertical;
+    // dy
+    sum.z = horizont;
     sum.w = 1.0f;
     imageStore(outTex, uv, sum); 
 }

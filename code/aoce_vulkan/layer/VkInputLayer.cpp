@@ -77,7 +77,7 @@ void VkInputLayer::onInitPipe() {
     }
 }
 
-void VkInputLayer::onPreCmd() {
+void VkInputLayer::onCommand() {
     // 不需要CS处理
     if (!bUsePipe) {
         outTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,

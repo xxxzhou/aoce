@@ -14,6 +14,7 @@ namespace layer {
 // 用的有向无循环图,所以不能有回环线,保存一桢然后使用构成回环
 // 定义这层为bInput = true,告诉外面不需要自动连接别层输入,手动连接
 class VkSaveFrameLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkSaveFrameLayer)
    private:
     // 是否自己使用ComputeShader复制
     bool bUserPipe = true;
@@ -31,10 +32,11 @@ class VkSaveFrameLayer : public VkLayer {
    protected:
     // 比较特殊,在这个时间,可能还拿不到inTexs数据,交给onPreCmd
     virtual void onInitPipe() override{};
-    virtual void onPreCmd() override;
+    virtual void onCommand() override;
 };
 
 class VkLowPassLayer : public VkDissolveBlendLayer {
+    AOCE_LAYER_GETNAME(VkSaveFrameLayer)
    private:
     /* data */
     std::unique_ptr<VkSaveFrameLayer> saveLayer = nullptr;

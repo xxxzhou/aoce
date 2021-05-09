@@ -33,39 +33,61 @@ class VkThresholdedNMS : public VkLayer, public ITLayer<float> {
     virtual void onInitGraph() override;
 };
 
-class VkHarrisCornerDetectionLayer
-    : public VkLayer,
-      public ITLayer<HarrisCornerDetectionParamet> {
-    AOCE_LAYER_QUERYINTERFACE(VkHarrisCornerDetectionLayer)
-   private:
+class VkHarrisDetectionBaseLayer : public VkLayer {
+   protected:
     /* data */
     std::unique_ptr<VkXYDerivativeLayer> xyDerivativeLayer;
     std::unique_ptr<VkGaussianBlurSLayer> blurLayer;
     std::unique_ptr<VkThresholdedNMS> thresholdNMSLayer;
 
    public:
-    VkHarrisCornerDetectionLayer(/* args */);
-    virtual ~VkHarrisCornerDetectionLayer();
-
-   private:
-    void updateUBO();
+    VkHarrisDetectionBaseLayer();
+    virtual ~VkHarrisDetectionBaseLayer();
 
    protected:
-    virtual void onUpdateParamet() override;
+    void baseParametChange(const HarrisDetectionBaseParamet& baseParamet);
+
+   protected:
     virtual void onInitGraph() override;
     virtual void onInitNode() override;
 };
 
-class VkNobleCornerDetectionLayer : public VkHarrisCornerDetectionLayer {
+class VkHarrisCornerDetectionLayer
+    : public VkHarrisDetectionBaseLayer,
+      public ITLayer<HarrisCornerDetectionParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkHarrisCornerDetectionLayer)
+   public:
+    VkHarrisCornerDetectionLayer(/* args */);
+    virtual ~VkHarrisCornerDetectionLayer();
+
+   protected:
+    void transformParamet();
+    virtual void onUpdateParamet() override;
+};
+
+class VkNobleCornerDetectionLayer
+    : public VkHarrisDetectionBaseLayer,
+      public ITLayer<NobleCornerDetectionParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkNobleCornerDetectionLayer)
    private:
     /* data */
    public:
     VkNobleCornerDetectionLayer(/* args */);
     virtual ~VkNobleCornerDetectionLayer();
+
+   protected:
+    void transformParamet();
+    virtual void onUpdateParamet() override;
 };
 
-
+class VkShiTomasiFeatureDetectionLayer : public VkNobleCornerDetectionLayer {
+    AOCE_LAYER_QUERYINTERFACE(VkShiTomasiFeatureDetectionLayer)
+   private:
+    /* data */
+   public:
+    VkShiTomasiFeatureDetectionLayer(/* args */);
+    virtual ~VkShiTomasiFeatureDetectionLayer();
+};
 
 }  // namespace layer
 }  // namespace vulkan

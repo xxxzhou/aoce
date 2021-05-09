@@ -21,12 +21,12 @@ static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
 static ITLayer<ReSizeParamet>* resizeLayer2 = nullptr;
 static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
 static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
-static ITLayer<HarrisCornerDetectionParamet>* ncdLayer = nullptr;
+static ITLayer<NobleCornerDetectionParamet>* ncdLayer = nullptr;
 static ITLayer<KernelSizeParamet>* boxFilterLayer1 = nullptr;
 // 亮度平均阈值
 static ITLayer<float>* averageLT = nullptr;
 static ITLayer<BilateralParamet>* bilateralLayer = nullptr;
-static ITLayer<BulgeDistortionParamet>* bdLayer = nullptr;
+static ITLayer<DistortionParamet>* bdLayer = nullptr;
 static ITLayer<CannyEdgeDetectionParamet>* cedLayer = nullptr;
 static BaseLayer* cgaLayer = nullptr;
 static ITLayer<FASTFeatureParamet>* fastLayer = nullptr;
@@ -50,6 +50,9 @@ static ITLayer<uint32_t>* medianLayer = nullptr;
 static BaseLayer* medianK3Layer = nullptr;
 static ITLayer<MotionBlurParamet>* motionBlurLayer = nullptr;
 static MotionDetectorLayer* motionDetectorLayer = nullptr;
+static ITLayer<PoissonParamet>* poissonLayer = nullptr;
+static BaseLayer* linerBlendLayer = nullptr;
+static PerlinNoiseLayer* noiseLayer = nullptr;
 
 void showMotion(vec4 motion) {
     std::cout << "x: " << motion.x << " y: " << motion.y << " z: " << motion.z
@@ -85,23 +88,25 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     adaParamet.offset = 0.01f;
     adaptiveLayer->updateParamet(adaParamet);
 
-    alphaShowLayer = createAlphaShowLayer();   
+    alphaShowLayer = createAlphaShowLayer();
     alphaShow2Layer = createAlphaShow2Layer();
     luminanceLayer = createLuminanceLayer();
 
     hcdLayer = createHarrisCornerDetectionLayer();
-    HarrisCornerDetectionParamet hcdParamet = {};
-    hcdParamet.threshold = 0.1f;
+    HarrisCornerDetectionParamet hcdParamet = {};    
     hcdParamet.harris = 0.04f;
-    hcdParamet.edgeStrength = 1.0f;
-    hcdParamet.blueParamet = {5, 0.0f};
+    hcdParamet.harrisBase.threshold = 0.1f;
+    hcdParamet.harrisBase.edgeStrength = 1.0f;
+    hcdParamet.harrisBase.blueParamet = {5, 0.0f};
     hcdLayer->updateParamet(hcdParamet);
 
     ncdLayer = createNobleCornerDetectionLayer();
-    ncdLayer->updateParamet(hcdParamet);	
+    NobleCornerDetectionParamet ncdParamet = {};
+    ncdParamet.harrisBase = hcdParamet.harrisBase;
+    ncdLayer->updateParamet(ncdParamet);
 
     boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);
-    boxFilterLayer1->updateParamet({5, 5});    
+    boxFilterLayer1->updateParamet({5, 5});
 
     resizeLayer = createResizeLayer(ImageType::rgba8);
     resizeLayer->updateParamet({true, 1920 / 8, 1080 / 8});
@@ -116,7 +121,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     bilateralLayer->updateParamet({10, 10.0f, 10.0f});
 
     bdLayer = createBulgeDistortionLayer();
-    BulgeDistortionParamet bdParamet = {};
+    DistortionParamet bdParamet = {};
     bdParamet.aspectRatio = 1080.0 / 1920.0;
     bdLayer->updateParamet(bdParamet);
 
@@ -129,13 +134,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     cgaLayer = createCGAColorspaceLayer();
 
-    dilationLayer = createDilationLayer();
+    dilationLayer = createDilationLayer(true);
     // dilationLayer->updateParamet(10);
 
-    erosionLayer = createErosionLayer();
+    erosionLayer = createErosionLayer(true);
     // erosionLayer->updateParamet(20);
 
-    closingLayer = createClosingLayer();
+    closingLayer = createClosingLayer(true);
 
     blurSelectiveLayer = createBlurSelectiveLayer();
     BlurSelectiveParamet bsp = {};
@@ -147,7 +152,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     bpp.gaussian.blurRadius = 20;
     blurPositionLayer->updateParamet(bpp);
 
-    srLayer = createSphereRefractionLayer();   
+    srLayer = createSphereRefractionLayer();
 
     ppLayer = createPixellateLayer();
 
@@ -179,6 +184,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     motionDetectorLayer = createMotionDetectorLayer();
     motionDetectorLayer->setMotionHandle(showMotion);
+
+    poissonLayer = createPoissonBlendLayer();
+    poissonLayer->updateParamet({0.5f, 10});
+
+    linerBlendLayer = createLinearBurnBlendLayer();
+
+    noiseLayer = createPerlinNoiseLayer();
+    noiseLayer->setImageSize(1920, 1080);
 
     std::vector<uint8_t> lutData;
     std::vector<BaseLayer*> layers;
@@ -240,7 +253,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---半色调效果，如新闻打印
     // layers.push_back(halftoneLayer->getLayer());
     // ---低通滤波器
-    layers.push_back(lowPassLayer->getLayer());
+    // layers.push_back(lowPassLayer->getLayer());
     // ---高通滤波器
     // bAutoIn = true;
     // layers.push_back(highPassLayer->getLayer());
@@ -269,6 +282,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(motionBlurLayer->getLayer());
     // ---运动检测
     // layers.push_back(motionDetectorLayer->getLayer());
+    // ---松泊融合 poissonLayer->getLayer() linerBlendLayer
+    // bAutoIn = true;
+    // layers.push_back(noiseLayer->getLayer());
+    // layers.push_back(poissonLayer->getLayer());
+    // ---柏林噪声
+    // layers.push_back(noiseLayer->getLayer());
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据

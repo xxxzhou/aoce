@@ -3,8 +3,14 @@
 // #define IS_SHARED 1
 
 layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+#if CHANNEL_RGBA
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+#elif CHANNEL_R8
 layout (binding = 0, r8) uniform readonly image2D inTex;
 layout (binding = 1, r8) uniform image2D outTex;
+#endif
 
 layout (binding = 2) uniform UBO {
 	int ksize;	    
@@ -12,17 +18,31 @@ layout (binding = 2) uniform UBO {
 
 #if EROSION 
     #define OPERATE min
-    #define INIT_VUL 1.0f
+    #if CHANNEL_RGBA
+        #define INIT_VUL vec4(1.0)
+    #elif CHANNEL_R8
+        #define INIT_VUL 1.0f
+    #endif
 #endif
 
 #if DILATION 
     #define OPERATE max
-    #define INIT_VUL 0.0f
+    #if CHANNEL_RGBA
+        #define INIT_VUL vec4(0.0)
+    #elif CHANNEL_R8
+        #define INIT_VUL 0.0f
+    #endif
 #endif
 
 #if IS_SHARED
+
 // 限定最大核为32
-shared float row_shared[16*3][16];
+#if CHANNEL_RGBA
+    shared vec4 row_shared[16*3][16];
+#elif CHANNEL_R8
+    shared float row_shared[16*3][16];
+#endif
+
 void main(){
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
     ivec2 size = imageSize(inTex);
@@ -32,15 +52,28 @@ void main(){
     ivec2 locId = ivec2(gl_LocalInvocationID.xy);
     for(int i = 0; i < 3; i++){
         uint gIdy = max(0,min(uv.y+(i-1)*16,size.y-1));
-        row_shared[locId.y + i*16][locId.x] = imageLoad(inTex,ivec2(uv.x,gIdy)).r;      
+        #if CHANNEL_RGBA
+            row_shared[locId.y + i*16][locId.x] = imageLoad(inTex,ivec2(uv.x,gIdy)); 
+        #elif CHANNEL_R8
+            row_shared[locId.y + i*16][locId.x] = imageLoad(inTex,ivec2(uv.x,gIdy)).r; 
+        #endif     
     }
     memoryBarrierShared();
 	barrier();
-    float result = INIT_VUL;
+    #if CHANNEL_RGBA
+        vec4 result = INIT_VUL;
+    #elif CHANNEL_R8
+        float result = INIT_VUL;
+    #endif
     for(int i =0; i < ubo.ksize; i++){
         int iy = locId.y - ubo.ksize/2 + i;
-        float fr = row_shared[16 + iy][locId.x];
-        result = OPERATE(fr,result);
+        #if CHANNEL_RGBA
+            vec4 fr = row_shared[16 + iy][locId.x];
+            result = OPERATE(fr,result);
+        #elif CHANNEL_R8
+            float fr = row_shared[16 + iy][locId.x];
+            result = OPERATE(fr,result);
+        #endif
     }
     imageStore(outTex, uv, vec4(result)); 
 }
@@ -53,12 +86,21 @@ void main(){
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     } 
-    float result = INIT_VUL;
+    #if CHANNEL_RGBA
+        vec4 result = INIT_VUL;
+    #elif CHANNEL_R8
+        float result = INIT_VUL;
+    #endif
     for(int i = 0; i< ubo.ksize; ++i){
         int y = uv.y-ubo.ksize/2+i;
         y = max(0,min(y,size.y-1));
-        float r = imageLoad(inTex,ivec2(uv.x,y)).r;
-        result = OPERATE(result,r);
+        #if CHANNEL_RGBA
+            vec4 r = imageLoad(inTex,ivec2(uv.x,y));
+            result = OPERATE(result,r);
+        #elif CHANNEL_R8
+            float r = imageLoad(inTex,ivec2(uv.x,y)).r;
+            result = OPERATE(result,r);
+        #endif        
     }
     imageStore(outTex, uv, vec4(result));     
 }

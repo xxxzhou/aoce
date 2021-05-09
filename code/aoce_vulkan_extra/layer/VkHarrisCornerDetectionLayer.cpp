@@ -7,7 +7,7 @@ namespace vulkan {
 namespace layer {
 
 VkXYDerivativeLayer::VkXYDerivativeLayer() {
-    glslPath = "glsl/prewitt.comp.spv";
+    glslPath = "glsl/xyDerivative.comp.spv";
     setUBOSize(sizeof(float), true);
     paramet = 1.0f;
     updateUBO(&paramet);
@@ -36,46 +36,23 @@ void VkThresholdedNMS::onInitGraph() {
     outFormats[0].imageType = ImageType::r8;
 }
 
-VkHarrisCornerDetectionLayer::VkHarrisCornerDetectionLayer(/* args */) {
-    // self
-    glslPath = "glsl/harrisCornerDetection.comp.spv";
-    setUBOSize(8);
+VkHarrisDetectionBaseLayer::VkHarrisDetectionBaseLayer() {
     //
     xyDerivativeLayer = std::make_unique<VkXYDerivativeLayer>();
     blurLayer = std::make_unique<VkGaussianBlurSLayer>(ImageType::rgba32f);
     thresholdNMSLayer = std::make_unique<VkThresholdedNMS>();
-    //
-    xyDerivativeLayer->updateParamet(paramet.edgeStrength);
-    blurLayer->updateParamet(paramet.blueParamet);
-    thresholdNMSLayer->updateParamet(paramet.threshold);
-    updateUBO();
 }
 
-VkHarrisCornerDetectionLayer::~VkHarrisCornerDetectionLayer() {}
+VkHarrisDetectionBaseLayer::~VkHarrisDetectionBaseLayer() {}
 
-void VkHarrisCornerDetectionLayer::updateUBO() {
-    std::vector<float> paramets = {paramet.harris, paramet.sensitivity};
-    VkLayer::updateUBO(paramets.data());
+void VkHarrisDetectionBaseLayer::baseParametChange(
+    const HarrisDetectionBaseParamet& baseParamet) {
+    xyDerivativeLayer->updateParamet(baseParamet.edgeStrength);
+    blurLayer->updateParamet(baseParamet.blueParamet);
+    thresholdNMSLayer->updateParamet(baseParamet.threshold);
 }
 
-void VkHarrisCornerDetectionLayer::onUpdateParamet() {
-    if (paramet.edgeStrength != oldParamet.edgeStrength) {
-        xyDerivativeLayer->updateParamet(paramet.edgeStrength);
-    }
-    if (!(paramet.blueParamet == oldParamet.blueParamet)) {
-        blurLayer->updateParamet(paramet.blueParamet);
-    }
-    if (paramet.threshold != oldParamet.threshold) {
-        thresholdNMSLayer->updateParamet(paramet.threshold);
-    }
-    if (paramet.harris != oldParamet.harris ||
-        paramet.sensitivity != oldParamet.sensitivity) {
-        updateUBO();
-        bParametChange = true;
-    }
-}
-
-void VkHarrisCornerDetectionLayer::onInitGraph() {
+void VkHarrisDetectionBaseLayer::onInitGraph() {
     VkLayer::onInitGraph();
     inFormats[0].imageType = ImageType::rgba32f;
     outFormats[0].imageType = ImageType::r32f;
@@ -84,18 +61,69 @@ void VkHarrisCornerDetectionLayer::onInitGraph() {
     pipeGraph->addNode(thresholdNMSLayer->getLayer());
 }
 
-void VkHarrisCornerDetectionLayer::onInitNode() {
+void VkHarrisDetectionBaseLayer::onInitNode() {
     blurLayer->addLine(this, 0, 0);
     addLine(thresholdNMSLayer.get(), 0, 0);
     setStartNode(xyDerivativeLayer.get());
     setEndNode(thresholdNMSLayer.get());
 }
 
+VkHarrisCornerDetectionLayer::VkHarrisCornerDetectionLayer(/* args */) {
+    // self
+    glslPath = "glsl/harrisCornerDetection.comp.spv";
+    setUBOSize(8);
+    baseParametChange(paramet.harrisBase);
+    transformParamet();
+}
+
+VkHarrisCornerDetectionLayer::~VkHarrisCornerDetectionLayer() {}
+
+void VkHarrisCornerDetectionLayer::transformParamet() {
+    std::vector<float> paramets = {paramet.harris, paramet.sensitivity};
+    updateUBO(paramets.data());
+}
+
+void VkHarrisCornerDetectionLayer::onUpdateParamet() {
+    if (!(paramet.harrisBase == oldParamet.harrisBase)) {
+        baseParametChange(paramet.harrisBase);
+    }
+    if (paramet.harris != oldParamet.harris ||
+        paramet.sensitivity != oldParamet.sensitivity) {
+        transformParamet();
+        bParametChange = true;
+    }
+}
+
 VkNobleCornerDetectionLayer::VkNobleCornerDetectionLayer(/* args */) {
     glslPath = "glsl/nobleCornerDetection.comp.spv";
+    setUBOSize(4);
+    baseParametChange(paramet.harrisBase);
+    transformParamet();
 }
 
 VkNobleCornerDetectionLayer::~VkNobleCornerDetectionLayer() {}
+
+void VkNobleCornerDetectionLayer::transformParamet() {
+    updateUBO(&paramet.sensitivity);
+}
+
+void VkNobleCornerDetectionLayer::onUpdateParamet() {
+    if (!(paramet.harrisBase == oldParamet.harrisBase)) {
+        baseParametChange(paramet.harrisBase);
+    }
+    if (paramet.sensitivity != oldParamet.sensitivity) {
+        transformParamet();
+        bParametChange = true;
+    }
+}
+
+VkShiTomasiFeatureDetectionLayer::VkShiTomasiFeatureDetectionLayer(/* args */) {
+    glslPath = "glsl/shiTomasiFeatureDetection.comp.spv";
+    paramet.sensitivity = 1.5f;
+    transformParamet();
+}
+
+VkShiTomasiFeatureDetectionLayer::~VkShiTomasiFeatureDetectionLayer() {}
 
 }  // namespace layer
 }  // namespace vulkan

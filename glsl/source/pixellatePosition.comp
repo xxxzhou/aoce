@@ -1,0 +1,34 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {
+    float aspectRatio;
+    float centerX;
+    float centerY;
+    float radius;
+    float size;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }   
+    vec2 center = vec2(ubo.centerX,ubo.centerY);
+    float x = (uv.x+0.5)/size.x;
+    float y = (uv.y+0.5)/size.y;
+    vec2 coord = vec2(x,((y-ubo.centerY)*ubo.aspectRatio)+ubo.centerY);  
+    float dist = distance(center,coord);
+    vec2 tcoord = vec2(x,y);
+    if(dist < ubo.radius){
+        vec2 sampleDivisor = vec2(ubo.size, ubo.size / ubo.aspectRatio);
+        vec2 tcoord = tcoord - mod(tcoord, sampleDivisor) + 0.5 * sampleDivisor;
+    }
+    vec4 inColor = textureLod(inSampler, tcoord,0);  
+    imageStore(outTex,uv,inColor);
+}

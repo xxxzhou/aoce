@@ -74,11 +74,12 @@ class AOCE_VULKAN_EXPORT UBOLayout {
     // count表示一个group有几个set,主要用于一个UBO结构填充多处不同内容
     int32_t addSetLayout(std::vector<UBOLayoutItem>& layout,
                          uint32_t count = 1);
-    void generateLayout();
+    void generateLayout(int32_t constSize = 0);
 
     void updateSetLayout(uint32_t groupIndex, uint32_t setIndex, ...);
 
-    void updateSetLayout(uint32_t groupIndex, uint32_t setIndex,std::vector<void*> bufferInfos);
+    void updateSetLayout(uint32_t groupIndex, uint32_t setIndex,
+                         std::vector<void*> bufferInfos);
 };
 
 class AOCE_VULKAN_EXPORT VulkanPipeline {

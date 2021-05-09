@@ -99,7 +99,7 @@ bool VkPipeGraph::onInitBuffers() {
     vkLayers.clear();
     for (auto index : nodeExcs) {
         VkLayer* vkLayer = static_cast<VkLayer*>(nodes[index]->getLayer());
-        vkLayer->onPreCmd();
+        vkLayer->onCommand();
         if (vkLayer->bOutput) {
             vkOutputLayers.push_back(vkLayer);
         } else {

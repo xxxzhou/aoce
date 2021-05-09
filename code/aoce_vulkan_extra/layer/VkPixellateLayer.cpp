@@ -28,6 +28,19 @@ VkHalftoneLayer::~VkHalftoneLayer() {}
 
 bool VkHalftoneLayer::getSampled(int32_t inIndex) { return inIndex == 0; }
 
+VkPolkaDotLayer::VkPolkaDotLayer(/* args */) {
+    glslPath = "glsl/polkaDot.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    paramet.fractionalWidthOfPixel = 0.01;
+    paramet.aspectRatio = 1.0f;
+    paramet.dotScaling = 0.90f;
+    updateUBO(&paramet);
+}
+
+VkPolkaDotLayer::~VkPolkaDotLayer() {}
+
+bool VkPolkaDotLayer::getSampled(int32_t inIndex) { return inIndex == 0; }
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

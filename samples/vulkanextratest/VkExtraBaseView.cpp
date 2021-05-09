@@ -30,7 +30,7 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst,
     resizeLayer = layerFactory->createSize();
     resizeLayer->updateParamet({1, 240, 120});
     layerNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
-    for (auto& layer : layers) {
+    for (auto& layer : layers) {        
         layerNode = layerNode->addNode(layer);
     }
     if (bAutoIn) {

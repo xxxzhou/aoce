@@ -35,7 +35,7 @@ class AOCE_VULKAN_EXPORT VkOutputLayer : public OutputLayer, public VkLayer {
     virtual void onUpdateParamet() override;
     virtual void onInitVkBuffer() override;
     virtual void onInitPipe() override{};
-    virtual void onPreCmd() override;
+    virtual void onCommand() override;
     virtual bool onFrame() override;
 
    public:

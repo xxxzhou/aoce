@@ -56,7 +56,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     std::vector<VulkanTexturePtr> inTexs;
     std::vector<VulkanTexturePtr> outTexs;
 
-    VkCommandBuffer cmd;
+    VkCommandBuffer cmd = VK_NULL_HANDLE;
     // 如果CPU与GPU参数对应
     bool bParametMatch = false;
     // 非线程更新告诉更新数据线程需要更新UBO
@@ -99,11 +99,12 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     virtual void onInitVkBuffer(){};
     // 根据上面shader/buffer,组建计算管线
     virtual void onInitPipe();
+    // CommandBuffer
+    virtual void onPreCommand(){};
+    virtual void onCommand();
     // 每桢onFrame之前调用,与onFrame/执行commandbuffer在同一线程.
     // 可以用来根据标记更新一些Vulkan 资源
     virtual void onPreFrame();
-    // CommandBuffer
-    virtual void onPreCmd();
 };
 
 }  // namespace layer

@@ -1,0 +1,41 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+layout (binding = 0, r8) uniform readonly image2D inTex;
+layout (binding = 1, r32f) uniform image2D outTex;
+
+layout (binding = 2) uniform UBO {
+	float edgeStrength;
+} ubo;
+
+const float horizontKernel[9] = {-1.0f,-2.0f,-1.0f,0.0f,0.0f,0.0f,1.0f,2.0f,1.0f};
+const float verticalKernel[9] = {-1.0f,0.0f,1.0f,-2.0f,0.0f,2.0f,-1.0f,0.0f,1.0f};
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }
+    float vertical = 0.0f;
+    float horizont = 0.0f;    
+    for(int i = 0; i< 3; ++i){
+        for(int j= 0; j< 3; ++j){
+            int x = uv.x - 1 + j;
+            int y = uv.y - 1 + i;
+            // REPLICATE border
+            x = max(0,min(x,size.x-1));
+            y = max(0,min(y,size.y-1));
+            int index = j+i*3;
+            float value = imageLoad(inTex,ivec2(x,y)).r;
+            vertical += value * verticalKernel[index];
+            horizont += value * horizontKernel[index];
+        }
+    }
+    float mag = length(vec2(horizont, vertical)) * ubo.edgeStrength;
+#if SKETCH
+    mag = 1.0f - mag;
+#endif  
+    imageStore(outTex, uv, vec4(mag));    
+}

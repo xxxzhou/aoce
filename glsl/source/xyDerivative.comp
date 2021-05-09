@@ -9,8 +9,9 @@ layout (binding = 2) uniform UBO {
 	float edgeStrength;
 } ubo;
 
-const float horizontKernel[9] = {1.0f,0.0f,-1.0f,2.0f,0.0f,-2.0f,1.0f,0.0f,-1.0f};
-const float verticalKernel[9] = {1.0f,2.0f,1.0f,0.0f,0.0f,0.0f,-1.0f,-2.0f,-1.0f};
+// prewitt算子,水平与垂直是否反了?先按照GPUImage来,后面查证 对应GPUImageXYDerivativeFilter
+const float horizontKernel[9] = {-1.0f,0.0f,1.0f,-1.0f,0.0f,1.0f,-1.0f,0.0f,1.0f};
+const float verticalKernel[9] = {-1.0f,-1.0f,-1.0f,0.0f,0.0f,0.0f,1.0f,1.0f,1.0f};
 
 void main(){
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
@@ -33,13 +34,12 @@ void main(){
             horizont += value * horizontKernel[index];
         }
     }
+    vertical = vertical * ubo.edgeStrength;
+    horizont = horizont * ubo.edgeStrength;
     vec4 sum = vec4(0.0f);
-    // 梯度
-    sum.x = length(vec2(horizont,vertical)) * ubo.edgeStrength;
-    // dx
-    sum.y = horizont;
-    // dy
-    sum.z = vertical;
+    sum.x = horizont* horizont;
+    sum.y = vertical* vertical;
+    sum.z = ((horizont*vertical)+1.0f)/2.0f;
     sum.w = 1.0f;
     imageStore(outTex, uv, sum); 
 }

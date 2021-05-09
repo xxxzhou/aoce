@@ -92,6 +92,13 @@ void VkLayer::createOutTexs() {
     outTexs.clear();
     for (int32_t i = 0; i < outCount; i++) {
         const ImageFormat& format = outFormats[i];
+        if (format.width <= 0 && format.height <= 0 &&
+            format.imageType == ImageType::other) {
+            std::string message;
+            string_format(message, getMark(), " out format index", i,
+                          "  incorrect");
+            logMessage(LogLevel::error, message.c_str());
+        }
         VkFormat vkft = ImageFormat2Vk(format.imageType);
         VulkanTexturePtr texPtr(new VulkanTexture());
         // VkMemoryPropertyFlags
@@ -205,7 +212,7 @@ void VkLayer::onPreFrame() {
     }
 }
 
-void VkLayer::onPreCmd() {
+void VkLayer::onCommand() {
     for (int i = 0; i < inCount; i++) {
         inTexs[i]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
                               VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,

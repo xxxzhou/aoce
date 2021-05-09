@@ -31,7 +31,7 @@ class AOCE_VULKAN_EXPORT VkInputLayer : public InputLayer, public VkLayer {
     virtual void onInitGraph() override;
     virtual void onInitVkBuffer() override;
     virtual void onInitPipe() override;
-    virtual void onPreCmd() override;
+    virtual void onCommand() override;
     virtual bool onFrame() override;
 };
 

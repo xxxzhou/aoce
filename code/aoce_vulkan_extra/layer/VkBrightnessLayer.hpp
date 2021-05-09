@@ -108,7 +108,35 @@ class VkOpacityLayer : public VkLayer, public ITLayer<float> {
     virtual ~VkOpacityLayer();
 };
 
+class VkPosterizeLayer : public VkLayer, public ITLayer<uint32_t> {
+    AOCE_LAYER_QUERYINTERFACE(VkPosterizeLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkPosterizeLayer(/* args */);
+    ~VkPosterizeLayer();
+};
 
+class VkSharpenLayer : public VkLayer, public ITLayer<SharpenParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkSharpenLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkSharpenLayer(/* args */);
+    ~VkSharpenLayer();
+};
+
+class VkSkinToneLayer : public VkLayer, public ITLayer<SkinToneParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkSkinToneLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkSkinToneLayer(/* args */);
+    ~VkSkinToneLayer();
+};
 
 }  // namespace layer
 }  // namespace vulkan

@@ -21,7 +21,7 @@ class VkHistogramLayer : public VkLayer {
    protected:
     virtual void onInitGraph() override;
     virtual void onInitLayer() override;
-    virtual void onPreCmd() override;
+    virtual void onCommand() override;
 };
 
 class VkHistogramC4Layer : public VkLayer {

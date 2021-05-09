@@ -6,8 +6,12 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkPreDilationLayer::VkPreDilationLayer() {
+VkPreDilationLayer::VkPreDilationLayer(bool bSingle) {
     glslPath = "glsl/morph1_dilation.comp.spv";
+    this->bSingle = bSingle;
+    if (bSingle) {
+        glslPath = "glsl/morph1_dilationC1.comp.spv";
+    }
     setUBOSize(sizeof(paramet), true);
     paramet = 3;
     updateUBO(&paramet);
@@ -17,16 +21,22 @@ VkPreDilationLayer::~VkPreDilationLayer() {}
 
 void VkPreDilationLayer::onInitGraph() {
     VkLayer::onInitGraph();
-    inFormats[0].imageType = ImageType::r8;
-    outFormats[0].imageType = ImageType::r8;
+    if (bSingle) {
+        inFormats[0].imageType = ImageType::r8;
+        outFormats[0].imageType = ImageType::r8;
+    }
 }
 
-VkDilationLayer::VkDilationLayer() {
+VkDilationLayer::VkDilationLayer(bool bSingle) {
     glslPath = "glsl/morph2_dilation.comp.spv";
+    this->bSingle = bSingle;
+    if (bSingle) {
+        glslPath = "glsl/morph2_dilationC1.comp.spv";
+    }
     setUBOSize(sizeof(paramet), true);
     paramet = 3;
     updateUBO(&paramet);
-    preLayer = std::make_unique<VkPreDilationLayer>();
+    preLayer = std::make_unique<VkPreDilationLayer>(bSingle);
 }
 
 VkDilationLayer::~VkDilationLayer() {}
@@ -42,8 +52,10 @@ void VkDilationLayer::onUpdateParamet() {
 
 void VkDilationLayer::onInitGraph() {
     VkLayer::onInitGraph();
-    inFormats[0].imageType = ImageType::r8;
-    outFormats[0].imageType = ImageType::r8;
+    if (bSingle) {
+        inFormats[0].imageType = ImageType::r8;
+        outFormats[0].imageType = ImageType::r8;
+    }
     pipeGraph->addNode(preLayer->getLayer());
 }
 
@@ -52,8 +64,12 @@ void VkDilationLayer::onInitNode() {
     setStartNode(preLayer.get());
 }
 
-VkPreErosionLayer::VkPreErosionLayer() {
+VkPreErosionLayer::VkPreErosionLayer(bool bSingle) {
     glslPath = "glsl/morph1_erosion.comp.spv";
+    this->bSingle = bSingle;
+    if (bSingle) {
+        glslPath = "glsl/morph1_erosionC1.comp.spv";
+    }
     setUBOSize(sizeof(paramet), true);
     paramet = 3;
     updateUBO(&paramet);
@@ -63,16 +79,22 @@ VkPreErosionLayer::~VkPreErosionLayer() {}
 
 void VkPreErosionLayer::onInitGraph() {
     VkLayer::onInitGraph();
-    inFormats[0].imageType = ImageType::r8;
-    outFormats[0].imageType = ImageType::r8;
+    if (bSingle) {
+        inFormats[0].imageType = ImageType::r8;
+        outFormats[0].imageType = ImageType::r8;
+    }
 }
 
-VkErosionLayer::VkErosionLayer() {
+VkErosionLayer::VkErosionLayer(bool bSingle) {
     glslPath = "glsl/morph2_erosion.comp.spv";
+    this->bSingle = bSingle;
+    if (bSingle) {
+        glslPath = "glsl/morph2_erosionC1.comp.spv";
+    }
     setUBOSize(sizeof(paramet), true);
     paramet = 3;
     updateUBO(&paramet);
-    preLayer = std::make_unique<VkPreErosionLayer>();
+    preLayer = std::make_unique<VkPreErosionLayer>(bSingle);
 }
 
 VkErosionLayer::~VkErosionLayer() {}
@@ -88,8 +110,10 @@ void VkErosionLayer::onUpdateParamet() {
 
 void VkErosionLayer::onInitGraph() {
     VkLayer::onInitGraph();
-    inFormats[0].imageType = ImageType::r8;
-    outFormats[0].imageType = ImageType::r8;
+    if (bSingle) {
+        inFormats[0].imageType = ImageType::r8;
+        outFormats[0].imageType = ImageType::r8;
+    }
     pipeGraph->addNode(preLayer->getLayer());
 }
 
@@ -98,9 +122,9 @@ void VkErosionLayer::onInitNode() {
     setStartNode(preLayer.get());
 }
 
-VkClosingLayer::VkClosingLayer() {
-    dilationLayer = std::make_unique<VkDilationLayer>();
-    erosionLayer = std::make_unique<VkErosionLayer>();
+VkClosingLayer::VkClosingLayer(bool bSingle) {
+    dilationLayer = std::make_unique<VkDilationLayer>(bSingle);
+    erosionLayer = std::make_unique<VkErosionLayer>(bSingle);
 }
 
 VkClosingLayer::~VkClosingLayer() {}
@@ -120,9 +144,9 @@ void VkClosingLayer::onInitNode() {
     setEndNode(erosionLayer.get());
 }
 
-VkOpeningLayer::VkOpeningLayer() {
-    dilationLayer = std::make_unique<VkDilationLayer>();
-    erosionLayer = std::make_unique<VkErosionLayer>();
+VkOpeningLayer::VkOpeningLayer(bool bSingle) {
+    dilationLayer = std::make_unique<VkDilationLayer>(bSingle);
+    erosionLayer = std::make_unique<VkErosionLayer>(bSingle);
 }
 
 VkOpeningLayer::~VkOpeningLayer() {}

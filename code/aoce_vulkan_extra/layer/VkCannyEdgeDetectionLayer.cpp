@@ -2,21 +2,20 @@
 
 #include "aoce/Layer/PipeGraph.hpp"
 
-
 namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkSobelEdgeDetectionLayer::VkSobelEdgeDetectionLayer(/* args */) {
-    glslPath = "glsl/sobel.comp.spv";
+VkDirectionalSobelEdgeDetectionLayer::VkDirectionalSobelEdgeDetectionLayer(/* args */) {
+    glslPath = "glsl/directionalSobel.comp.spv";
     setUBOSize(sizeof(paramet), true);
     paramet = 1.0f;
     updateUBO(&paramet);
 }
 
-VkSobelEdgeDetectionLayer::~VkSobelEdgeDetectionLayer() {}
+VkDirectionalSobelEdgeDetectionLayer::~VkDirectionalSobelEdgeDetectionLayer() {}
 
-void VkSobelEdgeDetectionLayer::onInitGraph() {
+void VkDirectionalSobelEdgeDetectionLayer::onInitGraph() {
     VkLayer::onInitGraph();
     inFormats[0].imageType = ImageType::r8;
     outFormats[0].imageType = ImageType::rgba32f;
@@ -50,7 +49,7 @@ VkCannyEdgeDetectionLayer::VkCannyEdgeDetectionLayer(/* args */) {
 
     luminanceLayer = std::make_unique<VkLuminanceLayer>();
     gaussianBlurLayer = std::make_unique<VkGaussianBlurSLayer>(ImageType::r8);
-    sobelEDLayer = std::make_unique<VkSobelEdgeDetectionLayer>();
+    sobelEDLayer = std::make_unique<VkDirectionalSobelEdgeDetectionLayer>();
     directNMSLayer = std::make_unique<VkDirectionalNMS>();
 
     gaussianBlurLayer->updateParamet(paramet.blueParamet);

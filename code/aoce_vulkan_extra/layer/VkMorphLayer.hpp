@@ -16,8 +16,12 @@ namespace layer {
 class VkPreDilationLayer : public VkLayer, public ITLayer<int32_t> {
     AOCE_LAYER_QUERYINTERFACE(VkPreDilationLayer)
     AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+    bool bSingle = false;
+
    public:
-    VkPreDilationLayer();
+    VkPreDilationLayer(bool bSingle = false);
     virtual ~VkPreDilationLayer();
 
    protected:
@@ -27,8 +31,12 @@ class VkPreDilationLayer : public VkLayer, public ITLayer<int32_t> {
 // 扩张放大图像中的明亮白色区域
 class VkDilationLayer : public VkLayer, public ITLayer<int32_t> {
     AOCE_LAYER_QUERYINTERFACE(VkDilationLayer)
+   private:
+    /* data */
+    bool bSingle = false;
+
    public:
-    VkDilationLayer();
+    VkDilationLayer(bool bSingle = false);
     virtual ~VkDilationLayer();
 
    protected:
@@ -43,8 +51,12 @@ class VkDilationLayer : public VkLayer, public ITLayer<int32_t> {
 class VkPreErosionLayer : public VkLayer, public ITLayer<int32_t> {
     AOCE_LAYER_QUERYINTERFACE(VkPreErosionLayer)
     AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+    bool bSingle = false;
+
    public:
-    VkPreErosionLayer();
+    VkPreErosionLayer(bool bSingle = false);
     virtual ~VkPreErosionLayer();
 
    protected:
@@ -54,8 +66,12 @@ class VkPreErosionLayer : public VkLayer, public ITLayer<int32_t> {
 // 它沿着物体边界移除像素并缩小物体的明亮白色区域
 class VkErosionLayer : public VkLayer, public ITLayer<int32_t> {
     AOCE_LAYER_QUERYINTERFACE(VkErosionLayer)
+   private:
+    /* data */
+    bool bSingle = false;
+
    public:
-    VkErosionLayer();
+    VkErosionLayer(bool bSingle = false);
     virtual ~VkErosionLayer();
 
    protected:
@@ -70,8 +86,12 @@ class VkErosionLayer : public VkLayer, public ITLayer<int32_t> {
 // Closing 先dilation后erosion
 class VkClosingLayer : public GroupLayer, public ITLayer<int32_t> {
     AOCE_LAYER_QUERYINTERFACE(VkClosingLayer)
+   private:
+    /* data */
+    bool bSingle = false;
+
    public:
-    VkClosingLayer();
+    VkClosingLayer(bool bSingle = false);
     virtual ~VkClosingLayer();
 
    protected:
@@ -87,8 +107,12 @@ class VkClosingLayer : public GroupLayer, public ITLayer<int32_t> {
 // Opening 先erosion后dilation
 class VkOpeningLayer : public GroupLayer, public ITLayer<int32_t> {
     AOCE_LAYER_QUERYINTERFACE(VkOpeningLayer)
+   private:
+    /* data */
+    bool bSingle = false;
+
    public:
-    VkOpeningLayer();
+    VkOpeningLayer(bool bSingle = false);
     virtual ~VkOpeningLayer();
 
    protected:

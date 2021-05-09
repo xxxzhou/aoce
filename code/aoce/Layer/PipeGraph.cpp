@@ -130,30 +130,11 @@ bool PipeGraph::checkHaveValid(PipeLinePtr nline) {
 }
 
 void PipeGraph::validNode() {
-    // 本节点的输入线
-    std::vector<std::vector<PipeLinePtr>> toLines(nodes.size());
     // 本节点的输出线
     std::vector<std::vector<PipeLinePtr>> formLines(nodes.size());
     validLines.clear();
     for (auto& line : lines) {
-        toLines[line->toNode].push_back(line);
         formLines[line->fromNode].push_back(line);
-    }
-    // 检查节点自身的输入输出线是否正确(注意,可能一个接点有多个输入,配合后面disable检查去掉相应)
-    for (auto& node : nodes) {
-        if (!node->bDisable && !node->layer->bInput) {
-            auto& tns = toLines[node->graphIndex];
-            uint32_t tmask = 0;
-            for (auto& tn : tns) {
-                uint32_t maskIndex = std::pow(2, tn->toInIndex);
-                tmask |= maskIndex;
-            }
-            int32_t inCount = node->layer->inCount;
-            // 节点的输入是否全部配齐
-            if (tmask != (std::pow(2, inCount) - 1)) {
-                node->bDisable = true;
-            }
-        }
     }
     // 检查有效链路,保存到validLines
     for (auto& node : nodes) {
@@ -254,7 +235,8 @@ bool PipeGraph::resetGraph() {
     for (auto index : nodeExcs) {
         if (!nodes[index]->layer->vaildInLayers()) {
             std::string message;
-            string_format(message, "layer vaild error,node: ", index);
+            string_format(message, nodes[index]->layer->getMark(),
+                          " vaild error ");
             logMessage(LogLevel::error, message);
             return false;
         }
@@ -272,10 +254,10 @@ bool PipeGraph::resetGraph() {
                     ->layer->outFormats[fromNode.siteIndex]
                     .imageType != nodes[index]->layer->inFormats[i].imageType) {
                 std::string message;
-                string_format(message, "graph error,",
-                              "from node: ", fromNode.nodeIndex, "-",
-                              fromNode.siteIndex,
-                              " not match image type in node:", index, "-", i);
+                string_format(message, "graph error,", "from : ",
+                              nodes[fromNode.nodeIndex]->layer->getMark(), "-",
+                              fromNode.siteIndex, " not match image type in :",
+                              nodes[index]->layer->getMark(), "-", i);
                 logMessage(LogLevel::error, message);
                 return false;
             }
@@ -295,6 +277,13 @@ bool PipeGraph::run() {
     std::lock_guard<std::mutex> mtx_locker(mtx);
     if (bReset) {
         logMessage(LogLevel::info, "start build graph.");
+#if AOCE_DEBUG_TYPE
+        logMessage(LogLevel::info, "---the graph all node name.");
+        for (auto node : nodes) {
+            logMessage(LogLevel::info, node->layer->getMark());
+        }
+        logMessage(LogLevel::info, "--- end graph.");
+#endif
         bReset = false;
         onReset();
         if (!resetGraph()) {
@@ -302,6 +291,14 @@ bool PipeGraph::run() {
             return false;
         } else {
             logMessage(LogLevel::info, "build graph success.");
+#if AOCE_DEBUG_TYPE
+            logMessage(LogLevel::info,
+                       "--- the order of execution of the graph.");
+            for (auto index : nodeExcs) {
+                logMessage(LogLevel::info, nodes[index]->layer->getMark());
+            }
+            logMessage(LogLevel::info, "--- end graph.");
+#endif
         }
     }
     return onRun();

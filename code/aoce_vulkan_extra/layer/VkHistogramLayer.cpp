@@ -36,9 +36,9 @@ void VkHistogramLayer::onInitLayer() {
     }
 }
 
-void VkHistogramLayer::onPreCmd() {
+void VkHistogramLayer::onCommand() {
     clearColor({0, 0, 0, 0});
-    VkLayer::onPreCmd();
+    VkLayer::onCommand();
 }
 
 VkHistogramC4Layer::VkHistogramC4Layer(/* args */) {

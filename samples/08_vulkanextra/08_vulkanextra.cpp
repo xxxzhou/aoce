@@ -23,6 +23,7 @@ static ITLayer<KernelSizeParamet>* boxFilterLayer;
 static ITLayer<ChromKeyParamet>* chromKeyLayer;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static BaseLayer* luminance = nullptr;
+static PerlinNoiseLayer* noiseLayer = nullptr;
 
 static GpuType gpuType = GpuType::vulkan;
 
@@ -89,6 +90,9 @@ int main() {
 
     luminance = createLuminanceLayer();
 
+    noiseLayer = createPerlinNoiseLayer();
+    noiseLayer->setImageSize(1920, 1080);
+
     VideoType videoType = selectFormat.videoType;
     if (selectFormat.videoType == VideoType::mjpg) {
         videoType = VideoType::yuv2I;
@@ -101,11 +105,12 @@ int main() {
         ->addNode(yuv2rgbLayer)
         ->addNode(chromKeyLayer)
         ->addNode(outputLayer);
+    // 设定输入格式
+    inputLayer->setImage(selectFormat);
+    // vkGraph->addNode(noiseLayer)->addNode(outputLayer);
     // vkGraph->addNode(inputLayer)->addNode(outputLayer);
     // 设定输出函数回调
     outputLayer->setImageProcessHandle(onImageProcessHandle);
-    // 设定输入格式
-    inputLayer->setImage(selectFormat);
     //显示
     show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
     show2 = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
