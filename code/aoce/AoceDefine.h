@@ -69,7 +69,7 @@
 #define M_PI 3.14159265358979323846 /* pi */
 #endif
 
-// 采用opencv里的数据描述,前三BIT表示类型，后三BIT表示通道个数
+// 采用opencv里的数据描述,前三BIT表示类型,后三BIT表示通道个数
 #pragma region opencv
 #define AOCE_CV_CN_MAX 512
 #define AOCE_CV_CN_SHIFT 3

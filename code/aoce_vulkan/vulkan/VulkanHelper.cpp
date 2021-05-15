@@ -442,7 +442,7 @@ void changeLayout(VkCommandBuffer command, VkImage image,
             imageMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
             break;
         case VK_IMAGE_LAYOUT_PREINITIALIZED:
-            //该布局旨在用作其内容由主机写入的图像的初始布局，因此无需首先执行布局转换就可以将数据立即写入内存
+            //该布局旨在用作其内容由主机写入的图像的初始布局,因此无需首先执行布局转换就可以将数据立即写入内存
             imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
             break;
         default:

@@ -16,7 +16,7 @@ class VkPrewittEdgeDetectionLayer : public VkLayer, public ITLayer<float> {
     /* data */
    public:
     VkPrewittEdgeDetectionLayer(/* args */);
-    ~VkPrewittEdgeDetectionLayer();
+    virtual ~VkPrewittEdgeDetectionLayer();
 
    protected:
     virtual void onInitGraph() override;
@@ -28,7 +28,7 @@ class VkSobelEdgeDetectionLayer : public VkPrewittEdgeDetectionLayer {
     /* data */
    public:
     VkSobelEdgeDetectionLayer(/* args */);
-    ~VkSobelEdgeDetectionLayer();
+    virtual ~VkSobelEdgeDetectionLayer();
 };
 
 class VkSketchLayer : public VkPrewittEdgeDetectionLayer {
@@ -37,7 +37,32 @@ class VkSketchLayer : public VkPrewittEdgeDetectionLayer {
     /* data */
    public:
     VkSketchLayer(/* args */);
-    ~VkSketchLayer();
+    virtual ~VkSketchLayer();
+};
+
+class VkThresholdSketchLayer : public VkLayer,
+                               public ITLayer<ThresholdSobelParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkThresholdSketchLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkThresholdSketchLayer(/* args */);
+    virtual ~VkThresholdSketchLayer();
+
+   protected:
+    virtual void onInitGraph() override;
+};
+
+// 按GPUImage2里来,实现同VkThresholdSketchLayer
+class VkThresholdEdgeDetectionLayer : public VkThresholdSketchLayer {
+    AOCE_LAYER_QUERYINTERFACE(VkThresholdEdgeDetectionLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkThresholdEdgeDetectionLayer(/* args */);
+    virtual ~VkThresholdEdgeDetectionLayer();
 };
 
 

@@ -11,6 +11,8 @@ namespace layer {
 VkMotionBlurLayer::VkMotionBlurLayer(/* args */) {
     glslPath = "glsl/motionBlur.comp.spv";
     setUBOSize(sizeof(vec2));
+    // 需要用到inFormats[0]的长宽,只有等到onInitLayer才知道
+    // transformParamet();
 }
 
 VkMotionBlurLayer::~VkMotionBlurLayer() {}
@@ -28,10 +30,30 @@ void VkMotionBlurLayer::transformParamet() {
 
 bool VkMotionBlurLayer::getSampled(int32_t inIndex) { return inIndex == 0; }
 
+void VkMotionBlurLayer::onUpdateParamet() {
+    if (inFormats.size() > 0 && inFormats[0].height > 0 &&
+        inFormats[0].width > 0) {
+        if (!(paramet == oldParamet)) {
+            transformParamet();
+            bParametChange = true;
+        }
+    }
+}
+
 void VkMotionBlurLayer::onInitLayer() {
     VkLayer::onInitLayer();
     transformParamet();
 }
+
+VkZoomBlurLayer::VkZoomBlurLayer(/* args */) {
+    glslPath = "glsl/zoomBlur.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    updateUBO(&paramet);
+}
+
+VkZoomBlurLayer::~VkZoomBlurLayer() {}
+
+bool VkZoomBlurLayer::getSampled(int32_t inIndex) { return inIndex == 0; }
 
 VkMotionDetectorLayer::VkMotionDetectorLayer(/* args */) {
     glslPath = "glsl/motionDetector.comp.spv";
@@ -53,7 +75,7 @@ void VkMotionDetectorLayer::onImageProcessHandle(uint8_t* data,
     if (onMotionEvent) {
         vec4 motion = {};
         memcpy(&motion, data, sizeof(vec4));
-        float size = inFormats[0].width*inFormats[0].height;
+        float size = inFormats[0].width * inFormats[0].height;
         motion.z = motion.z / size;
         motion.w = motion.w / size;
         onMotionEvent(motion);

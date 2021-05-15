@@ -16,7 +16,7 @@ endif()
 add_definitions(-DAOCE_CUDA_EXPORT_DEFINE)
 set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-O3; -G; -g;-std=c++14")
 # set(CUDA_SEPARABLE_COMPILATION ON)
-# C++和CUDA的编译参数，可选。如果CMAKE_CXX_FLAGS和CUDA_NVCC_FLAGS有相同参数会报错
+# C++和CUDA的编译参数,可选.如果CMAKE_CXX_FLAGS和CUDA_NVCC_FLAGS有相同参数会报错
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 # SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} "-gencode arch=compute_61,code=sm_61")
 # set(CUDA_NVCC_FLAGS "-gencode arch=compute_50,code=sm_50;-rdc=true;-use_fast_math")

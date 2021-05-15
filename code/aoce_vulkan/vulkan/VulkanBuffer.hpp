@@ -18,7 +18,7 @@ enum class BufferUsage {
 // (unmap后GPU最新)VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 // (CPU不可写,Computer shader)(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)
 // memory与view的关系应该是一对多,本类用于特殊的一对一情况
-// 后期专门设计一个memory对应多个view的类。(可以一个mesh的IBO,VBO放一起,也可多Mesh放一块)
+// 后期专门设计一个memory对应多个view的类.(可以一个mesh的IBO,VBO放一起,也可多Mesh放一块)
 class AOCE_VULKAN_EXPORT VulkanBuffer {
    private:
     VkDeviceMemory memory = VK_NULL_HANDLE;

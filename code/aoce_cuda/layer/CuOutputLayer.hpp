@@ -6,8 +6,8 @@
 namespace aoce {
 namespace cuda {
 
-// 现在CUDA与DX11交互，还是使用了DX11的共享纹理，需要一个独立的DX11上下文，后期考虑能不能替换掉，现在的问题是如果不使用
-// 这种方式，渲染线程要等CUDA的流执行完，除非后期找到一种有锁的CUDA与Dx11线程交互方式才能保证各不等待并能正确执行。
+// 现在CUDA与DX11交互,还是使用了DX11的共享纹理,需要一个独立的DX11上下文,后期考虑能不能替换掉,现在的问题是如果不使用
+// 这种方式,渲染线程要等CUDA的流执行完,除非后期找到一种有锁的CUDA与Dx11线程交互方式才能保证各不等待并能正确执行.
 class CuOutputLayer : public OutputLayer, public CuLayer {
     AOCE_LAYER_QUERYINTERFACE(CuOutputLayer)
    private:

@@ -99,7 +99,7 @@ bool updateDx11Resource(ID3D11DeviceContext* ctxDx11, ID3D11Resource* resouce,
     D3D11_MAPPED_SUBRESOURCE mappedResource = {0};
     HRESULT result =
         ctxDx11->Map(resouce, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    // RowPitch 需要注意，如果数据要返回给CPU,经试验,必需是32的倍数
+    // RowPitch 需要注意,如果数据要返回给CPU,经试验,必需是32的倍数
     memcpy(mappedResource.pData, data, size);
     ctxDx11->Unmap(resouce, 0);
     if (!SUCCEEDED(result)) {

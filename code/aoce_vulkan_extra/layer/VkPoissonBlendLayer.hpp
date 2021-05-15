@@ -20,7 +20,7 @@ class VkCopyImageLayer : public VkLayer {
 class VkPoissonBlendLayer : public VkLayer, public ITLayer<PoissonParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkPoissonBlendLayer)
    private:
-    // 当前层会改变第二个输入的数据,所以内置一个层用来代替第二个输入
+    // 当前层会改变第一个输入的数据,所以内置一个层用来保存第一个输入
     std::unique_ptr<VkCopyImageLayer> copyLayer = nullptr;
 
    public:

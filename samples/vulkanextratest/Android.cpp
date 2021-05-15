@@ -14,7 +14,7 @@ static VkExtraBaseView* view = nullptr;
 // box模糊
 static ITLayer<KernelSizeParamet>* boxFilterLayer = nullptr;
 static ITLayer<GaussianBlurParamet>* gaussianLayer = nullptr;
-static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
+static ITLayer<ChromaKeyParamet>* chromKeyLayer = nullptr;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static ITLayer<GuidedParamet>* guidedLayer = nullptr;
 static BaseLayer* convertLayer = nullptr;
@@ -27,7 +27,7 @@ static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
 static ITLayer<KernelSizeParamet>* boxFilterLayer1 = nullptr;
 static ITLayer<uint32_t>* kuwaharaLayer = nullptr;
 
-static ChromKeyParamet keyParamet = {};
+static ChromaKeyParamet keyParamet = {};
 extern "C" JNIEXPORT void JNICALL
 Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
                                                           jobject thiz) {
@@ -44,7 +44,7 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     gaussianLayer = createGaussianBlurLayer();
     gaussianLayer->updateParamet({10, 5.0f});
 
-    chromKeyLayer = createChromKeyLayer();
+    chromKeyLayer = createChromaKeyLayer();
     keyParamet.alphaScale = 10.0f;
     keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
     keyParamet.ambientColor = {0.9f, 0.1f, 0.1f};
@@ -57,9 +57,9 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
 
     hcdLayer = createHarrisCornerDetectionLayer();
     HarrisCornerDetectionParamet hcdParamet = {};
-    hcdParamet.threshold = 0.4f;
+    hcdParamet.harrisBase.threshold = 0.4f;
+    hcdParamet.harrisBase.edgeStrength = 1.0f;
     hcdParamet.harris = 0.04f;
-    hcdParamet.edgeStrength = 1.0f;
     hcdLayer->updateParamet(hcdParamet);
 
     boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);

@@ -28,7 +28,7 @@ void main(){
     float alpha = 0;
     vec4 sum = vec4(0);
     for(int i = 0; i < 4; i++){
-        ivec2 cuv = uv + centerT[0]*ubo.offset;
+        ivec2 cuv = uv + centerT[i]*ubo.offset;
         cuv.x = max(0,min(cuv.x,size.x-1));
         cuv.y = max(0,min(cuv.y,size.y-1));
         vec4 centColor = imageLoad(inTex,cuv);

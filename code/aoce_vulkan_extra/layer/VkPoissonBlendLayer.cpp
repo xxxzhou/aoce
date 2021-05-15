@@ -33,7 +33,7 @@ void VkPoissonBlendLayer::onUpdateParamet() {
     }
 }
 
-void VkPoissonBlendLayer::onInitGraph() {   
+void VkPoissonBlendLayer::onInitGraph() {
     if (!glslPath.empty()) {
         shader->loadShaderModule(context->device, glslPath);
     }
@@ -54,9 +54,9 @@ void VkPoissonBlendLayer::onInitGraph() {
 }
 
 void VkPoissonBlendLayer::onInitNode() {
-    copyLayer->addLine(this, 0, 1);
-    setStartNode(this, 0, 0);
-    setStartNode(copyLayer.get(), 1, 0);
+    copyLayer->addLine(this, 0, 0);
+    setStartNode(copyLayer.get());
+    setStartNode(this, 1, 1);
 }
 
 void VkPoissonBlendLayer::onCommand() {

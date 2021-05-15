@@ -22,10 +22,10 @@ android端简单演示,win端自身窗口显示,不需要配置opencv.
 
 ## [06_mediaplayer](https://zhuanlan.zhihu.com/p/302285687) (android/win)ffmpeg拉流
 
-1. 用ffmpeg打开rtmp流。
+1. 用ffmpeg打开rtmp流.
 2. 使用vulkan Compute shader处理yuv420P/yuv422P数据格式成rgba.
-3. 初始化android surface为vulkan的交换链，把如上结果复制到交换链上显示。
-4. 如果是opengles surface,如何不通过CPU直接把数据从vulkan复制到opengles里。
+3. 初始化android surface为vulkan的交换链,把如上结果复制到交换链上显示.
+4. 如果是opengles surface,如何不通过CPU直接把数据从vulkan复制到opengles里.
 
 需要配置ffmpeg第三方库,android/win各自配置对应的ffmpeg环境,不需要配置opencv.
 
@@ -35,8 +35,8 @@ android端简单演示,win端自身窗口显示,不需要配置opencv.
 
 1. ndk camera整合到aoce框架
 2. 使用vulkan Compute shader处理yuv420P/yuv422P数据格式成rgba.
-3. 初始化android surface为vulkan的交换链，把如上结果复制到交换链上显示。
-4. 如果是opengles surface,如何不通过CPU直接把数据从vulkan复制到opengles里。
+3. 初始化android surface为vulkan的交换链,把如上结果复制到交换链上显示.
+4. 如果是opengles surface,如何不通过CPU直接把数据从vulkan复制到opengles里.
 
 不需要配置第三方库.
 

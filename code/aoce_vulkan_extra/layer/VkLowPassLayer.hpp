@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../VkExtraExport.hpp"
-#include "VkDarkenBlendLayer.hpp"
+#include "VkBlendingModeLayer.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {

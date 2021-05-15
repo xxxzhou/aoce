@@ -20,18 +20,19 @@ void main(){
         return;
     }   
     vec2 center = vec2(ubo.centerX,ubo.centerY);
-    float x = (uv.x+0.5)/size.x;
-    float y = (uv.y+0.5)/size.y;
-    vec2 coord = vec2(x,((y-ubo.centerY)*ubo.aspectRatio)+ubo.centerY);  
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);      
+    vec2 coord = vec2(suv.x,(suv.y-0.5)*ubo.aspectRatio+0.5);  
     float dist = distance(center,coord);
-    vec2 tcoord = vec2(x,y);
+    coord = suv;
     if(dist < ubo.radius){
-        tcoord = tcoord - center;        
+        // 圆心坐标系
+        coord = coord - center;  
+        // 圆心距离-放大坐标倍数      
         float percent = 1.0 + ((0.5 - dist) / 0.5) * ubo.scale;
-        percent = percent* percent;
-        tcoord = tcoord * percent;
-        tcoord = tcoord + center;
+        percent = percent * percent;
+        coord = coord * percent;
+        coord = coord + center;
     }
-    vec4 inColor = textureLod(inSampler, tcoord,0);  
+    vec4 inColor = textureLod(inSampler, coord,0);  
     imageStore(outTex,uv,inColor);
 }

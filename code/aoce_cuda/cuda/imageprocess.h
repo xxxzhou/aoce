@@ -10,7 +10,7 @@
 using namespace aoce;
 using namespace aoce::cuda;
 
-//copy opencv resize实现，因为引入opencv_cudawarping太大
+//copy opencv resize实现,因为引入opencv_cudawarping太大
 template <typename T> __global__
 void resize_nearest(const PtrStep<T> src, PtrStepSz<T> dst, const float fx, const float fy) {
 	const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;

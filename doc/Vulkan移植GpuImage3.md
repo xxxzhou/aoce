@@ -1,4 +1,4 @@
-# Vulkan移植GpuImage(三)从A到C的滤镜
+# Vulkan移植GPUImage(三)从A到C的滤镜
 
 前面移植了几个比较复杂的效果后,算是确认了复杂滤镜不会对框架造成比较大的改动,开始从头移植,现已把A到C的所有滤镜用vulkan的ComputeShader实现了,讲一些其中实现的过程.
 

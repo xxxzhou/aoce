@@ -42,7 +42,7 @@ void main(){
     data_shared[tid] = INIT_VEC4;
     memoryBarrierShared(); 
     barrier();
-    // 因为只分配一个线程组，所以我们需要算出需要几个线程组
+    // 因为只分配一个线程组,所以我们需要算出需要几个线程组
     int groupSize = int(gl_WorkGroupSize.x);
     int count = (size+groupSize.x-1)/groupSize;
     // 把所有值算入分配的唯一一个线程组内

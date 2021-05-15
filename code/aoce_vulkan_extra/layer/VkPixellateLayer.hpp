@@ -23,7 +23,7 @@ class VkPixellateLayer : public VkLayer, public ITLayer<PixellateParamet> {
     virtual bool getSampled(int32_t inIndex) override;
 };
 
-// 半色调效果，如新闻打印
+// 半色调效果,如新闻打印
 class VkHalftoneLayer : public VkLayer, public ITLayer<PixellateParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkHalftoneLayer)
     AOCE_VULKAN_PARAMETUPDATE()

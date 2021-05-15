@@ -29,7 +29,8 @@ void main(){
         ubo.col10,ubo.col11,ubo.col12,
         ubo.col20,ubo.col21,ubo.col22
     );
-    vec4 sum = vec4(0.0f);    
+    vec3 sum = vec3(0.0f);
+    float a = imageLoad(inTex,uv).w;
     for(int i = 0; i< 3; ++i){
         for(int j= 0; j< 3; ++j){
             int x = uv.x-1+j;
@@ -39,10 +40,10 @@ void main(){
             y = max(0,min(y,size.y-1));   
             if( mat[i][j] != 0.0f ){         
                 vec4 rgba = imageLoad(inTex,ivec2(x,y));
-                sum = sum + rgba * mat[i][j];
+                sum = sum + rgba.rgb * mat[i][j];
             }
         }
     }
-    sum = clamp(sum,vec4(0.0),vec4(1.0));
-    imageStore(outTex, uv, sum); 
+    sum = clamp(sum,vec3(0.0),vec3(1.0));
+    imageStore(outTex, uv, vec4(sum,a)); 
 }

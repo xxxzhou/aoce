@@ -122,3 +122,28 @@ morph1.comp morph1_erosionC1.comp EROSION=1 IS_SHARED=1 CHANNEL_R8=1
 morph1.comp morph1_dilationC1.comp DILATION=1 IS_SHARED=1 CHANNEL_R8=1
 morph2.comp morph2_erosionC1.comp EROSION=1 IS_SHARED=1 CHANNEL_R8=1
 morph2.comp morph2_dilationC1.comp DILATION=1 IS_SHARED=1 CHANNEL_R8=1
+saturationBlend.comp
+screenBlend.comp
+sharpen.comp
+shiTomasiFeatureDetection.comp
+sobelEdge.comp
+sobelEdge.comp sketch.comp SKETCH=1
+skinTone.comp
+toon.comp
+softLightBlend.comp
+solarize.comp
+sourceOverBlend.comp
+stretchDisortion.comp
+subtractBlend.comp
+swirl.comp
+sharpen.comp
+poissonBlend.comp
+sobelThreshold.comp
+sobelThreshold.comp sketchThreshold.comp SKETCH=1
+tiltShift.comp
+unsharpMask.comp
+vibrance.comp
+vignette.comp
+zoomBlur.comp
+voronoiConsumer.comp
+rgb.comp

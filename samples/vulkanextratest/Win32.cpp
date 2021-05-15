@@ -10,7 +10,7 @@ static VkExtraBaseView* view = nullptr;
 // box模糊
 static ITLayer<KernelSizeParamet>* boxFilterLayer = nullptr;
 static ITLayer<GaussianBlurParamet>* gaussianLayer = nullptr;
-static ITLayer<ChromKeyParamet>* chromKeyLayer = nullptr;
+static ITLayer<ChromaKeyParamet>* chromKeyLayer = nullptr;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static ITLayer<GuidedParamet>* guidedLayer = nullptr;
 static BaseLayer* convertLayer = nullptr;
@@ -53,6 +53,7 @@ static MotionDetectorLayer* motionDetectorLayer = nullptr;
 static ITLayer<PoissonParamet>* poissonLayer = nullptr;
 static BaseLayer* linerBlendLayer = nullptr;
 static PerlinNoiseLayer* noiseLayer = nullptr;
+static ITLayer<DistortionParamet>* pdLayer = nullptr;
 
 void showMotion(vec4 motion) {
     std::cout << "x: " << motion.x << " y: " << motion.y << " z: " << motion.z
@@ -69,8 +70,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     gaussianLayer = createGaussianBlurLayer();
     gaussianLayer->updateParamet({10, 20.0f});
 
-    chromKeyLayer = createChromKeyLayer();
-    ChromKeyParamet keyParamet = {};
+    chromKeyLayer = createChromaKeyLayer();
+    ChromaKeyParamet keyParamet = {};
     keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
     keyParamet.alphaScale = 20.0f;
     keyParamet.alphaExponent = 0.1f;
@@ -93,7 +94,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     luminanceLayer = createLuminanceLayer();
 
     hcdLayer = createHarrisCornerDetectionLayer();
-    HarrisCornerDetectionParamet hcdParamet = {};    
+    HarrisCornerDetectionParamet hcdParamet = {};
     hcdParamet.harris = 0.04f;
     hcdParamet.harrisBase.threshold = 0.1f;
     hcdParamet.harrisBase.edgeStrength = 1.0f;
@@ -186,12 +187,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     motionDetectorLayer->setMotionHandle(showMotion);
 
     poissonLayer = createPoissonBlendLayer();
-    poissonLayer->updateParamet({0.5f, 10});
+    poissonLayer->updateParamet({0.8f, 10});
 
     linerBlendLayer = createLinearBurnBlendLayer();
 
     noiseLayer = createPerlinNoiseLayer();
     noiseLayer->setImageSize(1920, 1080);
+
+    pdLayer = createPinchDistortionLayer(); 
 
     std::vector<uint8_t> lutData;
     std::vector<BaseLayer*> layers;
@@ -228,9 +231,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     //     layers.push_back(lutLayer->getLayer());
     // }
     // ---双边滤波
-    // layers.push_back(bilateralLayer->getLayer());
-    // ---凸起失真，鱼眼效果
-    // layers.push_back(bdLayer->getLayer());
+    // layers.push_back(bilateralLayer->getLayer());   
     // canny边缘检测
     // layers.push_back(cedLayer->getLayer());
     // layers.push_back(alphaShowLayer);
@@ -250,7 +251,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(srLayer->getLayer());
     // ---马赛克
     // layers.push_back(ppLayer->getLayer());
-    // ---半色调效果，如新闻打印
+    // ---半色调效果,如新闻打印
     // layers.push_back(halftoneLayer->getLayer());
     // ---低通滤波器
     // layers.push_back(lowPassLayer->getLayer());
@@ -288,6 +289,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(poissonLayer->getLayer());
     // ---柏林噪声
     // layers.push_back(noiseLayer->getLayer());
+    // ---凸起失真,鱼眼效果
+    layers.push_back(bdLayer->getLayer());
+    // ---收缩 ，凹面镜
+    // layers.push_back(pdLayer->getLayer());
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据

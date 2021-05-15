@@ -23,7 +23,7 @@ layout (binding = 3) buffer inBuffer{
 const int PATCH_PER_BLOCK = 4;
 const int HALO_SIZE = 1; 
 
-// 共享块，扩充前后二边HALO_SIZE(分为上HALO_SIZE，中间自身*PATCH_PER_BLOCK，下HALO_SIZE)
+// 共享块,扩充前后二边HALO_SIZE(分为上HALO_SIZE,中间自身*PATCH_PER_BLOCK,下HALO_SIZE)
 #if CHANNEL_RGBA32F
 shared vec4 column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];//vec4[local_size_y][local_size_x]
 #define packUnorm4x8
@@ -43,7 +43,7 @@ void main(){
     }
     // 纹理范围的全局起点
     uint yStart = gl_WorkGroupID.y * (gl_WorkGroupSize.y*PATCH_PER_BLOCK) + gl_LocalInvocationID.y;
-    // 填充每个块的上HALO_SIZE，注意每列最前面的那个块取不到纹理数据
+    // 填充每个块的上HALO_SIZE,注意每列最前面的那个块取不到纹理数据
     if(gl_WorkGroupID.y > 0){// 填充非第一列的上边
         for(int j=0;j<HALO_SIZE;++j){
             vec4 rgba = imageLoad(inTex,ivec2(x,yStart-(HALO_SIZE-j)*gl_WorkGroupSize.y));

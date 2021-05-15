@@ -8,6 +8,32 @@
 namespace aoce {
 namespace vulkan {
 namespace layer {
+    
+class VkAddBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkAddBlendLayer(/* args */);
+    virtual ~VkAddBlendLayer();
+};
+
+class VkAlphaBlendLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkAlphaBlendLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkAlphaBlendLayer(/* args */);
+    virtual ~VkAlphaBlendLayer();
+};
+
+class VkHardLightBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkHardLightBlendLayer(/* args */);
+    ~VkHardLightBlendLayer();
+};
 
 class VkColorBlendLayer : public VkLayer {
     AOCE_LAYER_GETNAME(VkColorBlendLayer)
@@ -36,43 +62,9 @@ class VkColorDodgeBlendLayer : public VkLayer {
     virtual ~VkColorDodgeBlendLayer();
 };
 
-class VkColorInvertLayer : public VkLayer {
-    AOCE_LAYER_GETNAME(VkColorInvertLayer)
-   private:
-    /* data */
-   public:
-    VkColorInvertLayer(/* args */);
-    virtual ~VkColorInvertLayer();
-};
 
-class VkColorLBPLayer : public VkLayer {
-    AOCE_LAYER_GETNAME(VkColorLBPLayer)
-   private:
-    /* data */
-   public:
-    VkColorLBPLayer(/* args */);
-    virtual ~VkColorLBPLayer();
-};
 
-class VkContrastLayer : public VkLayer, public ITLayer<float> {
-    AOCE_LAYER_QUERYINTERFACE(VkContrastLayer)
-    AOCE_VULKAN_PARAMETUPDATE()
-   private:
-    /* data */
-   public:
-    VkContrastLayer(/* args */);
-    virtual ~VkContrastLayer();
-};
 
-class VkCrosshatchLayer : public VkLayer, public ITLayer<CrosshatchParamet> {
-    AOCE_LAYER_QUERYINTERFACE(VkCrosshatchLayer)
-    AOCE_VULKAN_PARAMETUPDATE()
-   private:
-    /* data */
-   public:
-    VkCrosshatchLayer(/* args */);
-    virtual ~VkCrosshatchLayer();
-};
 
 class VkExclusionBlendLayer : public VkLayer {
     AOCE_LAYER_GETNAME(VkExclusionBlendLayer)
@@ -83,15 +75,7 @@ class VkExclusionBlendLayer : public VkLayer {
     virtual ~VkExclusionBlendLayer();
 };
 
-class VkFalseColorLayer : public VkLayer, public ITLayer<FalseColorParamet> {
-    AOCE_LAYER_QUERYINTERFACE(VkFalseColorLayer)
-    AOCE_VULKAN_PARAMETUPDATE()
-   private:
-    /* data */
-   public:
-    VkFalseColorLayer(/* args */);
-    virtual ~VkFalseColorLayer();
-};
+
 
 class VkHueBlendLayer : public VkLayer {
     AOCE_LAYER_GETNAME(VkHueBlendLayer)
@@ -100,30 +84,6 @@ class VkHueBlendLayer : public VkLayer {
    public:
     VkHueBlendLayer(/* args */);
     virtual ~VkHueBlendLayer();
-};
-
-class VkHueLayer : public VkLayer, public ITLayer<float> {
-    AOCE_LAYER_QUERYINTERFACE(VkHueLayer)
-   private:
-    /* data */
-   public:
-    VkHueLayer(/* args */);
-    virtual ~VkHueLayer();
-
-   private:
-    void transformParamet();
-
-   protected:
-    virtual void onUpdateParamet() override;
-};
-
-class VkLevelsLayer : public VkLayer, public ITLayer<LevelsParamet> {
-    AOCE_LAYER_QUERYINTERFACE(VkLevelsLayer)
-   private:
-    /* data */
-   public:
-    VkLevelsLayer(/* args */);
-    virtual ~VkLevelsLayer();
 };
 
 class VkLightenBlendLayer : public VkLayer {
@@ -207,8 +167,68 @@ class VkScreenBlendLayer : public VkLayer {
     ~VkScreenBlendLayer();
 };
 
+class VkSoftLightBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkSoftLightBlendLayer)
+   private:
+    /* data */
+   public:
+    VkSoftLightBlendLayer(/* args */);
+    ~VkSoftLightBlendLayer();
+};
+
+class VkSourceOverBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkSourceOverBlendLayer)
+   private:
+    /* data */
+   public:
+    VkSourceOverBlendLayer(/* args */);
+    ~VkSourceOverBlendLayer();
+};
+
+class VkSubtractBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkSoftLightBlendLayer)
+   private:
+    /* data */
+   public:
+    VkSubtractBlendLayer(/* args */);
+    ~VkSubtractBlendLayer();
+};
+
+class VkDarkenBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkDarkenBlendLayer(/* args */);
+    virtual ~VkDarkenBlendLayer();
+};
+
+class VkDifferenceBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkDifferenceBlendLayer(/* args */);
+    virtual ~VkDifferenceBlendLayer();
+};
+
+class VkDissolveBlendLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkDissolveBlendLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkDissolveBlendLayer(/* args */);
+    virtual ~VkDissolveBlendLayer();
+};
+
+class VkDivideBlendLayer : public VkLayer {
+   private:
+    /* data */
+   public:
+    VkDivideBlendLayer(/* args */);
+    virtual ~VkDivideBlendLayer();
+};
 
 
-}  // namespace layer
-}  // namespace vulkan
-}  // namespace aoce
+}
+}
+}

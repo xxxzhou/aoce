@@ -22,7 +22,7 @@ layout (binding = 3) buffer inBuffer{
 
 const int PATCH_PER_BLOCK = 4;
 const int HALO_SIZE = 1;
-// 共享块，扩充左边右边HALO_SIZE(分为左边HALO_SIZE，中间自身*PATCH_PER_BLOCK，右边HALO_SIZE)
+// 共享块,扩充左边右边HALO_SIZE(分为左边HALO_SIZE,中间自身*PATCH_PER_BLOCK,右边HALO_SIZE)
 #if CHANNEL_RGBA32F
 shared vec4 row_shared[16][16*(PATCH_PER_BLOCK+HALO_SIZE*2)];
 #define packUnorm4x8
@@ -55,7 +55,7 @@ void main(){
             row_shared[gl_LocalInvocationID.y][gl_LocalInvocationID.x + j*gl_WorkGroupSize.x] = packUnorm4x8(rgba);
         }
     }
-    // 填充中间与右边HALO_SIZE块，注意每行右边的HALO_SIZE块是没有纹理数据的
+    // 填充中间与右边HALO_SIZE块,注意每行右边的HALO_SIZE块是没有纹理数据的
     if(gl_WorkGroupID.x + 2 < gl_NumWorkGroups.x){
         // 填充中间块
         for(int j=0;j<PATCH_PER_BLOCK;++j){

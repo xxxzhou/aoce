@@ -1,0 +1,41 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO{
+    float blurCenterX;
+    float blurCenterY;
+    float blurSize;    
+} ubo;
+
+const vec2 centerT[9] = {
+    vec2(0,0.18),
+    vec2(-1,0.15),
+    vec2(-2,0.12),
+    vec2(-3,0.09),
+    vec2(-4,0.05),
+    vec2(1,0.15),
+    vec2(2,0.12),
+    vec2(3,0.09),
+    vec2(4,0.05)
+};
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);    
+    vec2 blurCenter = vec2(ubo.blurCenterX,ubo.blurCenterY);
+    vec2 samplingOffset = 1.0/100.0 * (blurCenter - suv) * ubo.blurSize;
+    vec4 color = vec4(0);
+    for(int i=0;i<9;i++){
+        vec2 nuv = suv + samplingOffset * centerT[i].x;        
+        vec4 sampledColor = textureLod(inSampler,nuv ,0);
+        color += sampledColor * centerT[i].y;
+    }
+    imageStore(outTex,uv,color);
+}

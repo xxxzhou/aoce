@@ -10,7 +10,7 @@ namespace vulkan {
 namespace layer {
 
 // 膨胀与腐蚀(Dilation and Erosion)
-// 膨胀和腐蚀被称为形态学操作。它们通常在二进制图像上执行，类似于轮廓检测。通过将像素添加到该图像中的对象的感知边界，扩张放大图像中的明亮白色区域。侵蚀恰恰相反：它沿着物体边界移除像素并缩小物体的大小。
+// 膨胀和腐蚀被称为形态学操作.它们通常在二进制图像上执行,类似于轮廓检测.通过将像素添加到该图像中的对象的感知边界,扩张放大图像中的明亮白色区域.侵蚀恰恰相反:它沿着物体边界移除像素并缩小物体的大小.
 // Closing 先dilation后erosion
 
 class VkPreDilationLayer : public VkLayer, public ITLayer<int32_t> {

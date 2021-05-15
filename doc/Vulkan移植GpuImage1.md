@@ -1,4 +1,4 @@
-# Vulkan移植GpuImage(一)高斯模糊与自适应阈值
+# Vulkan移植GPUImage(一)高斯模糊与自适应阈值
 
 ## 自适应阈值效果图 [demo](https://github.com/xxxzhou/aoce/tree/master/samples/vulkanextratest)
 

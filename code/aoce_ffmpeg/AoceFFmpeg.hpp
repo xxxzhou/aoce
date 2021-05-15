@@ -61,7 +61,7 @@ inline void freefobj(AVIOContext* val) {
     AOCE_UNIQUE_FUNCTION(CLASSTYPE)    \
     typedef std::unique_ptr<CLASSTYPE, free##CLASSTYPE> FO##CLASSTYPE;
 
-//使用decltype,普通的函数指针，相应类型做为类的字段会声明不了
+//使用decltype,普通的函数指针,相应类型做为类的字段会声明不了
 // typedef std::unique_ptr<CLASSTYPE, decltype(freefobj<CLASSTYPE>)*>
 // O##CLASSTYPE;
 #define AOCE_UNIQUE_FCLASS(CLASSTYPE)                                   \

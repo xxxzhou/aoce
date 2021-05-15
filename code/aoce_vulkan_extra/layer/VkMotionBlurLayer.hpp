@@ -25,7 +25,21 @@ class VkMotionBlurLayer : public VkLayer, public ITLayer<MotionBlurParamet> {
 
    protected:
     virtual bool getSampled(int32_t inIndex) override;
+    virtual void onUpdateParamet() override;
     virtual void onInitLayer() override;
+};
+
+class VkZoomBlurLayer : public VkLayer, public ITLayer<ZoomBlurParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkZoomBlurLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkZoomBlurLayer(/* args */);
+    virtual ~VkZoomBlurLayer();
+
+   protected:
+    virtual bool getSampled(int32_t inIndex) override;    
 };
 
 class VkMotionDetectorLayer : public VkLayer, public MotionDetectorLayer {

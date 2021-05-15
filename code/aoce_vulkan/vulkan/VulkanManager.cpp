@@ -292,7 +292,7 @@ void VulkanManager::blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
     region.dstSubresource.layerCount = 1;
     region.dstOffsets[0] = {0, 0, 0};
     region.dstOffsets[1] = {destWidth, destHeight, 1};
-    // 要将源图像的区域复制到目标图像中，并可能执行格式转换，任意缩放和过滤
+    // 要将源图像的区域复制到目标图像中,并可能执行格式转换,任意缩放和过滤
     vkCmdBlitImage(cmd, src->image, src->layout, dest, destLayout, 1, &region,
                    VK_FILTER_LINEAR);
 }

@@ -27,7 +27,7 @@ VideoType getVideoType(const wchar_t* videoName) {
 MFVideoDevice::MFVideoDevice(/* args */) {
     auto hr = MFCreateAttributes(&pAttributes, 2);
     if (SUCCEEDED(hr)) {
-        //开户格式转换，如mgjp 转yuv2
+        //开户格式转换,如mgjp 转yuv2
         pAttributes->SetUINT32(MF_READWRITE_DISABLE_CONVERTERS, TRUE);
         if (bMFAsync) {
             // 异步采集方案
@@ -58,7 +58,7 @@ bool MFVideoDevice::init(IMFActivate* pActivate) {
     // copycharstr(id.data(), swid.c_str(), AOCE_VIDEO_MAX_NAME);
     CoTaskMemFree(wpname);
     CoTaskMemFree(wid);
-    //很多采集设备可以进这步，但是MF读不了，不需要给出错误信息
+    //很多采集设备可以进这步,但是MF读不了,不需要给出错误信息
     hr = activate->ActivateObject(__uuidof(IMFMediaSource), (void**)&source);
     if (!logHResult(hr, "create media source failed.")) {
         return false;
@@ -175,7 +175,7 @@ bool MFVideoDevice::open() {
             return false;
         }
     }
-    // 先关闭在读的流，不然设置不了format
+    // 先关闭在读的流,不然设置不了format
     setPlay(false);
     // 重新设置格式
     CComPtr<IMFMediaType> mtype = nullptr;
@@ -184,7 +184,7 @@ bool MFVideoDevice::open() {
     if (SUCCEEDED(hr)) {
         // source 应用新的格式
         hr = handle->SetCurrentMediaType(mtype);
-        // source reader得到当前的播放格式，如果是压缩的，输出转码
+        // source reader得到当前的播放格式,如果是压缩的,输出转码
         hr = sourceReader->GetNativeMediaType(videoIndex, selectIndex, &pType);
         if (!logHResult(hr, "the video formt have error media type.")) {
             return false;

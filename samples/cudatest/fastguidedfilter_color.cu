@@ -105,8 +105,8 @@ extern "C" void test10() {
 		cv::cuda::resize(gpuKeying, gpuResize, cv::Size(scaleWidth, scaleHeight), 0, 0, cv::INTER_NEAREST, curentStream);
 
 		findMatrix << <grid2, block, 0, cudaStream >> > (gpuResize, mean_Ipv, var_I_rxv, var_I_gbxfv);
-		//此外，在计算每个窗口的线性系数时，我们可以发现一个像素会被多个窗口包含，也就是说，每个像素都由多个线性函数所描述。
-		//因此，如之前所说，要具体求某一点的输出值时，只需将所有包含该点的线性函数值平均即可
+		//此外,在计算每个窗口的线性系数时,我们可以发现一个像素会被多个窗口包含,也就是说,每个像素都由多个线性函数所描述.
+		//因此,如之前所说,要具体求某一点的输出值时,只需将所有包含该点的线性函数值平均即可
 		nppiFilterBoxBorder_32f_C4R((Npp32f*)gpuResize.ptr<float4>(), gpuResize.step, oSizeROI, oSrcOffset, (Npp32f*)mean_I.ptr<float4>(), mean_I.step, oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE);
 		nppiFilterBoxBorder_32f_C3R((Npp32f*)mean_Ipv.ptr<float3>(), mean_Ipv.step, oSizeROI, oSrcOffset, (Npp32f*)mean_Ip.ptr<float3>(), mean_Ip.step, oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE);
 		nppiFilterBoxBorder_32f_C3R((Npp32f*)var_I_rxv.ptr<float3>(), var_I_rxv.step, oSizeROI, oSrcOffset, (Npp32f*)var_I_rx.ptr<float3>(), var_I_rx.step, oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE);

@@ -186,7 +186,7 @@ void VulkanWindow::initSurface(ANativeWindow* window)
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pWaitDstStageMask = &submitPipelineStages;
     submitInfo.waitSemaphoreCount = 1;
-    // 用于指定队列开始执行前需要等待的信号量，以及需要等待的管线阶段
+    // 用于指定队列开始执行前需要等待的信号量,以及需要等待的管线阶段
     submitInfo.pWaitSemaphores = &presentComplete;
     submitInfo.signalSemaphoreCount = 1;
     // 用于缓冲命令执行结束后发出信号的信号量对象

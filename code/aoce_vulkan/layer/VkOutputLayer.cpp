@@ -116,8 +116,8 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
     }
     if (paramet.bCpu && !paramet.bGpu) {
         if (outBuffer) {
-            // 20/12/11,ue4只能这样更新,奇怪了。。。
-            // 21/02/23,更奇怪的是Oculus quest这样更新会卡死。。。
+            // 20/12/11,ue4只能这样更新,奇怪了...
+            // 21/02/23,更奇怪的是Oculus quest这样更新会卡死...
             if (outTex.commandbuffer) {
                 uint8_t* tempPtr = (uint8_t*)outTex.commandbuffer;
                 outBuffer->download(tempPtr);

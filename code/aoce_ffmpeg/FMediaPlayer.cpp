@@ -111,7 +111,7 @@ void FMediaPlayer::prepare(bool bAsync) {
                             "media play cannot open audio decoder.", ret);
                     return;
                 }
-                // 分配音频重采样(原始数据格式如果是平面格式，转化成交叉格式与单通)
+                // 分配音频重采样(原始数据格式如果是平面格式,转化成交叉格式与单通)
                 auto tempSwr = swr_alloc_set_opts(
                     nullptr, outLayout, outSampleFormat, audioCtx->sample_rate,
                     av_get_default_channel_layout(audioCtx->channels),

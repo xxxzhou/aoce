@@ -27,7 +27,7 @@ class ACOE_WIN_EXPORT Dx11Resource {
     virtual void releaseResource(){};
 };
 
-//默认创建一个GPU可读写资源，UAV资源,非共享的
+//默认创建一个GPU可读写资源,UAV资源,非共享的
 class ACOE_WIN_EXPORT Dx11CSResource : public Dx11Resource {
    public:
     Dx11CSResource(){};
@@ -48,11 +48,11 @@ class ACOE_WIN_EXPORT Dx11CSResource : public Dx11Resource {
     bool bOnlyUAV = false;
 
    public:
-    //默认为UAV资源，为ture对应SRV资源
+    //默认为UAV资源,为ture对应SRV资源
     void setCpuWrite(bool bCpuWrite);
     //默认不共享,为true是共享
     void setShared(bool bShared);
-    //默认创建相应UVA/SRV资源，为true不创建
+    //默认创建相应UVA/SRV资源,为true不创建
     void setNoView(bool bNoView);
     //
     void setOnlyUAV(bool bOnlyUAV);

@@ -1,8 +1,3 @@
-saturationBlend.comp
-screenBlend.comp
-sharpen.comp
-shiTomasiFeatureDetection.comp
-sobelEdge.comp
-sobelEdge.comp sketch.comp SKETCH=1
-skinTone.comp
-toon.comp
+bulgeDistortion.comp
+pinchDistortion.comp
+pixellatePosition.comp

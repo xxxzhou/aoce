@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "../VkExtraExport.hpp"
-#include "VkBrightnessLayer.hpp"
+#include "VkColorAdjustmentLayer.hpp"
 #include "VkLuminanceLayer.hpp"
 #include "VkSeparableLinearLayer.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"

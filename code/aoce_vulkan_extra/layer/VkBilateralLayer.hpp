@@ -9,6 +9,7 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
+// 双边滤波
 class VkBilateralLayer : public VkLayer, public ITLayer<BilateralParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkBilateralLayer)
    private:

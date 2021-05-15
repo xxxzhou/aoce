@@ -20,7 +20,7 @@ static OutputLayer* outputLayer;
 static YUV2RGBALayer* yuv2rgbLayer;
 // box模糊
 static ITLayer<KernelSizeParamet>* boxFilterLayer;
-static ITLayer<ChromKeyParamet>* chromKeyLayer;
+static ITLayer<ChromaKeyParamet>* chromKeyLayer;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static BaseLayer* luminance = nullptr;
 static PerlinNoiseLayer* noiseLayer = nullptr;
@@ -75,8 +75,8 @@ int main() {
     boxFilterLayer = createBoxFilterLayer();
     boxFilterLayer->updateParamet({10, 10});
 
-    chromKeyLayer = createChromKeyLayer();
-    ChromKeyParamet keyParamet = {};
+    chromKeyLayer = createChromaKeyLayer();
+    ChromaKeyParamet keyParamet = {};
     keyParamet.ambientScale = 0.1f;
     keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
     keyParamet.ambientColor = {0.6f, 0.1f, 0.6f};

@@ -4,6 +4,16 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
+Vk3x3ConvolutionLayer::Vk3x3ConvolutionLayer() {
+    glslPath = "glsl/filterMat3x3.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+    paramet.col0 = {0.0f, 0.0f, 0.0f};
+    paramet.col1 = {0.0f, 1.0f, 0.0f};
+    paramet.col2 = {0.0f, 0.0f, 0.0f};
+    updateUBO(&paramet);
+}
+Vk3x3ConvolutionLayer::~Vk3x3ConvolutionLayer() {}
+
 VkLaplacianLayer::VkLaplacianLayer(bool small) {
     glslPath = "glsl/filterMat3x3.comp.spv";
     setUBOSize(sizeof(Mat3x3));

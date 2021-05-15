@@ -39,14 +39,18 @@ class VkHSBLayer : public VkLayer, public HSBLayer {
     virtual void adjustBrightness(const float& h);
 };
 
-class VkSepiaLayer : public VkLayer {
+class VkSepiaLayer : public VkLayer, public ITLayer<float> {
+    AOCE_LAYER_QUERYINTERFACE(VkSepiaLayer)
    private:
     /* data */
-    ColorMatrixParamet paramet = {};
+    ColorMatrixParamet mparamet = {};
 
    public:
     VkSepiaLayer(/* args */);
     ~VkSepiaLayer();
+
+   protected:
+    virtual void onUpdateParamet() override;
 };
 
 }  // namespace layer

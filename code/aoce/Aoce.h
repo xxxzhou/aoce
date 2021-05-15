@@ -14,7 +14,7 @@ enum AOCE_LOG_LEVEL {
 };
 
 // 完成win32端vulkan与dx11交互,
-// 经测试性能与dx11性能还高一点，比不上cuda,不过作为通用备份选择足够了
+// 经测试性能与dx11性能还高一点,比不上cuda,不过作为通用备份选择足够了
 enum AOCE_GPU_SDK {
     AOCE_GPU_OTHER = 0,
     AOCE_GPU_CUDA,
@@ -32,7 +32,7 @@ enum class LogLevel {
 };
 
 // 完成win32端vulkan与dx11交互,
-// 经测试性能与dx11性能还高一点，比不上cuda,不过作为通用备份选择足够了
+// 经测试性能与dx11性能还高一点,比不上cuda,不过作为通用备份选择足够了
 enum class GpuType {
     other = AOCE_GPU_OTHER,
     cuda = AOCE_GPU_CUDA,
@@ -228,7 +228,7 @@ struct MapChannel {
     }
 };
 
-// 方便C#交互不做额外设置，以及GPU参数结构对应,bool全用int表示
+// 方便C#交互不做额外设置,以及GPU参数结构对应,bool全用int表示
 struct Operate {
     // 是否X倒转
     int32_t bFlipX = false;

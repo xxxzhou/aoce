@@ -97,6 +97,7 @@ void VkHarrisCornerDetectionLayer::onUpdateParamet() {
 VkNobleCornerDetectionLayer::VkNobleCornerDetectionLayer(/* args */) {
     glslPath = "glsl/nobleCornerDetection.comp.spv";
     setUBOSize(4);
+    paramet.sensitivity = 5.0f;
     baseParametChange(paramet.harrisBase);
     transformParamet();
 }

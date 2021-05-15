@@ -1,0 +1,29 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1) uniform sampler2D inSampler1;
+layout (binding = 2, rgba8) uniform image2D outTex;
+
+vec2 getCoordFromColor(vec4 color,ivec2 size){
+   float z = color.z * 256.0;
+   float yoff = floor(z / 8.0);
+   float xoff = mod(z, 8.0);
+   float x = color.x*256.0 + xoff*256.0;
+   float y = color.y*256.0 + yoff*256.0;
+   return vec2(x,y) / size;
+}
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2  size = textureSize(inSampler,0);
+    ivec2  size1 = textureSize(inSampler1,0);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }     
+    vec2 suv = (vec2(uv)+vec2(0.5f))/size; 
+    vec4 colorLoc = textureLod(inSampler1, suv,0); 
+    vec2 nuv = getCoordFromColor(colorLoc,size1);
+    vec4 result = textureLod(inSampler, nuv,0); 
+    imageStore(outTex,uv,result);
+}

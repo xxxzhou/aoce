@@ -78,7 +78,7 @@ void VkLayer::onInit() {
                               VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                               constBufCpu.data());
     }
-    onInitGraph();
+    onInitGraph();    
 }
 
 void VkLayer::onInitLayer() {

@@ -1,25 +1,22 @@
 #include "VkExtraExport.hpp"
 
 #include "layer/VkAdaptiveThresholdLayer.hpp"
-#include "layer/VkAlphaBlendLayer.hpp"
 #include "layer/VkAlphaShowLayer.hpp"
 #include "layer/VkBilateralLayer.hpp"
-#include "layer/VkBrightnessLayer.hpp"
+#include "layer/VkBlendingModeLayer.hpp"
+#include "layer/VkBlurBlendBaseLayer.hpp"
 #include "layer/VkBulgeDistortionLayer.hpp"
-#include "layer/VkCGAColorspaceLayer.hpp"
 #include "layer/VkCannyEdgeDetectionLayer.hpp"
-#include "layer/VkChromKeyLayer.hpp"
-#include "layer/VkColorBlendLayer.hpp"
+#include "layer/VkColorAdjustmentLayer.hpp"
 #include "layer/VkColorMatrixLayer.hpp"
 #include "layer/VkColourFASTFeatureDetector.hpp"
 #include "layer/VkCropLayer.hpp"
 #include "layer/VkEdgeDetectionLayer.hpp"
-#include "layer/VkEmbossLayer.hpp"
 #include "layer/VkGuidedLayer.hpp"
 #include "layer/VkHarrisCornerDetectionLayer.hpp"
 #include "layer/VkHistogramLayer.hpp"
 #include "layer/VkIOSBlurLayer.hpp"
-#include "layer/VkKuwaharaLayer.hpp"
+#include "layer/VkImageProcessing.hpp"
 #include "layer/VkLaplacianLayer.hpp"
 #include "layer/VkLinearFilterLayer.hpp"
 #include "layer/VkLookupLayer.hpp"
@@ -34,6 +31,9 @@
 #include "layer/VkReduceLayer.hpp"
 #include "layer/VkSeparableLinearLayer.hpp"
 #include "layer/VkSphereLayer.hpp"
+#include "layer/VkToonLayer.hpp"
+#include "layer/VkVisualEffectLayer.hpp"
+#include "layer/VkVoronoiLayer.hpp"
 
 using namespace aoce::vulkan::layer;
 
@@ -50,8 +50,8 @@ ITLayer<GaussianBlurParamet>* createGaussianBlurLayer(ImageType imageType) {
     return layer;
 }
 
-ITLayer<ChromKeyParamet>* createChromKeyLayer() {
-    VkChromKeyLayer* chromKeyLayer = new VkChromKeyLayer();
+ITLayer<ChromaKeyParamet>* createChromaKeyLayer() {
+    VkChromaKeyLayer* chromKeyLayer = new VkChromaKeyLayer();
     return chromKeyLayer;
 }
 
@@ -78,6 +78,11 @@ ITLayer<HarrisCornerDetectionParamet>* createHarrisCornerDetectionLayer() {
 ITLayer<float>* createAverageLuminanceThresholdLayer() {
     VkAverageLuminanceThresholdLayer* layer =
         new VkAverageLuminanceThresholdLayer();
+    return layer;
+}
+
+ITLayer<float>* createLuminanceThresholdLayer() {
+    VkLuminanceThresholdLayer* layer = new VkLuminanceThresholdLayer();
     return layer;
 }
 
@@ -423,7 +428,7 @@ ITLayer<PoissonParamet>* createPoissonBlendLayer() {
     return layer;
 }
 
-ITLayer<DistortionParamet>* createPinchDistorionLayer() {
+ITLayer<DistortionParamet>* createPinchDistortionLayer() {
     VkPinchDistortionLayer* layer = new VkPinchDistortionLayer();
     return layer;
 }
@@ -450,6 +455,152 @@ ITLayer<uint32_t>* createPosterizeLayer() {
 
 ITLayer<float>* createPrewittEdgeDetectionLayer() {
     VkPrewittEdgeDetectionLayer* layer = new VkPrewittEdgeDetectionLayer();
+    return layer;
+}
+
+ITLayer<vec3>* createRGBLayer() {
+    VkRGBLayer* layer = new VkRGBLayer();
+    return layer;
+}
+
+BaseLayer* createSaturationBlendLayer() {
+    VkSaturationBlendLayer* layer = new VkSaturationBlendLayer();
+    return layer;
+}
+
+ITLayer<float>* createSaturationLayer() {
+    VkSaturationLayer* layer = new VkSaturationLayer();
+    return layer;
+}
+
+BaseLayer* createScreenBlendLayer() {
+    VkScreenBlendLayer* layer = new VkScreenBlendLayer();
+    return layer;
+}
+
+ITLayer<float>* createSepiaLayer() {
+    VkSepiaLayer* layer = new VkSepiaLayer();
+    return layer;
+}
+
+ITLayer<SharpenParamet>* createSharpenLayer() {
+    VkSharpenLayer* layer = new VkSharpenLayer();
+    return layer;
+}
+
+ITLayer<NobleCornerDetectionParamet>* createShiTomasiFeatureDetectionLayer() {
+    VkShiTomasiFeatureDetectionLayer* layer =
+        new VkShiTomasiFeatureDetectionLayer();
+    return layer;
+}
+
+ITLayer<float>* createSketchLayer() {
+    VkSketchLayer* layer = new VkSketchLayer();
+    return layer;
+}
+
+ITLayer<SkinToneParamet>* createSkinToneLayer() {
+    VkSkinToneLayer* layer = new VkSkinToneLayer();
+    return layer;
+}
+
+ITLayer<SmoothToonParamet>* createSmoothToonLayer() {
+    VkSmoothToonLayer* layer = new VkSmoothToonLayer();
+    return layer;
+}
+
+ITLayer<float>* createSobelEdgeDetectionLayer() {
+    VkSobelEdgeDetectionLayer* layer = new VkSobelEdgeDetectionLayer();
+    return layer;
+}
+
+SoftEleganceLayer* createSoftEleganceLayer() {
+    VkSoftEleganceLayer* layer = new VkSoftEleganceLayer();
+    return layer;
+}
+
+BaseLayer* createSoftLightBlendLayer() {
+    VkSoftLightBlendLayer* layer = new VkSoftLightBlendLayer();
+    return layer;
+}
+
+ITLayer<float>* createSolarizeLayer() {
+    VkSolarizeLayer* layer = new VkSolarizeLayer();
+    return layer;
+}
+
+BaseLayer* createSourceOverBlendLayer() {
+    VkSourceOverBlendLayer* layer = new VkSourceOverBlendLayer();
+    return layer;
+}
+
+ITLayer<vec2>* createStretchDistortionLayer() {
+    VkStrectchDistortionLayer* layer = new VkStrectchDistortionLayer();
+    return layer;
+}
+
+BaseLayer* createSubtractBlendLayer() {
+    VkSubtractBlendLayer* layer = new VkSubtractBlendLayer();
+    return layer;
+}
+
+ITLayer<SwirlParamet>* createSwirlLayer() {
+    VkSwirlLayer* layer = new VkSwirlLayer();
+    return layer;
+}
+
+ITLayer<ThresholdSobelParamet>* createThresholdEdgeDetectionLayer() {
+    VkThresholdEdgeDetectionLayer* layer = new VkThresholdEdgeDetectionLayer();
+    return layer;
+}
+
+ITLayer<ThresholdSobelParamet>* createThresholdSketchLayer() {
+    VkThresholdSketchLayer* layer = new VkThresholdSketchLayer();
+    return layer;
+}
+
+ITLayer<TiltShiftParamet>* createTiltShiftLayer() {
+    VkTiltShiftLayer* layer = new VkTiltShiftLayer();
+    return layer;
+}
+
+ITLayer<Mat3x3>* create3x3ConvolutionLayer() {
+    Vk3x3ConvolutionLayer* layer = new Vk3x3ConvolutionLayer();
+    return layer;
+}
+
+ITLayer<ToonParamet>* createToonLayer() {
+    VkToonLayer* layer = new VkToonLayer();
+    return layer;
+}
+
+ITLayer<UnsharpMaskParamet>* createUnsharpMaskLayer() {
+    VkUnsharpMaskLayer* layer = new VkUnsharpMaskLayer();
+    return layer;
+}
+
+ITLayer<float>* createVibranceLayer() {
+    VkVibranceLayer* layer = new VkVibranceLayer();
+    return layer;
+}
+
+ITLayer<VignetteParamet>* createVignetteLayer() {
+    VkVignetteLayer* layer = new VkVignetteLayer();
+    return layer;
+}
+
+BaseLayer* createVoronoiConsumerLayer() {
+    VkVoronoiConsumerLayer* layer = new VkVoronoiConsumerLayer();
+    return layer;
+}
+
+ITLayer<WhiteBalanceParamet>* createBalanceLayer() {
+    VkWhiteBalanceLayer* layer = new VkWhiteBalanceLayer();
+    return layer;
+}
+
+ITLayer<ZoomBlurParamet>* createZoomBlurLayer() {
+    VkZoomBlurLayer* layer = new VkZoomBlurLayer();
     return layer;
 }
 

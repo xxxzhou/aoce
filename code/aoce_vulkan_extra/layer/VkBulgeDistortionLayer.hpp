@@ -24,42 +24,6 @@ class VkBulgeDistortionLayer : public VkLayer,
     virtual bool getSampled(int32_t inIndex) override;
 };
 
-class VkGaussianBlurPositionLayer : public VkLayer,
-                                    public ITLayer<BulrPositionParamet> {
-    AOCE_LAYER_QUERYINTERFACE(VkGaussianBlurPositionLayer)
-   private:
-    /* data */
-    std::unique_ptr<VkGaussianBlurSLayer> blurLayer = nullptr;
-
-   public:
-    VkGaussianBlurPositionLayer(/* args */);
-    ~VkGaussianBlurPositionLayer();
-
-   protected:
-    virtual void onUpdateParamet() override;
-    virtual bool getSampled(int32_t inIndex) override;
-    virtual void onInitGraph() override;
-    virtual void onInitNode() override;
-};
-
-class VkGaussianBlurSelectiveLayer : public VkLayer,
-                                     public ITLayer<BlurSelectiveParamet> {
-    AOCE_LAYER_QUERYINTERFACE(VkGaussianBlurSelectiveLayer)
-   private:
-    /* data */
-    std::unique_ptr<VkGaussianBlurSLayer> blurLayer = nullptr;
-
-   public:
-    VkGaussianBlurSelectiveLayer(/* args */);
-    ~VkGaussianBlurSelectiveLayer();
-
-   protected:
-    virtual void onUpdateParamet() override;
-    virtual bool getSampled(int32_t inIndex) override;
-    virtual void onInitGraph() override;
-    virtual void onInitNode() override;
-};
-
 class VkPinchDistortionLayer : public VkLayer,
                                public ITLayer<DistortionParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkPinchDistortionLayer)
@@ -97,6 +61,32 @@ class VkPolarPixellateLayer : public VkLayer,
    public:
     VkPolarPixellateLayer(/* args */);
     ~VkPolarPixellateLayer();
+
+   protected:
+    virtual bool getSampled(int32_t inIndex) override;
+};
+
+class VkStrectchDistortionLayer : public VkLayer, public ITLayer<vec2> {
+    AOCE_LAYER_QUERYINTERFACE(VkStrectchDistortionLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkStrectchDistortionLayer(/* args */);
+    ~VkStrectchDistortionLayer();
+
+   protected:
+    virtual bool getSampled(int32_t inIndex) override;
+};
+
+class VkSwirlLayer : public VkLayer, public ITLayer<SwirlParamet> {
+    AOCE_LAYER_QUERYINTERFACE(VkSwirlLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
+   private:
+    /* data */
+   public:
+    VkSwirlLayer(/* args */);
+    ~VkSwirlLayer();
 
    protected:
     virtual bool getSampled(int32_t inIndex) override;

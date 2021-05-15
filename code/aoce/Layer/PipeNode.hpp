@@ -29,7 +29,7 @@ class PipeNode {
     // 如果为true,包含这个节点之后子节点不使用
     bool bDisable = false;
     // 在graph的索引
-    int32_t graphIndex = 0;
+    int32_t graphIndex = -1;
     // 对应输入连接不同的内部层,现都假设只连内部层的第一个输入
     std::vector<std::vector<StartNode>> startNodes;
     int32_t endNodeIndex = -1;

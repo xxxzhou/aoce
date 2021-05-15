@@ -485,7 +485,7 @@ bool loadFileBinary(const wchar_t* filePath, std::vector<uint8_t>& data) {
 }
 
 bool saveFileBinary(const wchar_t* filePath, void* data, int32_t lenght) {
-    // ios::out 写 文件不存在 则建立新文件 文件存在则直接清空文件内容。
+    // ios::out 写 文件不存在 则建立新文件 文件存在则直接清空文件内容.
     try {
         std::ofstream fileStream(filePath, std::ios::binary | std::ios::out);
         fileStream.write((char*)data, lenght);

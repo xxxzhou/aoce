@@ -68,8 +68,8 @@ bool Dx11Texture::createResource(ID3D11Device* deviceDx11) {
         D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
     if (bCpuWrite) {
         textureDesc.Usage =
-            D3D11_USAGE_DYNAMIC;  // DYNAMIC的对应cpu可写，STAGING
-                                  // CPU可读写，否则cpu没任何权限
+            D3D11_USAGE_DYNAMIC;  // DYNAMIC的对应cpu可写,STAGING
+                                  // CPU可读写,否则cpu没任何权限
         textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     }

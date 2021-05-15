@@ -1,4 +1,4 @@
-# Vulkan移植GpuImage(二)Harris角点检测与导向滤波
+# Vulkan移植GPUImage(二)Harris角点检测与导向滤波
 
 ## Harris角点检测
 
@@ -37,7 +37,7 @@ layout (binding = 0, rgba32f) uniform readonly image2D inTex;
 layout (binding = 1, rgba32f) uniform image2D outTex;
 #endif
 
-// 共享块，扩充前后二边HALO_SIZE(分为上HALO_SIZE，中间自身*PATCH_PER_BLOCK，下HALO_SIZE)
+// 共享块,扩充前后二边HALO_SIZE(分为上HALO_SIZE,中间自身*PATCH_PER_BLOCK,下HALO_SIZE)
 #if CHANNEL_RGBA32F
 shared vec4 column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];//vec4[local_size_y][local_size_x]
 #define packUnorm4x8
@@ -49,7 +49,7 @@ shared uint column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];//vec4[local_siz
 
 [python脚本](https://github.com/xxxzhou/aoce/blob/master/glsl/compileglsl.py)流程,针对传入的文件分析每行需要编译的文件,确认是否需要条件编译,根据条件编译每个文件,错误的话提示错误文件,正确则把所有文件复制到运行目录,安装目录.其中android则使用build.gradle复制生成目录下的编译文件到assets目录下.
 
-相关harris检测原理可以参考:[harris边角（兴趣点）检测算法](https://zhuanlan.zhihu.com/p/42490675)
+相关harris检测原理可以参考:[harris边角(兴趣点)检测算法](https://zhuanlan.zhihu.com/p/42490675)
 
 移植Harris角点检测的代码,实现比较简单,根据GPUImage源码,按XYDerivative/ GaussianBlur/ HarrisCornerDetection/ ThresholdedNonMaximumSuppression四层连接起来就行了,根据GPUImage的代码移植到Compute shader还是很快的,有兴趣可以查看[VkHarrisCornerDetectionLayer](https://github.com/xxxzhou/aoce/blob/master/code/aoce_vulkan_extra/layer/VkHarrisCornerDetectionLayer.cpp)的实现.
 

@@ -1,0 +1,37 @@
+#version 450
+
+// 调整图像的对比度
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+layout (binding = 0) uniform sampler2D inSampler;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {
+    float centerX;
+    float centerY;
+    float radius;
+    float angle;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }   
+    vec2 textureCoordinateToUse = (vec2(uv)+vec2(0.5f))/vec2(size);
+    vec2 center = vec2(ubo.centerX,ubo.centerY);  
+    float dist = distance(center, textureCoordinateToUse);
+    if (dist < ubo.radius) {
+        textureCoordinateToUse -= center;
+        float percent = (ubo.radius - dist) / ubo.radius;
+        float theta = percent * percent * ubo.angle * 8.0;
+        float s = sin(theta);
+        float c = cos(theta);
+        textureCoordinateToUse = vec2(dot(textureCoordinateToUse, vec2(c, -s)), dot(textureCoordinateToUse, vec2(s, c)));
+        textureCoordinateToUse += center;
+    }      
+    vec4 color = textureLod(inSampler,textureCoordinateToUse ,0);
+    imageStore(outTex,uv,color);
+}
