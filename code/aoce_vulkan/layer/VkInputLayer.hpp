@@ -1,5 +1,5 @@
 #pragma once
-#include <Layer/InputLayer.hpp>
+#include <layer/InputLayer.hpp>
 
 #include "VkLayer.hpp"
 

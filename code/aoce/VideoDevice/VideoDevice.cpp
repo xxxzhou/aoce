@@ -9,34 +9,22 @@ VideoDevice::VideoDevice(/* args */) {
 VideoDevice::~VideoDevice() {}
 
 void VideoDevice::onVideoFrameAction(VideoFrame frame) {
-    if (onVideoFrameEvent) {
-        onVideoFrameEvent(frame);
+    if (observer) {
+        observer->onVideoFrame(frame);
     }
 }
 
 void VideoDevice::onDepthFrameAction(VideoFrame colorFrame,
                                      VideoFrame depthFrame, void* alignParamt) {
-    if (onDepthFrameEvent) {
-        onDepthFrameEvent(colorFrame, depthFrame, alignParamt);
+    if (observer) {
+        observer->onDepthVideoFrame(colorFrame, depthFrame, alignParamt);
     }
 }
 
 void VideoDevice::onDeviceAction(VideoHandleId id, int32_t codeId) {
-    if (onDeviceEvent) {
-        onDeviceEvent(id, codeId);
+    if (observer) {
+        observer->onDeviceHandle(id, codeId);
     }
-}
-
-void VideoDevice::setVideoFrameHandle(videoFrameHandle handle) {
-    onVideoFrameEvent = handle;
-}
-
-void VideoDevice::setDepthFrameHandle(depthFrameHandle handle) {
-    onDepthFrameEvent = handle;
-}
-
-void VideoDevice::setDeviceHandle(deviceHandle handle) {
-    onDeviceEvent = handle;
 }
 
 int32_t VideoDevice::findFormatIndex(int32_t width, int32_t height,
@@ -82,7 +70,7 @@ int32_t VideoDevice::findFormatIndex(int32_t width, int32_t height,
     }
     for (const VideoFormat& format : formats) {
         if (format.width == width && format.height == height) {
-            if(filter(format)){
+            if (filter(format)) {
                 return index;
             }
         }

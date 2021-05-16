@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "VkBlendingModeLayer.hpp"
 #include "VkSeparableLinearLayer.hpp"
 #include "aoce_vulkan/layer/VkInputLayer.hpp"
@@ -12,7 +12,7 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkLookupLayer : public VkLayer, public LookupLayer {
+class VkLookupLayer : public VkLayer, public ILookupLayer {
     AOCE_LAYER_QUERYINTERFACE(VkLookupLayer)
    private:
     /* data */
@@ -31,7 +31,7 @@ class VkLookupLayer : public VkLayer, public LookupLayer {
     virtual void onInitNode() override;
 };
 
-class VkSoftEleganceLayer : public GroupLayer, public SoftEleganceLayer {
+class VkSoftEleganceLayer : public GroupLayer, public ISoftEleganceLayer {
     AOCE_LAYER_QUERYINTERFACE(VkSoftEleganceLayer)
    private:
     /* data */

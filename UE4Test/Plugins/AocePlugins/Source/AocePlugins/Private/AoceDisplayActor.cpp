@@ -7,7 +7,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
-#include "aoce/Layer/BaseLayer.hpp"
+#include "aoce/layer/BaseLayer.hpp"
 
 #if __ANDROID__
 #include <GLES2/gl2.h>
@@ -81,7 +81,7 @@ void AAoceDisplayActor::BeginPlay() {
 	actor->GetStaticMeshComponent()->SetMaterial(0, materialDynamic);
 
 	// 生成一张执行图
-	vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+	vkGraph = getPipeGraphFactory(gpuType)->createGraph();
 	auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
 	inputLayer = layerFactory->crateInput();
 	outputLayer = layerFactory->createOutput();

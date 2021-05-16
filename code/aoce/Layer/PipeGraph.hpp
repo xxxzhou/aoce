@@ -15,7 +15,7 @@ namespace aoce {
 // 设计为有向无环图,node包含layer.
 // node承担图像流程功能,不对外开放
 // layer包含图像本身处理
-class ACOE_EXPORT PipeGraph {
+class ACOE_EXPORT PipeGraph : public IPipeGraph {
    public:
     PipeGraph(/* args */);
     virtual ~PipeGraph();
@@ -42,28 +42,28 @@ class ACOE_EXPORT PipeGraph {
 
    public:
     // 当前图使用的gpu类型
-    inline GpuType getGpuType() { return gpu; }
+    virtual GpuType getGpuType() final;
     // 引发resetGraphr执行,但是不一定与当前执行同线程
-    void reset() { bReset = true; }
+    virtual void reset() final;
 
-    BaseLayer* getNode(int32_t index);
-    BaseLayer* addNode(BaseLayer* layer);
-    BaseLayer* addNode(ILayer* layer);
-    bool addLine(int32_t from, int32_t to, int32_t formOut = 0,
-                 int32_t toIn = 0);
-    bool addLine(BaseLayer* from, BaseLayer* to, int32_t formOut = 0,
-                 int32_t toIn = 0);
+    virtual IBaseLayer* getNode(int32_t index) final;
+    virtual IBaseLayer* addNode(IBaseLayer* layer) final;
+    virtual IBaseLayer* addNode(ILayer* layer) final;
+    virtual bool addLine(int32_t from, int32_t to, int32_t formOut = 0,
+                 int32_t toIn = 0) final;
+    virtual bool addLine(IBaseLayer* from, IBaseLayer* to, int32_t formOut = 0,
+                 int32_t toIn = 0) final;
 
-    bool getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
-                           ImageFormat& format, bool bOutput = false);
-    bool getLayerInFormat(int32_t nodeIndex, int32_t inputIndex,
-                          ImageFormat& format);
+    virtual bool getLayerOutFormat(int32_t nodeIndex, int32_t outputIndex,
+                           ImageFormat& format, bool bOutput = false) final;
+    virtual bool getLayerInFormat(int32_t nodeIndex, int32_t inputIndex,
+                          ImageFormat& format) final;
 
     // 清除连线(当逻辑变更导致执行列表重组)
-    void clearLines();
+    virtual void clearLines() final;
 
     // 清除节点(需要重新变更整个逻辑)
-    void clear();
+    virtual void clear() final;
 
    protected:
     // 如vulkan,需要同步资源
@@ -75,16 +75,6 @@ class ACOE_EXPORT PipeGraph {
 
    public:
     bool run();
-};
-
-// 在AoceManager注册vulkan/dx11/cuda类型的LayerFactory
-class ACOE_EXPORT PipeGraphFactory {
-   public:
-    PipeGraphFactory(){};
-    virtual ~PipeGraphFactory(){};
-
-   public:
-    virtual PipeGraph* createGraph() { return nullptr; };
 };
 
 }  // namespace aoce

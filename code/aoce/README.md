@@ -14,7 +14,7 @@
 
 ### VideoDevice 图像获取设备
 
-### FixGraph 组合一些常用的图像计算层
+### fixgraph 组合一些常用的图像计算层
 
 ## 不定
 

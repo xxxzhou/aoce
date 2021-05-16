@@ -1,11 +1,13 @@
 #pragma once
 
-#include "AoceVkExtra.hpp"
+#include "AoceVkExtra.h"
 
 // 类注释主要来源 https://gitee.com/xudoubi/GPUImage
 
 namespace aoce {
 namespace vulkan {
+
+extern "C" {
 
 // 色彩调整
 #pragma region Color adjustments
@@ -44,17 +46,17 @@ createHighlightShadowTintLayer();
 // 使用RGB颜色查找图像来重新映射图像中的颜色.
 // 在graph run之前,使用loadLookUp加载映射图里的数据
 // Amatorka/MissEtikate
-AOCE_VE_EXPORT LookupLayer* createLookupLayer();
+AOCE_VE_EXPORT ILookupLayer* createLookupLayer();
 // 基于双重查找的颜色重新映射滤镜
 // loadLookUp1/loadLookUp2分别加载对应映射表里的数据
-AOCE_VE_EXPORT SoftEleganceLayer* createSoftEleganceLayer();
+AOCE_VE_EXPORT ISoftEleganceLayer* createSoftEleganceLayer();
 // 肤色调整滤镜,可影响浅肤色颜色的唯一范围,并相应地调整粉红色/绿色或粉红色/橙色范围.
 // 默认值针对白皙的皮肤,但可以根据需要进行调整.
 AOCE_VE_EXPORT ITLayer<SkinToneParamet>* createSkinToneLayer();
 // 反转图像的颜色
-AOCE_VE_EXPORT BaseLayer* createColorInvertLayer();
+AOCE_VE_EXPORT IBaseLayer* createColorInvertLayer();
 // 将图像转换为灰度
-AOCE_VE_EXPORT BaseLayer* createLuminanceLayer();
+AOCE_VE_EXPORT IBaseLayer* createLuminanceLayer();
 // 根据每个像素的亮度将图像转换为单色版本
 AOCE_VE_EXPORT ITLayer<MonochromeParamet>* createMonochromeLayer();
 // 根据图像的亮度在两种用户指定的颜色之间进行混合
@@ -77,14 +79,14 @@ createAdaptiveThresholdLayer();
 AOCE_VE_EXPORT ITLayer<float>* createAverageLuminanceThresholdLayer();
 // 这将分析传入的图像并创建一个输出直方图,其输出每种颜色值的频率.
 // 该滤波器根据bSingle,输出[1x256]或是[4x256]的图像
-AOCE_VE_EXPORT BaseLayer* createHistogramLayer(bool bSingle = true);
+AOCE_VE_EXPORT IBaseLayer* createHistogramLayer(bool bSingle = true);
 // GPUImageAverageColor/GPUImageLuminosity由VkReduceLayer替代,用于求整张图的颜色和,最大值,最小值
 
 // 色度键扣像 参考
 // https://www.unrealengine.com/en-US/tech-blog/setting-up-a-chroma-key-material-in-ue4?sessionInvalidated=true
 AOCE_VE_EXPORT ITLayer<ChromaKeyParamet>* createChromaKeyLayer();
 // 用来添加色相旋转/饱和度/亮度调整
-AOCE_VE_EXPORT HSBLayer* createHSBLayer();
+AOCE_VE_EXPORT IHSBLayer* createHSBLayer();
 #pragma endregion
 
 // 图像处理
@@ -116,7 +118,7 @@ AOCE_VE_EXPORT ITLayer<IOSBlurParamet>* createIOSBlurLayer();
 // 不定长区域的中值模糊,不推荐,慢
 AOCE_VE_EXPORT ITLayer<uint32_t>* createMedianLayer(bool bSingle = true);
 // 3x3区域的中值模糊,实时可用
-AOCE_VE_EXPORT BaseLayer* createMedianK3Layer(bool bSingle = true);
+AOCE_VE_EXPORT IBaseLayer* createMedianK3Layer(bool bSingle = true);
 // 双边滤波,保留锐利边缘的同时模糊相似的颜色值
 AOCE_VE_EXPORT ITLayer<BilateralParamet>* createBilateralLayer();
 // 模拟倾斜移位镜头效果
@@ -158,7 +160,7 @@ AOCE_VE_EXPORT ITLayer<int32_t>* createOpeningLayer(bool bSingle);
 // 这将对周围8个像素的红色通道和中央像素的红色通道的强度进行比较.
 // 对比较结果进行编码,得到的比特串将变为该像素强度.
 // 最低有效位是右上比较,逆时针结束在最高有效位的右边比较.
-AOCE_VE_EXPORT BaseLayer* createColorLBPLayer();
+AOCE_VE_EXPORT IBaseLayer* createColorLBPLayer();
 // 这会将低通滤波器应用于传入的视频帧.
 // 基本上,这会累加前一帧和当前帧的加权滚动平均值.
 // 它们可用于对视频进行降噪,添加运动模糊或用于创建高通滤波器.
@@ -169,7 +171,7 @@ AOCE_VE_EXPORT ITLayer<float>* createLowPassLayer();
 // 此选项控制将先前累积的帧进行混合然后从当前帧中减去的程度,范围0.0-1.0,默认0.5
 AOCE_VE_EXPORT ITLayer<float>* createHighPassLayer();
 // 这是基于高通滤波器的运动检测器.输出运动强度.
-AOCE_VE_EXPORT MotionDetectorLayer* createMotionDetectorLayer();
+AOCE_VE_EXPORT IMotionDetectorLayer* createMotionDetectorLayer();
 // 使用Hough变换到平行坐标空间来检测图像中的线.
 // GPUImageHoughTransformLineDetector 以后实现
 
@@ -183,7 +185,7 @@ AOCE_VE_EXPORT ITLayer<ZoomBlurParamet>* createZoomBlurLayer();
 // 导向滤波
 AOCE_VE_EXPORT ITLayer<GuidedParamet>* createGuidedLayer();
 // 使用Laplacian算子锐化图像,bsamll参数对应不同Laplacian算子
-AOCE_VE_EXPORT BaseLayer* createLaplacianLayer(bool bsamll);
+AOCE_VE_EXPORT IBaseLayer* createLaplacianLayer(bool bsamll);
 #pragma endregion
 
 // 混合模式
@@ -194,54 +196,54 @@ AOCE_VE_EXPORT BaseLayer* createLaplacianLayer(bool bsamll);
 // 应用两个图像的溶解混合,参数表示第二张图片覆盖第一张图片的程度(0.0-1.0,默认值为0.5)
 AOCE_VE_EXPORT ITLayer<float>* createDissolveBlendLayer();
 // 应用两个图像的多次混合
-AOCE_VE_EXPORT BaseLayer* createMultiplyBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createMultiplyBlendLayer();
 // 应用两个图像的加法混合
-AOCE_VE_EXPORT BaseLayer* createAddBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createAddBlendLayer();
 // 应用两个图像的减法混合
-AOCE_VE_EXPORT BaseLayer* createSubtractBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createSubtractBlendLayer();
 // 应用两个图像的除法混合
-AOCE_VE_EXPORT BaseLayer* createDivideBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createDivideBlendLayer();
 // 应用两个图像的叠加混合
-AOCE_VE_EXPORT BaseLayer* createOverlayBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createOverlayBlendLayer();
 // 通过获取图像之间每个颜色分量的最小值来融合两个图像
-AOCE_VE_EXPORT BaseLayer* createDarkenBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createDarkenBlendLayer();
 // 通过获取图像之间每个颜色分量的最大值来融合两个图像
-AOCE_VE_EXPORT BaseLayer* createLightenBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createLightenBlendLayer();
 // 应用两个图像的颜色加深混合
-AOCE_VE_EXPORT BaseLayer* createColorBurnBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createColorBurnBlendLayer();
 // 应用两个图像的颜色减淡混合
-AOCE_VE_EXPORT BaseLayer* createColorDodgeBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createColorDodgeBlendLayer();
 // 应用两个图像的屏幕混合
-AOCE_VE_EXPORT BaseLayer* createScreenBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createScreenBlendLayer();
 // 应用两个图像的排除混合
-AOCE_VE_EXPORT BaseLayer* createExclusionBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createExclusionBlendLayer();
 // 应用两个图像的差异混合
-AOCE_VE_EXPORT BaseLayer* createDifferenceBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createDifferenceBlendLayer();
 // 应用两个图像的强光混合
-AOCE_VE_EXPORT BaseLayer* createHardLightBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createHardLightBlendLayer();
 // 应用两个图像的柔和光混合
-AOCE_VE_EXPORT BaseLayer* createSoftLightBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createSoftLightBlendLayer();
 // 根据第二个图像的Alpha通道在第二个图像上混合第二个图像
 // 参数mix:第二张图片覆盖第一张图片的程度(0.0-1.0,默认为1.0)
 AOCE_VE_EXPORT ITLayer<float>* createAlphaBlendLayer();
 // 将源应用于两个图像的混合
-AOCE_VE_EXPORT BaseLayer* createSourceOverBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createSourceOverBlendLayer();
 // 应用两个图像的普通混合
-AOCE_VE_EXPORT BaseLayer* createNormalBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createNormalBlendLayer();
 // 应用两个图像的颜色混合
-AOCE_VE_EXPORT BaseLayer* createColorBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createColorBlendLayer();
 // 应用两个图像的色调混合
-AOCE_VE_EXPORT BaseLayer* createHueBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createHueBlendLayer();
 // 应用两个图像的饱和度混合
-AOCE_VE_EXPORT BaseLayer* createSaturationBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createSaturationBlendLayer();
 // 应用两个图像的亮度混合
-AOCE_VE_EXPORT BaseLayer* createLuminosityBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createLuminosityBlendLayer();
 // 应用两个图像的线性刻录混合
-AOCE_VE_EXPORT BaseLayer* createLinearBurnBlendLayer();
+AOCE_VE_EXPORT IBaseLayer* createLinearBurnBlendLayer();
 // 应用两个图像的泊松混合
 AOCE_VE_EXPORT ITLayer<PoissonParamet>* createPoissonBlendLayer();
 // 使用另一个图像遮罩一个图像
-AOCE_VE_EXPORT BaseLayer* createMaskLayer();
+AOCE_VE_EXPORT IBaseLayer* createMaskLayer();
 #pragma endregion
 
 // 视觉效果
@@ -291,9 +293,9 @@ AOCE_VE_EXPORT ITLayer<VignetteParamet>* createVignetteLayer();
 // 参数表示核的大小,相对GPUImage有优化,核长为3在手机Radmi K10 Pro可实时
 AOCE_VE_EXPORT ITLayer<uint32_t>* createKuwaharaLayer();
 // 生成充满Perlin噪点的图像
-AOCE_VE_EXPORT PerlinNoiseLayer* createPerlinNoiseLayer();
+AOCE_VE_EXPORT IPerlinNoiseLayer* createPerlinNoiseLayer();
 // 模拟CGA监视器的颜色空间
-AOCE_VE_EXPORT BaseLayer* createCGAColorspaceLayer();
+AOCE_VE_EXPORT IBaseLayer* createCGAColorspaceLayer();
 // 此滤镜采用输入图块集,图块的亮度必须上升.
 // GPUImageMosaicFilter 后续实现
 
@@ -301,17 +303,19 @@ AOCE_VE_EXPORT BaseLayer* createCGAColorspaceLayer();
 // GPUImageJFAVoronoiFilter 后面实现
 
 //接收Voronoi映射,并使用该映射过滤传入的图像.
-AOCE_VE_EXPORT BaseLayer* createVoronoiConsumerLayer();
+AOCE_VE_EXPORT IBaseLayer* createVoronoiConsumerLayer();
 #pragma endregion
 
 AOCE_VE_EXPORT ITLayer<ReSizeParamet>* createResizeLayer(
     ImageType imageType = ImageType::rgba8);
 // 显示R8
-AOCE_VE_EXPORT BaseLayer* createAlphaShowLayer();
+AOCE_VE_EXPORT IBaseLayer* createAlphaShowLayer();
 // 显示二种输入,第一个输入R8,第二输入RGBA8的显示
-AOCE_VE_EXPORT BaseLayer* createAlphaShow2Layer();
+AOCE_VE_EXPORT IBaseLayer* createAlphaShow2Layer();
 // 用于图像格式转化,包含RGBA8->RGBA32F
-AOCE_VE_EXPORT BaseLayer* createConvertImageLayer();
+AOCE_VE_EXPORT IBaseLayer* createConvertImageLayer();
+
+}
 
 }  // namespace vulkan
 }  // namespace aoce

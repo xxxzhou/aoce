@@ -7,8 +7,8 @@ VkExtraBaseView::VkExtraBaseView() {}
 VkExtraBaseView::~VkExtraBaseView() {}
 
 void VkExtraBaseView::initGraph(ILayer* layer, void* hinst,
-                                BaseLayer* nextLayer) {
-    std::vector<BaseLayer*> layers;
+                                IBaseLayer* nextLayer) {
+    std::vector<IBaseLayer*> layers;
     layers.push_back(layer->getLayer());
     if (nextLayer != nullptr) {
         layers.push_back(nextLayer);
@@ -16,10 +16,10 @@ void VkExtraBaseView::initGraph(ILayer* layer, void* hinst,
     initGraph(layers, hinst);
 }
 
-void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst,
+void VkExtraBaseView::initGraph(std::vector<IBaseLayer*> layers, void* hinst,
                                 bool bAutoIn) {
     this->bAutoIn = bAutoIn;
-    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
@@ -30,7 +30,7 @@ void VkExtraBaseView::initGraph(std::vector<BaseLayer*> layers, void* hinst,
     resizeLayer = layerFactory->createSize();
     resizeLayer->updateParamet({1, 240, 120});
     layerNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
-    for (auto& layer : layers) {        
+    for (auto& layer : layers) {
         layerNode = layerNode->addNode(layer);
     }
     if (bAutoIn) {
@@ -83,7 +83,7 @@ void VkExtraBaseView::openDevice(int32_t id) {
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();
-    video->setVideoFrameHandle(std::bind(&VkExtraBaseView::onFrame, this, _1));
+    video->setObserver(this);
     VideoType videoType = selectFormat.videoType;
 #if WIN32
     if (selectFormat.videoType == VideoType::mjpg) {
@@ -104,7 +104,7 @@ void VkExtraBaseView::enableLayer(bool bEnable) {
     }
 }
 
-void VkExtraBaseView::onFrame(VideoFrame frame) {
+void VkExtraBaseView::onVideoFrame(VideoFrame frame) {
     if (getYuvIndex(frame.videoType) < 0) {
         yuv2rgbLayer->getLayer()->setVisable(false);
     } else if (yuv2rgbLayer->getParamet().type != frame.videoType) {

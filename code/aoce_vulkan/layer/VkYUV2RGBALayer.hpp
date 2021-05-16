@@ -1,12 +1,12 @@
 #pragma once
-#include <Layer/BaseLayer.hpp>
+#include <layer/BaseLayer.hpp>
 
 #include "VkLayer.hpp"
 
 namespace aoce {
 namespace vulkan {
 namespace layer {
-class VkYUV2RGBALayer : public VkLayer, public YUV2RGBALayer {
+class VkYUV2RGBALayer : public VkLayer, public IYUV2RGBALayer {
     AOCE_LAYER_QUERYINTERFACE(VkYUV2RGBALayer)
    private:
     /* data */

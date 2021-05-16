@@ -1,6 +1,6 @@
 #include "VkSeparableLinearLayer.hpp"
 
-#include "aoce/Layer/PipeGraph.hpp"
+#include "aoce/layer/PipeGraph.hpp"
 #define PATCH_PER_BLOCK 4
 
 namespace aoce {

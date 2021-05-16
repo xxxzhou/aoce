@@ -52,7 +52,7 @@
 
 在运行时,设定节点/分支是否可用,以及有点层参数改变会影响输出大小都会导致图层重启标记开启,用标记是考虑到更新参数层与执行GPU运算不在同一线程的情况,图层下次运行前,检测到重启标记开启,就会重新开始构建.
 
-相关源码在[PipeGraph](../code/aoce/Layer/PipeGraph.hpp)
+相关源码在[PipeGraph](../code/aoce/layer/PipeGraph.hpp)
 
 而第二点,为了方便用户扩展自己的层,我需要尽可能的自动完善各种信息来让用户只专注需求实现.
 
@@ -68,7 +68,7 @@
 
 5. onUpdateParamet 层的参数更新,时序独立于上面的4个点,设定要求随时可以调用.
 
-相关源码在[BaseLayer](../code/aoce/Layer/BaseLayer.hpp)
+相关源码在[BaseLayer](../code/aoce/layer/BaseLayer.hpp)
 
 准确到Vulkan模块,Vulkan下的运算层基类(VkLayer)会针对BaseLayer提供更精确的Vulkan资源时序.
 
@@ -88,7 +88,7 @@
 
 8. onFrame 每桢处理时调用,一般来说,只有输入层或输出层override处理,用于把vulkan texture交给CPU/opengl es/dx11等等.
 
-相关源码在[VkLayer](../code/aoce_vulkan/Layer/VkLayer.hpp)
+相关源码在[VkLayer](../code/aoce_vulkan/layer/VkLayer.hpp)
 
 虽然列出有这么多,但是从我移植GPUImage里来看,很多层特别是混合模式那些处理,完全一个都不用重载,就只在初始化指定下glslPath就行了,还有许多层按上面设定只需要重载一到二个方法就不用管了.
 
@@ -104,7 +104,7 @@
 
 1. 摄像头,在win端,有aoce_win_mf模块提供,在android端,有aoce_android提供.
 
-2. 对于多媒体文件(本地多媒体,RTMP等),由aoce_ffmpeg(win/android都支持)提供解析.
+2. 对于多媒体文件(本地多媒体,RTMP等),由aoce_ffmpeg(win/android都支持)提供解码.
 
 3. 直接非压缩的图像二进制数据.
 
@@ -113,3 +113,17 @@
 如果数据提供的是桢数据,对应摄像头/多媒体模块都会解析到VideoFrame并给出回调,而在数据处理模块会有InputLayer层,专门用来接收上面三种数据.
 
 而处理后数据会根据对应OutputLayer需要,导出CPU数据以及GPU数据对接对应系统常用渲染引擎对应纹理上,如在win端,aoce_cuda/aoce_vulkan模块的OutputLayer都支持直接导致到对应DX11纹理,而在android上,aoce_vulkan能直接导致到对应opengl es纹理上,这样就能直接与对应引擎(UE4/Unity3D)底层进行对接.
+
+## 导出给用户调用
+
+在重新整理了框架与结构,完善了一些内容,API应该不会有大的变动了,现开始考虑外部用户使用.
+
+在框架各模块内部,引用导出的类不要求什么不能用STL,毕竟肯定你编译这些模块肯定是相同编译环境,但是如果导出给别的用户使用,需要限制导出的数据与格式,以保证别的用户与你不同的编译环境也不会有问题.
+
+配合CMake,使用install只导出特殊编写的.h文件,这些文件主要是如下三种作用.
+
+1. C风格的结构,C风格导出帮助函数,与C风格导出用来创建对应工厂/管理对象.
+
+2. 纯净的抽像类,不包含任何STL对象结构,主要用来调用API,用户不要继承这些类.
+
+3. 后缀为Observer的抽像类,用户继承针对接口处理回调.

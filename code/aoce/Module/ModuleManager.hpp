@@ -41,11 +41,13 @@ class ACOE_EXPORT ModuleManager {
     ModuleManager& operator=(const ModuleManager&) = delete;
     /* data */
    public:
-    void registerModule(const char* name,
-                        loadModuleHandle handle = nullptr);
+    void registerModule(const char* name, loadModuleHandle handle = nullptr);
     void loadModule(const char* name);
     void unloadModule(const char* name);
     void regAndLoad(const char* name);
+
+   public:
+    bool checkLoadModel(const char* name);
 };
 
 template <class module>

@@ -1,4 +1,4 @@
-#include "VkExtraExport.hpp"
+#include "VkExtraExport.h"
 
 #include "layer/VkAdaptiveThresholdLayer.hpp"
 #include "layer/VkAlphaShowLayer.hpp"
@@ -91,7 +91,7 @@ ITLayer<BilateralParamet>* createBilateralLayer() {
     return layer;
 }
 
-BaseLayer* createAddBlendLayer() {
+IBaseLayer* createAddBlendLayer() {
     VkAddBlendLayer* layer = new VkAddBlendLayer();
     return layer;
 }
@@ -101,7 +101,7 @@ ITLayer<float>* createAlphaBlendLayer() {
     return layer;
 }
 
-LookupLayer* createLookupLayer() {
+ILookupLayer* createLookupLayer() {
     VkLookupLayer* layer = new VkLookupLayer();
     return layer;
 }
@@ -121,7 +121,7 @@ ITLayer<CannyEdgeDetectionParamet>* createCannyEdgeDetectionLayer() {
     return layer;
 }
 
-BaseLayer* createCGAColorspaceLayer() {
+IBaseLayer* createCGAColorspaceLayer() {
     VkCGAColorspaceLayer* layer = new VkCGAColorspaceLayer();
     return layer;
 }
@@ -146,27 +146,27 @@ ITLayer<int32_t>* createOpeningLayer(bool bSingle) {
     return layer;
 }
 
-BaseLayer* createColorBlendLayer() {
+IBaseLayer* createColorBlendLayer() {
     VkColorBlendLayer* layer = new VkColorBlendLayer();
     return layer;
 }
 
-BaseLayer* createColorBurnBlendLayer() {
+IBaseLayer* createColorBurnBlendLayer() {
     VkColorBurnBlendLayer* layer = new VkColorBurnBlendLayer();
     return layer;
 }
 
-BaseLayer* createColorDodgeBlendLayer() {
+IBaseLayer* createColorDodgeBlendLayer() {
     VkColorDodgeBlendLayer* layer = new VkColorDodgeBlendLayer();
     return layer;
 }
 
-BaseLayer* createColorInvertLayer() {
+IBaseLayer* createColorInvertLayer() {
     VkColorInvertLayer* layer = new VkColorInvertLayer();
     return layer;
 }
 
-BaseLayer* createColorLBPLayer() {
+IBaseLayer* createColorLBPLayer() {
     VkColorLBPLayer* layer = new VkColorLBPLayer();
     return layer;
 }
@@ -206,12 +206,12 @@ ITLayer<BlurSelectiveParamet>* createBlurSelectiveLayer() {
     return layer;
 }
 
-BaseLayer* createDarkenBlendLayer() {
+IBaseLayer* createDarkenBlendLayer() {
     VkDarkenBlendLayer* layer = new VkDarkenBlendLayer();
     return layer;
 }
 
-BaseLayer* createDifferenceBlendLayer() {
+IBaseLayer* createDifferenceBlendLayer() {
     VkDifferenceBlendLayer* layer = new VkDifferenceBlendLayer();
     return layer;
 }
@@ -221,7 +221,7 @@ ITLayer<float>* createDissolveBlendLayer() {
     return layer;
 }
 
-BaseLayer* createDivideBlendLayer() {
+IBaseLayer* createDivideBlendLayer() {
     VkDivideBlendLayer* layer = new VkDivideBlendLayer();
     return layer;
 }
@@ -231,7 +231,7 @@ ITLayer<float>* createEmbossLayer() {
     return layer;
 }
 
-BaseLayer* createExclusionBlendLayer() {
+IBaseLayer* createExclusionBlendLayer() {
     VkExclusionBlendLayer* layer = new VkExclusionBlendLayer();
     return layer;
 }
@@ -271,7 +271,7 @@ ITLayer<PixellateParamet>* createPixellateLayer() {
     return layer;
 }
 
-BaseLayer* createHardLightBlendLayer() {
+IBaseLayer* createHardLightBlendLayer() {
     VkHardLightBlendLayer* layer = new VkHardLightBlendLayer();
     return layer;
 }
@@ -291,12 +291,12 @@ ITLayer<float>* createHighPassLayer() {
     return layer;
 }
 
-HSBLayer* createHSBLayer() {
+IHSBLayer* createHSBLayer() {
     VkHSBLayer* layer = new VkHSBLayer();
     return layer;
 }
 
-BaseLayer* createHueBlendLayer() {
+IBaseLayer* createHueBlendLayer() {
     VkHueBlendLayer* layer = new VkHueBlendLayer();
     return layer;
 }
@@ -316,7 +316,7 @@ ITLayer<HighlightShadowTintParamet>* createHighlightShadowTintLayer() {
     return layer;
 }
 
-BaseLayer* createHistogramLayer(bool bSingle) {
+IBaseLayer* createHistogramLayer(bool bSingle) {
     if (bSingle) {
         return new VkHistogramLayer(true);
     }
@@ -333,7 +333,7 @@ ITLayer<uint32_t>* createKuwaharaLayer() {
     return layer;
 }
 
-BaseLayer* createLaplacianLayer(bool bsamll) {
+IBaseLayer* createLaplacianLayer(bool bsamll) {
     VkLaplacianLayer* layer = new VkLaplacianLayer(bsamll);
     return layer;
 }
@@ -343,27 +343,27 @@ ITLayer<LevelsParamet>* createLevelsLayer() {
     return layer;
 }
 
-BaseLayer* createLightenBlendLayer() {
+IBaseLayer* createLightenBlendLayer() {
     VkLightenBlendLayer* layer = new VkLightenBlendLayer();
     return layer;
 }
 
-BaseLayer* createLinearBurnBlendLayer() {
+IBaseLayer* createLinearBurnBlendLayer() {
     VkLinearBurnBlendLayer* layer = new VkLinearBurnBlendLayer();
     return layer;
 }
 
-BaseLayer* createLuminosityBlendLayer() {
+IBaseLayer* createLuminosityBlendLayer() {
     VkLuminosityBlendLayer* layer = new VkLuminosityBlendLayer();
     return layer;
 }
 
-BaseLayer* createLuminanceLayer() {
+IBaseLayer* createLuminanceLayer() {
     VkLuminanceLayer* layer = new VkLuminanceLayer();
     return layer;
 }
 
-BaseLayer* createMaskLayer() {
+IBaseLayer* createMaskLayer() {
     VkMaskLayer* layer = new VkMaskLayer();
     return layer;
 }
@@ -373,7 +373,7 @@ ITLayer<uint32_t>* createMedianLayer(bool bSingle) {
     return layer;
 }
 
-BaseLayer* createMedianK3Layer(bool bSingle) {
+IBaseLayer* createMedianK3Layer(bool bSingle) {
     VkMedianK3Layer* layer = new VkMedianK3Layer(bSingle);
     return layer;
 }
@@ -388,12 +388,12 @@ ITLayer<MotionBlurParamet>* createMotionBlurLayer() {
     return layer;
 }
 
-MotionDetectorLayer* createMotionDetectorLayer() {
+IMotionDetectorLayer* createMotionDetectorLayer() {
     VkMotionDetectorLayer* layer = new VkMotionDetectorLayer();
     return layer;
 }
 
-BaseLayer* createMultiplyBlendLayer() {
+IBaseLayer* createMultiplyBlendLayer() {
     VkMultiplyBlendLayer* layer = new VkMultiplyBlendLayer();
     return layer;
 }
@@ -403,7 +403,7 @@ ITLayer<NobleCornerDetectionParamet>* createNobleCornerDetectionLayer() {
     return layer;
 }
 
-BaseLayer* createNormalBlendLayer() {
+IBaseLayer* createNormalBlendLayer() {
     VkNormalBlendLayer* layer = new VkNormalBlendLayer();
     return layer;
 }
@@ -413,12 +413,12 @@ ITLayer<float>* createOpacityLayer() {
     return layer;
 }
 
-BaseLayer* createOverlayBlendLayer() {
+IBaseLayer* createOverlayBlendLayer() {
     VkOverlayBlendLayer* layer = new VkOverlayBlendLayer();
     return layer;
 }
 
-PerlinNoiseLayer* createPerlinNoiseLayer() {
+IPerlinNoiseLayer* createPerlinNoiseLayer() {
     VkPerlinNoiseLayer* layer = new VkPerlinNoiseLayer();
     return layer;
 }
@@ -463,7 +463,7 @@ ITLayer<vec3>* createRGBLayer() {
     return layer;
 }
 
-BaseLayer* createSaturationBlendLayer() {
+IBaseLayer* createSaturationBlendLayer() {
     VkSaturationBlendLayer* layer = new VkSaturationBlendLayer();
     return layer;
 }
@@ -473,7 +473,7 @@ ITLayer<float>* createSaturationLayer() {
     return layer;
 }
 
-BaseLayer* createScreenBlendLayer() {
+IBaseLayer* createScreenBlendLayer() {
     VkScreenBlendLayer* layer = new VkScreenBlendLayer();
     return layer;
 }
@@ -514,12 +514,12 @@ ITLayer<float>* createSobelEdgeDetectionLayer() {
     return layer;
 }
 
-SoftEleganceLayer* createSoftEleganceLayer() {
+ISoftEleganceLayer* createSoftEleganceLayer() {
     VkSoftEleganceLayer* layer = new VkSoftEleganceLayer();
     return layer;
 }
 
-BaseLayer* createSoftLightBlendLayer() {
+IBaseLayer* createSoftLightBlendLayer() {
     VkSoftLightBlendLayer* layer = new VkSoftLightBlendLayer();
     return layer;
 }
@@ -529,7 +529,7 @@ ITLayer<float>* createSolarizeLayer() {
     return layer;
 }
 
-BaseLayer* createSourceOverBlendLayer() {
+IBaseLayer* createSourceOverBlendLayer() {
     VkSourceOverBlendLayer* layer = new VkSourceOverBlendLayer();
     return layer;
 }
@@ -539,7 +539,7 @@ ITLayer<vec2>* createStretchDistortionLayer() {
     return layer;
 }
 
-BaseLayer* createSubtractBlendLayer() {
+IBaseLayer* createSubtractBlendLayer() {
     VkSubtractBlendLayer* layer = new VkSubtractBlendLayer();
     return layer;
 }
@@ -589,7 +589,7 @@ ITLayer<VignetteParamet>* createVignetteLayer() {
     return layer;
 }
 
-BaseLayer* createVoronoiConsumerLayer() {
+IBaseLayer* createVoronoiConsumerLayer() {
     VkVoronoiConsumerLayer* layer = new VkVoronoiConsumerLayer();
     return layer;
 }
@@ -604,17 +604,17 @@ ITLayer<ZoomBlurParamet>* createZoomBlurLayer() {
     return layer;
 }
 
-BaseLayer* createAlphaShowLayer() {
+IBaseLayer* createAlphaShowLayer() {
     VkAlphaShowLayer* layer = new VkAlphaShowLayer();
     return layer;
 }
 
-BaseLayer* createAlphaShow2Layer() {
+IBaseLayer* createAlphaShow2Layer() {
     VkAlphaShow2Layer* layer = new VkAlphaShow2Layer();
     return layer;
 }
 
-BaseLayer* createConvertImageLayer() {
+IBaseLayer* createConvertImageLayer() {
     VkConvertImageLayer* layer = new VkConvertImageLayer();
     return layer;
 }

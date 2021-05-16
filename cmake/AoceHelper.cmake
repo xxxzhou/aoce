@@ -30,14 +30,7 @@ function(install_aoce_module module contain_include)
           ARCHIVE DESTINATION lib  # 静态库安装路径
           RUNTIME DESTINATION bin  # 可执行文件安装路径
           # PUBLIC_HEADER DESTINATION include/${module}  # 头文件安装路径
-          )   
-   # 复制头文件        
-  if(contain_include)      
-    message(STATUS "copy ${module} include") 
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION include 
-            FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
-            )
-  endif()      
+          )  
 endfunction(install_aoce_module)
 
 

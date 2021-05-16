@@ -5,7 +5,7 @@
 #include "Strsafe.h"
 
 
-unsigned int* GetParametr(GUID guid, MediaType& out) {
+unsigned int* GetParametr(GUID guid, MFMediaType& out) {
 	if (guid == MF_MT_YUV_MATRIX)
 		return &(out.yuvMatrix);
 	if (guid == MF_MT_VIDEO_LIGHTING)
@@ -31,7 +31,7 @@ unsigned int* GetParametr(GUID guid, MediaType& out) {
 	return NULL;
 }
 
-HRESULT LogAttributeValueByIndexNew(IMFAttributes* pAttr, DWORD index, MediaType& out) {
+HRESULT LogAttributeValueByIndexNew(IMFAttributes* pAttr, DWORD index, MFMediaType& out) {
 	WCHAR* pGuidName = NULL;
 	WCHAR* pGuidValName = NULL;
 
@@ -158,7 +158,7 @@ HRESULT LogVideoAreaNew(const PROPVARIANT& var) {
 	return S_OK;
 }
 
-HRESULT SpecialCaseAttributeValueNew(GUID guid, const PROPVARIANT& var, MediaType& out) {
+HRESULT SpecialCaseAttributeValueNew(GUID guid, const PROPVARIANT& var, MFMediaType& out) {
 	if (guid == MF_MT_FRAME_SIZE) {
 		UINT32 uHigh = 0, uLow = 0;
 		LogUINT32AsUINT64New(var, uHigh, uLow);
@@ -351,7 +351,7 @@ LPCWSTR GetGUIDNameConstNew(const GUID& guid) {
 FormatReader::FormatReader(void) {
 }
 
-bool FormatReader::Read(IMFMediaType* pType, MediaType& mediaType) {
+bool FormatReader::Read(IMFMediaType* pType, MFMediaType& mediaType) {
 	UINT32 count = 0;
 	HRESULT hr = S_OK;
 	hr = pType->LockStore();

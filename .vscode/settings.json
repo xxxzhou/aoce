@@ -87,7 +87,10 @@
         "optional": "cpp",
         "shared_mutex": "cpp",
         "aoce.hpp": "c",
-        "aocedefine.h": "c"
+        "aocedefine.h": "c",
+        "aocecore.h": "c",
+        "stdint.h": "c",
+        "aocemedia.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,

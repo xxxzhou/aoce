@@ -1,7 +1,7 @@
 #include <AoceManager.hpp>
-#include <Module/ModuleManager.hpp>
 #include <iostream>
 #include <memory>
+#include <module/ModuleManager.hpp>
 #include <string>
 #include <thread>
 #include <vulkan/VulkanContext.hpp>
@@ -29,18 +29,20 @@ using namespace aoce::vulkan;
 static int index = 0;
 static int formatIndex = 29;
 static std::unique_ptr<VulkanWindow> window = nullptr;
-static PipeGraph *vkGraph;
-static InputLayer *inputLayer;
-static OutputLayer *outputLayer;
-static YUV2RGBALayer *yuv2rgbLayer;
+static IPipeGraph *vkGraph;
+static IInputLayer *inputLayer;
+static IOutputLayer *outputLayer;
+static IYUV2RGBALayer *yuv2rgbLayer;
 
 static GpuType gpuType = GpuType::vulkan;
 
-static void onDrawFrame(VideoFrame frame) {
-    // std::cout << "time stamp:" << frame.timeStamp << std::endl;
-    inputLayer->inputCpuData(frame.data[0]);
-    vkGraph->run();
-}
+class TestCameraObserver : public IVideoDeviceObserver {
+    virtual void onVideoFrame(VideoFrame frame) override {
+        // std::cout << "time stamp:" << frame.timeStamp << std::endl;
+        inputLayer->inputCpuData(frame.data[0]);
+        vkGraph->run();
+    }
+};
 
 void onPreCommand(uint32_t index) {
     VkImage winImage = window->images[index];
@@ -77,8 +79,9 @@ void android_main(struct android_app *app)
     auto &deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
     std::cout << "deivce count:" << deviceList.size() << std::endl;
+    TestCameraObserver cameraObserver = {};
     VideoDevicePtr video = deviceList[index];
-    video->setVideoFrameHandle(onDrawFrame);
+    video->setObserver(&cameraObserver);
     std::string name = video->getName();
     std::string id = video->getId();
     std::cout << "name: " << name << std::endl;
@@ -90,7 +93,7 @@ void android_main(struct android_app *app)
                   << " hight:" << vf.height << " fps:" << vf.fps
                   << " format:" << to_string(vf.videoType) << std::endl;
     }
-    formatIndex = video->findFormatIndex(1920,1080);
+    formatIndex = video->findFormatIndex(1920, 1080);
     video->setFormat(formatIndex);
     video->open();
     auto &selectFormat = video->getSelectFormat();
@@ -110,7 +113,7 @@ void android_main(struct android_app *app)
     }
 #endif
     // 生成一张执行图
-    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();

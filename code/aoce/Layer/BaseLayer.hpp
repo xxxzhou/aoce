@@ -20,7 +20,7 @@ enum class GpuBit {
 // 每个从继承ILayer的类,请在类头文件里添加这个宏,或是自己实现
 #define AOCE_LAYER_QUERYINTERFACE(OBJCLASS)           \
    public:                                            \
-    virtual inline BaseLayer* getLayer() override {   \
+    virtual inline IBaseLayer* getLayer() override {  \
         OBJCLASS* obj = static_cast<OBJCLASS*>(this); \
         return static_cast<BaseLayer*>(obj);          \
     }                                                 \
@@ -30,7 +30,7 @@ enum class GpuBit {
 // layer知道自己的gpu类型.设计分为二种
 // 其一是本身插件提供公共处理,配合factory.
 // 其二是外部插件提供new obj,需要自己设定gpu类型
-class ACOE_EXPORT BaseLayer {
+class ACOE_EXPORT BaseLayer : public IBaseLayer {
    protected:
     struct NodeIndex {
         int32_t nodeIndex = -1;
@@ -88,18 +88,23 @@ class ACOE_EXPORT BaseLayer {
 
     // 如下所有公共方法全是转接PipeNode,需要附加到PipeGraph后才可以调用
    public:
-    bool bAttachGraph();
-    void setVisable(bool bvisable);
-    void setEnable(bool benable);
-    int32_t getGraphIndex();
+    virtual bool bAttachGraph() final;
+    virtual void setVisable(bool bvisable) final;
+    virtual void setEnable(bool benable) final;
+    virtual int32_t getGraphIndex() final;
     // 如果层有多个输入,可能不同输入对应不同层内不同层
     // index表示输入节点索引,node表示层内层节点,toInIndex表示对应层内层输入位置
-    void setStartNode(BaseLayer* node, int32_t index = 0,
-                      int32_t toInIndex = 0);
-    void setEndNode(BaseLayer* node);
-    BaseLayer* addNode(BaseLayer* layer);
-    BaseLayer* addNode(class ILayer* layer);
-    BaseLayer* addLine(BaseLayer* to, int32_t formOut = 0, int32_t toIn = 0);
+    virtual void setStartNode(IBaseLayer* node, int32_t index = 0,
+                              int32_t toInIndex = 0) final;
+    virtual void setEndNode(IBaseLayer* node) final;
+    virtual IBaseLayer* addNode(IBaseLayer* layer) final;
+    virtual IBaseLayer* addNode(class ILayer* layer) final;
+    virtual IBaseLayer* addLine(IBaseLayer* to, int32_t formOut = 0,
+                                int32_t toIn = 0) final;
+    virtual const char* getMark() final;
+
+   public:
+    virtual const char* getName();
 
    protected:
     // 附加到图表上的节点
@@ -124,12 +129,8 @@ class ACOE_EXPORT BaseLayer {
     // 根据inputFormats初始化buffer
     virtual void onInitBuffer(){};
     // 更新参数,子类会有updateParamet(T t)保存参数,等到运行前提交执行
-    virtual void onUpdateParamet(){};
+    virtual void onUpdateParamet() override {};
     virtual bool onFrame() = 0;
-
-   public:
-    virtual const char* getName();
-    const char* getMark();
 };
 
 // GroupLayer自身不处理任何运算,只是组合运算层
@@ -141,46 +142,8 @@ class ACOE_EXPORT GroupLayer : public BaseLayer {
    protected:
     virtual void onInit() override{};
     // 实现层内子层的连接顺序
-    virtual void onInitNode() = 0;
+    virtual void onInitNode() override = 0;
     virtual bool onFrame() override { return true; };
 };
-
-// 实现层(非抽像层)不会单独从ILayer继承,还一个继承路径应该从BaseLayer来
-class ACOE_EXPORT ILayer {
-   public:
-    // 请看上面宏AOCE_LAYER_QUERYINTERFACE提供的默认实现
-    virtual BaseLayer* getLayer() = 0;
-};
-
-// 分离导致层不同参数的差异(AOCE_LAYER_QUERYINTERFACE)
-template <typename T>
-class ITLayer : public ILayer {
-   protected:
-    T oldParamet = {};
-    T paramet = {};
-
-   public:
-    ITLayer(){};
-    virtual ~ITLayer(){};
-
-   public:
-    void updateParamet(const T& t) {
-        oldParamet = this->paramet;
-        this->paramet = t;
-        getLayer()->onUpdateParamet();
-    };
-
-    T getParamet() { return paramet; }
-};
-
-// YUV 2 RGBA 转换
-typedef ITLayer<YUVParamet> YUV2RGBALayer;
-// RGBA 2 YUV 转换
-typedef ITLayer<YUVParamet> RGBA2YUVLayer;
-typedef ITLayer<TexOperateParamet> TexOperateLayer;
-typedef ITLayer<TransposeParamet> TransposeLayer;
-typedef ITLayer<ReSizeParamet> ReSizeLayer;
-typedef ITLayer<BlendParamet> BlendLayer;
-typedef ITLayer<YUVParamet> YUV2RGBALayer;
 
 }  // namespace aoce

@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
-#include "../Layer/LayerFactory.hpp"
-#include "../Layer/PipeGraph.hpp"
+#include "../layer/PipeGraph.hpp"
 
 namespace aoce {
 
@@ -9,10 +8,10 @@ namespace aoce {
 class ACOE_EXPORT VideoView {
    private:
     /* data */
-    PipeGraph* graph = nullptr;
-    std::unique_ptr<InputLayer> inputLayer = nullptr;
-    std::unique_ptr<OutputLayer> outputLayer = nullptr;
-    std::unique_ptr<YUV2RGBALayer> yuv2rgbLayer = nullptr;
+    IPipeGraph* graph = nullptr;
+    std::unique_ptr<IInputLayer> inputLayer = nullptr;
+    std::unique_ptr<IOutputLayer> outputLayer = nullptr;
+    std::unique_ptr<IYUV2RGBALayer> yuv2rgbLayer = nullptr;
 
     GpuType gpuType = GpuType::other;
     VideoFormat format = {};
@@ -22,7 +21,7 @@ class ACOE_EXPORT VideoView {
     ~VideoView();
 
    public:
-    inline OutputLayer* getOutputLayer() { return outputLayer.get(); }
+    inline IOutputLayer* getOutputLayer() { return outputLayer.get(); }
 
    public:
     void runFrame(const VideoFrame& frame, bool special = false);

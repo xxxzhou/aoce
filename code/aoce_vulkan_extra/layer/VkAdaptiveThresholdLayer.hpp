@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "VkLinearFilterLayer.hpp"
 #include "VkLuminanceLayer.hpp"
 #include "VkSeparableLinearLayer.hpp"

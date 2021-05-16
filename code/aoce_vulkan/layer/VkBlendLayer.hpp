@@ -19,7 +19,7 @@ struct VkBlendParamet {
     float opacity;
 };
 
-class VkBlendLayer : public VkLayer, public BlendLayer {
+class VkBlendLayer : public VkLayer, public IBlendLayer {
     AOCE_LAYER_QUERYINTERFACE(VkBlendLayer)
    private:
     VkBlendParamet vkParamet = {};

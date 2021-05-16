@@ -5,20 +5,17 @@ namespace aoce {
 
 void InputLayer::dataReady(uint8_t* data, bool bCopy) {
     if (bCopy) {
-        ImageFormat inFormat = getLayer()->inFormats[0];
-        int32_t size = inFormat.width * inFormat.height *
-                       getImageTypeSize(inFormat.imageType);
-        if (size <= 0) {
+        if (dataSize <= 0) {
             std::string message;
             string_format(message, getLayer()->getMark(),
                           " in format incorrect");
             logMessage(LogLevel::error, message.c_str());
             assert(false);
         }
-        if (videoFrameData.size() != size) {
-            videoFrameData.resize(size);
+        if (videoFrameData.size() != dataSize) {
+            videoFrameData.resize(dataSize);
         }
-        memcpy(videoFrameData.data(), data, size);
+        memcpy(videoFrameData.data(), data, dataSize);
         frameData = videoFrameData.data();
     } else {
         frameData = data;
@@ -29,17 +26,20 @@ void InputLayer::dataReady(uint8_t* data, bool bCopy) {
 void InputLayer::checkImageFormat(int32_t width, int32_t height,
                                   VideoType videoType) {
     assert(getLayer() != nullptr);
-    assert(getLayer()->getGraph() != nullptr);
-    assert(getLayer()->inFormats.size() > 0);
+    assert(getLayer()->bAttachGraph());
     if (width != videoFormat.width || height != videoFormat.height ||
         videoType != videoFormat.videoType) {
         videoFormat.width = width;
         videoFormat.height = height;
         videoFormat.videoType = videoType;
-        getLayer()->inFormats[0] = videoFormat2ImageFormat(videoFormat);
-        getLayer()->outFormats[0] = getLayer()->inFormats[0];
+        ImageFormat iformat = videoFormat2ImageFormat(videoFormat);
+        BaseLayer* layer = static_cast<BaseLayer*>(getLayer());
+        layer->inFormats[0] = iformat;
+        layer->outFormats[0] = iformat;
+        dataSize = iformat.width * iformat.height *
+                   getImageTypeSize(iformat.imageType);
         // 重新组织图
-        getLayer()->resetGraph();
+        layer->resetGraph();
     }
 }
 

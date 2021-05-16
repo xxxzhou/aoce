@@ -17,9 +17,10 @@ VideoView::VideoView(GpuType gpuType) {
     graph =
         AoceManager::Get().getPipeGraphFactory(this->gpuType)->createGraph();
     auto *layerFactory = AoceManager::Get().getLayerFactory(this->gpuType);
-    inputLayer = std::unique_ptr<InputLayer>(layerFactory->crateInput());
-    outputLayer = std::unique_ptr<OutputLayer>(layerFactory->createOutput());
-    yuv2rgbLayer = std::unique_ptr<YUV2RGBALayer>(layerFactory->createYUV2RGBA());
+    inputLayer = std::unique_ptr<IInputLayer>(layerFactory->crateInput());
+    outputLayer = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
+    yuv2rgbLayer =
+        std::unique_ptr<IYUV2RGBALayer>(layerFactory->createYUV2RGBA());
     // 链接图
     graph->addNode(inputLayer.get())
         ->addNode(yuv2rgbLayer.get())

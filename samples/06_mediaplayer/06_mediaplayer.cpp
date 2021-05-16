@@ -1,8 +1,8 @@
 #include <AoceManager.hpp>
-#include <Media/MediaPlayer.hpp>
-#include <Module/ModuleManager.hpp>
 #include <iostream>
+#include <media/MediaPlayer.hpp>
 #include <memory>
+#include <module/ModuleManager.hpp>
 #include <string>
 #include <thread>
 #include <vulkan/VulkanContext.hpp>
@@ -22,15 +22,15 @@ using namespace aoce;
 using namespace aoce::vulkan;
 
 static std::unique_ptr<VulkanWindow> window = nullptr;
-static PipeGraph *vkGraph;
-static InputLayer *inputLayer;
-static OutputLayer *outputLayer;
-static YUV2RGBALayer *yuv2rgbLayer;
+static IPipeGraph *vkGraph;
+static IInputLayer *inputLayer;
+static IOutputLayer *outputLayer;
+static IYUV2RGBALayer *yuv2rgbLayer;
 static VideoFormat format = {};
 
 static GpuType gpuType = GpuType::vulkan;
 
-static MediaPlayer *player = nullptr;
+static IMediaPlayer *player = nullptr;
 // test rtmp
 // static std::string uri = "rtmp://202.69.69.180:443/webcast/bshdlive-pc";
 static std::string uri = "rtmp://58.200.131.2:1935/livetv/hunantv";
@@ -50,7 +50,7 @@ class TestMediaPlay : public IMediaPlayerObserver {
     }
 
     virtual void onError(PlayStatus staus, int32_t code,
-                         std::string msg) override {
+                         const char *msg) override {
         std::string mssg;
         string_format(mssg, "status: ", (int32_t)staus, " msg: ", msg);
         logMessage(LogLevel::info, mssg);
@@ -107,9 +107,9 @@ static TestMediaPlay *testPlay = nullptr;
 #if _WIN32
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
-    
+
     // 生成一张执行图
-    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
@@ -119,7 +119,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
 
-    player = AoceManager::Get().getMediaPlayerFactory(MediaPlayType::ffmpeg)->createPlay();
+    player = AoceManager::Get()
+                 .getMediaFactory(MediaType::ffmpeg)
+                 ->createPlay();
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
     window = std::make_unique<VulkanWindow>(onPreCommand, false);
     window->initWindow(hInstance, 1280, 720, "vulkan test");
@@ -143,7 +145,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_initEngine(
     andEnv.activity = thiz;
     AoceManager::Get().initAndroid(andEnv);
     // 生成一张执行图
-    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
@@ -152,9 +154,11 @@ JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_initEngine(
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
-    player = AoceManager::Get().getMediaPlayerFactory(MediaPlayType::ffmpeg)->createPlay();
-    testPlay = new TestMediaPlay();   
-    player->setObserver(testPlay);    
+    player = AoceManager::Get()
+                 .getMediaFactory(MediaType::ffmpeg)
+                 ->createPlay();
+    testPlay = new TestMediaPlay();
+    player->setObserver(testPlay);
 }
 
 JNIEXPORT void JNICALL Java_aoce_samples_mediaplayer_MainActivity_vkInitSurface(

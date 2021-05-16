@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -25,6 +25,7 @@ class VkMedianLayer : public VkLayer, public ITLayer<uint32_t> {
 };
 
 class VkMedianK3Layer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkMedianK3Layer)
    private:
     /* data */
     bool bSingle = false;

@@ -6,7 +6,7 @@
 #include <android/hardware_buffer.h>
 #include <vulkan/vulkan.h>
 
-#include <aoce.hpp>
+#include <Aoce.hpp>
 
 #include "../vulkan/VulkanTexture.hpp"
 

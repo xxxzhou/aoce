@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
-#include "VKLuminanceLayer.hpp"
+#include "../VkExtraExport.h"
+#include "VkLuminanceLayer.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -11,6 +11,7 @@ namespace vulkan {
 namespace layer {
 
 class VkPreReduceLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkPreReduceLayer)
    protected:
     ReduceOperate reduceType = ReduceOperate::sum;
 
@@ -28,6 +29,7 @@ class VkPreReduceLayer : public VkLayer {
 };
 
 class VkReduceLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkReduceLayer)
    protected:
     /* data */
     std::unique_ptr<VkPreReduceLayer> preLayer;

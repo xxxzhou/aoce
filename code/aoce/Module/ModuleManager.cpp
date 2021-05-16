@@ -28,8 +28,7 @@ ModuleManager::ModuleManager(/* args */) {}
 
 ModuleManager::~ModuleManager() {}
 
-void ModuleManager::registerModule(const char* name,
-                                   loadModuleHandle handle) {
+void ModuleManager::registerModule(const char* name, loadModuleHandle handle) {
     if (modules.find(name) != modules.end()) {
         return;
     }
@@ -86,8 +85,9 @@ void ModuleManager::loadModule(const char* name) {
         if (loadAction) {
             moduleInfo->module = loadAction();
         } else {
-            logMessage(LogLevel::warn,
-                       moduleInfo->name + " is load,but no find method NewModule.");
+            logMessage(
+                LogLevel::warn,
+                moduleInfo->name + " is load,but no find method NewModule.");
             return;
         }
     }
@@ -98,9 +98,11 @@ void ModuleManager::loadModule(const char* name) {
     if (moduleInfo->module) {
         moduleInfo->load = moduleInfo->module->loadModule();
         if (moduleInfo->load) {
-            logMessage(LogLevel::info, moduleInfo->name + ": regedit module success.");
+            logMessage(LogLevel::info,
+                       moduleInfo->name + ": regedit module success.");
         } else {
-            logMessage(LogLevel::warn, moduleInfo->name + ": regedit module failed.");
+            logMessage(LogLevel::warn,
+                       moduleInfo->name + ": regedit module failed.");
         }
     }
 }
@@ -132,6 +134,17 @@ void ModuleManager::unloadModule(const char* name) {
         moduleInfo->handle = nullptr;
     }
     moduleInfo->load = false;
+}
+
+bool ModuleManager::checkLoadModel(const char* name) {
+    if (modules.find(name) == modules.end()) {
+        return false;
+    }
+    ModuleInfo* moduleInfo = modules[name];
+    if (!moduleInfo->load || !moduleInfo->handle) {
+        return false;
+    }
+    return moduleInfo->load;
 }
 
 }  // namespace aoce

@@ -51,7 +51,7 @@ extern "C" void testFastGuided() {
 	cv::cuda::GpuMat resultIP(height, width, CV_8UC4);
 	cv::cuda::GpuMat resultP(height, width, CV_8UC1);
 
-	std::string aocePath = getAocePath();
+	std::string aocePath = aoce::getAocePath();
 
 	std::string imgPathI = aocePath + "/images/top.bmp";//lookup_amatorka  toy.bmp
 	std::string imgPathP = aocePath + "/images/toy-mask.bmp";

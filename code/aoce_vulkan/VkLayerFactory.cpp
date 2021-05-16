@@ -17,32 +17,32 @@ VkLayerFactory::VkLayerFactory(/* args */) {}
 
 VkLayerFactory::~VkLayerFactory() {}
 
-InputLayer* VkLayerFactory::crateInput() {
+IInputLayer* VkLayerFactory::crateInput() {
     InputLayer* inLayer = new VkInputLayer();
     return inLayer;
 }
 
-OutputLayer* VkLayerFactory::createOutput() { return new VkOutputLayer(); }
+IOutputLayer* VkLayerFactory::createOutput() { return new VkOutputLayer(); }
 
-YUV2RGBALayer* VkLayerFactory::createYUV2RGBA() {
+IYUV2RGBALayer* VkLayerFactory::createYUV2RGBA() {
     return new VkYUV2RGBALayer();
 }
 
-RGBA2YUVLayer* VkLayerFactory::createRGBA2YUV() {
+IRGBA2YUVLayer* VkLayerFactory::createRGBA2YUV() {
     return new VkRGBA2YUVLayer();
 }
 
-TexOperateLayer* VkLayerFactory::createTexOperate() {
+ITexOperateLayer* VkLayerFactory::createTexOperate() {
     return new VkOperateLayer();
 }
 
-TransposeLayer* VkLayerFactory::createTranspose() {
+ITransposeLayer* VkLayerFactory::createTranspose() {
     return new VkTransposeLayer();
 }
 
-ReSizeLayer* VkLayerFactory::createSize() { return new VkResizeLayer(); }
+IReSizeLayer* VkLayerFactory::createSize() { return new VkResizeLayer(); }
 
-BlendLayer* VkLayerFactory::createBlend() { return new VkBlendLayer(); }
+IBlendLayer* VkLayerFactory::createBlend() { return new VkBlendLayer(); }
 
 }  // namespace layer
 }  // namespace vulkan

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "VkLowPassLayer.hpp"
 #include "VkReduceLayer.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
@@ -39,23 +39,29 @@ class VkZoomBlurLayer : public VkLayer, public ITLayer<ZoomBlurParamet> {
     virtual ~VkZoomBlurLayer();
 
    protected:
-    virtual bool getSampled(int32_t inIndex) override;    
+    virtual bool getSampled(int32_t inIndex) override;
 };
 
-class VkMotionDetectorLayer : public VkLayer, public MotionDetectorLayer {
+class VkMotionDetectorLayer : public VkLayer,
+                              public IMotionDetectorLayer,
+                              public IOutputLayerObserver {
     AOCE_LAYER_QUERYINTERFACE(VkMotionDetectorLayer)
    private:
     std::unique_ptr<VkLowPassLayer> lowLayer = nullptr;
     std::unique_ptr<VkReduceLayer> avageLayer = nullptr;
     std::unique_ptr<VkOutputLayer> outLayer = nullptr;
+    IMotionDetectorObserver* observer = nullptr;
 
    public:
     VkMotionDetectorLayer();
     virtual ~VkMotionDetectorLayer();
 
+   public:
+    virtual void setObserver(IMotionDetectorObserver* observer) final;
+
    private:
-    void onImageProcessHandle(uint8_t* data, ImageFormat imageFormat,
-                              int32_t outIndex);
+    virtual void onImageProcess(uint8_t* data, const ImageFormat& format,
+                                int32_t outIndex) final;
 
    protected:
     virtual void onUpdateParamet() override;

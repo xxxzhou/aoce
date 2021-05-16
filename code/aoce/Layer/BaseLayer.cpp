@@ -51,24 +51,25 @@ int32_t BaseLayer::getGraphIndex() {
     cheackAttachGraph();
     return getNode()->graphIndex;
 }
-void BaseLayer::setStartNode(BaseLayer* node, int32_t index,
+void BaseLayer::setStartNode(IBaseLayer* node, int32_t index,
                              int32_t toInIndex) {
     cheackAttachGraph();
     return getNode()->setStartNode(node, index, toInIndex);
 }
-void BaseLayer::setEndNode(BaseLayer* node) {
+void BaseLayer::setEndNode(IBaseLayer* node) {
     cheackAttachGraph();
     return getNode()->setEndNode(node);
 }
-BaseLayer* BaseLayer::addNode(BaseLayer* layer) {
+IBaseLayer* BaseLayer::addNode(IBaseLayer* layer) {
     cheackAttachGraph();
-    BaseLayer* ptr = pipeGraph->addNode(layer);
+    IBaseLayer* ptr = pipeGraph->addNode(layer);
     return addLine(ptr, 0, 0);
 }
-BaseLayer* BaseLayer::addNode(ILayer* layer) {
+IBaseLayer* BaseLayer::addNode(ILayer* layer) {
     return addNode(layer->getLayer());
 }
-BaseLayer* BaseLayer::addLine(BaseLayer* to, int32_t formOut, int32_t toIn) {
+IBaseLayer* BaseLayer::addLine(IBaseLayer* ito, int32_t formOut, int32_t toIn) {
+    BaseLayer* to = static_cast<BaseLayer*>(ito);
     cheackAttachGraph();
     to->cheackAttachGraph();
     // 如果是输入层,不能使用addLine的方法给输入层加线,会构成回环
@@ -87,7 +88,7 @@ BaseLayer* BaseLayer::addLine(BaseLayer* to, int32_t formOut, int32_t toIn) {
             pipeGraph->addLine(getGraphIndex(), toIndex, formOut, toIn);
         }
         if (to->getNode()->endNodeIndex >= 0) {
-            BaseLayer* result = pipeGraph->getNode(to->getNode()->endNodeIndex);
+            IBaseLayer* result = pipeGraph->getNode(to->getNode()->endNodeIndex);
             assert(result);
             return result;
         }
@@ -181,6 +182,7 @@ const char* BaseLayer::getMark() {
         }
         return markStr.c_str();
     }
+    return getName();
 }
 
 GroupLayer::GroupLayer() { bNoCompute = true; }

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -11,6 +11,7 @@ namespace layer {
 
 // 边框默认使用REPLICATE模式
 class VkLinearFilterLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkLinearFilterLayer)
     // AOCE_LAYER_QUERYINTERFACE(VkLinearFilterLayer)
    protected:
     std::unique_ptr<VulkanBuffer> kernelBuffer;

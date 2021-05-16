@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Aoce/Aoce.hpp"
-#include "Aoce/Layer/BaseLayer.hpp"
-#include "Aoce/Math/AMath.hpp"
+#include "AoceCore.h"
 
 #ifdef _WIN32
 #if defined(AOCE_VULKAN_EXTRA_EXPORT_DEFINE)
@@ -10,8 +8,12 @@
 #else
 #define AOCE_VE_EXPORT __declspec(dllimport)
 #endif
+#elif __ANDROID__
+#if defined(AOCE_VULKAN_EXTRA_EXPORT_DEFINE)
+#define AOCE_VE_EXPORT __attribute__((visibility("default")))
 #else
 #define AOCE_VE_EXPORT
+#endif
 #endif
 
 namespace aoce {
@@ -566,27 +568,29 @@ struct ZoomBlurParamet {
     }
 };
 
-class LookupLayer : public ILayer {
+class ILookupLayer : public ILayer {
    public:
+    virtual ~ILookupLayer(){};
     virtual void loadLookUp(uint8_t* data, int32_t size) = 0;
 };
 
-class SoftEleganceLayer : public ITLayer<SoftEleganceParamet> {
+class ISoftEleganceLayer : public ITLayer<SoftEleganceParamet> {
    public:
-    SoftEleganceLayer(){};
-    // ITLayer里面包含参数,需要提供
-    virtual ~SoftEleganceLayer(){};
+    virtual ~ISoftEleganceLayer(){};
 
    public:
     virtual void loadLookUp1(uint8_t* data, int32_t size) = 0;
     virtual void loadLookUp2(uint8_t* data, int32_t size) = 0;
 };
 
-class HSBLayer : public ILayer {
+class IHSBLayer : public ILayer {
+   public:
+    virtual ~IHSBLayer(){};
+
    public:
     // 重置过滤器以使其不具有任何变换.
     virtual void reset() = 0;
-    // 向滤镜添加色相旋转.  
+    // 向滤镜添加色相旋转.
     // 色相旋转范围为[-360,360],其中0为不变.
     // 请注意,此调整是累加的,因此如有必要,请使用重置方法.
     virtual void rotateHue(const float& h) = 0;
@@ -600,24 +604,23 @@ class HSBLayer : public ILayer {
     virtual void adjustBrightness(const float& h) = 0;
 };
 
-typedef std::function<void(vec4 motion)> motionHandle;
-
-class MotionDetectorLayer : public ITLayer<float> {
-   protected:
-    motionHandle onMotionEvent;
-
+class IMotionDetectorObserver {
    public:
-    MotionDetectorLayer(){};
-    virtual ~MotionDetectorLayer(){};
-
-   public:
-    inline void setMotionHandle(motionHandle handle) { onMotionEvent = handle; }
+    virtual ~IMotionDetectorObserver(){};
+    virtual void onMotion(const vec4& vec) = 0;
 };
 
-class PerlinNoiseLayer : public ITLayer<PerlinNoiseParamet> {
+class IMotionDetectorLayer : public ITLayer<float> {
    public:
-    PerlinNoiseLayer(){};
-    virtual ~PerlinNoiseLayer(){};
+    virtual ~IMotionDetectorLayer(){};
+
+   public:
+    virtual void setObserver(IMotionDetectorObserver* observer) = 0;
+};
+
+class IPerlinNoiseLayer : public ITLayer<PerlinNoiseParamet> {
+   public:
+    virtual ~IPerlinNoiseLayer(){};
 
    public:
     virtual void setImageSize(int32_t width, int32_t height) = 0;

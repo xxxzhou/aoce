@@ -1,6 +1,6 @@
 #include "VkReduceLayer.hpp"
 
-#include "aoce/Layer/PipeGraph.hpp"
+#include "aoce/layer/PipeGraph.hpp"
 
 
 // 一个线程处理每行PATCH_SIZE_X个元素

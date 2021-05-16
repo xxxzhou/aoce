@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Media/MediaPlayer.hpp>
+#include <media/MediaPlayer.hpp>
 #include <mutex>
 
 #include "AoceFFmpeg.hpp"
@@ -44,18 +44,16 @@ class FMediaPlayer : public MediaPlayer {
     virtual void release() override;
 };
 
-class FMediaPlayerFactory : public MediaPlayerFactory {
+class FMediaFactory : public MediaFactory {
    private:
     /* data */
    public:
-    FMediaPlayerFactory(/* args */);
-    virtual ~FMediaPlayerFactory() override;
+    FMediaFactory(/* args */);
+    virtual ~FMediaFactory() override;
 
    public:
-    virtual MediaPlayer* createPlay() override;
+    virtual IMediaPlayer* createPlay() override;
 };
-
-
 
 }  // namespace ffmpeg
 

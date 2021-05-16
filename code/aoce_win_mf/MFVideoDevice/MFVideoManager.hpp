@@ -1,5 +1,5 @@
 #pragma once
-#include "VideoDevice/VideoManager.hpp"
+#include "videodevice/VideoManager.hpp"
 namespace aoce {
 namespace win {
 namespace mf {

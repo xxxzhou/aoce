@@ -5,7 +5,7 @@
 #include <mfobjects.h>
 #include <mfreadwrite.h>
 
-#include <VideoDevice/VideoDevice.hpp>
+#include <videodevice/VideoDevice.hpp>
 #include <WinHelp.hpp>
 #include <condition_variable>
 #include <mutex>

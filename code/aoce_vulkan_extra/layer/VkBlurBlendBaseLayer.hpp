@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "VkSeparableLinearLayer.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 

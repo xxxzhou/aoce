@@ -1,12 +1,6 @@
 #pragma once
-
+#include "Aoce.h"
 #include <assert.h>
-
-#include <memory>
-#include <vector>
-
-#include "../Aoce.h"
-#include "../Aoce.hpp"
 
 namespace aoce {
 
@@ -138,6 +132,8 @@ struct Mat4x4 {
     }
 };
 
+extern "C" {
+
 ACOE_EXPORT void identMat(Mat4x4 &mat);
 
 ACOE_EXPORT Mat4x4 matMult(const Mat4x4 &a, const Mat4x4 &b);
@@ -164,5 +160,6 @@ ACOE_EXPORT Mat4x4 zshearMat(const Mat4x4 &mat, const float &dx,
 
 // rotate the hue, while maintaining luminance.
 ACOE_EXPORT Mat4x4 huerotateMat(const Mat4x4 &mat, const float &rot);
+}
 
 }  // namespace aoce

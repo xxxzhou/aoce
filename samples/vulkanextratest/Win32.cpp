@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "VkExtraBaseView.hpp"
-#include "aoce_vulkan_extra/VkExtraExport.hpp"
+#include "aoce_vulkan_extra/VkExtraExport.h"
 
 static VkExtraBaseView* view = nullptr;
 
@@ -13,10 +13,10 @@ static ITLayer<GaussianBlurParamet>* gaussianLayer = nullptr;
 static ITLayer<ChromaKeyParamet>* chromKeyLayer = nullptr;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static ITLayer<GuidedParamet>* guidedLayer = nullptr;
-static BaseLayer* convertLayer = nullptr;
-static BaseLayer* alphaShowLayer = nullptr;
-static BaseLayer* alphaShow2Layer = nullptr;
-static BaseLayer* luminanceLayer = nullptr;
+static IBaseLayer* convertLayer = nullptr;
+static IBaseLayer* alphaShowLayer = nullptr;
+static IBaseLayer* alphaShow2Layer = nullptr;
+static IBaseLayer* luminanceLayer = nullptr;
 static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
 static ITLayer<ReSizeParamet>* resizeLayer2 = nullptr;
 static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
@@ -28,9 +28,9 @@ static ITLayer<float>* averageLT = nullptr;
 static ITLayer<BilateralParamet>* bilateralLayer = nullptr;
 static ITLayer<DistortionParamet>* bdLayer = nullptr;
 static ITLayer<CannyEdgeDetectionParamet>* cedLayer = nullptr;
-static BaseLayer* cgaLayer = nullptr;
+static IBaseLayer* cgaLayer = nullptr;
 static ITLayer<FASTFeatureParamet>* fastLayer = nullptr;
-static LookupLayer* lutLayer = nullptr;
+static ILookupLayer* lutLayer = nullptr;
 static ITLayer<int>* dilationLayer = nullptr;
 static ITLayer<int>* erosionLayer = nullptr;
 static ITLayer<int>* closingLayer = nullptr;
@@ -41,24 +41,26 @@ static ITLayer<PixellateParamet>* ppLayer = nullptr;
 static ITLayer<PixellateParamet>* halftoneLayer = nullptr;
 static ITLayer<float>* lowPassLayer = nullptr;
 static ITLayer<float>* highPassLayer = nullptr;
-static BaseLayer* histogramLayer = nullptr;
-static BaseLayer* histogramLayer2 = nullptr;
+static IBaseLayer* histogramLayer = nullptr;
+static IBaseLayer* histogramLayer2 = nullptr;
 static ITLayer<IOSBlurParamet>* iosBlurLayer = nullptr;
 static ITLayer<uint32_t>* kuwaharaLayer = nullptr;
-static BaseLayer* lapLayer = nullptr;
+static IBaseLayer* lapLayer = nullptr;
 static ITLayer<uint32_t>* medianLayer = nullptr;
-static BaseLayer* medianK3Layer = nullptr;
+static IBaseLayer* medianK3Layer = nullptr;
 static ITLayer<MotionBlurParamet>* motionBlurLayer = nullptr;
-static MotionDetectorLayer* motionDetectorLayer = nullptr;
+static IMotionDetectorLayer* motionDetectorLayer = nullptr;
 static ITLayer<PoissonParamet>* poissonLayer = nullptr;
-static BaseLayer* linerBlendLayer = nullptr;
-static PerlinNoiseLayer* noiseLayer = nullptr;
+static IBaseLayer* linerBlendLayer = nullptr;
+static IPerlinNoiseLayer* noiseLayer = nullptr;
 static ITLayer<DistortionParamet>* pdLayer = nullptr;
 
-void showMotion(vec4 motion) {
-    std::cout << "x: " << motion.x << " y: " << motion.y << " z: " << motion.z
-              << " w: " << motion.w << std::endl;
-}
+class MotionDetectorObserver : public IMotionDetectorObserver {
+    virtual void onMotion(const vec4& motion) override {
+        std::cout << "x: " << motion.x << " y: " << motion.y
+                  << " z: " << motion.z << " w: " << motion.w << std::endl;
+    }
+};
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     loadAoce();
@@ -184,7 +186,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     motionBlurLayer->updateParamet({2.0f, 45.0});
 
     motionDetectorLayer = createMotionDetectorLayer();
-    motionDetectorLayer->setMotionHandle(showMotion);
+    MotionDetectorObserver motionObserver = {};
+    motionDetectorLayer->setObserver(&motionObserver);
 
     poissonLayer = createPoissonBlendLayer();
     poissonLayer->updateParamet({0.8f, 10});
@@ -194,10 +197,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     noiseLayer = createPerlinNoiseLayer();
     noiseLayer->setImageSize(1920, 1080);
 
-    pdLayer = createPinchDistortionLayer(); 
+    pdLayer = createPinchDistortionLayer();
 
     std::vector<uint8_t> lutData;
-    std::vector<BaseLayer*> layers;
+    std::vector<IBaseLayer*> layers;
     // 如果为true,层需要二个输入,用原始图像做第二个输入
     bool bAutoIn = false;
     // ---高斯模糊
@@ -209,11 +212,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(adaptiveLayer->getLayer());
     // layers.push_back(alphaShowLayer);
     // ---查看Harris 角点检测
-    // bAutoIn = true;
-    // layers.push_back(luminanceLayer);
-    // layers.push_back(hcdLayer->getLayer());//hcdLayer ncdLayer
-    // layers.push_back(boxFilterLayer1->getLayer());
-    // layers.push_back(alphaShow2Layer);
+    bAutoIn = true;
+    layers.push_back(luminanceLayer);
+    layers.push_back(hcdLayer->getLayer());  // hcdLayer ncdLayer
+    layers.push_back(boxFilterLayer1->getLayer());
+    layers.push_back(alphaShow2Layer);
     // ---查看导向滤波效果
     // layers.push_back(chromKeyLayer->getLayer());
     // layers.push_back(guidedLayer->getLayer());
@@ -231,7 +234,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     //     layers.push_back(lutLayer->getLayer());
     // }
     // ---双边滤波
-    // layers.push_back(bilateralLayer->getLayer());   
+    // layers.push_back(bilateralLayer->getLayer());
     // canny边缘检测
     // layers.push_back(cedLayer->getLayer());
     // layers.push_back(alphaShowLayer);
@@ -290,7 +293,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---柏林噪声
     // layers.push_back(noiseLayer->getLayer());
     // ---凸起失真,鱼眼效果
-    layers.push_back(bdLayer->getLayer());
+    // layers.push_back(bdLayer->getLayer());
     // ---收缩 ，凹面镜
     // layers.push_back(pdLayer->getLayer());
 

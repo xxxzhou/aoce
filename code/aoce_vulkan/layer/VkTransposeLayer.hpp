@@ -6,7 +6,7 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkTransposeLayer : public VkLayer, public TransposeLayer {
+class VkTransposeLayer : public VkLayer, public ITransposeLayer {
     AOCE_LAYER_QUERYINTERFACE(VkTransposeLayer)
     AOCE_VULKAN_PARAMETUPDATE()
    private:

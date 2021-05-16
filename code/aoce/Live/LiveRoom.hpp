@@ -1,64 +1,10 @@
 #pragma once
 
 #include "../Aoce.hpp"
-#include "ILiveObserver.hpp"
+
 namespace aoce {
 
-struct PushSetting {
-    // 是否推声音
-    int32_t bAudio = 1;
-    // 是否推视频
-    int32_t bVideo = 1;
-    // 视频信息
-    VideoStream videoStream = {};
-    // 音频信息
-    AudioStream audioStream = {};
-    // 是否转推CDN
-    int32_t bCDN = false;
-};
-
-struct PullSetting {
-    // 是否拉取声音
-    int32_t bAudio = 1;
-    // 是否拉取视频
-    int32_t bVideo = 1;
-};
-
-struct PullStream {
-    int32_t userId = 0;
-    int32_t streamId = 0;
-    int32_t bOpen = false;
-    PullSetting setting = {};
-};
-
-struct PushStream {
-    int32_t bOpen = false;
-    PushSetting setting = {};
-};
-
-enum class RoomType {
-    // 没有初始化
-    noInit,
-    // 初始化
-    init,
-    // 登陆房间中
-    logining,
-    // 登陆成功回调
-    login,
-    // 登出房间
-    logout,
-};
-
-struct AgoraContext {
-    // 是否软编
-    int32_t bSFEncoder = false;
-    // 是否自己采集声卡
-    int32_t bLoopback = false;
-    // andrid下需要提供context
-    void* context = nullptr;
-};
-
-class ACOE_EXPORT LiveRoom {
+class ACOE_EXPORT LiveRoom : public ILiveRoom {
    protected:
     // 推流设置
     std::vector<PushStream> pushStreams;
@@ -97,35 +43,41 @@ class ACOE_EXPORT LiveRoom {
     virtual bool onLogoutRoom() = 0;
     virtual void onShutdownRoom() = 0;
 
-   public:
-    int32_t getUserId();
-    int32_t getPullIndex(int32_t userId, int32_t index);
+   protected:
     void resetStreams();
-    float getMicVolume();
+
+   public:
+    virtual int32_t getUserId() final;
+    virtual int32_t getPullIndex(int32_t userId, int32_t index) final;
+    virtual float getMicVolume() final;
 
    public:
     // 设置播放拉流音量,0静音,100最大,如果自己处理音量数据,请设置为0
-    virtual void setPlayVolume(int32_t value){};
+    virtual void setPlayVolume(int32_t value) override{};
 
    public:
     // 因为每个直播SDK初始化信息不相同,简单使用void*表示
-    bool initRoom(void* liveContext, ILiveObserver* liveBack);
+    virtual bool initRoom(void* liveContext, ILiveObserver* liveBack) final;
     // 登陆房间,房间名,用户id,推流个数(这个会影响一些设置)
-    bool loginRoom(const char* roomName, int32_t useId, int32_t pushCount);
+    virtual bool loginRoom(const char* roomName, int32_t useId,
+                           int32_t pushCount) final;
 
-    bool pushStream(int32_t index, const PushSetting& setting);
-    void stopPushStream(int32_t index);
+    virtual bool pushStream(int32_t index, const PushSetting& setting) final;
+    virtual void stopPushStream(int32_t index);
 
-    bool pushVideoFrame(int32_t index, const VideoFrame& videoFrame);
-    bool pushAudioFrame(int32_t index, const AudioFrame& audioFrame);
+    virtual bool pushVideoFrame(int32_t index,
+                                const VideoFrame& videoFrame) final;
+    virtual bool pushAudioFrame(int32_t index,
+                                const AudioFrame& audioFrame) final;
 
-    bool pullStream(int32_t userId, int32_t index, const PullSetting& setting);
-    void stopPullStream(int32_t userId, int32_t index);
+    virtual bool pullStream(int32_t userId, int32_t index,
+                            const PullSetting& setting) final;
+    virtual void stopPullStream(int32_t userId, int32_t index) final;
 
     // 退出房间,对应loginRoom
-    void logoutRoom();
+    virtual void logoutRoom() final;
     // 关闭当前房间,对应initRoom
-    void shutdownRoom();
+    virtual void shutdownRoom() final;
 };
 
 }  // namespace aoce

@@ -12,7 +12,11 @@ PipeGraph::PipeGraph(/* args */) {}
 
 PipeGraph::~PipeGraph() {}
 
-BaseLayer* PipeGraph::getNode(int32_t index) {
+GpuType PipeGraph::getGpuType() { return gpu; }
+
+void PipeGraph::reset() { bReset = true; }
+
+IBaseLayer* PipeGraph::getNode(int32_t index) {
     int32_t count = (int32_t)nodes.size();
     if (index >= 0 && index < count) {
         return nodes[index]->layer;
@@ -20,7 +24,8 @@ BaseLayer* PipeGraph::getNode(int32_t index) {
     return nullptr;
 }
 
-BaseLayer* PipeGraph::addNode(BaseLayer* layer) {
+IBaseLayer* PipeGraph::addNode(IBaseLayer* ilayer) {
+    BaseLayer* layer = static_cast<BaseLayer*>(ilayer);
     logAssert(layer != nullptr, "node layer can not be empty");
     if (!layer->bNoCompute) {
         logAssert(this->gpu == layer->gpu,
@@ -44,7 +49,7 @@ BaseLayer* PipeGraph::addNode(BaseLayer* layer) {
     return layer;
 }
 
-BaseLayer* PipeGraph::addNode(ILayer* layer) {
+IBaseLayer* PipeGraph::addNode(ILayer* layer) {
     assert(layer != nullptr);
     return addNode(layer->getLayer());
 }
@@ -70,7 +75,7 @@ bool PipeGraph::addLine(int32_t from, int32_t to, int32_t formOut,
     return false;
 }
 
-bool PipeGraph::addLine(BaseLayer* from, BaseLayer* to, int32_t formOut,
+bool PipeGraph::addLine(IBaseLayer* from, IBaseLayer* to, int32_t formOut,
                         int32_t toIn) {
     return addLine(from->getGraphIndex(), to->getGraphIndex(), formOut, toIn);
 }

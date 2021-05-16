@@ -1,6 +1,6 @@
 #include <AoceManager.hpp>
-#include <Module/ModuleManager.hpp>
 #include <iostream>
+#include <module/ModuleManager.hpp>
 #include <opencv2/opencv.hpp>
 #include <string>
 
@@ -11,27 +11,33 @@ static cv::Mat* show = nullptr;
 static cv::Mat* show2 = nullptr;
 static int index = 0;
 static int formatIndex = 0;
-static PipeGraph* vkGraph;
-static InputLayer* inputLayer;
-static OutputLayer* outputLayer;
-static YUV2RGBALayer* yuv2rgbLayer;
+static IPipeGraph* vkGraph;
+static IInputLayer* inputLayer;
+static IOutputLayer* outputLayer;
+static IYUV2RGBALayer* yuv2rgbLayer;
 
 // cuda也可测试
 static GpuType gpuType = GpuType::vulkan;
 
-static void onDrawFrame(VideoFrame frame) {
-    // std::cout << "time stamp:" << frame.timeStamp << std::endl;
-    inputLayer->inputCpuData(frame.data[0]);
-    vkGraph->run();
-}
-static void onImageProcessHandle(uint8_t* data, ImageFormat format,
-                                 int32_t outIndex) {
-    // std::cout << "data:" << (int)data[10000] << std::endl;
-    // std::vector<float> vecf(width*height * 4);
-    // memcpy(vecf.data(), data, width * height * elementSize);
-    memcpy(show->ptr<char>(0), data,
-           format.width * format.height * getImageTypeSize(format.imageType));
-}
+class TestCameraObserver : public IVideoDeviceObserver {
+    virtual void onVideoFrame(VideoFrame frame) override {
+        // std::cout << "time stamp:" << frame.timeStamp << std::endl;
+        inputLayer->inputCpuData(frame.data[0]);
+        vkGraph->run();
+    }
+};
+
+class OutputLayerObserver : public IOutputLayerObserver {
+    virtual void onImageProcess(uint8_t* data, const ImageFormat& format,
+                                int32_t outIndex) final {
+        // std::cout << "data:" << (int)data[10000] << std::endl;
+        // std::vector<float> vecf(width*height * 4);
+        // memcpy(vecf.data(), data, width * height * elementSize);
+        memcpy(
+            show->ptr<char>(0), data,
+            format.width * format.height * getImageTypeSize(format.imageType));
+    }
+};
 
 int main() {
     loadAoce();
@@ -54,10 +60,11 @@ int main() {
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();
-    video->setVideoFrameHandle(onDrawFrame);
+    TestCameraObserver cameraObserver = {};
+    video->setObserver(&cameraObserver);
 
     // 生成一张执行图
-    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
@@ -74,7 +81,8 @@ int main() {
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
     // vkGraph->addNode(inputLayer)->addNode(outputLayer);
     // 设定输出函数回调
-    outputLayer->setImageProcessHandle(onImageProcessHandle);
+    OutputLayerObserver outputObserver = {};
+    outputLayer->setObserver(&outputObserver);
     // 设定输入格式
     inputLayer->setImage(selectFormat);
 

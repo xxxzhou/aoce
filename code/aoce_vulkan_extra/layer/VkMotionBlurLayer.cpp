@@ -65,20 +65,23 @@ VkMotionDetectorLayer::VkMotionDetectorLayer(/* args */) {
 
     paramet = 0.5f;
     lowLayer->updateParamet(paramet);
-    outLayer->setImageProcessHandle(std::bind(
-        &VkMotionDetectorLayer::onImageProcessHandle, this, _1, _2, _3));
+    outLayer->setObserver(this);
 }
 
-void VkMotionDetectorLayer::onImageProcessHandle(uint8_t* data,
-                                                 ImageFormat imageFormat,
-                                                 int32_t outIndex) {
-    if (onMotionEvent) {
+void VkMotionDetectorLayer::setObserver(IMotionDetectorObserver* observer) {
+    this->observer = observer;
+}
+
+void VkMotionDetectorLayer::onImageProcess(uint8_t* data,
+                                           const ImageFormat& format,
+                                           int32_t outIndex) {
+    if (observer) {
         vec4 motion = {};
         memcpy(&motion, data, sizeof(vec4));
         float size = inFormats[0].width * inFormats[0].height;
         motion.z = motion.z / size;
         motion.w = motion.w / size;
-        onMotionEvent(motion);
+        observer->onMotion(motion);
     }
 }
 

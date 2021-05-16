@@ -4,10 +4,11 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include "Aoce.hpp"
-#include "Module/ModuleManager.hpp"
+#include "module/ModuleManager.hpp"
 #if WIN32
 #include <Shlwapi.h>
 #include <Windows.h>
@@ -19,12 +20,12 @@
 #include <stdlib.h>
 #endif
 
-using namespace aoce;
+namespace aoce {
 
-const char* infoAoceLevel = "info";
-const char* warnAoceLevel = "warn";
-const char* errorAoceLevel = "error";
-const char* debugAoceLevel = "debug";
+static const char* infoAoceLevel = "info";
+static const char* warnAoceLevel = "warn";
+static const char* errorAoceLevel = "error";
+static const char* debugAoceLevel = "debug";
 
 static logEventHandle logHandle = nullptr;
 
@@ -544,3 +545,4 @@ void unloadAoce() {
     ModuleManager::Get().unloadModule("aoce_ffmpeg");
 #endif
 }
+}  // namespace aoce

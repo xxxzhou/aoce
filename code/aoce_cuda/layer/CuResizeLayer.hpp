@@ -1,13 +1,13 @@
 #pragma once
 
-#include <Layer/BaseLayer.hpp>
+#include <layer/BaseLayer.hpp>
 
 #include "CuLayer.hpp"
 
 namespace aoce {
 namespace cuda {
 
-class CuResizeLayer : public CuLayer, public ReSizeLayer {
+class CuResizeLayer : public CuLayer, public IReSizeLayer {
     AOCE_LAYER_QUERYINTERFACE(CuResizeLayer)
    private:
     /* data */

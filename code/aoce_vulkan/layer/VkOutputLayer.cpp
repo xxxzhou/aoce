@@ -145,7 +145,7 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
             oldIndex != outTex.image) {
             format.width = outTex.width;
             format.height = outTex.height;
-            format.imageType == ImageType::rgba8;
+            format.imageType = ImageType::rgba8;
             hardwareImage->createAndroidBuffer(format);
             hardwareImage->bindGL(outTex.image, bindType);
             // 重新生成cmdbuffer

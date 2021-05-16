@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "VkConvertImageLayer.hpp"
 #include "VkLinearFilterLayer.hpp"
 #include "VkSeparableLinearLayer.hpp"
@@ -17,6 +17,7 @@ namespace layer {
 // 论文地址http://kaiminghe.com/publications/pami12guidedfilter.pdf
 // https://www.cnblogs.com/zhouxin/p/10203954.html
 class VkToMatLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkToMatLayer)
    public:
     VkToMatLayer();
     virtual ~VkToMatLayer();

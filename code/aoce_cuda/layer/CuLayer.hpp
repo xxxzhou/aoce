@@ -1,5 +1,5 @@
 #pragma once
-#include <Layer/BaseLayer.hpp>
+#include <layer/BaseLayer.hpp>
 
 #include "../CudaHelper.hpp"
 #include "../CudaMat.hpp"

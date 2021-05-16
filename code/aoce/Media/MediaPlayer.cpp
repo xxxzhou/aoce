@@ -4,13 +4,13 @@
 
 namespace aoce {
 
-const std::map<MediaType, std::vector<std::string>> MediaTypeMap = {
-    {MediaType::rtmp, {"rtmp://"}},
-    {MediaType::http, {"http://", "udp://"}},
-    {MediaType::file, {".mp4", ".rmvb"}},
+const std::map<MediaSourceType, std::vector<std::string>> MediaTypeMap = {
+    {MediaSourceType::rtmp, {"rtmp://"}},
+    {MediaSourceType::http, {"http://", "udp://"}},
+    {MediaSourceType::file, {".mp4", ".rmvb"}},
 };
 
-MediaType getMediaType(const std::string& str) {
+MediaSourceType getMediaType(const std::string& str) {
     for (const auto& kv : MediaTypeMap) {
         for (const auto& suffix : kv.second) {
             // 后缀
@@ -25,7 +25,7 @@ MediaType getMediaType(const std::string& str) {
             }
         }
     }
-    return MediaType::other;
+    return MediaSourceType::other;
 }
 
 void MediaPlayer::setObserver(IMediaPlayerObserver* observer) {

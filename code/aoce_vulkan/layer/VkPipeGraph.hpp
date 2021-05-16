@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Layer/PipeGraph.hpp>
+#include <layer/PipeGraph.hpp>
 #include <memory>
 
 #include "../vulkan/VulkanContext.hpp"
@@ -69,7 +69,7 @@ class VkPipeGraphFactory : public PipeGraphFactory {
     virtual ~VkPipeGraphFactory(){};
 
    public:
-    inline virtual PipeGraph* createGraph() override {
+    inline virtual IPipeGraph* createGraph() override {
         return new VkPipeGraph();
     };
 };

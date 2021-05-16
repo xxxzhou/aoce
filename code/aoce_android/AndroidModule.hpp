@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Module/IModule.hpp>
+#include <module/IModule.hpp>
 
 namespace aoce {
 namespace android {

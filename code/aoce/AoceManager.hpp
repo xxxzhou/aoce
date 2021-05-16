@@ -3,11 +3,10 @@
 #include <map>
 
 #include "Aoce.hpp"
-#include "Layer/LayerFactory.hpp"
-#include "Layer/PipeGraph.hpp"
+#include "layer/PipeGraph.hpp"
 #include "Live/LiveRoom.hpp"
-#include "Media/MediaPlayer.hpp"
-#include "VideoDevice/VideoManager.hpp"
+#include "media/MediaPlayer.hpp"
+#include "videodevice/VideoManager.hpp"
 
 #if __ANDROID__
 struct android_app;
@@ -88,7 +87,7 @@ class ACOE_EXPORT AoceManager {
     AOCE_MANAGER_OBJ(GpuType, PipeGraphFactory)
     AOCE_MANAGER_OBJ(GpuType, LayerFactory)
     AOCE_MANAGER_OBJ(LiveType, LiveRoom)
-    AOCE_MANAGER_OBJ(MediaPlayType, MediaPlayerFactory)
+    AOCE_MANAGER_OBJ(MediaType, MediaFactory)
 };
 
 }  // namespace aoce

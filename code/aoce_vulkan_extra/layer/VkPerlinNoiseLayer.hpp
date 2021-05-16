@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class VkPerlinNoiseLayer : public VkLayer, public PerlinNoiseLayer {
+class VkPerlinNoiseLayer : public VkLayer, public IPerlinNoiseLayer {
     AOCE_LAYER_QUERYINTERFACE(VkPerlinNoiseLayer)
     AOCE_VULKAN_PARAMETUPDATE()
    private:

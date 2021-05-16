@@ -4,7 +4,7 @@ void checkCudaError(cudaError_t err, const char* file, const int line,
                     const char* func) {
     if (cudaSuccess != err) {
         std::string msg;
-        string_format(msg, "cuda error: ", cudaGetErrorString(err),
+        aoce::string_format(msg, "cuda error: ", cudaGetErrorString(err),
                       " file: ", file, " line: ", line, " in function: ", func);
         logMessage(aoce::LogLevel::error, msg);
     }

@@ -1,31 +1,31 @@
 #pragma once
 
 #include <AoceManager.hpp>
-#include <Module/ModuleManager.hpp>
 #include <iostream>
+#include <module/ModuleManager.hpp>
 #include <string>
 #include <vulkan/VulkanContext.hpp>
 #include <vulkan/VulkanWindow.hpp>
 
-#include "aoce_vulkan_extra/VkExtraExport.hpp"
+#include "aoce_vulkan_extra/VkExtraExport.h"
 
 using namespace aoce;
 using namespace aoce::vulkan;
 
-class VkExtraBaseView {
+class VkExtraBaseView : public IVideoDeviceObserver {
    private:
     int index = 0;
     int formatIndex = 0;
-    PipeGraph* vkGraph = nullptr;
-    InputLayer* inputLayer = nullptr;
-    OutputLayer* outputLayer = nullptr;
-    YUV2RGBALayer* yuv2rgbLayer = nullptr;
-    TransposeLayer* transposeLayer = nullptr;
-    TexOperateLayer* operateLayer = nullptr;
-    ReSizeLayer* resizeLayer = nullptr;
+    IPipeGraph* vkGraph = nullptr;
+    IInputLayer* inputLayer = nullptr;
+    IOutputLayer* outputLayer = nullptr;
+    IYUV2RGBALayer* yuv2rgbLayer = nullptr;
+    ITransposeLayer* transposeLayer = nullptr;
+    ITexOperateLayer* operateLayer = nullptr;
+    IReSizeLayer* resizeLayer = nullptr;
     ILayer* extraLayer = nullptr;
 
-    BaseLayer* layerNode = nullptr;
+    IBaseLayer* layerNode = nullptr;
     VideoDevicePtr video = nullptr;
 
     GpuType gpuType = GpuType::vulkan;
@@ -41,19 +41,18 @@ class VkExtraBaseView {
     ~VkExtraBaseView();
 
    private:
-    void onFrame(VideoFrame frame);
-
-    void onPreCommand(uint32_t index);
+        void onPreCommand(uint32_t index);
 
    public:
-    void initGraph(ILayer* layer, void* hinst, BaseLayer* nextLayer = nullptr);
-    void initGraph(std::vector<BaseLayer*> layers, void* hinst,
+    virtual void onVideoFrame(VideoFrame frame) override;
+    void initGraph(ILayer* layer, void* hinst, IBaseLayer* nextLayer = nullptr);
+    void initGraph(std::vector<IBaseLayer*> layers, void* hinst,
                    bool bAutoIn = false);
 
     void openDevice(int32_t id = 0);
     void closeDevice();
 
-    inline OutputLayer* getOutputLayer() { return outputLayer; }
+    inline IOutputLayer* getOutputLayer() { return outputLayer; }
 
     void enableLayer(bool bEnable);
 

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <Layer/BaseLayer.hpp>
+#include <layer/BaseLayer.hpp>
 
 #include "CuLayer.hpp"
 
 namespace aoce {
 namespace cuda {
 
-class CuRGBA2YUVLayer : public CuLayer, public RGBA2YUVLayer {
+class CuRGBA2YUVLayer : public CuLayer, public IRGBA2YUVLayer {
     AOCE_LAYER_QUERYINTERFACE(CuRGBA2YUVLayer)
    private:
     /* data */

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -30,6 +30,7 @@ class VkVignetteLayer : public VkLayer, public ITLayer<VignetteParamet> {
 };
 
 class VkCGAColorspaceLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkCGAColorspaceLayer)
    private:
     /* data */
    public:

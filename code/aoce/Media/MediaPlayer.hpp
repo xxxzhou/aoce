@@ -4,49 +4,14 @@
 
 namespace aoce {
 
-enum class PlayStatus {
-    idle,
-    end,
-    error,
-    init,
-    preparing,
-    prepared,
-    started,
-    stopped,
-    paused,
-    completed,
-};
+ACOE_EXPORT MediaSourceType getMediaType(const std::string& str);
 
-enum class MediaType {
-    other,
-    file,
-    rtmp,
-    http,
-};
-
-class ACOE_EXPORT IMediaPlayerObserver {
-   public:
-    IMediaPlayerObserver(/* args */){};
-    virtual ~IMediaPlayerObserver(){};
-
-   public:
-    // prepared后,能拿到MediaPlayer的视频与音频信息
-    virtual void onPrepared(){};
-    virtual void onError(PlayStatus staus, int32_t code, std::string msg){};
-    virtual void onVideoFrame(const VideoFrame& frame){};
-    virtual void onAudioFrame(const AudioFrame& frame){};
-    virtual void onStop(){};
-    virtual void onComplate(){};
-};
-
-ACOE_EXPORT MediaType getMediaType(const std::string& str);
-
-class ACOE_EXPORT MediaPlayer {
+class ACOE_EXPORT MediaPlayer : public IMediaPlayer {
    protected:
     IMediaPlayerObserver* observer;
     std::string uri = "";
     PlayStatus status = PlayStatus::idle;
-    MediaType mediaType = MediaType::other;
+    MediaSourceType mediaType = MediaSourceType::other;
     AudioStream audioStream = {};
     VideoStream videoStream = {};
 
@@ -56,33 +21,24 @@ class ACOE_EXPORT MediaPlayer {
 
    public:
     // 同步的prepare需要之后才能拿到,异步在回调里的onPrepared
-    AudioStream getAudioStream() { return audioStream; };
+    virtual const AudioStream& getAudioStream() final { return audioStream; };
     // 同步的prepare需要之后才能拿到,异步在回调里的onPrepared
-    VideoStream getVideoStream() { return videoStream; };
+    virtual const VideoStream& getVideoStream() final { return videoStream; };
 
    protected:
     virtual void onSetObserver(){};
     virtual void onSetDataSource(){};
 
    public:
-    void setObserver(IMediaPlayerObserver* observer);
+    virtual void setObserver(IMediaPlayerObserver* observer) final;
     // 文件路径,URL(RTMP这些)
-    void setDataSource(const char* path);
-    virtual void prepare(bool bAsync) = 0;
+    virtual void setDataSource(const char* path) final;
+    // virtual void prepare(bool bAsync) = 0;
     // 同步prepare可以在下面直接调用start,否则需要在observer里的prepare调用
-    virtual void start() = 0;
+    // virtual void start() = 0;
     virtual void pause(){};
-    virtual void stop() = 0;
+    // virtual void stop() = 0;
     virtual void release(){};
-};
-
-class ACOE_EXPORT MediaPlayerFactory {
-   public:
-    MediaPlayerFactory(){};
-    virtual ~MediaPlayerFactory(){};
-
-   public:
-    virtual MediaPlayer* createPlay() = 0;
 };
 
 }  // namespace aoce

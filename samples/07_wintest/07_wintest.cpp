@@ -1,11 +1,11 @@
-#include <AoceCore.h>
 
 #include <AoceManager.hpp>
-#include <Media/MediaPlayer.hpp>
-#include <Module/ModuleManager.hpp>
+#include <media/MediaPlayer.hpp>
+#include <module/ModuleManager.hpp>
 #include <thread>
 
-#include "../aoce_win/DX11/Dx11Window.hpp"
+#include "aoce/fixgraph/VideoView.hpp"
+#include "aoce_win/DX11/Dx11Window.hpp"
 
 // 是用摄像机还是用ffmpeg拉流
 #define USE_CAMERA 1
@@ -18,7 +18,7 @@ static int index = 0;
 static int formatIndex = 0;  // 29;
 #else
 static HINSTANCE instance = nullptr;
-static MediaPlayer *player = nullptr;
+static IMediaPlayer *player = nullptr;
 static class TestMediaPlay *testPlay = nullptr;
 static std::string uri = "rtmp://58.200.131.2:1935/livetv/hunantv";
 #endif
@@ -43,11 +43,13 @@ static void onTick(void *dx11, void *tex) {
 }
 
 #if USE_CAMERA
-static void onDrawFrame(VideoFrame frame) {
-    // std::cout << "time stamp:" << frame.timeStamp << std::endl;
-    viewGraph->runFrame(frame);
-    // viewGraph->getOutputLayer()->outDx11GpuTex(dx11Device, dx11Tex);
-}
+class TestCameraObserver : public IVideoDeviceObserver {
+    virtual void onVideoFrame(VideoFrame frame) override {
+        // std::cout << "time stamp:" << frame.timeStamp << std::endl;
+        viewGraph->runFrame(frame);
+        // viewGraph->getOutputLayer()->outDx11GpuTex(dx11Device, dx11Tex);
+    }
+};
 #else
 class TestMediaPlay : public IMediaPlayerObserver {
    public:
@@ -89,8 +91,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     auto &deviceList =
         AoceManager::Get().getVideoManager(CameraType::win_mf)->getDeviceList();
     std::cout << "deivce count:" << deviceList.size() << std::endl;
+    TestCameraObserver cameraObserver = {};
     VideoDevicePtr video = deviceList[index];
-    video->setVideoFrameHandle(onDrawFrame);
+    video->setObserver(&cameraObserver);
     std::string name = video->getName();
     std::string id = video->getId();
     std::cout << "name: " << name << std::endl;
@@ -113,7 +116,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 #else
     instance = hInstance;
     player = AoceManager::Get()
-                 .getMediaPlayerFactory(MediaPlayType::ffmpeg)
+                 .getMediaFactory(MediaType::ffmpeg)
                  ->createPlay();
     testPlay = new TestMediaPlay();
     player->setDataSource(uri.c_str());

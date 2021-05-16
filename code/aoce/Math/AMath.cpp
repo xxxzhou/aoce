@@ -1,6 +1,5 @@
-#include "AMath.hpp"
-
-#include "../Aoce.h"
+#include "../AoceMath.h"
+#include <math.h>
 
 namespace aoce {
 

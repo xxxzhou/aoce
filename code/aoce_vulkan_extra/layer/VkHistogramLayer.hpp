@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -10,6 +10,7 @@ namespace vulkan {
 namespace layer {
 
 class VkHistogramLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkHistogramLayer)
    private:
     /* data */
     int32_t channalCount = 1;
@@ -25,6 +26,7 @@ class VkHistogramLayer : public VkLayer {
 };
 
 class VkHistogramC4Layer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkHistogramC4Layer)
    private:
     /* data */
     std::unique_ptr<VkHistogramLayer> preLayer = nullptr;

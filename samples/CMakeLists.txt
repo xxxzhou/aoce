@@ -51,6 +51,7 @@ function(sample)
 endfunction(sample) 
 
 include_directories("../code")
+include_directories("../install/win/include")
 
 if(WIN32)
     include_directories(${AOCE_HEADER_DIR} ${OpenCV_INCLUDE_DIRS} ${AOCE_VULKAN_HEADER_DIR} ${Vulkan_INCLUDE_DIR})

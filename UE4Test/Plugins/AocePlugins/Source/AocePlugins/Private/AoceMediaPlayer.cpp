@@ -13,7 +13,7 @@
 using namespace aoce;
 
 AoceMediaPlayer::AoceMediaPlayer() {
-	player = AoceManager::Get().getMediaPlayerFactory(MediaPlayType::ffmpeg)->createPlay();
+	player = AoceManager::Get().getMediaFactory(MediaType::ffmpeg)->createPlay();
 	player->setObserver(this);
 }
 

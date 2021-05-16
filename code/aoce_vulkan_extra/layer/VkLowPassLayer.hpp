@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "VkBlendingModeLayer.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 

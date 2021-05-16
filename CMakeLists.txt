@@ -85,7 +85,20 @@ cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGOR
 
 # 配置联系cmake/c++
 configure_file(${CMAKE_SOURCE_DIR}/cmake/AoceBuildSettings.h.in ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h @ONLY)
-install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h DESTINATION include/aoce)
+# 导出给外部用户使用的C头文件,主要是抽像类/结构/C风格创建对象三种
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceDefine.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/Aoce.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceCore.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceLayer.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceLive.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceMath.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceMedia.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceVideoDevice.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_vulkan_extra/AoceVkExtra.h DESTINATION include/aoce_vulkan_extra)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_vulkan_extra/VkExtraExport.h DESTINATION include/aoce_vulkan_extra) 
+if(AOCE_TALKTO_EXIST)
+    install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_talkto/TalkTo.h DESTINATION include/aoce_talkto)
+endif()
 
 add_subdirectory(code)
 add_subdirectory(samples)

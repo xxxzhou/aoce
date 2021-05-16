@@ -1,4 +1,4 @@
-#include <AoceCore.h>
+#include "aoce/fixgraph/VideoView.hpp"
 #include <android/native_activity.h>
 #include <android/native_window_jni.h>
 #include <android_native_app_glue.h>
@@ -15,16 +15,19 @@ static int formatIndex = 0;
 static VideoDevicePtr video = nullptr;
 static std::unique_ptr<VulkanWindow> window = nullptr;
 static std::unique_ptr<VideoView> viewGraph = nullptr;
+static std::unique_ptr<class TestCameraObserver> cameraObserver = nullptr;
 
-static void onDrawFrame(VideoFrame frame) {
-    std::string msg;
-    string_format(msg, "time stamp: ", getNowTimeStamp());
-    logMessage(LogLevel::info, msg);
-    viewGraph->runFrame(frame);
-    if (window) {
-        window->tick();
+class TestCameraObserver : public IVideoDeviceObserver {
+    virtual void onVideoFrame(VideoFrame frame) override {
+        std::string msg;
+        string_format(msg, "time stamp: ", getNowTimeStamp());
+        logMessage(LogLevel::info, msg);
+        viewGraph->runFrame(frame);
+        if (window) {
+            window->tick();
+        }
     }
-}
+};
 
 void onPreCommand(uint32_t index) {
     VkImage winImage = window->images[index];
@@ -74,7 +77,8 @@ void android_main(struct android_app* app) {
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();
-    video->setVideoFrameHandle(onDrawFrame);
+    TestCameraObserver cameraObserver = {};
+    video->setObserver(&cameraObserver);
 
     window = std::make_unique<VulkanWindow>(onPreCommand, false);
     window->initWindow();
@@ -94,6 +98,7 @@ Java_aoce_samples_androidtest_MainActivity_initEngine(JNIEnv* env,
     loadAoce();
 
     viewGraph = std::make_unique<VideoView>();
+    cameraObserver = std::make_unique<TestCameraObserver>();
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -126,7 +131,7 @@ Java_aoce_samples_androidtest_MainActivity_openCamera(JNIEnv* env, jobject thiz,
         video->close();
     }
     video = deviceList[index];
-    video->setVideoFrameHandle(onDrawFrame);
+    video->setObserver(cameraObserver.get());
     auto& formats = video->getFormats();
     for (const auto& vf : formats) {
         std::string msg;

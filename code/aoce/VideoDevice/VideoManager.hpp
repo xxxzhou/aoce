@@ -3,7 +3,7 @@
 #include "VideoDevice.hpp"
 namespace aoce {
 
-class ACOE_EXPORT VideoManager {
+class ACOE_EXPORT VideoManager : public IVideoManager {
    protected:
     /* data */
     std::vector<VideoDevicePtr> videoList;
@@ -18,6 +18,12 @@ class ACOE_EXPORT VideoManager {
 
    public:
     const std::vector<VideoDevicePtr>& getDeviceList(bool bUpdate = false);
+
+   public:
+    virtual int32_t getDeviceCount(bool bUpdate = false) override;
+    // 得到所有支持的格式
+    virtual void getDevices(IVideoDevice** videos, int32_t size,
+                            int32_t start = 0) override;
 };
 
 }  // namespace aoce

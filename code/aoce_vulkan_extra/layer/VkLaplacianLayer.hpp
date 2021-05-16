@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -23,6 +23,7 @@ class Vk3x3ConvolutionLayer : public VkLayer, public ITLayer<Mat3x3> {
 
 // 构造是传入false,更多的细节边.
 class VkLaplacianLayer : public VkLayer {
+     AOCE_LAYER_GETNAME(VkLaplacianLayer)
    private:
     /* data */
     Mat3x3 mat = {};

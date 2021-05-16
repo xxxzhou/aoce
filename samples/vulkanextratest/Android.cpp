@@ -17,10 +17,10 @@ static ITLayer<GaussianBlurParamet>* gaussianLayer = nullptr;
 static ITLayer<ChromaKeyParamet>* chromKeyLayer = nullptr;
 static ITLayer<AdaptiveThresholdParamet>* adaptiveLayer = nullptr;
 static ITLayer<GuidedParamet>* guidedLayer = nullptr;
-static BaseLayer* convertLayer = nullptr;
-static BaseLayer* alphaShowLayer = nullptr;
-static BaseLayer* alphaShow2Layer = nullptr;
-static BaseLayer* luminanceLayer = nullptr;
+static IBaseLayer* convertLayer = nullptr;
+static IBaseLayer* alphaShowLayer = nullptr;
+static IBaseLayer* alphaShow2Layer = nullptr;
+static IBaseLayer* luminanceLayer = nullptr;
 static ITLayer<ReSizeParamet>* resizeLayer = nullptr;
 static ITLayer<KernelSizeParamet>* box1Layer = nullptr;
 static ITLayer<HarrisCornerDetectionParamet>* hcdLayer = nullptr;
@@ -67,9 +67,9 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     luminanceLayer = createLuminanceLayer();
 
     kuwaharaLayer = createKuwaharaLayer();
-    // kuwaharaLayer->updateParamet(5);
+    kuwaharaLayer->updateParamet(3);
 
-    std::vector<BaseLayer*> layers;
+    std::vector<IBaseLayer*> layers;
     // // 导向滤波
     // layers.push_back(chromKeyLayer->getLayer());
     // layers.push_back(guidedLayer->getLayer());

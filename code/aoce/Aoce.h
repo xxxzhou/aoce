@@ -1,7 +1,8 @@
 #pragma once
 
-//导出给外部库使用文件
-#include <string>
+// 导出给外部库使用文件
+
+#include <stdint.h>
 
 #include "AoceDefine.h"
 
@@ -64,7 +65,7 @@ enum class VideoType {
     yuv420P,
 };
 
-inline std::string to_string(VideoType value) {
+inline const char *to_string(VideoType value) {
     switch (value) {
         case VideoType::nv12:
             return "nv12";
@@ -133,7 +134,7 @@ enum class LiveType {
     agora,
 };
 
-enum class MediaPlayType {
+enum class MediaType {
     other = 0,
     ffmpeg,
 };
@@ -155,15 +156,6 @@ struct ImageFormat {
     inline bool operator==(const ImageFormat &right) {
         return this->width == right.width && this->height == right.height &&
                this->imageType == right.imageType;
-    }
-
-    inline ImageFormat &operator=(const ImageFormat &right) {
-        if (this != &right) {
-            width = right.width;
-            height = right.height;
-            imageType = right.imageType;
-        }
-        return *this;
     }
 };
 
@@ -298,11 +290,9 @@ struct SizeScaleParamet {
     }
 };
 
-}  // namespace aoce
-
 extern "C" {
+
 ACOE_EXPORT void setLogAction(logEventAction action);
-ACOE_EXPORT void setLogHandle(logEventHandle action);
 
 ACOE_EXPORT const char *getLogLevel(AOCE_LOG_LEVEL level);
 
@@ -310,6 +300,25 @@ ACOE_EXPORT void logMessage(AOCE_LOG_LEVEL level, const char *message);
 
 ACOE_EXPORT uint32_t divUp(int32_t x, int32_t y);
 ACOE_EXPORT long long getNowTimeStamp();
+
+ACOE_EXPORT aoce::ImageType videoType2ImageType(
+    const aoce::VideoType &videoType);
+
+// 原则上,应该只由VideoType转ImageType
+// ImageType转VideoType,只有bgra8/r16/rgba8三种有意义
+ACOE_EXPORT aoce::VideoType imageType2VideoType(
+    const aoce::ImageType &imageType);
+
+ACOE_EXPORT int32_t getYuvIndex(const aoce::VideoType &videoType);
+
+ACOE_EXPORT aoce::ImageFormat videoFormat2ImageFormat(
+    const aoce::VideoFormat &videoFormat);
+
+ACOE_EXPORT int32_t getImageTypeSize(const aoce::ImageType &imageType);
+
+// 平面格式可能非紧密排列,给GPU的紧密排列大小,否则返回0
+ACOE_EXPORT int32_t getVideoFrame(const aoce::VideoFrame &frame,
+                                  uint8_t *data = nullptr);
 
 ACOE_EXPORT void loadAoce();
 ACOE_EXPORT void unloadAoce();
@@ -319,3 +328,5 @@ ACOE_EXPORT void unloadAoce();
 // ACOE_EXPORT void JNI_OnUnload(JavaVM *jvm, void *);
 #endif
 }
+
+}  // namespace aoce

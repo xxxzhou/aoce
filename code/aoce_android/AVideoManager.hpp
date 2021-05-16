@@ -4,7 +4,7 @@
 #include <camera/NdkCameraMetadata.h>
 #include <camera/NdkCameraDevice.h>
 #include <media/NdkImageReader.h>
-#include "VideoDevice/VideoManager.hpp"
+#include "videodevice/VideoManager.hpp"
 
 namespace aoce {
 namespace android {

@@ -1,10 +1,9 @@
 // 需要实现特定的直播模块,如果没有,这个模块不能运行
 #include <AoceManager.hpp>
-#include <Live/ILiveObserver.hpp>
 #include <Live/LiveRoom.hpp>
-#include <Module/ModuleManager.hpp>
 #include <iostream>
 #include <memory>
+#include <module/ModuleManager.hpp>
 #include <string>
 #include <thread>
 #include <vulkan/VulkanContext.hpp>
@@ -26,10 +25,10 @@ using namespace aoce;
 using namespace aoce::vulkan;
 
 static std::unique_ptr<VulkanWindow> window = nullptr;
-static PipeGraph *vkGraph;
-static InputLayer *inputLayer;
-static OutputLayer *outputLayer;
-static YUV2RGBALayer *yuv2rgbLayer;
+static IPipeGraph *vkGraph;
+static IInputLayer *inputLayer;
+static IOutputLayer *outputLayer;
+static IYUV2RGBALayer *yuv2rgbLayer;
 static VideoFormat format = {};
 
 static GpuType gpuType = GpuType::vulkan;
@@ -46,7 +45,7 @@ class TestLive : public ILiveObserver {
    public:
     // 网络发生的各种情况与处理码,如断网,网络情况不好等
     virtual void onEvent(int32_t operater, int32_t code, LogLevel level,
-                         const std::string &msg) {
+                         const char *msg) {
         std::string str;
         string_format(str, "code: ", code, " msg: ", msg);
         logMessage(level, str);
@@ -115,8 +114,8 @@ class TestLive : public ILiveObserver {
 
     // 用户对应流的音频桢数据
     virtual void onAudioFrame(int32_t userId, int32_t index,
-                              const AudioFrame &audioFrame){
-        logMessage(LogLevel::info,"audio frame.");
+                              const AudioFrame &audioFrame) {
+        logMessage(LogLevel::info, "audio frame.");
     };
 
     // 推流的质量
@@ -168,7 +167,7 @@ void android_main(struct android_app *app)
     AoceManager::Get().initAndroid(app);
 #endif
     // 生成一张执行图
-    vkGraph = AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto layerFactory = AoceManager::Get().getLayerFactory(gpuType);
     inputLayer = layerFactory->crateInput();
     outputLayer = layerFactory->createOutput();
@@ -221,9 +220,9 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_initEngine(
     AoceManager::Get().initAndroid(andEnv);
     // // 生成一张执行图
     // vkGraph =
-    // AoceManager::Get().getPipeGraphFactory(gpuType)->createGraph();
+    // getPipeGraphFactory(gpuType)->createGraph();
     // 生成一张执行图
-    auto graphFactory = AoceManager::Get().getPipeGraphFactory(gpuType);
+    auto graphFactory = getPipeGraphFactory(gpuType);
     if (graphFactory == nullptr) {
         logMessage(LogLevel::error, "no graph factory");
         return;

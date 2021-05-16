@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Layer/PipeGraph.hpp>
+#include <layer/PipeGraph.hpp>
 
 #include "../CudaMat.hpp"
 #include "CuLayer.hpp"
@@ -38,7 +38,7 @@ class CuPipeGraphFactory : public PipeGraphFactory {
     virtual ~CuPipeGraphFactory(){};
 
    public:
-    inline virtual PipeGraph* createGraph() override {
+    inline virtual IPipeGraph* createGraph() override {
         return new CuPipeGraph();
     };
 };

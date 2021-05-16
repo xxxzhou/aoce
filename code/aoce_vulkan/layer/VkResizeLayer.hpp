@@ -1,5 +1,5 @@
 #pragma once
-#include <Layer/BaseLayer.hpp>
+#include <layer/BaseLayer.hpp>
 
 #include "VkLayer.hpp"
 
@@ -7,7 +7,7 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-class AOCE_VULKAN_EXPORT VkResizeLayer : public VkLayer, public ReSizeLayer {
+class AOCE_VULKAN_EXPORT VkResizeLayer : public VkLayer, public IReSizeLayer {
     AOCE_LAYER_QUERYINTERFACE(VkResizeLayer)
    private:
     /* data */

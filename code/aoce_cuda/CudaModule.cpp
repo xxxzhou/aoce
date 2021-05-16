@@ -1,7 +1,5 @@
 #include "cudaModule.hpp"
 
-#include <AoceCore.h>
-
 #include <AoceManager.hpp>
 
 #include "CuLayerFactory.hpp"

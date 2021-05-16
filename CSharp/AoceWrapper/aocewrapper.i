@@ -1,63 +1,53 @@
-%module(directors="1") AoceWrapper
-%feature("director") IMediaPlayerObserver;
-%{   
-#include <aoce/Aoce.h>
-#include <aoce/Layer/BaseLayer.hpp>
-#include <aoce/AoceManager.hpp>
-#include <aoce/VideoDevice/VideoManager.hpp>
-#include <aoce/Media/MediaPlayer.hpp>
+%module(directors = "1") AoceWrapper
+%{
+#include "aoce/Aoce.h"
+#include "aoce/AoceCore.h"
+#include "aoce/AoceDefine.h"
 %}
 
-%rename(LoadAoce) loadAoce;
-%rename(UnloadAoce) unloadAoce;
+#define ACOE_EXPORT
 
-// Import standard types.
-%include "std_vector.i"
 %include "stdint.i"
 
-%feature("director") LogEventHandle;
-%inline %{
-    class LogEventHandle {
-    public:
-        LogEventHandle() = default;
-        virtual ~LogEventHandle() = default;       
-        virtual void onLogEvent(int level, const char* message) = 0;        
-        logEventHandle createWrapper() {
-            return [this](int level, const char* message) -> void {
-                onLogEvent(level, message);
-            };
-        }
-    };
-%}
-
-%feature("director") IMediaPlayerObserver;
-
-%inline %{
-void SetLogHandle(LogEventHandle* handle){
-    setLogHandle(handle->createWrapper());
-}
-%}
-
-void loadAoce();
-
-void unloadAoce();
-
-%nodefaultctor ;
-%nodefaultdtor ;
+%include "aoce/Aoce.h"
+%include "aoce/AoceLayer.h"
+%include "aoce/AoceLive.h"
+%include "aoce/AoceMath.h"
+%include "aoce/AoceMedia.h"
+%include "aoce/AoceVideoDevice.h"
+%include "aoce/AoceCore.h"
 
 namespace aoce {
-class VideoDevice{
-    public:
-     bool open();
-};
+    
+%feature("director") IMediaPlayerObserver;
+%feature("director") IBaseLayer;
+%feature("director") PipeGraphFactory;
+%feature("director") LayerFactory;
+%feature("director") IVideoManager;
+%feature("director") MediaFactory;
+%feature("director") ILiveRoom;
+%feature("director") IVideoDevice;
+    
+// void loadAoce();
+// void unloadAoce();
+// bool checkLoadModel(const char* modelName);
+// aoce::PipeGraphFactory* getPipeGraphFactory(const aoce::GpuType& gpuType);
+// aoce::LayerFactory* getLayerFactory(const aoce::GpuType& gpuType);
+// aoce::IVideoManager* getVideoManager(const aoce::CameraType& cameraType);
+// aoce::MediaFactory* getMediaFactory(
+//     const aoce::MediaType& mediaType);
+// aoce::ILiveRoom* getLiveRoom(const aoce::LiveType& liveType);
 
-// class MediaPlayer{
-//     public:
-//     void setObserver(IMediaPlayerObserver* observer);
-// };
-}
+%nodefaultctor;
+%nodefaultdtor;
 
-%clearnodefaultctor; 
-%clearnodefaultdtor; 
 
-#include <aoce/Aoce.h>
+%clearnodefaultctor;
+%clearnodefaultdtor;
+
+
+};  // namespace aoce
+
+
+
+

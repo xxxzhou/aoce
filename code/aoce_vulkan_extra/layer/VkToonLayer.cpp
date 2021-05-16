@@ -1,6 +1,6 @@
 #include "VkToonLayer.hpp"
 
-#include "aoce/Layer/PipeGraph.hpp"
+#include "aoce/layer/PipeGraph.hpp"
 namespace aoce {
 namespace vulkan {
 namespace layer {

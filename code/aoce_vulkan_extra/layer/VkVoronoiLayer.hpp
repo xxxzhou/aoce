@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -8,6 +8,7 @@ namespace vulkan {
 namespace layer {
 
 class VkVoronoiConsumerLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkVoronoiConsumerLayer)
    private:
     /* data */
    public:

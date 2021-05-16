@@ -3,12 +3,12 @@
 #include "PipeGraph.hpp"
 namespace aoce {
 
-PipeNode::PipeNode(BaseLayer* _layer) {
+PipeNode::PipeNode(IBaseLayer* _layer) {
     if (_layer == nullptr) {
         logMessage(LogLevel::error, "node layer can not be empty");
     }
     assert(_layer != nullptr);
-    this->layer = _layer;
+    this->layer = static_cast<BaseLayer*>(_layer);
     endNodeIndex = -1;
     startNodes.resize(this->layer->inCount);
 }
@@ -31,7 +31,9 @@ void PipeNode::setEnable(bool benable) {
 
 // index表示输入节点索引,node表示层内层节点,toInIndex表示对应层内层输入位置
 // 简单来说,index对应本身node,toInIndex对应toNode
-void PipeNode::setStartNode(BaseLayer* node, int32_t index, int32_t toInIndex) {
+void PipeNode::setStartNode(IBaseLayer* inode, int32_t index,
+                            int32_t toInIndex) {
+    BaseLayer* node = static_cast<BaseLayer*>(inode);
     if (toInIndex >= node->getNode()->startNodes.size()) {
         return;
     }
@@ -44,7 +46,7 @@ void PipeNode::setStartNode(BaseLayer* node, int32_t index, int32_t toInIndex) {
     // 如果当前组件也有头部
     if (nodes.size() > 0) {
         for (const auto& node : nodes) {
-            BaseLayer* ptr = layer->getGraph()->getNode(node.nodeIndex);
+            IBaseLayer* ptr = layer->getGraph()->getNode(node.nodeIndex);
             setStartNode(ptr, index, node.inIndex);
         }
     } else {
@@ -52,7 +54,7 @@ void PipeNode::setStartNode(BaseLayer* node, int32_t index, int32_t toInIndex) {
     }
 }
 
-void PipeNode::setEndNode(BaseLayer* node) {
+void PipeNode::setEndNode(IBaseLayer* node) {
     endNodeIndex = node->getGraphIndex();
 }
 

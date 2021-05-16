@@ -37,7 +37,7 @@ class PipeNode {
     // PipeNode* startNode = nullptr;
 
    public:
-    PipeNode(BaseLayer* _layer);
+    PipeNode(IBaseLayer* _layer);
     virtual ~PipeNode();
 
    public:
@@ -49,9 +49,9 @@ class PipeNode {
     // 如果层有多个输入,可能不同输入对应不同层内不同层
     // index表示输入节点索引,node表示层内层节点,toInIndex表示对应层内层输入位置
     // 简单来说,index对应本身node,toInIndex对应toNode
-    void setStartNode(BaseLayer* toNode, int32_t index = 0,
+    void setStartNode(IBaseLayer* toNode, int32_t index = 0,
                       int32_t toInIndex = 0);
-    void setEndNode(BaseLayer* node);
+    void setEndNode(IBaseLayer* node);
 };
 
 template <typename T>

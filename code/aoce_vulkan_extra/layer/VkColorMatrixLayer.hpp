@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -19,7 +19,7 @@ class VkColorMatrixLayer : public VkLayer, public ITLayer<ColorMatrixParamet> {
     virtual ~VkColorMatrixLayer();
 };
 
-class VkHSBLayer : public VkLayer, public HSBLayer {
+class VkHSBLayer : public VkLayer, public IHSBLayer {
     AOCE_LAYER_QUERYINTERFACE(VkHSBLayer)
    private:
     /* data */
@@ -33,10 +33,10 @@ class VkHSBLayer : public VkLayer, public HSBLayer {
     void parametTransform();
 
    public:
-    virtual void reset();
-    virtual void rotateHue(const float& h);
-    virtual void adjustSaturation(const float& h);
-    virtual void adjustBrightness(const float& h);
+    virtual void reset() override;
+    virtual void rotateHue(const float& h) override;
+    virtual void adjustSaturation(const float& h) override;
+    virtual void adjustBrightness(const float& h) override;
 };
 
 class VkSepiaLayer : public VkLayer, public ITLayer<float> {

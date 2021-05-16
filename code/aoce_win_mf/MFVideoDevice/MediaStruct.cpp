@@ -10,7 +10,7 @@
 #include "FormatReader.hpp"
 
 bool getSourceMediaList(IMFMediaSource* source,
-                        std::vector<MediaType>& mediaTypeList,
+                        std::vector<MFMediaType>& mediaTypeList,
                         CComPtr<IMFMediaTypeHandler>& handle) {
     CComPtr<IMFPresentationDescriptor> pd = nullptr;
     CComPtr<IMFStreamDescriptor> sd = nullptr;
@@ -40,7 +40,7 @@ bool getSourceMediaList(IMFMediaSource* source,
         if (FAILED(hr)) {
             return false;
         }
-        MediaType mediaType = {};
+        MFMediaType mediaType = {};
         if (FormatReader::Read(type, mediaType)) {
             mediaTypeList.push_back(mediaType);
         }

@@ -3,8 +3,7 @@
 #include "../vulkan/VulkanContext.hpp"
 #include "../vulkan/VulkanPipeline.hpp"
 #include "../vulkan/VulkanShader.hpp"
-#include "Aoce/Layer/BaseLayer.hpp"
-#include "Aoce/Math/AMath.hpp"
+#include "aoce/layer/BaseLayer.hpp"
 #include "VkHelper.hpp"
 
 namespace aoce {

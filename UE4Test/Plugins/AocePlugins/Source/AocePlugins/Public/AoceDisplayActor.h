@@ -30,10 +30,10 @@ private:
 	class UMaterialInstanceDynamic* materialDynamic = nullptr;
 
 	aoce::PipeGraph* vkGraph = nullptr;
-	aoce::InputLayer* inputLayer = nullptr;
+	aoce::IInputLayer* inputLayer = nullptr;
 	aoce::OutputLayer* outputLayer = nullptr;
-	aoce::YUV2RGBALayer* yuv2rgbLayer = nullptr;
-	aoce::TexOperateLayer* texLayer = nullptr;
+	aoce::IYUV2RGBALayer* yuv2rgbLayer = nullptr;
+	aoce::ITexOperateLayer* texLayer = nullptr;
 	aoce::VideoFormat format = {};
 
 	aoce::GpuType gpuType = aoce::GpuType::vulkan;

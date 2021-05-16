@@ -1,7 +1,7 @@
 #include <Aoce.hpp>
 #include <AoceManager.hpp>
-#include <Module/ModuleManager.hpp>
 #include <iostream>
+#include <module/ModuleManager.hpp>
 #include <opencv2/opencv.hpp>
 #include <string>
 
@@ -14,9 +14,11 @@ static cv::Mat* show = nullptr;
 static int index = 0;
 static int formatIndex = 0;
 
-static void onDrawFrame(VideoFrame frame) {
-    std::cout << "time stamp:" << frame.timeStamp << std::endl;
-}
+class TestCameraObserver : public IVideoDeviceObserver {
+    virtual void onVideoFrame(VideoFrame frame) override {
+        std::cout << "time stamp:" << frame.timeStamp << std::endl;
+    }
+};
 
 int main() {
     ModuleManager::Get().regAndLoad("aoce_win_mf");
@@ -42,12 +44,13 @@ int main() {
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();
-    video->setVideoFrameHandle(onDrawFrame);
+    TestCameraObserver cameraObserver = {};
+    video->setObserver(&cameraObserver);
     show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
 
     // std::string aocePath = getAocePath();
     // std::string imgPathI =
-    //     aocePath + "/images/lookup_amatorka.png";  // lookup_amatorka  toy.bmp
+    //     aocePath + "/images/lookup_amatorka.png";  // lookup_amatorka toy.bmp
     // std::string imgPathP = aocePath + "/images/toy-mask.bmp";
     // cv::Mat I = cv::imread(imgPathI.c_str(), IMREAD_COLOR);
     // cv::cvtColor(I, I, cv::COLOR_BGR2RGB);

@@ -71,12 +71,12 @@ bool MFVideoDevice::init(IMFActivate* pActivate) {
     // format清理
     formats.clear();
     // 获取摄像机所有输出格式
-    std::vector<MediaType> mediaList;
+    std::vector<MFMediaType> mediaList;
     if (!getSourceMediaList(source, mediaList, handle)) {
         return false;
     }
     for (int i = 0; i < mediaList.size(); i++) {
-        MediaType& mediaType = mediaList[i];
+        MFMediaType& mediaType = mediaList[i];
         VideoFormat videoFormat = {};
         videoFormat.index = i;
         videoFormat.width = mediaType.width;
@@ -252,7 +252,7 @@ HRESULT MFVideoDevice::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
     if (!isOpen) {
         return hr;
     }
-    if (pSample && onVideoFrameEvent) {
+    if (pSample && observer) {
         CComPtr<IMFMediaBuffer> pBuffer = nullptr;
         DWORD lenght;
         pSample->GetTotalLength(&lenght);
@@ -273,7 +273,7 @@ HRESULT MFVideoDevice::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
             frame.width = selectFormat.width;
             frame.height = selectFormat.height;
             frame.timeStamp = getNowTimeStamp();
-            onVideoFrameAction(frame);
+            observer->onVideoFrame(frame);
             pBuffer->Unlock();
         }
     }

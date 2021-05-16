@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "VkColorAdjustmentLayer.hpp"
 #include "VkLuminanceLayer.hpp"
 #include "VkSeparableLinearLayer.hpp"

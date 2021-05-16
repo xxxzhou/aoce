@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -10,6 +10,7 @@ namespace vulkan {
 namespace layer {
     
 class VkAddBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkAddBlendLayer)
    private:
     /* data */
    public:
@@ -28,6 +29,7 @@ class VkAlphaBlendLayer : public VkLayer, public ITLayer<float> {
 };
 
 class VkHardLightBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkHardLightBlendLayer)
    private:
     /* data */
    public:
@@ -61,10 +63,6 @@ class VkColorDodgeBlendLayer : public VkLayer {
     VkColorDodgeBlendLayer(/* args */);
     virtual ~VkColorDodgeBlendLayer();
 };
-
-
-
-
 
 class VkExclusionBlendLayer : public VkLayer {
     AOCE_LAYER_GETNAME(VkExclusionBlendLayer)
@@ -195,6 +193,7 @@ class VkSubtractBlendLayer : public VkLayer {
 };
 
 class VkDarkenBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkDarkenBlendLayer)
    private:
     /* data */
    public:
@@ -203,6 +202,7 @@ class VkDarkenBlendLayer : public VkLayer {
 };
 
 class VkDifferenceBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkDifferenceBlendLayer)
    private:
     /* data */
    public:
@@ -221,6 +221,7 @@ class VkDissolveBlendLayer : public VkLayer, public ITLayer<float> {
 };
 
 class VkDivideBlendLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkDivideBlendLayer)
    private:
     /* data */
    public:

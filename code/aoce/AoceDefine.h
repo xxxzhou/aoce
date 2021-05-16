@@ -1,6 +1,4 @@
 #pragma once
-#include <functional>
-
 #include "AoceBuildSettings.h"
 
 #ifdef _WIN32
@@ -159,12 +157,5 @@
 // #define min(a, b) (((a) < (b)) ? (a) : (b))
 // #endif
 
-// 回调定义,C++传值改用std::function.
-// typedef C++ function后缀定义 handle,C为action,前缀不要加on
-// 定义的handle变量为on前缀,event后缀
-// 定义的handle包装方法为on前缀,handle后缀
-// 定义的set handle变量的方法为set前缀(不包含on),handle后缀
-
 //日志回调
 typedef void (*logEventAction)(int32_t level, const char* message);
-typedef std::function<void(int32_t level, const char* message)> logEventHandle;

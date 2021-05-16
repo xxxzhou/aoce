@@ -1,6 +1,6 @@
 #pragma once
 
-#include <AoceCore.h>
+#include "aoce/module/IModule.hpp"
 
 namespace aoce {
 namespace win {

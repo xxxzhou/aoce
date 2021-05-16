@@ -25,7 +25,7 @@ void FMediaPlayer::onError(PlayStatus status, const std::string& msg,
         logFFmpegRet(ret, msg);
     }
     if (observer) {
-        observer->onError(status, ret, msg);
+        observer->onError(status, ret, msg.c_str());
     }
     this->status = PlayStatus::error;
 }
@@ -214,7 +214,7 @@ void FMediaPlayer::start() {
                                sizeof(videoFrame.dataAlign));
                         observer->onVideoFrame(videoFrame);
                     }
-                    if (mediaType == MediaType::file) {
+                    if (mediaType == MediaSourceType::file) {
                         if (frame->pts < minPts) {
                             minPts = frame->pts;
                             minNowMs = getNowTimeStamp();
@@ -268,7 +268,7 @@ void FMediaPlayer::start() {
                         audioFrame.timeStamp = frame->pts;
                         observer->onAudioFrame(audioFrame);
                     }
-                    if (mediaType == MediaType::file) {
+                    if (mediaType == MediaSourceType::file) {
                         if (frame->pts < minPts) {
                             minPts = frame->pts;
                             minNowMs = getNowTimeStamp();
@@ -322,14 +322,11 @@ void FMediaPlayer::release() {
     status = PlayStatus::end;
 }
 
+FMediaFactory::FMediaFactory(/* args */) {}
 
-FMediaPlayerFactory::FMediaPlayerFactory(/* args */) {}
+FMediaFactory::~FMediaFactory() {}
 
-FMediaPlayerFactory::~FMediaPlayerFactory() {}
-
-MediaPlayer* FMediaPlayerFactory::createPlay(){
-    return new FMediaPlayer();
-}
+IMediaPlayer* FMediaFactory::createPlay() { return new FMediaPlayer(); }
 
 }  // namespace ffmpeg
 }  // namespace aoce

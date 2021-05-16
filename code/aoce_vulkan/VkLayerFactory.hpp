@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Layer/LayerFactory.hpp>
+#include "aoce/AoceCore.h"
 
 namespace aoce {
 namespace vulkan {
@@ -14,14 +14,14 @@ class VkLayerFactory : public LayerFactory {
     virtual ~VkLayerFactory() override;
 
    public:
-    virtual InputLayer* crateInput() override;
-    virtual OutputLayer* createOutput() override;
-    virtual YUV2RGBALayer* createYUV2RGBA() override;
-    virtual RGBA2YUVLayer* createRGBA2YUV() override;
-    virtual TexOperateLayer* createTexOperate() override;
-    virtual TransposeLayer* createTranspose() override;
-    virtual ReSizeLayer* createSize() override;
-    virtual BlendLayer* createBlend() override;
+    virtual IInputLayer* crateInput() override;
+    virtual IOutputLayer* createOutput() override;
+    virtual IYUV2RGBALayer* createYUV2RGBA() override;
+    virtual IRGBA2YUVLayer* createRGBA2YUV() override;
+    virtual ITexOperateLayer* createTexOperate() override;
+    virtual ITransposeLayer* createTranspose() override;
+    virtual IReSizeLayer* createSize() override;
+    virtual IBlendLayer* createBlend() override;
 };
 
 }  // namespace layer

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../VkExtraExport.hpp"
+#include "../VkExtraExport.h"
 #include "aoce_vulkan/layer/VkLayer.hpp"
 
 namespace aoce {
@@ -10,6 +10,7 @@ namespace vulkan {
 namespace layer {
 
 class VkAlphaShowLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkAlphaShowLayer)
    private:
     /* data */
 
@@ -22,6 +23,7 @@ class VkAlphaShowLayer : public VkLayer {
 };
 
 class VkAlphaShow2Layer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkAlphaShow2Layer)
    public:
     VkAlphaShow2Layer();
     virtual ~VkAlphaShow2Layer();

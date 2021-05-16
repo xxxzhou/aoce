@@ -17,7 +17,7 @@
 // 写文件
 struct IMFMediaType;
 
-struct MediaType {
+struct MFMediaType {
     unsigned int frameSize;
     unsigned int height;
     unsigned int width;
@@ -49,5 +49,5 @@ struct MediaType {
 };
 
 bool getSourceMediaList(IMFMediaSource* source,
-                        std::vector<MediaType>& mediaTypeList,
+                        std::vector<MFMediaType>& mediaTypeList,
                         CComPtr<IMFMediaTypeHandler>& handle);
