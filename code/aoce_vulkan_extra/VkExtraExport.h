@@ -5,7 +5,64 @@
 // 类注释主要来源 https://gitee.com/xudoubi/GPUImage
 
 namespace aoce {
-namespace vulkan {
+
+class ILookupLayer : public ILayer {
+   public:
+    virtual ~ILookupLayer(){};
+    virtual void loadLookUp(uint8_t* data, int32_t size) = 0;
+};
+
+class ISoftEleganceLayer : public ITLayer<SoftEleganceParamet> {
+   public:
+    virtual ~ISoftEleganceLayer(){};
+
+   public:
+    virtual void loadLookUp1(uint8_t* data, int32_t size) = 0;
+    virtual void loadLookUp2(uint8_t* data, int32_t size) = 0;
+};
+
+class IHSBLayer : public ILayer {
+   public:
+    virtual ~IHSBLayer(){};
+
+   public:
+    // 重置过滤器以使其不具有任何变换.
+    virtual void reset() = 0;
+    // 向滤镜添加色相旋转.
+    // 色相旋转范围为[-360,360],其中0为不变.
+    // 请注意,此调整是累加的,因此如有必要,请使用重置方法.
+    virtual void rotateHue(const float& h) = 0;
+    // 向滤镜添加饱和度调整.
+    // 饱和度调整在[0.0,2.0]的范围内,其中1.0为不变.
+    // 请注意,此调整是累加的,因此如有必要,请使用重置方法.
+    virtual void adjustSaturation(const float& h) = 0;
+    // 向滤镜添加亮度调整
+    // 亮度调整在[0.0,2.0]的范围内,其中1.0不变.
+    // 请注意,此调整是累加的,因此如有必要,请使用重置方法.
+    virtual void adjustBrightness(const float& h) = 0;
+};
+
+class IMotionDetectorObserver {
+   public:
+    virtual ~IMotionDetectorObserver(){};
+    virtual void onMotion(const vec4& vec) = 0;
+};
+
+class IMotionDetectorLayer : public ITLayer<float> {
+   public:
+    virtual ~IMotionDetectorLayer(){};
+
+   public:
+    virtual void setObserver(IMotionDetectorObserver* observer) = 0;
+};
+
+class IPerlinNoiseLayer : public ITLayer<PerlinNoiseParamet> {
+   public:
+    virtual ~IPerlinNoiseLayer(){};
+
+   public:
+    virtual void setImageSize(int32_t width, int32_t height) = 0;
+};
 
 extern "C" {
 
@@ -81,7 +138,6 @@ AOCE_VE_EXPORT ITLayer<float>* createAverageLuminanceThresholdLayer();
 // 该滤波器根据bSingle,输出[1x256]或是[4x256]的图像
 AOCE_VE_EXPORT IBaseLayer* createHistogramLayer(bool bSingle = true);
 // GPUImageAverageColor/GPUImageLuminosity由VkReduceLayer替代,用于求整张图的颜色和,最大值,最小值
-
 // 色度键扣像 参考
 // https://www.unrealengine.com/en-US/tech-blog/setting-up-a-chroma-key-material-in-ue4?sessionInvalidated=true
 AOCE_VE_EXPORT ITLayer<ChromaKeyParamet>* createChromaKeyLayer();
@@ -306,6 +362,8 @@ AOCE_VE_EXPORT IBaseLayer* createCGAColorspaceLayer();
 AOCE_VE_EXPORT IBaseLayer* createVoronoiConsumerLayer();
 #pragma endregion
 
+AOCE_VE_EXPORT ITLayer<SizeScaleParamet>* createSizeScaleLayer(
+    ImageType imageType = ImageType::rgba8);
 AOCE_VE_EXPORT ITLayer<ReSizeParamet>* createResizeLayer(
     ImageType imageType = ImageType::rgba8);
 // 显示R8
@@ -314,8 +372,6 @@ AOCE_VE_EXPORT IBaseLayer* createAlphaShowLayer();
 AOCE_VE_EXPORT IBaseLayer* createAlphaShow2Layer();
 // 用于图像格式转化,包含RGBA8->RGBA32F
 AOCE_VE_EXPORT IBaseLayer* createConvertImageLayer();
-
 }
 
-}  // namespace vulkan
 }  // namespace aoce

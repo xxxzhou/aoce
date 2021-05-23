@@ -122,8 +122,11 @@ void imageCallback(void* context, AImageReader* reader) {
             frame.height = device->selectFormat.height;
             frame.timeStamp = timestamp;
             device->onVideoFrameAction(frame);
+            // AImage_delete(image);
         }
-        AImage_delete(image);
+        if(image) {
+            AImage_delete(image);
+        }
     });
     // 当处理的速度慢于取图片的速度,AImageReader_new(maxImages)个图片一起读,然后等待一久时间,造成卡顿的感觉
     // 不如用join,对于取大图片来说效果最好
@@ -160,7 +163,6 @@ bool AVideoDevice::open() {
             selectFormat.width, selectFormat.height,
             getImageFormat(selectFormat.videoType), 4, &imageReader);
         if (mstatus == AMEDIA_OK) {
-            ANativeWindow* surface = nullptr;
             if (AImageReader_getWindow(imageReader, &surface) == AMEDIA_OK) {
                 AImageReader_ImageListener listener{
                     .context = this,
@@ -210,26 +212,39 @@ bool AVideoDevice::close() {
         ACameraCaptureSession_close(session);
         session = nullptr;
     }
+    if (request) {
+        ACaptureRequest_removeTarget(request, outputTarget);
+        ACaptureRequest_free(request);
+        ACameraOutputTarget_free(outputTarget);
+        request = nullptr;
+        outputTarget = nullptr;
+    }
+    if(sessionOutput) {
+        ACaptureSessionOutputContainer_remove(outputContainer,sessionOutput);
+        ACaptureSessionOutput_free(sessionOutput);
+        sessionOutput = nullptr;
+    }
+    if(surface){
+        ANativeWindow_release(surface);
+        surface = nullptr;
+    }
     if (outputContainer) {
         ACaptureSessionOutputContainer_free(outputContainer);
         outputContainer = nullptr;
-    }
-    if (outputTarget) {
-        ACameraOutputTarget_free(outputTarget);
     }
     if (ndkDevice) {
         ACameraDevice_close(ndkDevice);
         ndkDevice = nullptr;
     }
     if (imageReader) {
+        AImage* image = nullptr;
+        if(AImageReader_acquireLatestImage(imageReader, &image) != AMEDIA_OK){
+            AImage_delete(image);
+        }
         AImageReader_delete(imageReader);
         imageReader = nullptr;
     }
-    if (request) {
-        ACaptureRequest_free(request);
-        request = nullptr;
-    }
-    return false;
+    return true;
 }
 
 bool AVideoDevice::init(ACameraManager* manager, const char* id) {

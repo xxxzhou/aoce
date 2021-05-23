@@ -8,7 +8,6 @@
 
 using namespace aoce;
 using namespace cv;
-using namespace aoce::vulkan;
 
 static cv::Mat* show = nullptr;
 static cv::Mat* show2 = nullptr;

@@ -25,12 +25,15 @@
     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libagora-rtc-sdk-jni.so" dst="$S(BuildDir)/libs/armeabi-v7a/libagora-rtc-sdk-jni.so"/>
     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce.so"/>
     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_agora.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_agora.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_vulkan.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_vulkan.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_ffmpeg.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_ffmpeg.so"/>
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_vulkan.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_vulkan.so"/> 
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_vulkan_extra.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_vulkan_extra.so"/>
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_talkto.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_talkto.so"/>
+    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_android.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_android.so"/>
+    <!--<copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_ffmpeg.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_ffmpeg.so"/>
     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libffmpeg.so" dst="$S(BuildDir)/libs/armeabi-v7a/libffmpeg.so"/>
     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libmp3lame.so" dst="$S(BuildDir)/libs/armeabi-v7a/libmp3lame.so"/>
     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libnative-app-glue.a" dst="$S(BuildDir)/libs/armeabi-v7a/libnative-app-glue.a"/>
-    <!-- <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libc++_shared.so" dst="$S(BuildDir)/libs/armeabi-v7a/libc++_shared.so"/>-->
+     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libc++_shared.so" dst="$S(BuildDir)/libs/armeabi-v7a/libc++_shared.so"/>-->
     <copyDir src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/glsl" dst="$S(BuildDir)/assets/glsl"/>
   </resourceCopies>
   <soLoadLibrary>

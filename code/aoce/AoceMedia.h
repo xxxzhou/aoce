@@ -3,7 +3,7 @@
 
 namespace aoce {
 
-enum class PlayStatus {
+enum class PlayStatus : int32_t {
     idle,
     end,
     error,
@@ -16,7 +16,7 @@ enum class PlayStatus {
     completed,
 };
 
-enum class MediaSourceType {
+enum class MediaSourceType : int32_t {
     other,
     file,
     rtmp,

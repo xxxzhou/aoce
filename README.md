@@ -71,12 +71,6 @@ win平台下aoce图像获取设备的Media Foundation实现
 
 ## [文档](doc)
 
-[ChromaKey](doc/ChromaKey.md)
-
-[Vulkan与DX11交互](doc/Vulkan与DX11交互.md)
-
-[PC平台Vulkan运算层时间记录](doc/PC平台Vulkan运算层时间记录.md)
-
 [Vulkan移植GpuImage(一)高斯模糊与自适应阈值](doc/Vulkan移植GpuImage1.md)
 
 [Vulkan移植GpuImage(二)Harris角点检测与导向滤波](doc/Vulkan移植GpuImage2.md)
@@ -84,6 +78,16 @@ win平台下aoce图像获取设备的Media Foundation实现
 [Vulkan移植GpuImage(三)从A到C的滤镜](doc/Vulkan移植GpuImage3.md)
 
 [Vulkan移植GpuImage(四)从D到M的滤镜](doc/Vulkan移植GpuImage4.md)
+
+[Vulkan移植GPUImage(五)从P到Z的滤镜](doc/Vulkan移植GpuImage5.md)
+
+[GPUImage移植总结](doc/GPUImage移植总结.md)
+
+[ChromaKey](doc/ChromaKey.md)
+
+[Vulkan与DX11交互](doc/Vulkan与DX11交互.md)
+
+[PC平台Vulkan运算层时间记录](doc/PC平台Vulkan运算层时间记录.md)
 
 ## [GPUImage移植模块](code/aoce_vulkan_extra)
 

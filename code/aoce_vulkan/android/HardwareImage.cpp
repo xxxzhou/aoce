@@ -23,43 +23,81 @@ using PFNGLMAPBUFFERRANGEPROC = void *(GL_APIENTRYP)(GLenum target,
                                                      GLsizeiptr length,
                                                      GLbitfield access);
 using PFNGLUNMAPBUFFERPROC = void *(GL_APIENTRYP)(GLenum target);
-PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES;
-PFNEGLGETNATIVECLIENTBUFFERANDROID eglGetNativeClientBufferANDROID;
-PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR;
-PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR;
-PFNGLFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC glFramebufferTextureMultiviewOVR;
-PFNGLFRAMEBUFFERTEXTUREMULTISAMPLEMULTIVIEWOVRPROC
-glFramebufferTextureMultisampleMultiviewOVR;
-PFNGLBUFFERSTORAGEEXTERNALEXTPROC glBufferStorageExternalEXT;
-PFNGLMAPBUFFERRANGEPROC glMapBufferRange;
-PFNGLUNMAPBUFFERPROC glUnmapBuffer;
-PFN_vkGetAndroidHardwareBufferPropertiesANDROID
-    vkGetAndroidHardwareBufferPropertiesANDROID;
-PFN_vkBindImageMemory2KHR vkBindImageMemory2KHR;
+
+static PFNGLEGLIMAGETARGETTEXTURE2DOESPROC glEGLImageTargetTexture2DOES =
+    nullptr;
+static PFNEGLGETNATIVECLIENTBUFFERANDROID eglGetNativeClientBufferANDROID =
+    nullptr;
+static PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = nullptr;
+static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
+static PFNGLFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC
+    glFramebufferTextureMultiviewOVR = nullptr;
+;
+static PFNGLFRAMEBUFFERTEXTUREMULTISAMPLEMULTIVIEWOVRPROC
+    glFramebufferTextureMultisampleMultiviewOVR = nullptr;
+;
+static PFNGLBUFFERSTORAGEEXTERNALEXTPROC glBufferStorageExternalEXT = nullptr;
+;
+static PFNGLMAPBUFFERRANGEPROC glMapBufferRange = nullptr;
+;
+static PFNGLUNMAPBUFFERPROC glUnmapBuffer = nullptr;
+;
+static PFN_vkGetAndroidHardwareBufferPropertiesANDROID
+    vkGetAndroidHardwareBufferPropertiesANDROID = nullptr;
+;
+static PFN_vkBindImageMemory2KHR vkBindImageMemory2KHR = nullptr;
+;
+
 namespace aoce {
 namespace vulkan {
 
-HardwareImage::HardwareImage(/* args */) {
-    vkDevice = VulkanManager::Get().device;
+bool supportHardwareImage(VkDevice device) {
     vkGetAndroidHardwareBufferPropertiesANDROID =
         reinterpret_cast<PFN_vkGetAndroidHardwareBufferPropertiesANDROID>(
-            vkGetDeviceProcAddr(vkDevice,
+            vkGetDeviceProcAddr(device,
                                 "vkGetAndroidHardwareBufferPropertiesANDROID"));
+    if (!vkGetAndroidHardwareBufferPropertiesANDROID) {
+        logMessage(LogLevel::warn,
+                   "vkGetAndroidHardwareBufferPropertiesANDROID is null");
+        return false;
+    }
     vkBindImageMemory2KHR = reinterpret_cast<PFN_vkBindImageMemory2KHR>(
-        vkGetDeviceProcAddr(vkDevice, "vkBindImageMemory2KHR"));
-    // assert(vkGetAndroidHardwareBufferPropertiesANDROID);
-    // assert(vkBindImageMemory2KHR);
-
+        vkGetDeviceProcAddr(device, "vkBindImageMemory2KHR"));
+    if (!vkBindImageMemory2KHR) {
+        logMessage(LogLevel::warn, "vkBindImageMemory2KHR is null");
+        return false;
+    }
+    if (!eglGetProcAddress) {
+        logMessage(LogLevel::warn, "eglGetProcAddress is null");
+        return false;
+    }
     LOAD_PROC(glEGLImageTargetTexture2DOES,
               PFNGLEGLIMAGETARGETTEXTURE2DOESPROC);
-    // assert(glEGLImageTargetTexture2DOES);
+    if (!glEGLImageTargetTexture2DOES) {
+        logMessage(LogLevel::warn, "glEGLImageTargetTexture2DOES is null");
+        return false;
+    }
     LOAD_PROC(eglGetNativeClientBufferANDROID,
               PFNEGLGETNATIVECLIENTBUFFERANDROID);
-    // assert(eglGetNativeClientBufferANDROID);
+    if (!eglGetNativeClientBufferANDROID) {
+        logMessage(LogLevel::warn, "eglGetNativeClientBufferANDROID is null");
+        return false;
+    }
     LOAD_PROC(eglCreateImageKHR, PFNEGLCREATEIMAGEKHRPROC);
-    // assert(eglCreateImageKHR);
+    if (!eglCreateImageKHR) {
+        logMessage(LogLevel::warn, "eglCreateImageKHR is null");
+        return false;
+    }
     LOAD_PROC(eglDestroyImageKHR, PFNEGLDESTROYIMAGEKHRPROC);
-    // assert(eglDestroyImageKHR);
+    if (!eglDestroyImageKHR) {
+        logMessage(LogLevel::warn, "eglDestroyImageKHR is null");
+        return false;
+    }
+    return true;
+}
+
+HardwareImage::HardwareImage(/* args */) {
+    vkDevice = VulkanManager::Get().device;    
 }
 
 HardwareImage::~HardwareImage() { release(); }
@@ -105,7 +143,7 @@ void HardwareImage::createAndroidBuffer(const ImageFormat &format) {
 #if __ANDROID_API__ >= 26
     AHardwareBuffer_allocate(&usage, &buffer);
     bindVK(buffer);
-#endif    
+#endif
 }
 
 // https://android.googlesource.com/platform/cts/+/master/tests/tests/graphics/jni/VulkanTestHelpers.cpp

@@ -15,9 +15,9 @@ endfunction()
 function(aoce_output targetname) 
     # message(STATUS "output" ${targetname})
     set_target_properties(${targetname} PROPERTIES 
-    RUNTIME_OUTPUT_DIRECTORY ${AOCE_RUNTIME_DIR}
-    LIBRARY_OUTPUT_DIRECTORY ${AOCE_LIBRARY_DIR}     
-    ARCHIVE_OUTPUT_DIRECTORY ${AOCE_LIBRARY_DIR}
+      RUNTIME_OUTPUT_DIRECTORY ${AOCE_RUNTIME_DIR}
+      LIBRARY_OUTPUT_DIRECTORY ${AOCE_LIBRARY_DIR}     
+      ARCHIVE_OUTPUT_DIRECTORY ${AOCE_LIBRARY_DIR}
     )
 endfunction(aoce_output targetname)
 
@@ -26,13 +26,31 @@ function(install_aoce_module module contain_include)
   install(TARGETS ${module}
           EXPORT ${module}EXPORT
           # CONFIGURATIONS Release
-          LIBRARY DESTINATION lib  # 动态库安装路径
-          ARCHIVE DESTINATION lib  # 静态库安装路径
           RUNTIME DESTINATION bin  # 可执行文件安装路径
+          LIBRARY DESTINATION lib  # 动态库安装路径
+          ARCHIVE DESTINATION lib  # 静态库安装路径          
           # PUBLIC_HEADER DESTINATION include/${module}  # 头文件安装路径
           )  
 endfunction(install_aoce_module)
 
+function(aoce_swig_output targetname) 
+  set_target_properties(${targetname} PROPERTIES 
+    RUNTIME_OUTPUT_DIRECTORY ${AOCE_RUNTIME_DIR} 
+    LIBRARY_OUTPUT_DIRECTORY ${AOCE_RUNTIME_DIR}     
+    ARCHIVE_OUTPUT_DIRECTORY ${AOCE_LIBRARY_DIR}
+  )
+endfunction(aoce_swig_output targetname)
+
+function(install_aoce_swig_module module contain_include) 
+  install(TARGETS ${module}
+          EXPORT ${module}EXPORT
+          # CONFIGURATIONS Release
+          RUNTIME DESTINATION bin  # 可执行文件安装路径
+          LIBRARY DESTINATION bin  # 动态库安装路径
+          ARCHIVE DESTINATION lib  # 静态库安装路径          
+          # PUBLIC_HEADER DESTINATION include/${module}  # 头文件安装路径
+          )  
+endfunction(install_aoce_swig_module)
 
 # Construct search paths for includes and libraries from a PREFIX_PATH
 macro(create_search_paths PREFIX)

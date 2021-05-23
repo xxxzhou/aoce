@@ -38,7 +38,6 @@
 using namespace aoce::vulkan::layer;
 
 namespace aoce {
-namespace vulkan {
 
 ITLayer<KernelSizeParamet>* createBoxFilterLayer(ImageType imageType) {
     VkBoxBlurSLayer* boxBlur = new VkBoxBlurSLayer(imageType);
@@ -65,8 +64,13 @@ ITLayer<GuidedParamet>* createGuidedLayer() {
     return layer;
 }
 
+ITLayer<SizeScaleParamet>* createSizeScaleLayer(ImageType imageType) {
+    VkSizeScaleLayer* layer = new VkSizeScaleLayer(imageType);
+    return layer;
+}
+
 ITLayer<ReSizeParamet>* createResizeLayer(ImageType imageType) {
-    VkResizeLayer* layer = new VkResizeLayer(imageType);
+    VkResizeLayer* layer = new VkResizeLayer();
     return layer;
 }
 
@@ -619,5 +623,4 @@ IBaseLayer* createConvertImageLayer() {
     return layer;
 }
 
-}  // namespace vulkan
 }  // namespace aoce

@@ -74,7 +74,10 @@ void VkExtraBaseView::openDevice(int32_t id) {
     }
     index = id;
     video = deviceList[index];
-    auto& formats = video->getFormats();
+    // auto& formats = video->getFormats();
+    int32_t formatCount = video->getFormatCount();
+    std::vector<VideoFormat> formats(formatCount);
+    video->getFormats(formats.data(), formatCount);
 #if WIN32
     formatIndex = video->findFormatIndex(1920, 1080);
 #elif __ANDROID__
@@ -82,7 +85,7 @@ void VkExtraBaseView::openDevice(int32_t id) {
 #endif
     video->setFormat(formatIndex);
     video->open();
-    auto& selectFormat = video->getSelectFormat();
+    auto selectFormat = video->getSelectFormat();
     video->setObserver(this);
     VideoType videoType = selectFormat.videoType;
 #if WIN32

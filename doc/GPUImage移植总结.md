@@ -6,13 +6,13 @@
 
 [Vulkan移植GPUImage(一)高斯模糊与自适应阈值](Vulkan移植GPUImage1.md)
 
-[Vulkan移植GPUImage(二)Harris角点检测与导向滤波](Vulkan移植GPUImage1.md)
+[Vulkan移植GPUImage(二)Harris角点检测与导向滤波](Vulkan移植GPUImage2.md)
 
-[Vulkan移植GPUImage(三)从A到C的滤镜](Vulkan移植GPUImage1.md)
+[Vulkan移植GPUImage(三)从A到C的滤镜](Vulkan移植GPUImage3.md)
 
-[Vulkan移植GPUImage(四)从D到O的滤镜](Vulkan移植GPUImage1.md)
+[Vulkan移植GPUImage(四)从D到O的滤镜](Vulkan移植GPUImage4.md)
 
-[Vulkan移植GPUImage(五)从P到Z的滤镜](Vulkan移植GPUImage1.md)
+[Vulkan移植GPUImage(五)从P到Z的滤镜](Vulkan移植GPUImage5.md)
 
 [CMake 常用命令](https://zhuanlan.zhihu.com/p/258118287)
 
@@ -50,7 +50,7 @@
 
 第一点,我受[FrameGraph|设计&基于DX12实现](https://zhuanlan.zhihu.com/p/147207161)启发,想到利用有向无环图来实现.在开始构建时,节点互相连接好.然后利用深度优先搜索自动排除到关闭自己/分支的节点,拿到最终的有效连接线,有向无环图可以根据有效连接线生成正确的执行顺序,然后检查每层节点与连接的节点的图像类型是否符合,检查成功后就初始化每层节点的资源,如果是Vulkan模块,所有层资源生成后,就会把所有执行命令填充到当前图层的VkCommandBuffer对象中,运行时执行VkCommandBuffer记录的指令.
 
-在运行时,设定节点/分支是否可用,以及有点层参数改变会影响输出大小都会导致图层重启标记开启,用标记是考虑到更新参数层与执行GPU运算不在同一线程的情况,图层下次运行前,检测到重启标记开启,就会重新开始构建.
+在运行时,设定节点/分支是否可用,以及有些层参数改变会影响输出大小都会导致图层重启标记开启,用标记是考虑到更新参数层与执行GPU运算不在同一线程的情况,图层下次运行前,检测到重启标记开启,就会重新开始构建.
 
 相关源码在[PipeGraph](../code/aoce/layer/PipeGraph.hpp)
 
@@ -58,7 +58,7 @@
 
 对于运算层基类(BaseLayer)注意如下几个时序.
 
-1. onInit/onInitNode 当层被加入PipeGraph前/后分别调用,在之后,会有个weak_ptr关联PipeGraph的PipeNode,同样,检查这个引用是否有效可以知道是否已经附加到PipeGraph上.
+1. onInit/onInitNode 当层被加入PipeGraph前/后分别调用,在之后,会有个弱引用关联PipeGraph的PipeNode,同样,检查这个引用是否有效可以知道是否已经附加到PipeGraph上.
 
 2. onInitLayer 当PipeGraph生成正确的有效连接线后,根据有效连接线重新连接上下层并生成正确执行顺序后,对各运算层调用.
 
@@ -94,9 +94,9 @@
 
 其中Vulkan图层中,每个图层中包含一个VulkanContext对象,其有独立的VkCommandBuffer对象,这样可以保证每个图层在多个线程互不干扰,各个线程可以独立运行一个或是多个图层,对于cuda图层来说,每个图层也有个cudaStream_t对象,做到各个线程独立运行.
 
-其中aoce_vulkan我定义了VkPipeGraph/VkLayer的实现,以及各个Vulkan对象的封装,还有输入/输出,包含RGBA<->YUV的转化这些基本的计算层,余下的GPUImage的所有层全在aoce_vulkan_extra完成,也算是对为了方便用户扩展自己的层的一个测试,说实话,aoce_vulkan_extra模块移植过程中,我感觉我以前存储的一些Vulkan知识已经快被我忘光了.
+其中aoce_vulkan我定义了VkPipeGraph/VkLayer的实现,以及各个Vulkan对象的封装,还有输入/输出,包含RGBA<->YUV的转化这些基本的计算层,余下的GPUImage的所有层全在aoce_vulkan_extra完成,也算是对方便用户扩展自己的层的一个测试,说实话,在移植GPUImage到aoce_vulkan_extra模块过程中,我感觉以前存储的一些Vulkan知识已经快被我忘光了.
 
-最后到这,用户实现自己的vulkan处理层,就不需要懂太多vulkan知识就能完成,只需要写好glsl源码,继承VkLayer,然后根据需求重载上面的一二个函数就行了,欢迎大家在这基础之上实现自己的运算层并反馈给我.
+最后到这,用户实现自己的vulkan处理层,就不需要懂太多vulkan知识就能完成,只需要写好glsl源码,继承VkLayer,然后根据需求重载上面的一二个函数就行了,欢迎大家在这基础之上实现自己的运算层.
 
 ## 框架数据流程
 
@@ -120,7 +120,7 @@
 
 在框架各模块内部,引用导出的类不要求什么不能用STL,毕竟肯定你编译这些模块肯定是相同编译环境,但是如果导出给别的用户使用,需要限制导出的数据与格式,以保证别的用户与你不同的编译环境也不会有问题.
 
-配合CMake,使用install只导出特殊编写的.h文件,这些文件主要是如下三种作用.
+配合CMake,使用install只导出特殊编写的.h头文件给外部程序使用,这些头文件主要包含如下三种类型.
 
 1. C风格的结构,C风格导出帮助函数,与C风格导出用来创建对应工厂/管理对象.
 

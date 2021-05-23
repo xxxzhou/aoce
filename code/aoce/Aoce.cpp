@@ -10,17 +10,37 @@
 #include "Aoce.hpp"
 #include "module/ModuleManager.hpp"
 #if WIN32
-#include <Shlwapi.h>
-#include <Windows.h>
-
-#include <filesystem>
-#include <iomanip>
-#pragma comment(lib, "shlwapi.lib")
+    #include <Shlwapi.h>
+    #include <Windows.h>    
+    
+    #include <iomanip>
+    // MS VC++ 16.0 _MSC_VER = 1928 (Visual Studio 2019)
+    // MS VC++ 15.0 _MSC_VER = 1910 (Visual Studio 2017)
+    // MS VC++ 14.0 _MSC_VER = 1900 (Visual Studio 2015)
+    #if _MSC_VER > 1910 && _HAS_CXX17
+        #include <filesystem>
+        namespace fs = std::filesystem;   
+    #else 
+        #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
+        #include <experimental/filesystem>
+        namespace fs = std::experimental::filesystem;
+    #endif
+    #pragma comment(lib, "shlwapi.lib")
 #elif __ANDROID__
-#include <stdlib.h>
+    #include <stdlib.h>
+    #include "AoceManager.hpp"
 #endif
 
 namespace aoce {
+
+// template class ITLayer<InputParamet>;
+// template class ITLayer<OutputParamet>;
+// template class ITLayer<YUVParamet>;
+// template class ITLayer<YUVParamet>;
+// template class ITLayer<TexOperateParamet>;
+// template class ITLayer<TransposeParamet>;
+// template class ITLayer<ReSizeParamet>;
+// template class ITLayer<BlendParamet>;
 
 static const char* infoAoceLevel = "info";
 static const char* warnAoceLevel = "warn";
@@ -31,29 +51,37 @@ static logEventHandle logHandle = nullptr;
 
 void setLogAction(logEventAction action) { logHandle = action; }
 void setLogHandle(logEventHandle action) { logHandle = action; }
+void setLogObserver(ILogObserver* observer) {
+    logHandle = [observer](int32_t level, const char* message) -> void {
+        if (observer == nullptr) {
+            return;
+        }
+        observer->onLogEvent(level, message);
+    };
+}
 
-const char* getLogLevel(AOCE_LOG_LEVEL level) {
+const char* getLogLevel(LogLevel level) {
     switch (level) {
-        case AOCE_LOG_INFO:
+        case LogLevel::info:
             return infoAoceLevel;
-        case AOCE_LOG_WARN:
+        case LogLevel::warn:
             return warnAoceLevel;
-        case AOCE_LOG_ERROR:
+        case LogLevel::error:
             return errorAoceLevel;
-        case AOCE_LOG_DEBUG:
+        case LogLevel::debug:
             return debugAoceLevel;
     }
     return nullptr;
 }
 
-void logMessage(AOCE_LOG_LEVEL level, const char* message) {
+void logMessage(LogLevel level, const char* message) {
 #if !DEBUG
-    if (level == AOCE_LOG_DEBUG) {
+    if (level == LogLevel::debug) {
         return;
     }
 #endif
     if (logHandle != nullptr) {
-        logHandle(level, message);
+        logHandle((int32_t)level, message);
     } else if (message) {
 #if WIN32
         auto now = std::chrono::system_clock::to_time_t(
@@ -66,16 +94,16 @@ void logMessage(AOCE_LOG_LEVEL level, const char* message) {
         // << "\" in " << __FILE__ << " at line " << __LINE__
 #elif __ANDROID__
         switch (level) {
-            case AOCE_LOG_INFO:
+            case LogLevel::info:
                 LOGI(message, __FILE__, __LINE__);
                 break;
-            case AOCE_LOG_WARN:
+            case LogLevel::warn:
                 LOGW(message, __FILE__, __LINE__);
                 break;
-            case AOCE_LOG_ERROR:
+            case LogLevel::error:
                 LOGE(message, __FILE__, __LINE__);
                 break;
-            case AOCE_LOG_DEBUG:
+            case LogLevel::debug:
                 LOGD(message, __FILE__, __LINE__);
                 break;
             default:
@@ -89,13 +117,45 @@ void logMessage(aoce::LogLevel level, const std::string& message) {
     if (message.empty()) {
         return;
     }
-    logMessage((AOCE_LOG_LEVEL)level, message.c_str());
+    logMessage(level, message.c_str());
 }
 
 void logAssert(bool expression, const std::string& message) {
     if (!expression) {
         logMessage(LogLevel::error, message);
         assert(expression);
+    }
+}
+
+const char* to_string(const VideoType& value) {
+    switch (value) {
+        case VideoType::nv12:
+            return "nv12";
+        case VideoType::yuv2I:
+            return "yuv2I";
+        case VideoType::yvyuI:
+            return "yvyuI";
+        case VideoType::uyvyI:
+            return "uyvyI";
+        case VideoType::mjpg:
+            return "mjpg";
+        case VideoType::rgb8:
+            return "rgb8";
+        case VideoType::argb8:
+            return "argb8";
+        case VideoType::rgba8:
+            return "rgba8";
+        case VideoType::bgra8:
+            return "bgra8";
+        case VideoType::depth16u:
+            return "depth16u";
+        case VideoType::yuy2P:
+            return "yuy2P";
+        case VideoType::yuv420P:
+            return "yuv420P";
+        case VideoType::other:
+        default:
+            return "invalid";
     }
 }
 
@@ -449,8 +509,8 @@ std::string getAocePath() {
 }
 
 #if WIN32
-bool existsFile(const wchar_t* filePath) {
-    return std::tr2::sys::exists(filePath);
+bool existsFile(const wchar_t* filePath) {    
+    return fs::exists(filePath);
 }
 
 bool loadFileBinary(const wchar_t* filePath, std::vector<uint8_t>& data) {
@@ -545,4 +605,11 @@ void unloadAoce() {
     ModuleManager::Get().unloadModule("aoce_ffmpeg");
 #endif
 }
+
+#if __ANDROID__
+void initAndroid(const AndroidEnv& andEnv) {
+    AoceManager::Get().initAndroid(andEnv);
+}
+#endif
+
 }  // namespace aoce

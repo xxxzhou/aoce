@@ -13,10 +13,24 @@
 
 void FAocePluginsModule::StartupModule()
 {
+#if WIN32
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	LoadDllEx(FString("AocePlugins/ThirdParty/Aoce/win/bin/aoce.dll"), false);	
-	loadAoce();
-#if __ANDROID__ // PLATFORM_ANDROID
+	// LoadDllEx(FString("AocePlugins/ThirdParty/Aoce/win/bin/aoce.dll"), false);
+	FString relativePath = FString("AocePlugins/ThirdParty/Aoce/win/bin/aoce.dll");
+	FString filePath = FPaths::ProjectPluginsDir() / relativePath;
+	if (FPaths::FileExists(filePath))
+	{
+		FString fullFileName = FPaths::ConvertRelativePathToFull(filePath);
+		FString fullPath = FPaths::GetPath(fullFileName);
+		FPlatformProcess::PushDllDirectory(*fullPath);
+		void* hdll = FPlatformProcess::GetDllHandle(*fullFileName);
+		FPlatformProcess::PopDllDirectory(*fullPath);
+		if (hdll == nullptr) {
+		}
+	}
+#endif	
+	aoce::loadAoce();
+#if __ANDROID__ // PLATFORM_ANDROID __ANDROID__
 	JNIEnv* jni_env = FAndroidApplication::GetJavaEnv(true);
 	jobject at = FAndroidApplication::GetGameActivityThis();
 	jmethodID getApplication = jni_env->GetMethodID(FJavaWrapper::GameActivityClassID, "getApplication", "()Landroid/app/Application;");
@@ -24,11 +38,7 @@ void FAocePluginsModule::StartupModule()
 	AndroidEnv andEnv = {};
 	andEnv.env = jni_env;
 	andEnv.activity = at;
-	//// 从https://blog.csdn.net/hust_liuX/article/details/1460486 得到的修改方案
-	//JavaVM* g_jvm = nullptr;
-	//jni_env->GetJavaVM(&g_jvm);
-	//g_jvm->AttachCurrentThread(&jni_env, 0);
-	AoceManager::Get().initAndroid(andEnv);
+	initAndroid(andEnv);
 #endif	
 }
 
@@ -36,7 +46,7 @@ void FAocePluginsModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
-	unloadAoce();
+	aoce::unloadAoce();
 }
 
 void FAocePluginsModule::LoadDllEx(FString relativePath, bool bSeacher) {
@@ -45,17 +55,9 @@ void FAocePluginsModule::LoadDllEx(FString relativePath, bool bSeacher) {
 	{
 		FString fullFileName = FPaths::ConvertRelativePathToFull(filePath);
 		FString fullPath = FPaths::GetPath(fullFileName);
-		void *hdll = nullptr;
-		if (bSeacher) {
-			//FPlatformProcess::PushDllDirectory(*fullPath);
-			//hdll = LoadLibraryEx(*fullFileName, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
-			//FPlatformProcess::PopDllDirectory(*fullPath);
-		}
-		else {
-			FPlatformProcess::PushDllDirectory(*fullPath);
-			hdll = FPlatformProcess::GetDllHandle(*fullFileName);
-			FPlatformProcess::PopDllDirectory(*fullPath);
-		}
+		FPlatformProcess::PushDllDirectory(*fullPath);
+		void* hdll = FPlatformProcess::GetDllHandle(*fullFileName);
+		FPlatformProcess::PopDllDirectory(*fullPath);
 		if (hdll == nullptr) {
 			//int error_id = GetLastError();
 			//if (error_id != 0)
@@ -69,5 +71,5 @@ void FAocePluginsModule::LoadDllEx(FString relativePath, bool bSeacher) {
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FAocePluginsModule, AocePlugins)

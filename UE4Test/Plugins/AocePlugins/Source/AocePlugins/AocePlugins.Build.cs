@@ -53,22 +53,23 @@ public class AocePlugins : ModuleRules
             );
         CppStandard = CppStandardVersion.Cpp14;
         // 头文件
-        PublicIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath, "Aoce/win/include") });
+        PublicSystemIncludePaths.AddRange(new string[] { Path.Combine(ThirdPartyPath, "Aoce/win/include") });
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-            Definitions.Add("__ANDROID__=0");
-            Definitions.Add("WIN32=1");
+            PublicDefinitions.Add("__ANDROID__=0");
+            PublicDefinitions.Add("WIN32=1");
             string aocePath = Path.Combine(ThirdPartyPath, "Aoce/win");
             string libPath = Path.Combine(aocePath, "lib");
             string binPath = Path.Combine(aocePath, "bin");
             // 链接库
-            PublicLibraryPaths.Add(libPath);
-            PublicAdditionalLibraries.Add("aoce.lib");
-            // 需要延迟加载的dll,不加的话,需把相应dll拷贝到工程的Binaries,否则编辑器到75%就因加载不了dll crash.     
-            PublicDelayLoadDLLs.Add("aoce.dll");
-            // PublicDelayLoadDLLs.Add("aoce_agora.dll");
-            // PublicDelayLoadDLLs.Add("agora_rtc_sdk.dll");
-            // RuntimeDependencies.Add(Path.Combine(binPath, "aoce.dll"));
+            PublicSystemLibraryPaths.Add(libPath);
+            string[] runLibs = { "aoce", "aoce_talkto", "aoce_vulkan_extra" };
+            foreach (var runLib in runLibs)
+            {
+                PublicSystemLibraries.Add(runLib + ".lib");
+                // 需要延迟加载的dll,不加的话,需把相应dll拷贝到工程的Binaries,否则编辑器到75%就因加载不了dll crash.     
+                PublicDelayLoadDLLs.Add(runLib + ".dll");
+            }
             foreach (string path in Directory.GetFiles(binPath, "*.*", SearchOption.AllDirectories))
             {
                 RuntimeDependencies.Add(path);
@@ -85,8 +86,7 @@ public class AocePlugins : ModuleRules
             string libPath = Path.Combine(aocePath, "armeabi-v7a");
             // 链接库
             PublicAdditionalLibraries.Add(Path.Combine(libPath, "libaoce.so"));
-            PublicAdditionalLibraries.Add(Path.Combine(libPath, "libffmpeg.so"));
-            // PublicAdditionalLibraries.Add(Path.Combine(libPath, "libagora-rtc-sdk-jni.so"));            
+            PublicAdditionalLibraries.Add(Path.Combine(libPath, "libaoce_talkto.so"));
         }
     }
 

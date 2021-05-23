@@ -10,6 +10,13 @@ void OutputLayer::onImageProcessHandle(uint8_t* data,
     }
 }
 
+void OutputLayer::onFormatChanged(const ImageFormat& imageFormat,
+                                  int32_t outIndex) {
+    if (observer) {
+        observer->onFormatChanged(imageFormat, outIndex);
+    }
+}
+
 void OutputLayer::setObserver(IOutputLayerObserver* observer) {
     this->observer = observer;
 }

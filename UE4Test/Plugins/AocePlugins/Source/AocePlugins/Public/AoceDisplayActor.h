@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/Texture2D.h"
 #include "aoce/AoceCore.h"
+#include "VideoDisplay.hpp"
 #include "AoceDisplayActor.generated.h"
 
 UCLASS()
@@ -24,32 +25,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		UTexture2D* sourceTex = nullptr;
 private:
-	// UFUNCTION(BlueprintCallable)
-	void SetMatTexture(UTexture2D* texture);
+	aoce::VideoDisplay* videoDisplay = nullptr;
+
 private:
 	class UMaterialInstanceDynamic* materialDynamic = nullptr;
-
-	aoce::PipeGraph* vkGraph = nullptr;
-	aoce::IInputLayer* inputLayer = nullptr;
-	aoce::OutputLayer* outputLayer = nullptr;
-	aoce::IYUV2RGBALayer* yuv2rgbLayer = nullptr;
-	aoce::ITexOperateLayer* texLayer = nullptr;
-	aoce::VideoFormat format = {};
-
-	aoce::GpuType gpuType = aoce::GpuType::vulkan;
-	FTexture2DRHIRef textureRHI = nullptr;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void outLayerData(uint8_t* data, aoce::ImageFormat imageFormat,
-		int32_t outIndex);
+	void onTextureChange(const aoce::ImageFormat imageFormat);
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 public:
-	// 请保证这个方法在游戏线程调用
-	void UpdateFrame(const aoce::VideoFrame& frame);
+	void setDisplay(aoce::VideoDisplay* display);
 };
 
-void initTexture(UTexture2D** texture, int width, int height, EPixelFormat format = PF_R8G8B8A8);

@@ -30,4 +30,9 @@ void VideoManager::getDevices(IVideoDevice** videos, int32_t size,
     }
 }
 
+IVideoDevice* VideoManager::getDevice(int32_t index) {
+    assert(index >= 0 && index < videoList.size());
+    return videoList[index].get();
+}
+
 }  // namespace aoce

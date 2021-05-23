@@ -17,13 +17,13 @@ namespace vulkan {
 // AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM VK_FORMAT_R8G8B8A8_UNORM GL_RGBA8
 // AHARDWAREBUFFER_FORMAT_S8_UINT VK_FORMAT_S8_UINT GL_STENCIL_INDEX8
 
+bool supportHardwareImage(VkDevice device);
+
+
 class HardwareImage {
    private:
     /* data */
     AHardwareBuffer *buffer = nullptr;
-    //    PFN_vkGetAndroidHardwareBufferPropertiesANDROID
-    //        vkGetAndroidHardwareBufferPropertiesANDROID = nullptr;
-    //    PFN_vkBindImageMemory2KHR vkBindImageMemory2KHR = nullptr;
     VkDevice vkDevice = VK_NULL_HANDLE;
     VkImage vkImage = VK_NULL_HANDLE;
     VkDeviceMemory memory = VK_NULL_HANDLE;
@@ -31,6 +31,8 @@ class HardwareImage {
     EGLDisplay display = nullptr;
     ImageFormat format = {};
     uint32_t textureId = -1;
+
+    bool bInit = false;
 
    public:
     HardwareImage(/* args */);

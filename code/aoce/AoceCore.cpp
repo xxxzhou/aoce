@@ -4,7 +4,7 @@
 #include "module/ModuleManager.hpp"
 
 namespace aoce {
-
+ 
 bool checkLoadModel(const char* modelName) {
     return ModuleManager::Get().checkLoadModel(modelName);
 }

@@ -40,6 +40,7 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     int32_t computeIndex = -1;
     bool bAloneCompute = false;
     bool bInterpDx11 = false;
+    bool bInterpGLES = false;
     bool bDebugMsg = false;
 
    public:

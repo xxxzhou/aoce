@@ -6,44 +6,27 @@
 
 #include "AoceDefine.h"
 
-enum AOCE_LOG_LEVEL {
-    AOCE_LOG_INFO = 0,
-    AOCE_LOG_WARN,
-    AOCE_LOG_ERROR,
-    // 在这定义只在debug下才会输出
-    AOCE_LOG_DEBUG,
-};
-
-// 完成win32端vulkan与dx11交互,
-// 经测试性能与dx11性能还高一点,比不上cuda,不过作为通用备份选择足够了
-enum AOCE_GPU_SDK {
-    AOCE_GPU_OTHER = 0,
-    AOCE_GPU_CUDA,
-    // AOCE_GPU_DX11,
-    AOCE_GPU_VULKAN,
-};
-
 namespace aoce {
+
 // 对应上面AOCE_LOG_LEVEL
-enum class LogLevel {
-    info = AOCE_LOG_INFO,
-    warn = AOCE_LOG_WARN,
-    error = AOCE_LOG_ERROR,
-    debug = AOCE_LOG_DEBUG,
+enum class LogLevel : int32_t {
+    info = 0,
+    warn,
+    error,
+    debug,
 };
 
 // 完成win32端vulkan与dx11交互,
-// 经测试性能与dx11性能还高一点,比不上cuda,不过作为通用备份选择足够了
-enum class GpuType {
-    other = AOCE_GPU_OTHER,
-    cuda = AOCE_GPU_CUDA,
-    // dx11 = AOCE_GPU_DX11,
-    vulkan = AOCE_GPU_VULKAN,
+// 经测试性能与dx11性能还高一些,比不上cuda,不过作为通用备份选择足够了
+enum class GpuType : int32_t {
+    other = 0,
+    cuda,
+    vulkan,
 };
 
 // 视频设备与游戏内部纹理使用,YUV格式是Interleaved/Semi-Planar,没想到android设备直接读出p格式
 // 难道android图像设备直接输出的是编码过的数据?还需要解码?等以后验证
-enum class VideoType {
+enum class VideoType : int32_t {
     other = 0,
     // 这几种一般是window平台图像读取设备常用格式
     nv12,  // yuv420SP
@@ -65,39 +48,7 @@ enum class VideoType {
     yuv420P,
 };
 
-inline const char *to_string(VideoType value) {
-    switch (value) {
-        case VideoType::nv12:
-            return "nv12";
-        case VideoType::yuv2I:
-            return "yuv2I";
-        case VideoType::yvyuI:
-            return "yvyuI";
-        case VideoType::uyvyI:
-            return "uyvyI";
-        case VideoType::mjpg:
-            return "mjpg";
-        case VideoType::rgb8:
-            return "rgb8";
-        case VideoType::argb8:
-            return "argb8";
-        case VideoType::rgba8:
-            return "rgba8";
-        case VideoType::bgra8:
-            return "bgra8";
-        case VideoType::depth16u:
-            return "depth16u";
-        case VideoType::yuy2P:
-            return "yuy2P";
-        case VideoType::yuv420P:
-            return "yuv420P";
-        case VideoType::other:
-        default:
-            return "invalid";
-    }
-}
-
-enum class CameraType {
+enum class CameraType : int32_t {
     other = 0,
     win_mf,
     and_camera2,
@@ -105,7 +56,7 @@ enum class CameraType {
 };
 
 // aoce外部接收图像暂时就包含这几种
-enum class ImageType {
+enum class ImageType : int32_t {
     other = 0,
     r8,
     rgba8,
@@ -118,23 +69,23 @@ enum class ImageType {
     rgba32,
 };
 
-enum class VideoCodec {
+enum class VideoCodec : int32_t {
     other = 0,
     h264,
 };
 
-enum class AudioCodec {
+enum class AudioCodec : int32_t {
     other = 0,
     acc,
 };
 
-enum class LiveType {
+enum class LiveType : int32_t {
     other = 0,
     aoce,
     agora,
 };
 
-enum class MediaType {
+enum class MediaType : int32_t {
     other = 0,
     ffmpeg,
 };
@@ -290,13 +241,18 @@ struct SizeScaleParamet {
     }
 };
 
+//日志回调
+typedef void (*logEventAction)(int32_t level, const char *message);
+
 extern "C" {
 
 ACOE_EXPORT void setLogAction(logEventAction action);
 
-ACOE_EXPORT const char *getLogLevel(AOCE_LOG_LEVEL level);
+ACOE_EXPORT const char *getLogLevel(LogLevel level);
 
-ACOE_EXPORT void logMessage(AOCE_LOG_LEVEL level, const char *message);
+ACOE_EXPORT void logMessage(LogLevel level, const char *message);
+
+ACOE_EXPORT const char *to_string(const VideoType &value);
 
 ACOE_EXPORT uint32_t divUp(int32_t x, int32_t y);
 ACOE_EXPORT long long getNowTimeStamp();
@@ -326,6 +282,17 @@ ACOE_EXPORT void unloadAoce();
 #if __ANDROID__
 // ACOE_EXPORT jint JNI_OnLoad(JavaVM *jvm, void *);
 // ACOE_EXPORT void JNI_OnUnload(JavaVM *jvm, void *);
+struct AndroidEnv {
+    JavaVM *vm = nullptr;
+    // 在调用initAndroid里线程,注意不同线程这值不同
+    JNIEnv *env = nullptr;
+    jobject activity = nullptr;
+    jobject application = nullptr;
+    int32_t sdkVersion = 0;
+    AAssetManager *assetManager = nullptr;
+};
+ACOE_EXPORT void initAndroid(const AndroidEnv &andEnv);
+
 #endif
 }
 

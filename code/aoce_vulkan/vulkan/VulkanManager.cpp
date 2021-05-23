@@ -3,6 +3,7 @@
 
 #include <vulkan/vulkan.h>
 #if __ANDROID__
+#include "../android/HardwareImage.hpp"
 #include "../android/vulkan_wrapper.h"
 #endif
 
@@ -247,6 +248,17 @@ bool VulkanManager::createDevice(bool bAloneCompute) {
     bInterpDx11 &= (ExternalImageFormatProperties.externalMemoryProperties
                         .compatibleHandleTypes &
                     VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT) > 0;
+    if (!bInterpDx11) {
+        logMessage(LogLevel::warn, "aoce_vulkan not interp dx11");
+    }
+#endif
+#if __ANDROID__
+    bInterpGLES = supportHardwareImage(device);
+    if (!bInterpGLES) {
+        logMessage(LogLevel::warn, "aoce_vulkan not interp opengl es");
+    } else {
+        logMessage(LogLevel::info, "aoce_vulkan can interp opengl es");
+    }
 #endif
     return true;
 }

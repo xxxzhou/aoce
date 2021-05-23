@@ -24,6 +24,7 @@ class AVideoDevice : public VideoDevice {
     ACaptureSessionOutputContainer* outputContainer = nullptr;
     ACaptureSessionOutput* sessionOutput = nullptr;
     ACameraCaptureSession* session = nullptr;
+    ANativeWindow* surface = nullptr;
     // std::string mid ="";
 
     friend void imageCallback(void* context, AImageReader* reader);

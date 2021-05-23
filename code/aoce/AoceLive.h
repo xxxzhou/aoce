@@ -35,7 +35,7 @@ struct PushStream {
     PushSetting setting = {};
 };
 
-enum class RoomType {
+enum class RoomType : int32_t {
     // 没有初始化
     noInit,
     // 初始化

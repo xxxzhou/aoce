@@ -2,10 +2,8 @@
 
 
 #include "AoceLiveActor.h"
-#if PLATFORM_ANDROID
-#include "Runtime/Launch/Public/Android/AndroidJNI.h"
-#include "Runtime/ApplicationCore/Public/Android/AndroidApplication.h"
-#endif
+#include "LiveManager.hpp"
+#include "CameraManager.hpp"
 
 using namespace aoce;
 
@@ -17,38 +15,49 @@ AAoceLiveActor::AAoceLiveActor() {
 
 // Called when the game starts or when spawned
 void AAoceLiveActor::BeginPlay() {
-	Super::BeginPlay();	
+	Super::BeginPlay();
+	aoce::LiveManager::Get().initLive(aoce::LiveType::agora, aoce::GpuType::vulkan);
+	auto videoList = aoce::CameraManager::Get().getVideoList();
+	if (videoList.size() > 0) {
+		auto firstVideo = videoList[0];
+		int32_t format = firstVideo->findFormatIndex(1280, 720);
+		aoce::LiveManager::Get().setCameraId(videoList[0]->getId(), format);
+	}
+}
 
-	liveManager = std::make_unique<AoceLiveManager>();
-	liveManager->initRoom(aoce::LiveType::agora, dispActor);
-	liveManager->getRoom()->loginRoom("123", 710, 1);
+void AAoceLiveActor::onLogin(int roleIndex) {
+	RoleType rtype = (RoleType)roleIndex;
+	int32_t userIndex = 0;
+	if (rtype == RoleType::student) {
+		userIndex = 5;
+	}
+	aoce::LiveManager::Get().loginRoom("123", rtype, userIndex);
+	dispActor->setDisplay(aoce::LiveManager::Get().getVideoDisplay());
+}
 
-//	std::string uri = "rtmp://58.200.131.2:1935/livetv/hunantv";
-//	mediaPlayer = std::make_unique< AoceMediaPlayer>();
-//	mediaPlayer->initPlay(dispActor);
-//	mediaPlayer->getPlay()->setDataSource(uri.c_str());
-//#if WIN32
-//	mediaPlayer->getPlay()->prepare(true);
-//#elif __ANDROID__
-//	mediaPlayer->getPlay()->prepare(false);
-//#endif
+void AAoceLiveActor::onLogout() {
+	aoce::LiveManager::Get().logoutRoom();
+}
+
+void AAoceLiveActor::showDevice(int modeIndex) {
+	aoce::CameraProcess *cp = aoce::LiveManager::Get().getCameraProcess();
+	if (modeIndex == 1) {
+		cp->openCamera(aoce::ProcessType::source);
+	}
+	else if (modeIndex == 2) {
+		cp->openCamera(aoce::ProcessType::matting);
+	}
+	dispActor->setDisplay(cp->getVideoDisplay());
 }
 
 void AAoceLiveActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
-	if (liveManager) {
-		liveManager->getRoom()->logoutRoom();
-		liveManager->getRoom()->shutdownRoom();
-	}
-	if (mediaPlayer) {
-		mediaPlayer->getPlay()->stop();
-	}	
+	aoce::LiveManager::Get().logoutRoom();
+	aoce::LiveManager::Get().shutdownRoom();
 }
 
 // Called every frame
 void AAoceLiveActor::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
-	if (mediaPlayer) {
-		// mediaPlayer->updateTexture();
-	}
+
 }
 

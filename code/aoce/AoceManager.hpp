@@ -10,17 +10,6 @@
 
 #if __ANDROID__
 struct android_app;
-namespace aoce {
-struct AndroidEnv {
-    JavaVM *vm = nullptr;
-    // 在调用initAndroid里线程,注意不同线程这值不同
-    JNIEnv *env = nullptr;
-    jobject activity = nullptr;
-    jobject application = nullptr;
-    int32_t sdkVersion = 0;
-    AAssetManager *assetManager = nullptr;
-};
-}  // namespace aoce
 #endif
 
 namespace aoce {

@@ -37,7 +37,12 @@ echo end copy bin
 timeout 1
 echo start copy android bin
 set androidDir=05_livetest
-xcopy /s /e /y /c /i "..\android\%androidDir%\build\intermediates\cmake\debug\obj\armeabi-v7a" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a"
+if %copyMode%== 1 (
+	xcopy /s /e /y /c /i "..\android\%androidDir%\build\intermediates\cmake\debug\obj\armeabi-v7a" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a"
+) ^
+else if %copyMode%== 2 (
+	xcopy /s /e /y /c /i "..\android\%androidDir%\build\intermediates\cmake\release\obj\armeabi-v7a" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a"
+)
 xcopy /s /e /y /c /i "..\glsl\target" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a\glsl"
 copy "..\thirdparty\agora\android\agora-rtc-sdk.jar" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\agora-rtc-sdk.jar"
 copy "..\thirdparty\agora\android\armeabi-v7a\libagora-rtc-sdk-jni.so" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a\libagora-rtc-sdk-jni.so"
@@ -46,7 +51,7 @@ echo end copy android
 timeout 1
 echo start copy ffmpeg
 set copyffmpeg = 1
-:if %copyffmpeg%== 1
+:if %copyffmpeg%== 0
 xcopy /s /e /y /c /i "..\thirdparty\ffmpeg\x64\dll" ".\Plugins\AocePlugins\ThirdParty\Aoce\win\bin"
 xcopy /s /e /y /c /i "..\thirdparty\ffmpeg\android\armeabi-v7a" ".\Plugins\AocePlugins\ThirdParty\Aoce\android\armeabi-v7a"
 echo end copy ffmpeg

@@ -33,10 +33,11 @@ class IVideoDevice {
     // 得到所有支持的格式
     virtual void getFormats(VideoFormat* formats, int32_t size,
                             int32_t start = 0) = 0;
+    virtual VideoFormat getFormat(int32_t index) = 0;
 
     virtual const char* getName() = 0;
     virtual const char* getId() = 0;
-    virtual const VideoFormat& getSelectFormat() = 0;
+    virtual VideoFormat getSelectFormat() = 0;
 
     // 针对android是否后置摄像头
     virtual bool back() = 0;
@@ -67,7 +68,7 @@ class IVideoManager {
     // 得到所有摄像头
     virtual void getDevices(IVideoDevice** videos, int32_t size,
                             int32_t start = 0) = 0;
+    virtual IVideoDevice* getDevice(int32_t index) = 0;
 };
-
 
 }  // namespace aoce

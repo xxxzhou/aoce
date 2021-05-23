@@ -54,7 +54,9 @@ bool CuOutputLayer::onFrame() {
     return true;
 }
 
-void CuOutputLayer::onInitCuBufffer() {}
+void CuOutputLayer::onInitCuBufffer() {
+    onFormatChanged(outFormats[0], 0);
+}
 
 void CuOutputLayer::onUpdateParamet() {
     if (paramet.bCpu == oldParamet.bCpu && paramet.bGpu == oldParamet.bGpu) {

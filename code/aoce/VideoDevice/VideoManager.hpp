@@ -24,6 +24,7 @@ class ACOE_EXPORT VideoManager : public IVideoManager {
     // 得到所有支持的格式
     virtual void getDevices(IVideoDevice** videos, int32_t size,
                             int32_t start = 0) override;
+    virtual IVideoDevice* getDevice(int32_t index) override;
 };
 
 }  // namespace aoce

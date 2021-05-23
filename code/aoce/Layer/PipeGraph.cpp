@@ -6,6 +6,8 @@
 #include <queue>
 #include <stack>
 
+#include "OutputLayer.hpp"
+
 namespace aoce {
 
 PipeGraph::PipeGraph(/* args */) {}
@@ -271,7 +273,7 @@ bool PipeGraph::resetGraph() {
     onInitLayers();
     for (auto index : nodeExcs) {
         nodes[index]->layer->onInitBuffer();
-    }
+    }    
     onInitBuffers();
     return true;
 }

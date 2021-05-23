@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "AoceLiveManager.h"
-#include "AoceMediaPlayer.h"
 #include <memory>
 #include "AoceDisplayActor.h"
 #include "AoceLiveActor.generated.h"
@@ -20,14 +18,18 @@ public:
 	AAoceLiveActor();
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		AAoceDisplayActor *dispActor;
-private:
-	std::unique_ptr<AoceLiveManager> liveManager = nullptr;
-	std::unique_ptr<AoceMediaPlayer> mediaPlayer = nullptr;
+		AAoceDisplayActor* dispActor;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+public:
+	UFUNCTION(BlueprintCallable)
+	void onLogin(int roleIndex);
+	UFUNCTION(BlueprintCallable)
+	void onLogout();
+	UFUNCTION(BlueprintCallable)
+	void showDevice(int modeIndex);
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

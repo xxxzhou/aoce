@@ -9,7 +9,7 @@
         VkResult res = (f);                                             \
         if (res != VK_SUCCESS) {                                        \
             std::string str = "aoce vulkan error: " + errorString(res); \
-            logMessage(AOCE_LOG_ERROR, str.c_str());                    \
+            logMessage(aoce::LogLevel::error, str.c_str());                    \
             assert(res == VK_SUCCESS);                                  \
         }                                                               \
     }

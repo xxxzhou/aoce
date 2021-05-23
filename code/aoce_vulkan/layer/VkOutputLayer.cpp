@@ -19,7 +19,9 @@ void VkOutputLayer::onInitGraph() {
     winImage = std::make_unique<VkWinImage>();
     bWinInterop = false;
 #elif __ANDROID_API__ >= 26
-    hardwareImage = std::make_unique<HardwareImage>();
+    if (VulkanManager::Get().bInterpGLES) {
+        hardwareImage = std::make_unique<HardwareImage>();
+    }
     // hardwareImage->createAndroidBuffer(format);
 #endif
 }
@@ -47,6 +49,7 @@ void VkOutputLayer::onInitVkBuffer() {
         }
     }
 #endif
+    onFormatChanged(outFormats[0], 0);
 }
 
 bool VkOutputLayer::onFrame() {
@@ -76,15 +79,18 @@ void VkOutputLayer::onCommand() {
     }
 #endif
 #if __ANDROID_API__ >= 26
-    if (paramet.bGpu && hardwareImage->getImage()) {
-        changeLayout(cmd, hardwareImage->getImage(), VK_IMAGE_LAYOUT_UNDEFINED,
-                     VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                     VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                     VK_PIPELINE_STAGE_TRANSFER_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
-        VulkanManager::blitFillImage(cmd, inTexs[0].get(),
-                                     hardwareImage->getImage(),
-                                     hardwareImage->getFormat().width,
-                                     hardwareImage->getFormat().height);
+    if (VulkanManager::Get().bInterpGLES) {
+        if (paramet.bGpu && hardwareImage->getImage()) {
+            changeLayout(
+                cmd, hardwareImage->getImage(), VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                VK_PIPELINE_STAGE_TRANSFER_BIT, VK_IMAGE_ASPECT_COLOR_BIT);
+            VulkanManager::blitFillImage(cmd, inTexs[0].get(),
+                                         hardwareImage->getImage(),
+                                         hardwareImage->getFormat().width,
+                                         hardwareImage->getFormat().height);
+        }
     }
 #endif
 }
@@ -138,7 +144,7 @@ void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
         }
     }
 #if __ANDROID_API__ >= 26
-    if (paramet.bGpu) {
+    if (VulkanManager::Get().bInterpGLES && paramet.bGpu) {
         ImageFormat format = hardwareImage->getFormat();
         uint32_t oldIndex = hardwareImage->getTextureId();
         if (format.width != outTex.width || format.height != outTex.height ||

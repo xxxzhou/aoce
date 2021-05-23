@@ -5,6 +5,8 @@
 namespace aoce {
 
 class ACOE_EXPORT OutputLayer : public IOutputLayer {
+    friend class PipeGraph;
+
    public:
     virtual ~OutputLayer(){};
 
@@ -14,6 +16,7 @@ class ACOE_EXPORT OutputLayer : public IOutputLayer {
    protected:
     void onImageProcessHandle(uint8_t* data, const ImageFormat& imageFormat,
                               int32_t outIndex = 0);
+    void onFormatChanged(const ImageFormat& imageFormat, int32_t outIndex = 0);
 
    public:
     virtual void setObserver(IOutputLayerObserver* observer) final;

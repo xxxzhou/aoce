@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AoceCore.h"
+#include "../aoce/AoceCore.h"
 
 #ifdef _WIN32
 #if defined(AOCE_VULKAN_EXTRA_EXPORT_DEFINE)
@@ -17,11 +17,10 @@
 #endif
 
 namespace aoce {
-namespace vulkan {
 
-enum class ConvertType { other = 0, rgba82rgba32f, rgba32f2rgba8 };
+enum class ConvertType : int32_t { other = 0, rgba82rgba32f, rgba32f2rgba8 };
 
-enum class ReduceOperate {
+enum class ReduceOperate : int32_t {
     sum,
     min,
     max,
@@ -568,62 +567,72 @@ struct ZoomBlurParamet {
     }
 };
 
-class ILookupLayer : public ILayer {
-   public:
-    virtual ~ILookupLayer(){};
-    virtual void loadLookUp(uint8_t* data, int32_t size) = 0;
-};
+typedef ITLayer<SoftEleganceParamet> ASoftEleganceLayer;
+typedef ITLayer<PerlinNoiseParamet> APerlinNoiseLayer;
+typedef ITLayer<float> AFloatLayer;
 
-class ISoftEleganceLayer : public ITLayer<SoftEleganceParamet> {
-   public:
-    virtual ~ISoftEleganceLayer(){};
+typedef ITLayer<vec2> IStretchDistortionLayer;
+typedef ITLayer<vec3> IRGBLayer;
+typedef ITLayer<uint32_t> IMedianLayer;
+typedef ITLayer<Mat3x3> I3x3ConvolutionLayer;
+typedef ITLayer<int32_t> IMorphLayer;
 
-   public:
-    virtual void loadLookUp1(uint8_t* data, int32_t size) = 0;
-    virtual void loadLookUp2(uint8_t* data, int32_t size) = 0;
-};
+typedef ITLayer<float> IBrightnessLayer;
+typedef ITLayer<float> IExposureLayer;
+typedef ITLayer<float> IContrastLayer;
+typedef ITLayer<float> ISaturationLayer;
+typedef ITLayer<float> IGammaLayer;
+typedef ITLayer<float> ISolarizeLayer;
+typedef ITLayer<float> IHueLayer;
+typedef ITLayer<float> IVibranceLayer;
+typedef ITLayer<float> ISepiaLayer;
+typedef ITLayer<float> IOpacityLayer;
+typedef ITLayer<float> ILuminanceThresholdLayer;
+typedef ITLayer<float> IAverageLuminanceThresholdLayer;
 
-class IHSBLayer : public ILayer {
-   public:
-    virtual ~IHSBLayer(){};
+typedef ITLayer<SizeScaleParamet> ISizeScaleLayer;
+typedef ITLayer<KernelSizeParamet> IKernelSizeLayer;
+typedef ITLayer<GaussianBlurParamet> IGaussianBlurLayer;
+typedef ITLayer<ChromaKeyParamet> IChromaKeyLayer;
+typedef ITLayer<AdaptiveThresholdParamet> IAdaptiveThresholdLayer;
+typedef ITLayer<GuidedParamet> IGuidedLayer;
+typedef ITLayer<HarrisCornerDetectionParamet> IHarrisCornerDetectionLayer;
+typedef ITLayer<NobleCornerDetectionParamet> INobleCornerDetectionLayer;
+typedef ITLayer<CannyEdgeDetectionParamet> ICannyEdgeDetectionLayer;
+typedef ITLayer<FASTFeatureParamet> IFASTFeatureLayer;
+typedef ITLayer<BilateralParamet> IBilateralLayer;
+typedef ITLayer<DistortionParamet> IDistortionLayer;
+typedef ITLayer<PositionParamet> IPositionLayer;
+typedef ITLayer<SelectiveParamet> ISelectiveLayer;
+typedef ITLayer<BulrPositionParamet> IBulrPositionLayer;
+typedef ITLayer<BlurSelectiveParamet> IBlurSelectiveLayer;
+typedef ITLayer<SphereRefractionParamet> ISphereRefractionLayer;
+typedef ITLayer<PixellateParamet> IPixellateLayer;
+typedef ITLayer<ColorMatrixParamet> IColorMatrixLayer;
+typedef ITLayer<CropParamet> ICropLayer;
+typedef ITLayer<CrosshatchParamet> ICrosshatchLayer;
+typedef ITLayer<FalseColorParamet> IFalseColorLayer;
+typedef ITLayer<HazeParamet> IHazeLayer;
+typedef ITLayer<HighlightShadowParamet> IHighlightShadowLayer;
+typedef ITLayer<HighlightShadowTintParamet> IHighlightShadowTintLayer;
+typedef ITLayer<IOSBlurParamet> IIOSBlurLayer;
+typedef ITLayer<LevelsParamet> ILevelsLayer;
+typedef ITLayer<MonochromeParamet> IMonochromeLayer;
+typedef ITLayer<MotionBlurParamet> IMotionBlurLayer;
+typedef ITLayer<PoissonParamet> IPoissonLayer;
+typedef ITLayer<PolarPixellateParamet> IPolarPixellateLayer;
+typedef ITLayer<PolkaDotParamet> IPolkaDotLayer;
+typedef ITLayer<SharpenParamet> ISharpenLayer;
+typedef ITLayer<SkinToneParamet> ISkinToneLayer;
+typedef ITLayer<ToonParamet> IToonLayer;
+typedef ITLayer<SmoothToonParamet> ISmoothToonLayer;
+typedef ITLayer<SwirlParamet> ISwirlParametLayer;
+typedef ITLayer<SharpenParamet> ISharpenParametLayer;
+typedef ITLayer<ThresholdSobelParamet> IThresholdSobelLayer;
+typedef ITLayer<TiltShiftParamet> ITiltShiftLayer;
+typedef ITLayer<UnsharpMaskParamet> IUnsharpMaskLayer;
+typedef ITLayer<VignetteParamet> IVignetteLayer;
+typedef ITLayer<WhiteBalanceParamet> IWhiteBalanceLayer;
+typedef ITLayer<ZoomBlurParamet> IZoomBlurLayer;
 
-   public:
-    // 重置过滤器以使其不具有任何变换.
-    virtual void reset() = 0;
-    // 向滤镜添加色相旋转.
-    // 色相旋转范围为[-360,360],其中0为不变.
-    // 请注意,此调整是累加的,因此如有必要,请使用重置方法.
-    virtual void rotateHue(const float& h) = 0;
-    // 向滤镜添加饱和度调整.
-    // 饱和度调整在[0.0,2.0]的范围内,其中1.0为不变.
-    // 请注意,此调整是累加的,因此如有必要,请使用重置方法.
-    virtual void adjustSaturation(const float& h) = 0;
-    // 向滤镜添加亮度调整
-    // 亮度调整在[0.0,2.0]的范围内,其中1.0不变.
-    // 请注意,此调整是累加的,因此如有必要,请使用重置方法.
-    virtual void adjustBrightness(const float& h) = 0;
-};
-
-class IMotionDetectorObserver {
-   public:
-    virtual ~IMotionDetectorObserver(){};
-    virtual void onMotion(const vec4& vec) = 0;
-};
-
-class IMotionDetectorLayer : public ITLayer<float> {
-   public:
-    virtual ~IMotionDetectorLayer(){};
-
-   public:
-    virtual void setObserver(IMotionDetectorObserver* observer) = 0;
-};
-
-class IPerlinNoiseLayer : public ITLayer<PerlinNoiseParamet> {
-   public:
-    virtual ~IPerlinNoiseLayer(){};
-
-   public:
-    virtual void setImageSize(int32_t width, int32_t height) = 0;
-};
-}  // namespace vulkan
 }  // namespace aoce

@@ -76,7 +76,7 @@ void android_main(struct android_app* app) {
     int32_t formatIndex = video->findFormatIndex(1920,1080,0);
     video->setFormat(formatIndex);
     video->open();
-    auto& selectFormat = video->getSelectFormat();
+    auto selectFormat = video->getSelectFormat();
     TestCameraObserver cameraObserver = {};
     video->setObserver(&cameraObserver);
 
@@ -142,7 +142,7 @@ Java_aoce_samples_androidtest_MainActivity_openCamera(JNIEnv* env, jobject thiz,
     }
     // formatIndex = video->findFormatIndex(1920,1080,0);
     video->setFormat(formatIndex);
-    auto& selectFormat = video->getSelectFormat();
+    auto selectFormat = video->getSelectFormat();
     VideoType videoType = selectFormat.videoType;
     viewGraph->getOutputLayer()->updateParamet({false,true});
     video->open();

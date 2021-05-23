@@ -56,9 +56,14 @@ class ACOE_EXPORT VideoDevice : public IVideoDevice {
         memcpy(formatList, &formats[start], sizeof(VideoFormat) * size);
     }
 
+    inline virtual VideoFormat getFormat(int32_t index) final {
+        assert(index >= 0 && index < formats.size());
+        return formats[index];
+    }
+
     inline virtual const char* getName() final { return name.c_str(); };
     inline virtual const char* getId() final { return id.c_str(); };
-    inline virtual const VideoFormat& getSelectFormat() final {
+    inline virtual VideoFormat getSelectFormat() final {
         return selectFormat;
     }
 

@@ -12,6 +12,10 @@ AVideoManager::~AVideoManager() {
         ACameraManager_deleteCameraIdList(cameraIdList);
         cameraIdList = nullptr;
     }
+    if(cameraManager) {
+        ACameraManager_delete(cameraManager);
+        cameraManager = nullptr;
+    }
 }
 
 void AVideoManager::getDevices() {
