@@ -44,6 +44,9 @@ namespace aoce {
 			IOutputLayerObserver* handle = nullptr);
 
 		void closeCamera();
+
+		void updateMatting(const MattingParamet& mp);
+		void updateOperate(const TexOperateParamet& op);
 	};
 
 }  // namespace aoce

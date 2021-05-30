@@ -76,19 +76,25 @@ IBaseLayer* BaseLayer::addLine(IBaseLayer* ito, int32_t formOut, int32_t toIn) {
     if (!to->bInput) {
         assert(toIn < to->inCount);
         assert(formOut < outCount);
-        int toIndex = to->getGraphIndex();
+        int32_t toIndex = to->getGraphIndex();
+        int32_t formIndex = getGraphIndex();
+        // 添加逻辑,完善直接用有layer(endnode)->addline(layer)的节点添加
+        if (getNode()->endNodeIndex >= 0) {
+            formIndex = getNode()->endNodeIndex;
+        }
         // 节点如果有多组输入toIn,一个输入可以有多个输出
         const auto& toStartNodes = to->getNode()->startNodes[toIn];
         if (toStartNodes.size() > 0) {
             for (const auto& startNode : toStartNodes) {
-                pipeGraph->addLine(getGraphIndex(), startNode.nodeIndex,
-                                   formOut, startNode.inIndex);
+                pipeGraph->addLine(formIndex, startNode.nodeIndex, formOut,
+                                   startNode.inIndex);
             }
         } else {
-            pipeGraph->addLine(getGraphIndex(), toIndex, formOut, toIn);
+            pipeGraph->addLine(formIndex, toIndex, formOut, toIn);
         }
         if (to->getNode()->endNodeIndex >= 0) {
-            IBaseLayer* result = pipeGraph->getNode(to->getNode()->endNodeIndex);
+            IBaseLayer* result =
+                pipeGraph->getNode(to->getNode()->endNodeIndex);
             assert(result);
             return result;
         }

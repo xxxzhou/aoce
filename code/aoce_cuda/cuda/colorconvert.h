@@ -279,7 +279,7 @@ inline __global__ void argb2rgba(PtrStepSz<uchar4> source,
 
 inline __global__ void textureMap(PtrStepSz<uchar4> source,
                                   PtrStepSz<uchar4> dest,
-                                  MapChannel paramt) {
+                                  MapChannelParamet paramt) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
     if (idx < dest.width && idy < dest.height) {
@@ -306,8 +306,8 @@ inline __global__ void blend(PtrStepSz<uchar4> source,
     }
 }
 
-inline __global__ void operate(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
-                               Operate paramt) {
+inline __global__ void flip(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
+                               FlipParamet paramt) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
     if (idx < dest.width && idy < dest.height) {
@@ -319,10 +319,36 @@ inline __global__ void operate(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
         if (paramt.bFlipY) {
             iy = source.height - 1 - idy;
         }
-        float4 rgba = rgbauchar42float4(source(iy, ix));
+        dest(idy, idx) = source(iy, ix);
+    }
+}
+
+inline __global__ void transpose(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
+                               TransposeParamet paramt) {
+    const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+    if (idx < dest.width && idy < dest.height) {
+        int ix = idy;
+        int iy = idx;
+        if (paramt.bFlipX) {
+            ix = source.height - 1 - idx;
+        }
+        if (paramt.bFlipY) {
+            iy = source.width - 1 - idy;
+        }
+        dest(idy, idx) = source(iy, ix);
+    }
+}
+
+inline __global__ void gamma(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
+                               float gamma) {
+    const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+    if (idx < dest.width && idy < dest.height) {        
+        float4 rgba = rgbauchar42float4(source(idy, idx));
         float4 grgba =
-            make_float4(powf(rgba.x, paramt.gamma), powf(rgba.y, paramt.gamma),
-                        powf(rgba.z, paramt.gamma), rgba.w);
+            make_float4(powf(rgba.x, gamma), powf(rgba.y, gamma),
+                        powf(rgba.z, gamma), rgba.w);
         dest(idy, idx) = rgbafloat42uchar4(grgba);
     }
 }

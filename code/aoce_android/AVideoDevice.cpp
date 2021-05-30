@@ -45,6 +45,7 @@ int32_t getImageFormat(VideoType videoType) {
 void onDisconnected(void* context, ACameraDevice* device) {
     AVideoDevice* adevice = (AVideoDevice*)context;
     adevice->onDeviceAction(VideoHandleId::lost, -1);
+    adevice->isOpen = false;
 }
 
 void onError(void* context, ACameraDevice* device, int error) {
@@ -85,52 +86,50 @@ void onCaptureCompleted(void* context, ACameraCaptureSession* session,
                         ACaptureRequest* request,
                         const ACameraMetadata* result) {}
 
-static std::mutex procMtx;
+// static std::mutex procMtx;
 
 // AImageReader_ImageListener
 void imageCallback(void* context, AImageReader* reader) {
-    AImage* image = nullptr;
-    // 当取图片过大,Unable to acquire a lockedBuffer, very likely client tries to lock more than
-    if(AImageReader_acquireNextImage(reader, &image) != AMEDIA_OK){
+    AVideoDevice* device = (AVideoDevice*)context;
+
+    AImage* image = nullptr;  
+    if (AImageReader_acquireLatestImage(reader, &image) != AMEDIA_OK) {
         return;
     }
-    std::thread processor([=]() {
-        // 如果用join,就没必要std::lock_guard<std::mutex> mtx_locker(procMtx),防止读取已经释放数据
-        // Check status here ...
-        AVideoDevice* device = (AVideoDevice*)context;
-        // Try to process data without blocking the callback
-        uint8_t* data = nullptr;
-        int32_t numPlanes = 0;
-        media_status_t mstatus = AImage_getNumberOfPlanes(image, &numPlanes);
-        if(mstatus == AMEDIA_OK) {
-            int64_t timestamp = 0;
-            AImage_getTimestamp(image, &timestamp);
-            VideoFrame frame = {};
-            for (int32_t i = 0; i < numPlanes; i++) {
-                int32_t len = 0;
-                int32_t rowStride = 0;
-                AImage_getPlaneData(image, i, &data, &len);
-                AImage_getPlaneRowStride(image, i, &rowStride);
-                frame.data[i] = data;
-                frame.dataAlign[i] = rowStride;
-            }
-            frame.videoType = device->selectFormat.videoType;
-            if (numPlanes == 3 && frame.dataAlign[0] == frame.dataAlign[1]) {
-                frame.videoType = VideoType::nv12;
-            }
-            frame.width = device->selectFormat.width;
-            frame.height = device->selectFormat.height;
-            frame.timeStamp = timestamp;
-            device->onVideoFrameAction(frame);
-            // AImage_delete(image);
+    // std::thread processor([=]() {
+    // 如果用join,就没必要std::lock_guard<std::mutex> mtx_locker(procMtx)
+    // 防止读取已经释放数据 Check status here ...
+    // Try to process data without blocking the callback
+    uint8_t* data = nullptr;
+    int32_t numPlanes = 0;
+    media_status_t mstatus = AImage_getNumberOfPlanes(image, &numPlanes);
+    if (mstatus == AMEDIA_OK) {
+        int64_t timestamp = 0;
+        AImage_getTimestamp(image, &timestamp);
+        VideoFrame frame = {};
+        for (int32_t i = 0; i < numPlanes; i++) {
+            int32_t len = 0;
+            int32_t rowStride = 0;
+            AImage_getPlaneData(image, i, &data, &len);
+            AImage_getPlaneRowStride(image, i, &rowStride);
+            frame.data[i] = data;
+            frame.dataAlign[i] = rowStride;
         }
-        if(image) {
-            AImage_delete(image);
+        frame.videoType = device->selectFormat.videoType;
+        if (numPlanes == 3 && frame.dataAlign[0] == frame.dataAlign[1]) {
+            frame.videoType = VideoType::nv12;
         }
-    });
-    // 当处理的速度慢于取图片的速度,AImageReader_new(maxImages)个图片一起读,然后等待一久时间,造成卡顿的感觉
-    // 不如用join,对于取大图片来说效果最好
-    processor.join();//processor.detach();
+        frame.width = device->selectFormat.width;
+        frame.height = device->selectFormat.height;
+        frame.timeStamp = timestamp;
+        device->onVideoFrameAction(frame);
+        // AImage_delete(image);
+    }
+    AImage_delete(image);
+    //    });
+    //    当处理的速度慢于取图片的速度,AImageReader_new(maxImages)个图片一起读,然后等待一久时间,造成卡顿的感觉
+    //    // 不如用join,对于取大图片来说效果最好
+    //    processor.join();  // processor.detach();
 }
 
 AVideoDevice::AVideoDevice(/* args */) {}
@@ -207,6 +206,7 @@ bool AVideoDevice::open() {
 }
 
 bool AVideoDevice::close() {
+    // std::lock_guard<std::mutex> mtx_locker(procMtx);
     if (session) {
         ACameraCaptureSession_stopRepeating(session);
         ACameraCaptureSession_close(session);
@@ -219,12 +219,12 @@ bool AVideoDevice::close() {
         request = nullptr;
         outputTarget = nullptr;
     }
-    if(sessionOutput) {
-        ACaptureSessionOutputContainer_remove(outputContainer,sessionOutput);
+    if (sessionOutput) {
+        ACaptureSessionOutputContainer_remove(outputContainer, sessionOutput);
         ACaptureSessionOutput_free(sessionOutput);
         sessionOutput = nullptr;
     }
-    if(surface){
+    if (surface) {
         ANativeWindow_release(surface);
         surface = nullptr;
     }
@@ -237,10 +237,6 @@ bool AVideoDevice::close() {
         ndkDevice = nullptr;
     }
     if (imageReader) {
-        AImage* image = nullptr;
-        if(AImageReader_acquireLatestImage(imageReader, &image) != AMEDIA_OK){
-            AImage_delete(image);
-        }
         AImageReader_delete(imageReader);
         imageReader = nullptr;
     }

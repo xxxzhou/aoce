@@ -34,7 +34,7 @@ guidedFilter2.comp
 guidedMatting.comp
 convertImage.comp convertImage.comp CHANNEL_RGBA=1
 convertImage.comp convertImageF4.comp CHANNEL_RGBA32F=1
-prewitt.comp
+prewittEdge.comp
 harrisCornerDetection.comp
 thresholdedNMS.comp
 showRound.comp
@@ -147,3 +147,15 @@ vignette.comp
 zoomBlur.comp
 voronoiConsumer.comp
 rgb.comp
+mapChannel.comp
+flip.comp
+memset.comp memset.comp CHANNEL_RGBA=1
+memset.comp memsetU1.comp CHANNEL_R16UI=1
+hue.comp
+hueBlend.comp
+emboss.comp
+exclusionBlend.comp
+exposure.comp
+falseColor.comp
+canny.comp
+directionalNMS.comp

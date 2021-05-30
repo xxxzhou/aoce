@@ -30,7 +30,7 @@ class HardwareImage {
     EGLImageKHR image = nullptr;
     EGLDisplay display = nullptr;
     ImageFormat format = {};
-    uint32_t textureId = -1;
+    int32_t textureId = -1;
 
     bool bInit = false;
 
@@ -44,7 +44,7 @@ class HardwareImage {
     inline VkImage getImage() { return vkImage; }
     inline AHardwareBuffer *getHarderBuffer() { return buffer; }
     inline const ImageFormat &getFormat() { return format; }
-    inline const uint32_t getTextureId() { return textureId; }
+    inline const int32_t getTextureId() { return textureId; }
 
    private:
     // https://android.googlesource.com/platform/cts/+/master/tests/tests/graphics/jni/VulkanTestHelpers.cpp

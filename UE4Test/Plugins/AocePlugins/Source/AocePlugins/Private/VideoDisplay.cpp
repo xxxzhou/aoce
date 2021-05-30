@@ -1,4 +1,5 @@
 #include "VideoDisplay.hpp"
+#include "Core/Public/Core.h"
 #if PLATFORM_ANDROID
 #include "Runtime/Launch/Public/Android/AndroidJNI.h"
 #include "Runtime/ApplicationCore/Public/Android/AndroidApplication.h"
@@ -82,6 +83,15 @@ namespace aoce {
 
 	void VideoDisplay::setTextureChange(std::function<void(const ImageFormat&)> onTextureChangeAction) {
 		this->onTextureChange = onTextureChangeAction;
+	}
+
+	void VideoDisplay::changeDisplay() {
+		if (outLayer) {
+			OutputParamet op = outLayer->getParamet();
+			op.bCpu = 1 - op.bCpu;
+			op.bGpu = 1 - op.bGpu;
+			outLayer->updateParamet(op);
+		}
 	}
 
 	void VideoDisplay::updateFrameGPU() {

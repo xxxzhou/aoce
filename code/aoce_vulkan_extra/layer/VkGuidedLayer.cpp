@@ -23,7 +23,7 @@ void VkToMatLayer::onInitGraph() {
 }
 
 VkGuidedSolveLayer::VkGuidedSolveLayer() {
-    setUBOSize(sizeof(float), true);
+    setUBOSize(sizeof(paramet), true);
     glslPath = "glsl/guidedFilter2.comp.spv";
     inCount = 4;
     outCount = 1;
@@ -58,14 +58,22 @@ VkGuidedLayer::VkGuidedLayer(/* args */) {
     guidedSlayerLayer = std::make_unique<VkGuidedSolveLayer>();
     box5Layer = std::make_unique<VkBoxBlurSLayer>(ImageType::rgba32f);
     resize1Layer = std::make_unique<VkResizeLayer>(ImageType::rgba32f);
-    // box1Layer->updateParamet({paramet.boxSize, paramet.boxSize});
-    resizeLayer->updateParamet({false, 1920 / 8, 1080 / 8});
+    int32_t cwidth = 1920;
+    int32_t cheight = 1080;
+#if __ANDROID__
+    cwidth = 1280;
+    cheight = 720;
+#endif
+    int32_t swidth = divUp(cwidth, zoom);
+    int32_t sheight = divUp(cheight, zoom);
+    resizeLayer->updateParamet({false, swidth, sheight});
+    box1Layer->updateParamet({paramet.boxSize, paramet.boxSize});
     box2Layer->updateParamet({paramet.boxSize, paramet.boxSize});
     box3Layer->updateParamet({paramet.boxSize, paramet.boxSize});
     box4Layer->updateParamet({paramet.boxSize, paramet.boxSize});
     box5Layer->updateParamet({paramet.boxSize, paramet.boxSize});
     guidedSlayerLayer->updateParamet(paramet.eps);
-    resize1Layer->updateParamet({true, 1920, 1080});
+    resize1Layer->updateParamet({true, cwidth, cheight});
 }
 
 void VkGuidedLayer::onUpdateParamet() {

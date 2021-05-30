@@ -25,6 +25,8 @@ class AOCE_VULKAN_EXPORT VkOutputLayer : public OutputLayer, public VkLayer {
 #elif __ANDROID__
     std::unique_ptr<HardwareImage> hardwareImage = nullptr;
 #endif
+    // 用作记录GPU输出大小
+    ImageFormat outFormat = {};
 
    public:
     VkOutputLayer(/* args */);

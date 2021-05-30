@@ -25,11 +25,13 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 public:
 	UFUNCTION(BlueprintCallable)
-	void onLogin(int roleIndex);
+		void onLogin(int roleIndex);
 	UFUNCTION(BlueprintCallable)
-	void onLogout();
+		void onLogout();
 	UFUNCTION(BlueprintCallable)
-	void showDevice(int modeIndex);
+		void showDevice(int modeIndex);
+	UFUNCTION(BlueprintCallable)
+		void onChangeDisplay();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

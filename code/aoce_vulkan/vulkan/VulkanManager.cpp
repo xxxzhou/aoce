@@ -50,6 +50,9 @@ VulkanManager::VulkanManager(/* args */) {}
 VulkanManager& VulkanManager::Get() {
     if (instance == nullptr) {
         instance = new VulkanManager();
+#if AOCE_DEBUG_TYPE && WIN32
+        // instance->bDebugMsg = true;
+#endif
     }
     return *instance;
 }
@@ -96,6 +99,8 @@ bool VulkanManager::createInstance(const char* appName) {
         if (CreateDebugUtilsMessengerEXT(instace, &createInfo, nullptr,
                                          &debugMessenger) != VK_SUCCESS) {
             logMessage(LogLevel::warn, "not create vk debug utils message.");
+        } else {
+            logMessage(LogLevel::info, "create vk debug utils message.");
         }
     }
 #endif
@@ -250,6 +255,8 @@ bool VulkanManager::createDevice(bool bAloneCompute) {
                     VK_EXTERNAL_MEMORY_HANDLE_TYPE_D3D11_TEXTURE_BIT) > 0;
     if (!bInterpDx11) {
         logMessage(LogLevel::warn, "aoce_vulkan not interp dx11");
+    } else {
+        logMessage(LogLevel::info, "aoce_vulkan can interp dx11");
     }
 #endif
 #if __ANDROID__

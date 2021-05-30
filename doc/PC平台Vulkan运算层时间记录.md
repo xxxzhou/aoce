@@ -16,7 +16,7 @@
 
 2 计算XYDerivative,3*3,0.29ms.
 
-[glsl代码](../glsl/source/prewitt.comp)
+[glsl代码](../glsl/source/prewittEdge.comp)
 
 ![avatar](../images/cs_time_2.png "XYDerivative")
 

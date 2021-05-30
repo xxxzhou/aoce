@@ -228,7 +228,7 @@ VkResult createInstance(VkInstance& instance, const char* appName,
     std::vector<const char*> instanceExtensions = {
         VK_KHR_SURFACE_EXTENSION_NAME};
     // Enable surface extensions depending on os
-#if defined(_WIN32)
+#if _WIN32
     instanceExtensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
     instanceExtensions.push_back(
         VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
@@ -237,7 +237,6 @@ VkResult createInstance(VkInstance& instance, const char* appName,
 #elif defined(VK_USE_PLATFORM_ANDROID_KHR)
     instanceExtensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
     // 和android里的AHardwareBuffer交互
-
     instanceExtensions.push_back(
         VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME);
     instanceExtensions.push_back(
@@ -256,11 +255,11 @@ VkResult createInstance(VkInstance& instance, const char* appName,
     instanceExtensions.push_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
 #endif
     VkInstanceCreateInfo instInfo = {};
-#if AOCE_DEBUG_TYPE && WIN32
-    instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    instanceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
+#if AOCE_DEBUG_TYPE
     std::vector<const char*> enableLayers = {"VK_LAYER_KHRONOS_validation"};
     if (bDebugMsg && checkValidationLayerSupport(enableLayers)) {
+        instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        instanceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
         instInfo.enabledLayerCount = static_cast<uint32_t>(enableLayers.size());
         instInfo.ppEnabledLayerNames = enableLayers.data();
     }
@@ -282,8 +281,10 @@ VkResult enumerateDevice(VkInstance instance,
     // Physical device
     uint32_t gpuCount = 0;
     // Get number of available physical devices
-    VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
-    assert(gpuCount > 0);
+    VkResult result = vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr);
+    if (gpuCount == 0) {
+        return result;
+    }
     // Enumerate devices
     pDevices.resize(gpuCount);
     std::vector<VkPhysicalDevice> physicalDevices(gpuCount);

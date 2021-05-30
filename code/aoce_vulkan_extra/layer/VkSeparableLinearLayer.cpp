@@ -37,7 +37,6 @@ void VkSeparableLayer::onInitGraph() {
     outFormats[0].imageType = imageType;
 
     shader->loadShaderModule(context->device, glslPath);
-
     std::vector<UBOLayoutItem> items = {
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT},
@@ -86,7 +85,7 @@ void VkSeparableLinearLayer::onInitGraph() {
 
 void VkSeparableLinearLayer::onInitNode() {
     rowLayer->addLine(this, 0, 0);
-    setStartNode(rowLayer.get());
+    setStartNode(rowLayer.get());      
 }
 
 void VkSeparableLinearLayer::onInitLayer() {
@@ -104,6 +103,8 @@ VkBoxBlurSLayer::VkBoxBlurSLayer(ImageType imageType)
 VkBoxBlurSLayer::~VkBoxBlurSLayer() {}
 
 void VkBoxBlurSLayer::onUpdateParamet() {
+    paramet.kernelSizeX = std::min(paramet.kernelSizeX, 32);
+    paramet.kernelSizeY = std::min(paramet.kernelSizeY, 32);
     if (paramet == oldParamet) {
         return;
     }
@@ -135,6 +136,7 @@ VkGaussianBlurSLayer::VkGaussianBlurSLayer(ImageType imageType)
 VkGaussianBlurSLayer::~VkGaussianBlurSLayer() {}
 
 void VkGaussianBlurSLayer::onUpdateParamet() {
+    paramet.blurRadius = std::min(paramet.blurRadius, 16);
     if (paramet == oldParamet) {
         return;
     }

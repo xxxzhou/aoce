@@ -32,9 +32,11 @@ IRGBA2YUVLayer* VkLayerFactory::createRGBA2YUV() {
     return new VkRGBA2YUVLayer();
 }
 
-ITexOperateLayer* VkLayerFactory::createTexOperate() {
-    return new VkOperateLayer();
+IMapChannelLayer* VkLayerFactory::createMapChannel() {
+    return new VkMapChannelLayer();
 }
+
+IFlipLayer* VkLayerFactory::createFlip() { return new VkFlipLayer(); }
 
 ITransposeLayer* VkLayerFactory::createTranspose() {
     return new VkTransposeLayer();

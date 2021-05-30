@@ -63,7 +63,7 @@ class ACOE_EXPORT LiveRoom : public ILiveRoom {
                            int32_t pushCount) final;
 
     virtual bool pushStream(int32_t index, const PushSetting& setting) final;
-    virtual void stopPushStream(int32_t index);
+    virtual void stopPushStream(int32_t index) final;
 
     virtual bool pushVideoFrame(int32_t index,
                                 const VideoFrame& videoFrame) final;

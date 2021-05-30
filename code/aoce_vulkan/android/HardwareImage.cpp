@@ -32,21 +32,14 @@ static PFNEGLCREATEIMAGEKHRPROC eglCreateImageKHR = nullptr;
 static PFNEGLDESTROYIMAGEKHRPROC eglDestroyImageKHR = nullptr;
 static PFNGLFRAMEBUFFERTEXTUREMULTIVIEWOVRPROC
     glFramebufferTextureMultiviewOVR = nullptr;
-;
 static PFNGLFRAMEBUFFERTEXTUREMULTISAMPLEMULTIVIEWOVRPROC
     glFramebufferTextureMultisampleMultiviewOVR = nullptr;
-;
 static PFNGLBUFFERSTORAGEEXTERNALEXTPROC glBufferStorageExternalEXT = nullptr;
-;
 static PFNGLMAPBUFFERRANGEPROC glMapBufferRange = nullptr;
-;
 static PFNGLUNMAPBUFFERPROC glUnmapBuffer = nullptr;
-;
 static PFN_vkGetAndroidHardwareBufferPropertiesANDROID
     vkGetAndroidHardwareBufferPropertiesANDROID = nullptr;
-;
 static PFN_vkBindImageMemory2KHR vkBindImageMemory2KHR = nullptr;
-;
 
 namespace aoce {
 namespace vulkan {
@@ -97,7 +90,7 @@ bool supportHardwareImage(VkDevice device) {
 }
 
 HardwareImage::HardwareImage(/* args */) {
-    vkDevice = VulkanManager::Get().device;    
+    vkDevice = VulkanManager::Get().device;
 }
 
 HardwareImage::~HardwareImage() { release(); }
@@ -144,11 +137,12 @@ void HardwareImage::createAndroidBuffer(const ImageFormat &format) {
     AHardwareBuffer_allocate(&usage, &buffer);
     bindVK(buffer);
 #endif
+    textureId = -1;
 }
 
 // https://android.googlesource.com/platform/cts/+/master/tests/tests/graphics/jni/VulkanTestHelpers.cpp
 void HardwareImage::bindVK(AHardwareBuffer *buffer, bool useExternalFormat) {
-    AHardwareBuffer_Desc bufferDesc;
+    AHardwareBuffer_Desc bufferDesc = {};
 #if __ANDROID_API__ >= 26
     AHardwareBuffer_describe(buffer, &bufferDesc);
 #else
@@ -182,7 +176,8 @@ void HardwareImage::bindVK(AHardwareBuffer *buffer, bool useExternalFormat) {
     };
     VkImageCreateInfo imageInfo = {};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.pNext = &externalCreateInfo, imageInfo.flags = 0u;
+    imageInfo.pNext = &externalCreateInfo;
+    imageInfo.flags = 0u;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
     imageInfo.format =
         useExternalFormat ? VK_FORMAT_UNDEFINED : formatInfo.format;
@@ -244,7 +239,9 @@ void HardwareImage::bindVK(AHardwareBuffer *buffer, bool useExternalFormat) {
     // assert(image != EGL_NO_IMAGE_KHR);
     if (image == EGL_NO_IMAGE_KHR) {
         int32_t errorId = eglGetError();
-        logMessage(LogLevel::error, "not create image,error id" + errorId);
+        logMessage(LogLevel::error, "not create hardware image,error id" + errorId);
+    } else {
+        logMessage(LogLevel::info, "hardware image create success.");
     }
 }
 
@@ -258,7 +255,7 @@ void HardwareImage::bindGL(uint32_t textureId, uint32_t texType) {
     }
     this->textureId = textureId;
     // AHardwareBuffer_lock(AHARDWAREBUFFER_USAGE_CPU_READ_NEVER)
-    glActiveTexture(GL_TEXTURE0);
+    // glActiveTexture(GL_TEXTURE0);
     glBindTexture(bindType,
                   textureId);  // GL_TEXTURE_EXTERNAL_OES GL_TEXTURE_2D
     glEGLImageTargetTexture2DOES(bindType, image);

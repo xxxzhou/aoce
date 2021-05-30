@@ -117,7 +117,7 @@ void VulkanTexture::InitResource(uint32_t width, uint32_t height,
         }
         vkUnmapMemory(device, memory);
     }
-
+    bool bDepth = usageFlag == VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
     // 创建view
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -129,7 +129,8 @@ void VulkanTexture::InitResource(uint32_t width, uint32_t height,
     viewInfo.components.g = VK_COMPONENT_SWIZZLE_G;
     viewInfo.components.b = VK_COMPONENT_SWIZZLE_B;
     viewInfo.components.a = VK_COMPONENT_SWIZZLE_A;
-    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.aspectMask =
+        bDepth ? VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.levelCount = 1;
     viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -142,7 +143,7 @@ void VulkanTexture::InitResource(uint32_t width, uint32_t height,
     descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
 }
 
-void VulkanTexture::createSampler(bool bLinear){
+void VulkanTexture::createSampler(bool bLinear) {
     // 创建sampler
     VkSamplerCreateInfo samplerCreateInfo = {};
     samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -161,8 +162,8 @@ void VulkanTexture::createSampler(bool bLinear){
     samplerCreateInfo.maxLod = 0.0;
     samplerCreateInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
     VK_CHECK_RESULT(
-        vkCreateSampler(device, &samplerCreateInfo, nullptr, &sampler)); 
-    descInfo.sampler = sampler;   
+        vkCreateSampler(device, &samplerCreateInfo, nullptr, &sampler));
+    descInfo.sampler = sampler;
 }
 
 void VulkanTexture::addBarrier(VkCommandBuffer command, VkImageLayout newLayout,

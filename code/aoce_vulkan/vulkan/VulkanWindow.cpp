@@ -217,25 +217,26 @@ void VulkanWindow::createSwipChain(bool bInit) {
         // imageCount一般来说不会变动
         cmdBuffers.resize(imageCount);
         VkCommandBufferAllocateInfo cmdBufInfo = {};
+        cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         cmdBufInfo.commandPool = cmdPool;
         cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         cmdBufInfo.commandBufferCount = (uint32_t)cmdBuffers.size();
         VK_CHECK_RESULT(
             vkAllocateCommandBuffers(device, &cmdBufInfo, cmdBuffers.data()));
         // 开始组合build
-        if (this->bPreCmd || !onCmdExecuteEvent) {
+        if (this->bPreCmd) {
             for (uint32_t i = 0; i < imageCount; i++) {
                 vkBeginCommandBuffer(cmdBuffers[i], &cmdBufferBeginInfo);
                 vkCmdSetViewport(cmdBuffers[i], 0, 1, &viewport);
                 vkCmdSetScissor(cmdBuffers[i], 0, 1, &scissor);
                 renderPassBeginInfo.framebuffer = frameBuffers[i];
                 // renderpass关联渲染目标
-                vkCmdBeginRenderPass(cmdBuffers[i], &renderPassBeginInfo,
-                                     VK_SUBPASS_CONTENTS_INLINE);
+                // vkCmdBeginRenderPass(cmdBuffers[i], &renderPassBeginInfo,
+                //                      VK_SUBPASS_CONTENTS_INLINE);
                 if (onCmdExecuteEvent) {
                     onCmdExecuteEvent(i);
                 }
-                vkCmdEndRenderPass(cmdBuffers[i]);
+                // vkCmdEndRenderPass(cmdBuffers[i]);
                 vkEndCommandBuffer(cmdBuffers[i]);
             }
         }
@@ -548,13 +549,13 @@ void VulkanWindow::tick() {
             vkCmdSetViewport(cmdBuffers[currentIndex], 0, 1, &viewport);
             vkCmdSetScissor(cmdBuffers[currentIndex], 0, 1, &scissor);
             renderPassBeginInfo.framebuffer = frameBuffers[currentIndex];
-            // renderpass关联渲染目标
-            vkCmdBeginRenderPass(cmdBuffers[currentIndex], &renderPassBeginInfo,
-                                 VK_SUBPASS_CONTENTS_INLINE);
+            // renderpass关联渲染目标 BlitImage不能包含在RenderPass里面
+            // vkCmdBeginRenderPass(cmdBuffers[currentIndex], &renderPassBeginInfo,
+            //                      VK_SUBPASS_CONTENTS_INLINE);
             if (onCmdExecuteEvent) {
                 onCmdExecuteEvent(currentIndex);
             }
-            vkCmdEndRenderPass(cmdBuffers[currentIndex]);
+            // vkCmdEndRenderPass(cmdBuffers[currentIndex]);
             vkEndCommandBuffer(cmdBuffers[currentIndex]);
         }
         // 提交缓冲区命令,执行完后发送信号给renderComplete

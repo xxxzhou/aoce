@@ -72,8 +72,7 @@ void VkMotionDetectorLayer::setObserver(IMotionDetectorObserver* observer) {
     this->observer = observer;
 }
 
-void VkMotionDetectorLayer::onImageProcess(uint8_t* data,
-                                           const ImageFormat& format,
+void VkMotionDetectorLayer::onImageProcess(uint8_t* data, const ImageFormat& format,
                                            int32_t outIndex) {
     if (observer) {
         vec4 motion = {};

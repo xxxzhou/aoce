@@ -2,6 +2,7 @@
 /thirdparty/
 code/aoce_agora/
 code/aoce_talkto/
+code/aoce_unity3d/
 code/aoce/AoceBuildSettings.h
 samples/talktotest/
 samples/talkto_live_test/
@@ -42,6 +43,7 @@ UE4Test/Content/Maps
 UE4Test/Content/Blueprints
 UE4Test/UE4Test.zip
 CSharp/AoceWrapper/Swig
+CSharp/.vs
 
 out/
 .vs/

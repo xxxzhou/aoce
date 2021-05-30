@@ -1,6 +1,6 @@
 // 需要实现特定的直播模块,如果没有,这个模块不能运行
 #include <AoceManager.hpp>
-#include <Live/LiveRoom.hpp>
+#include <live/LiveRoom.hpp>
 #include <iostream>
 #include <memory>
 #include <module/ModuleManager.hpp>
@@ -95,11 +95,11 @@ class TestLive : public ILiveObserver {
     // 用户对应流的视频桢数据
     virtual void onVideoFrame(int32_t userId, int32_t index,
                               const VideoFrame &videoFrame) {
-        std::string str;
-        string_format(str, "width:", videoFrame.width,
-                      " height:", videoFrame.height,
-                      " yuvtype:", to_string(videoFrame.videoType));
-        logMessage(LogLevel::info, str);
+//        std::string str;
+//        string_format(str, "width:", videoFrame.width,
+//                      " height:", videoFrame.height,
+//                      " yuvtype:", getVideoType(videoFrame.videoType));
+//        logMessage(LogLevel::info, str);
         if (yuv2rgbLayer->getParamet().type != videoFrame.videoType) {
             yuv2rgbLayer->updateParamet({videoFrame.videoType, true});
         }
@@ -115,7 +115,7 @@ class TestLive : public ILiveObserver {
     // 用户对应流的音频桢数据
     virtual void onAudioFrame(int32_t userId, int32_t index,
                               const AudioFrame &audioFrame) {
-        logMessage(LogLevel::info, "audio frame.");
+        // logMessage(LogLevel::info, "audio frame.");
     };
 
     // 推流的质量

@@ -62,4 +62,16 @@ namespace aoce {
 		}
 	}
 
+	void CameraProcess::updateMatting(const MattingParamet& mp) {
+		auto* layer = getMattingLayer();
+		if (layer != nullptr) {
+			layer->updateParamet(mp);
+		}
+	}
+	void CameraProcess::updateOperate(const TexOperateParamet& op) {
+		if (videoProcess) {
+			videoProcess->operateLayer->updateParamet(op);
+		}
+	}
+
 }  // namespace aoce

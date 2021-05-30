@@ -70,7 +70,7 @@ ITLayer<SizeScaleParamet>* createSizeScaleLayer(ImageType imageType) {
 }
 
 ITLayer<ReSizeParamet>* createResizeLayer(ImageType imageType) {
-    VkResizeLayer* layer = new VkResizeLayer();
+    VkResizeLayer* layer = new VkResizeLayer(imageType);
     return layer;
 }
 

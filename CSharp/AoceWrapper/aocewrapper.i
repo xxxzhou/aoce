@@ -49,7 +49,8 @@
 %template(AOutputLayer) aoce::ITLayer<aoce::OutputParamet>; 
 %include "aoce/AoceCore.h" 
 %template(IRGBA2YUVLayer) aoce::ITLayer<aoce::YUVParamet>; 
-%template(ITexOperateLayer) aoce::ITLayer<aoce::TexOperateParamet>;
+%template(IMapChannelLayer) aoce::ITLayer<aoce::MapChannelParamet>;
+%template(IFlipLayer) aoce::ITLayer<aoce::FlipParamet>;
 %template(ITransposeLayer) aoce::ITLayer<aoce::TransposeParamet>;
 %template(IReSizeLayer) aoce::ITLayer<aoce::ReSizeParamet>;
 %template(IBlendLayer) aoce::ITLayer<aoce::BlendParamet>;

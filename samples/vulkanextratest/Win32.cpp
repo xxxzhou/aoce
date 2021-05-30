@@ -108,6 +108,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     ncdParamet.harrisBase = hcdParamet.harrisBase;
     ncdLayer->updateParamet(ncdParamet);
 
+    box1Layer = createBoxFilterLayer(ImageType::rgba8);
+    box1Layer->updateParamet({5, 5});
+
     boxFilterLayer1 = createBoxFilterLayer(ImageType::r8);
     boxFilterLayer1->updateParamet({5, 5});
 
@@ -206,17 +209,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---高斯模糊
     // layers.push_back(gaussianLayer->getLayer());
     // 检测resize效果
-    // layers.push_back(resizeLayer->getLayer());
+    layers.push_back(resizeLayer->getLayer());
+    layers.push_back(box1Layer->getLayer());
     // layers.push_back(resizeLayer2->getLayer());
     // ---查看自适应阈值化效果
     // layers.push_back(adaptiveLayer->getLayer());
     // layers.push_back(alphaShowLayer);
     // ---查看Harris 角点检测
-    bAutoIn = true;
-    layers.push_back(luminanceLayer);
-    layers.push_back(hcdLayer->getLayer());  // hcdLayer ncdLayer
-    layers.push_back(boxFilterLayer1->getLayer());
-    layers.push_back(alphaShow2Layer);
+    // bAutoIn = true;
+    // layers.push_back(luminanceLayer);
+    // layers.push_back(hcdLayer->getLayer());  // hcdLayer ncdLayer
+    // layers.push_back(boxFilterLayer1->getLayer());
+    // layers.push_back(alphaShow2Layer);
     // ---查看导向滤波效果
     // layers.push_back(chromKeyLayer->getLayer());
     // layers.push_back(guidedLayer->getLayer());

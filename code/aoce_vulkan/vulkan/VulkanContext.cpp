@@ -48,6 +48,7 @@ void VulkanContext::initContext() {
     VK_CHECK_RESULT(
         vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool));
     VkCommandBufferAllocateInfo cmdBufInfo = {};
+    cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     cmdBufInfo.commandPool = cmdPool;
     cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmdBufInfo.commandBufferCount = 1;

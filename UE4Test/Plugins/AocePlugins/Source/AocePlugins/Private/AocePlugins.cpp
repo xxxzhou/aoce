@@ -15,19 +15,7 @@ void FAocePluginsModule::StartupModule()
 {
 #if WIN32
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	// LoadDllEx(FString("AocePlugins/ThirdParty/Aoce/win/bin/aoce.dll"), false);
-	FString relativePath = FString("AocePlugins/ThirdParty/Aoce/win/bin/aoce.dll");
-	FString filePath = FPaths::ProjectPluginsDir() / relativePath;
-	if (FPaths::FileExists(filePath))
-	{
-		FString fullFileName = FPaths::ConvertRelativePathToFull(filePath);
-		FString fullPath = FPaths::GetPath(fullFileName);
-		FPlatformProcess::PushDllDirectory(*fullPath);
-		void* hdll = FPlatformProcess::GetDllHandle(*fullFileName);
-		FPlatformProcess::PopDllDirectory(*fullPath);
-		if (hdll == nullptr) {
-		}
-	}
+	LoadDllEx(FString("AocePlugins/ThirdParty/Aoce/win/bin/aoce.dll"), false);
 #endif	
 	aoce::loadAoce();
 #if __ANDROID__ // PLATFORM_ANDROID __ANDROID__
@@ -35,10 +23,10 @@ void FAocePluginsModule::StartupModule()
 	jobject at = FAndroidApplication::GetGameActivityThis();
 	jmethodID getApplication = jni_env->GetMethodID(FJavaWrapper::GameActivityClassID, "getApplication", "()Landroid/app/Application;");
 	jobject jcontext = jni_env->CallObjectMethod(at, getApplication);
-	AndroidEnv andEnv = {};
+	aoce::AndroidEnv andEnv = {};
 	andEnv.env = jni_env;
 	andEnv.activity = at;
-	initAndroid(andEnv);
+	aoce::initAndroid(andEnv);
 #endif	
 }
 

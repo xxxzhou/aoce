@@ -3,12 +3,11 @@
 layout (local_size_x = 16, local_size_y = 16) in;
 
 layout (binding = 0, rgba32f) uniform readonly image2D inTex;
-layout (binding = 1, rgba32f) uniform image2D inTex1;
-layout (binding = 2, rgba32f) uniform image2D inTex2;
-layout (binding = 3, rgba32f) uniform image2D inTex3;
+layout (binding = 1, rgba32f) uniform readonly image2D inTex1;
+layout (binding = 2, rgba32f) uniform readonly image2D inTex2;
+layout (binding = 3, rgba32f) uniform readonly image2D inTex3;
 layout (binding = 4, rgba32f) uniform image2D outTex;
-layout (binding = 5) uniform UBO 
-{
+layout (binding = 5) uniform UBO {
 	float eps;
 } ubo;
 

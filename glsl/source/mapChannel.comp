@@ -1,0 +1,27 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 2) uniform UBO {
+    // 0
+    int red;
+    // 1
+    int green;
+    // 2
+    int blue;
+    // 3
+    int alpha;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }   
+    vec4 rgba = imageLoad(inTex,uv);
+    vec4 result = vec4(rgba[ubo.red],rgba[ubo.green],rgba[ubo.blue],rgba[ubo.alpha]);
+    imageStore(outTex, uv,result); 
+}

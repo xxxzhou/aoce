@@ -19,6 +19,5 @@ install_aoce_module(aoce_ffmpeg FLASE)
 
 if(WIN32)  
     message(STATUS "ffmpeg dll path: " ${FFMPEG_BINARYS})  
-    file(COPY ${FFMPEG_BINARYS} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")
-    file(COPY ${FFMPEG_BINARYS} DESTINATION "${CMAKE_BINARY_DIR}/install/win/bin")
+    file(COPY ${FFMPEG_BINARYS} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")    
 endif()

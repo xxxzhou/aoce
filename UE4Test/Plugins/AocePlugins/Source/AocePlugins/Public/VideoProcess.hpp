@@ -33,7 +33,10 @@ enum class ProcessType {
 };
 ENUM_FLAG_OPERATORS(ProcessType)
 
+typedef ITLayer<TexOperateParamet> ITexOperateLayer;
+
 class VideoProcess : public IVideoDeviceObserver {
+	friend class CameraProcess;
    private:
     /* data */
     IPipeGraph* graph = nullptr;
@@ -47,6 +50,7 @@ class VideoProcess : public IVideoDeviceObserver {
     std::unique_ptr<IOutputLayer> outputLayer1;
     std::unique_ptr<IOutputLayer> outputLayer2;
     std::unique_ptr<IYUV2RGBALayer> yuv2rgbLayer;
+	std::unique_ptr<ITexOperateLayer> operateLayer;
     std::unique_ptr<IRGBA2YUVLayer> rgb2yuvLayer;
     std::unique_ptr<IMattingLayer> mattingLayer;
 

@@ -29,6 +29,10 @@ if(AOCE_INSTALL_FFMPEG)
     add_subdirectory(aoce_ffmpeg)
 endif()
 
+if(AOCE_UNITY3D_EXIST)
+    add_subdirectory(aoce_unity3d)
+endif()
+
 
 
 

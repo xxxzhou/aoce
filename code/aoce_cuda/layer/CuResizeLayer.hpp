@@ -16,7 +16,7 @@ class CuResizeLayer : public CuLayer, public IReSizeLayer {
    public:
     CuResizeLayer();
     CuResizeLayer(ImageType imageType);
-    ~CuResizeLayer();
+    virtual ~CuResizeLayer();
 
    protected:
     virtual void onInitLayer() override;

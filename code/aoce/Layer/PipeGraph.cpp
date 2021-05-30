@@ -257,14 +257,19 @@ bool PipeGraph::resetGraph() {
         int size = nodes[index]->layer->inLayers.size();
         for (int i = 0; i < size; i++) {
             const auto& fromNode = nodes[index]->layer->inLayers[i];
-            if (nodes[fromNode.nodeIndex]
-                    ->layer->outFormats[fromNode.siteIndex]
-                    .imageType != nodes[index]->layer->inFormats[i].imageType) {
+            BaseLayer* srcLayer = nodes[fromNode.nodeIndex]->layer;
+            BaseLayer* dstLayer = nodes[index]->layer;
+            ImageType srcImageType =
+                srcLayer->outFormats[fromNode.siteIndex].imageType;
+            ImageType dstImageType = dstLayer->inFormats[i].imageType;
+            if (srcImageType != dstImageType) {
                 std::string message;
-                string_format(message, "graph error,", "from : ",
-                              nodes[fromNode.nodeIndex]->layer->getMark(), "-",
-                              fromNode.siteIndex, " not match image type in :",
-                              nodes[index]->layer->getMark(), "-", i);
+                string_format(
+                    message, "graph error,", "from : ", srcLayer->getMark(),
+                    "-", fromNode.siteIndex, "(", getImageType(srcImageType),
+                    ")", " not match image type in :",
+                    nodes[index]->layer->getMark(), "-", i, "(",
+                    getImageType(dstImageType), ")");
                 logMessage(LogLevel::error, message);
                 return false;
             }
@@ -273,7 +278,7 @@ bool PipeGraph::resetGraph() {
     onInitLayers();
     for (auto index : nodeExcs) {
         nodes[index]->layer->onInitBuffer();
-    }    
+    }
     onInitBuffers();
     return true;
 }
@@ -289,7 +294,7 @@ bool PipeGraph::run() {
         for (auto node : nodes) {
             logMessage(LogLevel::info, node->layer->getMark());
         }
-        logMessage(LogLevel::info, "--- end graph.");
+        logMessage(LogLevel::info, "--- end all graph.");
 #endif
         bReset = false;
         onReset();
@@ -304,7 +309,7 @@ bool PipeGraph::run() {
             for (auto index : nodeExcs) {
                 logMessage(LogLevel::info, nodes[index]->layer->getMark());
             }
-            logMessage(LogLevel::info, "--- end graph.");
+            logMessage(LogLevel::info, "--- end build graph.");
 #endif
         }
     }

@@ -59,10 +59,11 @@ class VkMotionDetectorLayer : public VkLayer,
    public:
     virtual void setObserver(IMotionDetectorObserver* observer) final;
 
-   private:
+   public:
     virtual void onImageProcess(uint8_t* data, const ImageFormat& format,
                                 int32_t outIndex) final;
-
+    virtual void onFormatChanged(const ImageFormat &imageFormat,
+                         int32_t outIndex) override {};
    protected:
     virtual void onUpdateParamet() override;
     virtual void onInitGraph() override;

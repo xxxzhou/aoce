@@ -42,9 +42,10 @@ VkDilationLayer::VkDilationLayer(bool bSingle) {
 VkDilationLayer::~VkDilationLayer() {}
 
 void VkDilationLayer::onUpdateParamet() {
+    paramet = std::min(paramet, 32);
     if (paramet == oldParamet) {
         return;
-    }
+    }    
     preLayer->updateParamet(paramet);
     updateUBO(&paramet);
     bParametChange = true;
@@ -100,6 +101,7 @@ VkErosionLayer::VkErosionLayer(bool bSingle) {
 VkErosionLayer::~VkErosionLayer() {}
 
 void VkErosionLayer::onUpdateParamet() {
+    paramet = std::min(paramet, 32);
     if (paramet == oldParamet) {
         return;
     }

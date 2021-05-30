@@ -1,3 +1,2 @@
-bulgeDistortion.comp
-pinchDistortion.comp
-pixellatePosition.comp
+mapChannel.comp
+flip.comp

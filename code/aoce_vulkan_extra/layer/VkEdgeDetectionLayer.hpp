@@ -23,7 +23,7 @@ class VkPrewittEdgeDetectionLayer : public VkLayer, public ITLayer<float> {
 };
 
 class VkSobelEdgeDetectionLayer : public VkPrewittEdgeDetectionLayer {
-    AOCE_LAYER_QUERYINTERFACE(VkPrewittEdgeDetectionLayer)
+    AOCE_LAYER_QUERYINTERFACE(VkSobelEdgeDetectionLayer)
    private:
     /* data */
    public:

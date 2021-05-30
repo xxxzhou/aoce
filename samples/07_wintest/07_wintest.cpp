@@ -103,7 +103,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     for (const auto &vf : formats) {
         std::cout << "index:" << vf.index << " width: " << vf.width
                   << " hight:" << vf.height << " fps:" << vf.fps
-                  << " format:" << to_string(vf.videoType) << std::endl;
+                  << " format:" << getVideoType(vf.videoType) << std::endl;
     }
     formatIndex = video->findFormatIndex(1280, 720);
     video->setFormat(formatIndex);

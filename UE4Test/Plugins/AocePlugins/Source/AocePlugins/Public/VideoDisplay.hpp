@@ -25,6 +25,7 @@ namespace aoce {
 	public:
 		void setOutLayer(IOutputLayer* layer);
 		void setTextureChange(std::function<void(const ImageFormat&)> onTextureChangeAction);
+		void changeDisplay();
 		void updateFrameGPU();
 	public:
 		virtual void onImageProcess(uint8_t* data, const ImageFormat& imageFormat,

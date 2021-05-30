@@ -1,5 +1,6 @@
 #include "CuLayerFactory.hpp"
 
+#include "layer/CuComputeLayer.hpp"
 #include "layer/CuInputLayer.hpp"
 #include "layer/CuOutputLayer.hpp"
 #include "layer/CuRGBA2YUVLayer.hpp"
@@ -24,10 +25,20 @@ IYUV2RGBALayer* CuLayerFactory::createYUV2RGBA() {
 IRGBA2YUVLayer* CuLayerFactory::createRGBA2YUV() {
     return new CuRGBA2YUVLayer();
 }
-ITexOperateLayer* CuLayerFactory::createTexOperate() { return nullptr; }
-ITransposeLayer* CuLayerFactory::createTranspose() { return nullptr; }
+
+IMapChannelLayer* CuLayerFactory::createMapChannel() {
+    return new CuMapChannelLayer();
+}
+
+IFlipLayer* CuLayerFactory::createFlip() { return new CuFlipLayer(); }
+
+ITransposeLayer* CuLayerFactory::createTranspose() {
+    return new CuTransposeLayer();
+}
+
 IReSizeLayer* CuLayerFactory::createSize() { return new CuResizeLayer(); }
-IBlendLayer* CuLayerFactory::createBlend() { return nullptr; }
+
+IBlendLayer* CuLayerFactory::createBlend() { return new CuBlendLayer(); }
 
 }  // namespace cuda
 }  // namespace aoce

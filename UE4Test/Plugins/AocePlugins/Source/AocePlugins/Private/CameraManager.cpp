@@ -44,7 +44,7 @@ namespace aoce {
 			getVideoManager(CameraType::and_camera2)
 				->getDevices(andevices.data(), andCount);
 			// 只添加后置摄像头
-			for (auto &device : rldevices) {
+			for (auto &device : andevices) {
 				if (device->back()) {
 					deviceList.push_back(device);
 				}

@@ -23,12 +23,15 @@ namespace aoce {
 		outputLayer2 = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
 		yuv2rgbLayer =
 			std::unique_ptr<IYUV2RGBALayer>(layerFactory->createYUV2RGBA());
+		operateLayer = std::unique_ptr<ITexOperateLayer>(createTexOperateLayer(this->gpuType));
 		rgb2yuvLayer =
 			std::unique_ptr<IRGBA2YUVLayer>(layerFactory->createRGBA2YUV());
 
 		outputLayer->updateParamet({ true, false });
+#if WIN32
 		outputLayer1->updateParamet({ false, true });
 		outputLayer2->updateParamet({ false, true });
+#endif
 		rgb2yuvLayer->updateParamet({ VideoType::yuy2P, true });
 	}
 
@@ -49,6 +52,7 @@ namespace aoce {
 		// outputLayer用于传输出去
 		graph->addNode(inputLayer.get())
 			->addNode(yuv2rgbLayer.get())
+			->addNode(operateLayer.get())
 			->addNode(mattingLayer.get())
 			->addNode(rgb2yuvLayer.get())
 			->addNode(outputLayer.get());
@@ -59,27 +63,13 @@ namespace aoce {
 			inputLayer1->getLayer()->addLine(mattingLayer->getLayer(), 0, 1);
 		}
 		// outputLayer1输出原图
-		yuv2rgbLayer->getLayer()->addLine(outputLayer1->getLayer());
+		operateLayer->getLayer()->addLine(outputLayer1->getLayer());
 		// outputLayer2输出扣像图
 		mattingLayer->getLayer()->addLine(outputLayer2->getLayer());
 	}
 
 	bool VideoProcess::bOpen() {
 		if (video) {
-			MattingParamet mp = {};
-			mp.colorParamet.average = 0.95;
-			mp.colorParamet.percent = 0.95;
-			mp.colorParamet.bpercent = 0.84;
-			mp.colorParamet.bBlueKey = 0;
-			mp.colorParamet.saturation = 0.97;
-			mp.colorParamet.greenRemove = 0.0078;
-			mp.colorParamet.intensity = 2;
-			mp.colorParamet.gamma = 1.0f;
-			mp.colorParamet.amount = 1.0f;
-			mp.colorParamet.softness = 12;
-			mp.colorParamet.spread = 2;
-			mp.colorParamet.eps = 0.00001f;
-			mattingLayer->updateParamet(mp);
 			return video->bOpen();
 		}
 		return false;
@@ -116,7 +106,7 @@ namespace aoce {
 			}
 		}
 		else {
-			inputLayer->getLayer()->addLine(outputLayer1->getLayer());
+			inputLayer->getLayer()->addLine(operateLayer->getLayer());
 			yuv2rgbLayer->getLayer()->setVisable(false);
 		}
 		inputLayer->inputCpuData(frame);

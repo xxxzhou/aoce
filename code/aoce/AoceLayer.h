@@ -130,10 +130,4 @@ class PipeGraphFactory {
     virtual IPipeGraph *createGraph() = 0;
 };
 
-class ILogObserver {
-   public:
-    virtual ~ILogObserver() = default;
-    virtual void onLogEvent(int level, const char *message) = 0;
-};
-
 }  // namespace aoce

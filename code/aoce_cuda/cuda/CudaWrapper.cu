@@ -83,7 +83,7 @@ void rgba2yuv_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest, cudaStream_t 
 	rgba2yuv << <grid, block, 0, stream >> > (source, dest);
 }
 
-void textureMap_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, MapChannel paramt, cudaStream_t stream) {
+void textureMap_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, MapChannelParamet paramt, cudaStream_t stream) {
 	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
 	textureMap << <grid, block, 0, stream >> > (source, dest, paramt);
 }
@@ -94,9 +94,20 @@ void blend_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> blendTex, PtrStepSz<u
 	blend << <grid, block, 0, stream >> > (source, blendTex, dest, left, top, opacity);
 }
 
-void operate_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, Operate paramt, cudaStream_t stream) {
+void flip_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, FlipParamet paramt, cudaStream_t stream) {
 	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
-	operate << <grid, block, 0, stream >> > (source, dest, paramt);
+	flip << <grid, block, 0, stream >> > (source, dest, paramt);
+}
+
+void transpose_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
+	TransposeParamet paramt, cudaStream_t stream){
+	dim3 grid(divUp(dest.width, block.x), divUp(dest.height, block.y));
+	transpose << <grid, block, 0, stream >> > (source, dest, paramt);
+}
+
+void gamma_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, float value, cudaStream_t stream) {
+	dim3 grid(divUp(source.width, block.x), divUp(source.height, block.y));
+	gamma << <grid, block, 0, stream >> > (source, dest, value);
 }
 
 void uchar2float_gpu(PtrStepSz<uchar4> source, PtrStepSz<float4> dest, cudaStream_t stream){

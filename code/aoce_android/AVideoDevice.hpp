@@ -5,6 +5,7 @@
 #include <media/NdkImageReader.h>
 
 #include <videodevice/VideoDevice.hpp>
+#include <mutex>
 
 namespace aoce {
 namespace android {
@@ -25,6 +26,7 @@ class AVideoDevice : public VideoDevice {
     ACaptureSessionOutput* sessionOutput = nullptr;
     ACameraCaptureSession* session = nullptr;
     ANativeWindow* surface = nullptr;
+    std::mutex procMtx;
     // std::string mid ="";
 
     friend void imageCallback(void* context, AImageReader* reader);

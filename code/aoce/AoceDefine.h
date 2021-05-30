@@ -149,10 +149,13 @@
     (AOCE_CV_MAT_CN(type) * AOCE_CV_ELEM_SIZE1(type))
 #pragma endregion
 
-// #ifndef max
-// #define max(a, b) (((a) > (b)) ? (a) : (b))
+// #define AOCE_DEBUG_TYPE 0
+
+// #if defined(_DEBUG)
+// #define AOCE_DEBUG_TYPE 1
 // #endif
 
-// #ifndef min
-// #define min(a, b) (((a) < (b)) ? (a) : (b))
+// #if defined(DEBUG)
+// #define AOCE_DEBUG_TYPE 1
 // #endif
+

@@ -10,25 +10,26 @@
 #include "Aoce.hpp"
 #include "module/ModuleManager.hpp"
 #if WIN32
-    #include <Shlwapi.h>
-    #include <Windows.h>    
-    
-    #include <iomanip>
-    // MS VC++ 16.0 _MSC_VER = 1928 (Visual Studio 2019)
-    // MS VC++ 15.0 _MSC_VER = 1910 (Visual Studio 2017)
-    // MS VC++ 14.0 _MSC_VER = 1900 (Visual Studio 2015)
-    #if _MSC_VER > 1910 && _HAS_CXX17
-        #include <filesystem>
-        namespace fs = std::filesystem;   
-    #else 
-        #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
-        #include <experimental/filesystem>
-        namespace fs = std::experimental::filesystem;
-    #endif
-    #pragma comment(lib, "shlwapi.lib")
+#include <Shlwapi.h>
+#include <Windows.h>
+
+#include <iomanip>
+// MS VC++ 16.0 _MSC_VER = 1928 (Visual Studio 2019)
+// MS VC++ 15.0 _MSC_VER = 1910 (Visual Studio 2017)
+// MS VC++ 14.0 _MSC_VER = 1900 (Visual Studio 2015)
+#if _MSC_VER > 1910 && _HAS_CXX17
+#include <filesystem>
+namespace fs = std::filesystem;
+#else
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
+#pragma comment(lib, "shlwapi.lib")
 #elif __ANDROID__
-    #include <stdlib.h>
-    #include "AoceManager.hpp"
+#include <stdlib.h>
+
+#include "AoceManager.hpp"
 #endif
 
 namespace aoce {
@@ -127,7 +128,7 @@ void logAssert(bool expression, const std::string& message) {
     }
 }
 
-const char* to_string(const VideoType& value) {
+const char* getVideoType(const VideoType& value) {
     switch (value) {
         case VideoType::nv12:
             return "nv12";
@@ -154,6 +155,30 @@ const char* to_string(const VideoType& value) {
         case VideoType::yuv420P:
             return "yuv420P";
         case VideoType::other:
+        default:
+            return "invalid";
+    }
+}
+
+const char* getImageType(const ImageType& imageType) {
+    switch (imageType) {
+        case ImageType::bgra8:
+            return "bgra8";
+        case ImageType::r16:
+            return "r16";
+        case ImageType::r8:
+            return "r8";
+        case ImageType::rgba8:
+            return "rgba8";
+        case ImageType::rgba32f:
+            return "rgba32f";
+        case ImageType::r32f:
+            return "r32f";
+        case ImageType::r32:
+            return "r32";
+        case ImageType::rgba32:
+            return "rgba32";
+        case ImageType::other:
         default:
             return "invalid";
     }
@@ -509,9 +534,7 @@ std::string getAocePath() {
 }
 
 #if WIN32
-bool existsFile(const wchar_t* filePath) {    
-    return fs::exists(filePath);
-}
+bool existsFile(const wchar_t* filePath) { return fs::exists(filePath); }
 
 bool loadFileBinary(const wchar_t* filePath, std::vector<uint8_t>& data) {
     if (!existsFile(filePath)) {

@@ -21,7 +21,8 @@ typedef ITLayer<OutputParamet> AOutputLayer;
 typedef ITLayer<YUVParamet> IYUV2RGBALayer;
 // RGBA 2 YUV 转换
 typedef ITLayer<YUVParamet> IRGBA2YUVLayer;
-typedef ITLayer<TexOperateParamet> ITexOperateLayer;
+typedef ITLayer<MapChannelParamet> IMapChannelLayer;
+typedef ITLayer<FlipParamet> IFlipLayer;
 typedef ITLayer<TransposeParamet> ITransposeLayer;
 typedef ITLayer<ReSizeParamet> IReSizeLayer;
 typedef ITLayer<BlendParamet> IBlendLayer;
@@ -66,10 +67,17 @@ class LayerFactory {
     virtual IOutputLayer* createOutput() = 0;
     virtual IYUV2RGBALayer* createYUV2RGBA() = 0;
     virtual IRGBA2YUVLayer* createRGBA2YUV() = 0;
-    virtual ITexOperateLayer* createTexOperate() = 0;
+    virtual IMapChannelLayer* createMapChannel() = 0;
+    virtual IFlipLayer* createFlip() = 0;
     virtual ITransposeLayer* createTranspose() = 0;
     virtual IReSizeLayer* createSize() = 0;
     virtual IBlendLayer* createBlend() = 0;
+};
+
+class ILogObserver {
+   public:
+    virtual ~ILogObserver() = default;
+    virtual void onLogEvent(int level, const char* message) = 0;
 };
 
 extern "C" {

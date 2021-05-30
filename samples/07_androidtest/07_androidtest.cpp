@@ -27,6 +27,10 @@ class TestCameraObserver : public IVideoDeviceObserver {
             window->tick();
         }
     }
+    virtual void onDepthVideoFrame(VideoFrame frame, VideoFrame depth,
+                                   void* alignParamet) final{
+
+    }
 };
 
 void onPreCommand(uint32_t index) {
@@ -70,7 +74,7 @@ void android_main(struct android_app* app) {
         std::string msg;
         string_format(msg, "index:", vf.index, " width: ", vf.width,
                       " hight:", vf.height, " fps:", vf.fps,
-                      " format:", to_string(vf.videoType));
+                      " format:", getVideoType(vf.videoType));
         logMessage(LogLevel::info, msg);
     }
     int32_t formatIndex = video->findFormatIndex(1920,1080,0);
@@ -137,7 +141,7 @@ Java_aoce_samples_androidtest_MainActivity_openCamera(JNIEnv* env, jobject thiz,
         std::string msg;
         string_format(msg, "index:", vf.index, " width: ", vf.width,
                       " hight:", vf.height, " fps:", vf.fps,
-                      " format:", to_string(vf.videoType));
+                      " format:", getVideoType(vf.videoType));
         logMessage(LogLevel::info, msg);
     }
     // formatIndex = video->findFormatIndex(1920,1080,0);

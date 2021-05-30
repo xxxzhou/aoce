@@ -17,7 +17,8 @@ class CuLayerFactory : public LayerFactory {
     virtual IOutputLayer* createOutput() override;
     virtual IYUV2RGBALayer* createYUV2RGBA() override;
     virtual IRGBA2YUVLayer* createRGBA2YUV() override;
-    virtual ITexOperateLayer* createTexOperate() override;
+    virtual IMapChannelLayer* createMapChannel() override;
+    virtual IFlipLayer* createFlip() override;
     virtual ITransposeLayer* createTranspose() override;
     virtual IReSizeLayer* createSize() override;
     virtual IBlendLayer* createBlend() override;

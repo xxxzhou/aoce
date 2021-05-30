@@ -19,9 +19,13 @@ VkResizeLayer::VkResizeLayer(ImageType imageType) {
     } else if (imageType == ImageType::rgba32f) {
         glslPath = "glsl/resizeF4.comp.spv";
     }
-    paramet.bLinear = true;
+    paramet.bLinear = 1;
     paramet.newWidth = 1920;
     paramet.newHeight = 1080;
+#if __ANDROID__
+    paramet.newWidth = 1280;
+    paramet.newHeight = 720;
+#endif
 }
 
 VkResizeLayer::~VkResizeLayer() {}
@@ -109,7 +113,7 @@ void VkSizeScaleLayer::onInitGraph() {
 void VkSizeScaleLayer::onInitLayer() {
     assert(paramet.fx > 0.0f && paramet.fx > 0.0f);
     outFormats[0].width = inFormats[0].width * paramet.fx;
-    outFormats[0].height = inFormats[0].width * paramet.fx;
+    outFormats[0].height = inFormats[0].height * paramet.fx;
     paramet.fx = 1.0f / paramet.fx;
     paramet.fy = 1.0f / paramet.fy;
     updateUBO(&paramet);

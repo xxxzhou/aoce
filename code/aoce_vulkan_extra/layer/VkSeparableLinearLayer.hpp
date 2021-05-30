@@ -15,7 +15,7 @@ class VkSeparableLayer : public VkLayer {
    protected:
     /* data */
     ImageType imageType = ImageType::rgba8;
-    std::unique_ptr<VulkanBuffer> kernelBuffer;
+    std::unique_ptr<VulkanBuffer> kernelBuffer = nullptr;
 
    public:
     VkSeparableLayer(ImageType imageType = ImageType::rgba8);
@@ -32,7 +32,7 @@ class VkSeparableLayer : public VkLayer {
 class VkSeparableLinearLayer : public VkSeparableLayer {
     AOCE_LAYER_GETNAME(VkSeparableLinearLayer)
    protected:
-    std::unique_ptr<VkSeparableLayer> rowLayer;
+    std::unique_ptr<VkSeparableLayer> rowLayer = nullptr;
 
    public:
     VkSeparableLinearLayer(ImageType imageType = ImageType::rgba8);
@@ -72,7 +72,6 @@ class VkGaussianBlurSLayer : public VkSeparableLinearLayer,
     virtual void onUpdateParamet() override;
     virtual void onInitLayer() override;
 };
-
 
 }  // namespace layer
 }  // namespace vulkan

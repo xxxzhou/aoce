@@ -160,37 +160,24 @@ struct YUVParamet {
 };
 
 // ARGB<->BGRA<->RGBA<->RRRR
-struct MapChannel {
+struct MapChannelParamet {
     int32_t red = 0;
     int32_t green = 1;
     int32_t blue = 2;
     int32_t alpha = 3;
-    inline bool operator==(const MapChannel &right) {
+    inline bool operator==(const MapChannelParamet &right) {
         return this->red == right.red && this->green == right.green &&
                this->blue == right.blue && this->alpha == right.alpha;
     }
 };
 
 // 方便C#交互不做额外设置,以及GPU参数结构对应,bool全用int表示
-struct Operate {
+struct FlipParamet {
     // 是否X倒转
     int32_t bFlipX = false;
     int32_t bFlipY = false;
-    // 调整亮度
-    float gamma = 1.f;
-    inline bool operator==(const Operate &right) {
-        return this->bFlipX == right.bFlipX && this->bFlipY == right.bFlipY &&
-               this->gamma == right.gamma;
-    }
-};
-
-// 纹理些基本操作
-struct TexOperateParamet {
-    MapChannel mapChannel = {};
-    Operate operate = {};
-    inline bool operator==(const TexOperateParamet &right) {
-        return this->mapChannel == right.mapChannel &&
-               this->operate == right.operate;
+    inline bool operator==(const FlipParamet &right) {
+        return this->bFlipX == right.bFlipX && this->bFlipY == right.bFlipY;
     }
 };
 
@@ -248,13 +235,16 @@ extern "C" {
 
 ACOE_EXPORT void setLogAction(logEventAction action);
 
-ACOE_EXPORT const char *getLogLevel(LogLevel level);
-
 ACOE_EXPORT void logMessage(LogLevel level, const char *message);
 
-ACOE_EXPORT const char *to_string(const VideoType &value);
+ACOE_EXPORT const char *getLogLevel(LogLevel level);
+
+ACOE_EXPORT const char *getVideoType(const VideoType &value);
+
+ACOE_EXPORT const char *getImageType(const ImageType &imageType);
 
 ACOE_EXPORT uint32_t divUp(int32_t x, int32_t y);
+
 ACOE_EXPORT long long getNowTimeStamp();
 
 ACOE_EXPORT aoce::ImageType videoType2ImageType(

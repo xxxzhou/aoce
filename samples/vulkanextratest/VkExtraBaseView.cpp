@@ -26,7 +26,7 @@ void VkExtraBaseView::initGraph(std::vector<IBaseLayer*> layers, void* hinst,
     outputLayer->updateParamet({false, true});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     transposeLayer = layerFactory->createTranspose();
-    operateLayer = layerFactory->createTexOperate();
+    operateLayer = layerFactory->createFlip();
     resizeLayer = layerFactory->createSize();
     resizeLayer->updateParamet({1, 240, 120});
     layerNode = vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
@@ -37,17 +37,17 @@ void VkExtraBaseView::initGraph(std::vector<IBaseLayer*> layers, void* hinst,
         yuv2rgbLayer->getLayer()->addLine(layerNode, 0, 1);
     }
 #if _WIN32
-    TexOperateParamet texParamet = {};
-    texParamet.operate.bFlipX = false;
-    texParamet.operate.bFlipY = false;
+    FlipParamet texParamet = {};
+    texParamet.bFlipX = false;
+    texParamet.bFlipY = false;
     // texParamet.operate.gamma = 0.45f;
     operateLayer->updateParamet(texParamet);
     layerNode->addNode(operateLayer)->addNode(outputLayer);  //
 #elif __ANDROID__
-    TransposeParamet tranParamet = {};
-    tranParamet.bFlipX = true;
-    tranParamet.bFlipY = true;
-    transposeLayer->updateParamet(tranParamet);
+    TransposeParamet texParamet = {};
+    texParamet.bFlipX = true;
+    texParamet.bFlipY = true;
+    transposeLayer->updateParamet(texParamet);
     layerNode->addNode(transposeLayer)->addNode(outputLayer);
 #endif
     if (hinst) {
@@ -69,7 +69,7 @@ void VkExtraBaseView::openDevice(int32_t id) {
 #endif
     auto& deviceList =
         AoceManager::Get().getVideoManager(cameraType)->getDeviceList();
-    if (video != nullptr) {
+    if (video != nullptr && video->bOpen()) {
         video->close();
     }
     index = id;

@@ -91,7 +91,7 @@ void android_main(struct android_app *app)
     for (const auto &vf : formats) {
         std::cout << "index:" << vf.index << " width: " << vf.width
                   << " hight:" << vf.height << " fps:" << vf.fps
-                  << " format:" << to_string(vf.videoType) << std::endl;
+                  << " format:" << getVideoType(vf.videoType) << std::endl;
     }
     formatIndex = video->findFormatIndex(1920, 1080);
     video->setFormat(formatIndex);
