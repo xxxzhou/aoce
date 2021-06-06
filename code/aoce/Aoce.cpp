@@ -76,7 +76,7 @@ const char* getLogLevel(LogLevel level) {
 }
 
 void logMessage(LogLevel level, const char* message) {
-#if !DEBUG
+#if !AOCE_DEBUG_TYPE
     if (level == LogLevel::debug) {
         return;
     }
@@ -592,6 +592,17 @@ void loadAoce() {
         return;
     }
     bLoad = true;
+#if AOCE_DEBUG_TYPE
+    logMessage(LogLevel::info, "aoce debug model");
+#else
+    logMessage(LogLevel::info, "aoce release model");
+#endif
+#if defined(_WIN64) || defined(__ia64) || defined(__aarch64__)
+    logMessage(LogLevel::info, "aoce 64bit run model");
+#else
+    logMessage(LogLevel::info, "aoce 32bit run model");
+#endif
+
     ModuleManager::Get().regAndLoad("aoce_vulkan");
 #if WIN32
     ModuleManager::Get().regAndLoad("aoce_win_mf");

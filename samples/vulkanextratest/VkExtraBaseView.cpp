@@ -21,7 +21,7 @@ void VkExtraBaseView::initGraph(std::vector<IBaseLayer*> layers, void* hinst,
     this->bAutoIn = bAutoIn;
     vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
-    inputLayer = layerFactory->crateInput();
+    inputLayer = layerFactory->createInput();
     outputLayer = layerFactory->createOutput();
     outputLayer->updateParamet({false, true});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
@@ -88,11 +88,6 @@ void VkExtraBaseView::openDevice(int32_t id) {
     auto selectFormat = video->getSelectFormat();
     video->setObserver(this);
     VideoType videoType = selectFormat.videoType;
-#if WIN32
-    if (selectFormat.videoType == VideoType::mjpg) {
-        videoType = VideoType::yuv2I;
-    }
-#endif
 }
 
 void VkExtraBaseView::closeDevice() {

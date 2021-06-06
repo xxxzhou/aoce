@@ -22,10 +22,10 @@ namespace aoce {
 		outputLayer1 = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
 		outputLayer2 = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
 		yuv2rgbLayer =
-			std::unique_ptr<IYUV2RGBALayer>(layerFactory->createYUV2RGBA());
+			std::unique_ptr<IYUVLayer>(layerFactory->createYUV2RGBA());
 		operateLayer = std::unique_ptr<ITexOperateLayer>(createTexOperateLayer(this->gpuType));
 		rgb2yuvLayer =
-			std::unique_ptr<IRGBA2YUVLayer>(layerFactory->createRGBA2YUV());
+			std::unique_ptr<IYUVLayer>(layerFactory->createRGBA2YUV());
 
 		outputLayer->updateParamet({ true, false });
 #if WIN32

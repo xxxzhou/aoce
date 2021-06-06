@@ -103,13 +103,19 @@ struct OutputParamet {
 struct VkOutGpuTex {
     // vkcommandbuffer
     void *commandbuffer = nullptr;
-#if WIN32
-    void *image = nullptr;
-#elif __ANDROID__
+#if defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__) ) || defined(_M_X64) || defined(__ia64) || defined (_M_IA64) || defined(__aarch64__) || defined(__powerpc64__)
+     void *image = nullptr;
+#else
     uint64_t image = 0;
 #endif
-    int width = 1920;
-    int height = 1080;
+    int32_t width = 1920;
+    int32_t height = 1080;
+};
+
+struct GLOutGpuTex{
+    int32_t image = -1;
+    int32_t width = 1280;
+    int32_t height = 720;
 };
 
 class IOutputLayerObserver {

@@ -32,7 +32,7 @@ static std::unique_ptr<VulkanWindow> window = nullptr;
 static IPipeGraph *vkGraph;
 static IInputLayer *inputLayer;
 static IOutputLayer *outputLayer;
-static IYUV2RGBALayer *yuv2rgbLayer;
+static IYUVLayer *yuv2rgbLayer;
 
 static GpuType gpuType = GpuType::vulkan;
 
@@ -115,7 +115,7 @@ void android_main(struct android_app *app)
     // 生成一张执行图
     vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto layerFactory = AoceManager::Get().getLayerFactory(gpuType);
-    inputLayer = layerFactory->crateInput();
+    inputLayer = layerFactory->createInput();
     outputLayer = layerFactory->createOutput();
     outputLayer->updateParamet({true, true});
     yuv2rgbLayer = layerFactory->createYUV2RGBA();

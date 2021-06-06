@@ -35,10 +35,7 @@ shared uint row_shared[16][16*(PATCH_PER_BLOCK+HALO_SIZE*2)];//vec4[local_size_y
 // 核心的最大宽度由HALO_SIZE*gl_WorkGroupSize.x决定
 void main(){    
     ivec2 size = imageSize(outTex);  
-    uint y = gl_GlobalInvocationID.y;
-    if(y >= size.y){
-        return;
-    }
+    uint y = min(gl_GlobalInvocationID.y,size.y-1);   
     // 纹理正常范围的全局起点
     uint xStart = gl_WorkGroupID.x * (gl_WorkGroupSize.x*PATCH_PER_BLOCK) + gl_LocalInvocationID.x;
     // 每个线程组填充HALO_SIZE*gl_WorkGroupSize个数据
@@ -85,7 +82,7 @@ void main(){
 	barrier();
     for (int j = 0; j < PATCH_PER_BLOCK; ++j){
         uint x = xStart + j*gl_WorkGroupSize.x;
-        if(x<size.x){
+        if(x<size.x && gl_GlobalInvocationID.y<size.y){
             vec4 sum = vec4(0);
             for(int k=0;k<ubo.xksize;++k){
                 uint xx = gl_LocalInvocationID.x + (HALO_SIZE+j)*gl_WorkGroupSize.x - ubo.anchor + k;

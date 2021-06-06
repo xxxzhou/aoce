@@ -1,15 +1,13 @@
 package aoce.samples.vulkanextratest;
 
 import androidx.fragment.app.FragmentActivity;
-import aoce.android.library.*;
-import aoce.samples.vulkanextratest.R;
+import aoce.android.library.wrapper.GLVideoRender;
+import aoce.android.library.wrapper.IGLCopyTexture;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.view.Surface;
-import android.view.SurfaceView;
 import android.widget.*;
 import android.view.View;
 
@@ -51,13 +49,13 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, Vi
         scaleBar = findViewById(R.id.seekBar4);
         dscaleBar = findViewById(R.id.seekBar5);
 
-//        if (checkSelfPermission( Manifest.permission.CAMERA) !=
-//                PackageManager.PERMISSION_GRANTED) {
-//            requestPermissions(
-//                    new String[]{Manifest.permission.CAMERA},
-//                    PERMISSION_REQUEST_CODE_CAMERA);
-//            return;
-//        }
+        if (checkSelfPermission( Manifest.permission.CAMERA) !=
+                PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSION_REQUEST_CODE_CAMERA);
+            return;
+        }
 
         initEngine();
 

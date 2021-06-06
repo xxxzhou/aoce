@@ -31,9 +31,6 @@ namespace aoce {
 	VideoView::~VideoView() {}
 
 	void VideoView::runFrame(const VideoFrame& frame, bool special) {
-#if __ANDROID__
-		AsyncTask(ENamedThreads::GameThread, [=]() {
-#endif
 		if (getYuvIndex(frame.videoType) >= 0) {
 			yuv2rgbLayer->getLayer()->setVisable(true);
 			if (yuv2rgbLayer->getParamet().type != frame.videoType) {
@@ -45,9 +42,6 @@ namespace aoce {
 		}
 		inputLayer->inputCpuData(frame);
 		graph->run();
-#if __ANDROID__
-		});
-#endif
 	}
 
 }  // namespace aoce

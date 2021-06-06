@@ -28,9 +28,9 @@ class ACOE_EXPORT OutputLayer : public IOutputLayer {
 
     virtual void outDx11GpuTex(void* device, void* tex) override{};
 
-#if __ANDROID__
-    virtual void outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType = 0,
+
+    virtual void outGLGpuTex(const GLOutGpuTex& outTex, uint32_t texType = 0,
                              int32_t outIndex = 0) override{};
-#endif
+
 };
 }  // namespace aoce

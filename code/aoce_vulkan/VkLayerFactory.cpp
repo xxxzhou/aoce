@@ -17,18 +17,18 @@ VkLayerFactory::VkLayerFactory(/* args */) {}
 
 VkLayerFactory::~VkLayerFactory() {}
 
-IInputLayer* VkLayerFactory::crateInput() {
+IInputLayer* VkLayerFactory::createInput() {
     InputLayer* inLayer = new VkInputLayer();
     return inLayer;
 }
 
 IOutputLayer* VkLayerFactory::createOutput() { return new VkOutputLayer(); }
 
-IYUV2RGBALayer* VkLayerFactory::createYUV2RGBA() {
+IYUVLayer* VkLayerFactory::createYUV2RGBA() {
     return new VkYUV2RGBALayer();
 }
 
-IRGBA2YUVLayer* VkLayerFactory::createRGBA2YUV() {
+IYUVLayer* VkLayerFactory::createRGBA2YUV() {
     return new VkRGBA2YUVLayer();
 }
 

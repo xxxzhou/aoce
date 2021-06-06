@@ -151,9 +151,9 @@ void MFVideoDevice::setFormat(int32_t index) {
     }
     selectIndex = index;
     selectFormat = formats[index];
-    if (selectFormat.videoType == VideoType::mjpg) {
-        selectFormat.videoType = VideoType::yuv2I;
-    }
+    // if (selectFormat.videoType == VideoType::mjpg) {
+    //     selectFormat.videoType = VideoType::yuv2I;
+    // }
     if (tempOpen) {
         open();
     }
@@ -265,11 +265,11 @@ HRESULT MFVideoDevice::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
             auto hr = pBuffer->Lock(&data, &length, &length);
             VideoFrame frame = {};
             frame.data[0] = data;
-            frame.videoType = selectFormat.videoType;
             // mjpg会自动转化成YUV2P格式
+            frame.videoType = selectFormat.videoType;
             if (selectFormat.videoType == VideoType::mjpg) {
-                selectFormat.videoType = VideoType::yuy2P;
-            }
+                frame.videoType = VideoType::yuy2P;
+            }            
             frame.width = selectFormat.width;
             frame.height = selectFormat.height;
             frame.timeStamp = getNowTimeStamp();

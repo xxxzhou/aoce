@@ -1,7 +1,6 @@
-package aoce.android.library;
+package aoce.android.library.wrapper;
 
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 

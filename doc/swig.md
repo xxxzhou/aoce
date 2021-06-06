@@ -51,4 +51,6 @@
 
 实现方法类似为回调abserver类的每个方法对应声明对应函数指针对象,然后把C#对应override方法传入在对应每个函数指针.在上个项目Oeip里的Oeip_live里OeipLiveBackWrapper类用的就是这种方式.在win端也可通过COM技术实现C#与C++类之间互相继承交流,类似Oeip里的OeipLiveCom.
 
-### 抽象类
+## SWIG
+
+swig在处理里添加特有的宏(#ifdef SWIG)

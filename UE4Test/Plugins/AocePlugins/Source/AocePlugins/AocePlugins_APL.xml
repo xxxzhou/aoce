@@ -3,6 +3,10 @@
 <root xmlns:android="http://schemas.android.com/apk/res/android">
   <init>
     <log text="Android Aoce init"/>
+    <setBool result="abi64" value="false"/>
+    <isArch arch="arm64-v8a">
+      <setBool result="abi64" value="true"/>
+    </isArch>
   </init>
   <androidManifestUpdates>
     <addElements tag="manifest">
@@ -21,22 +25,31 @@
     </addElements>
   </androidManifestUpdates>
   <resourceCopies>
+    <copyDir src="$S(PluginDir)/../../ThirdParty/Aoce/android/glsl" dst="$S(BuildDir)/assets/glsl"/>
     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/agora-rtc-sdk.jar" dst="$S(BuildDir)/libs/agora-rtc-sdk.jar"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libagora-rtc-sdk-jni.so" dst="$S(BuildDir)/libs/armeabi-v7a/libagora-rtc-sdk-jni.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_agora.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_agora.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_vulkan.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_vulkan.so"/> 
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_vulkan_extra.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_vulkan_extra.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_talkto.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_talkto.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_android.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_android.so"/>
-    <!--<copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_ffmpeg.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_ffmpeg.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libffmpeg.so" dst="$S(BuildDir)/libs/armeabi-v7a/libffmpeg.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libmp3lame.so" dst="$S(BuildDir)/libs/armeabi-v7a/libmp3lame.so"/>
-    <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libnative-app-glue.a" dst="$S(BuildDir)/libs/armeabi-v7a/libnative-app-glue.a"/>
-     <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libc++_shared.so" dst="$S(BuildDir)/libs/armeabi-v7a/libc++_shared.so"/>-->
-    <copyDir src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/glsl" dst="$S(BuildDir)/assets/glsl"/>
+    <isArch arch="armeabi-v7a">      
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libagora-ffmpeg.so" dst="$S(BuildDir)/libs/armeabi-v7a/libagora-ffmpeg.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libagora-rtc-sdk-jni.so" dst="$S(BuildDir)/libs/armeabi-v7a/libagora-rtc-sdk-jni.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_agora.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_agora.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_vulkan.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_vulkan.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_vulkan_extra.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_vulkan_extra.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_talkto.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_talkto.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/armeabi-v7a/libaoce_android.so" dst="$S(BuildDir)/libs/armeabi-v7a/libaoce_android.so"/>
+    </isArch>
+    <isArch arch="arm64-v8a">
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/arm64-v8a/libagora-ffmpeg.so" dst="$S(BuildDir)/libs/arm64-v8a/libagora-ffmpeg.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/arm64-v8a/libagora-rtc-sdk-jni.so" dst="$S(BuildDir)/libs/arm64-v8a/libagora-rtc-sdk-jni.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/arm64-v8a/libaoce.so" dst="$S(BuildDir)/libs/arm64-v8a/libaoce.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/arm64-v8a/libaoce_agora.so" dst="$S(BuildDir)/libs/arm64-v8a/libaoce_agora.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/arm64-v8a/libaoce_vulkan.so" dst="$S(BuildDir)/libs/arm64-v8a/libaoce_vulkan.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/arm64-v8a/libaoce_vulkan_extra.so" dst="$S(BuildDir)/libs/arm64-v8a/libaoce_vulkan_extra.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/arm64-v8a/libaoce_talkto.so" dst="$S(BuildDir)/libs/arm64-v8a/libaoce_talkto.so"/>
+      <copyFile src="$S(PluginDir)/../../ThirdParty/Aoce/android/arm64-v8a/libaoce_android.so" dst="$S(BuildDir)/libs/arm64-v8a/libaoce_android.so"/>
+    </isArch>
   </resourceCopies>
   <soLoadLibrary>
+    <loadLibrary name="agora-ffmpeg" failmsg="agora-ffmpeg loaded failed" />    
     <loadLibrary name="agora-rtc-sdk-jni" failmsg="agora-rtc-sdk-jni loaded failed" />    
   </soLoadLibrary>
 </root>

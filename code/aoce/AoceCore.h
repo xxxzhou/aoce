@@ -17,10 +17,8 @@ namespace aoce {
 
 typedef ITLayer<InputParamet> AInputLayer;
 typedef ITLayer<OutputParamet> AOutputLayer;
-// YUV 2 RGBA 转换
-typedef ITLayer<YUVParamet> IYUV2RGBALayer;
-// RGBA 2 YUV 转换
-typedef ITLayer<YUVParamet> IRGBA2YUVLayer;
+// YUV 2 RGBA/RGBA 2 YUV 转换
+typedef ITLayer<YUVParamet> IYUVLayer;
 typedef ITLayer<MapChannelParamet> IMapChannelLayer;
 typedef ITLayer<FlipParamet> IFlipLayer;
 typedef ITLayer<TransposeParamet> ITransposeLayer;
@@ -51,10 +49,10 @@ class IOutputLayer : public AOutputLayer {
 
     virtual void outDx11GpuTex(void* device, void* tex) = 0;
 
-#if __ANDROID__
-    virtual void outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType = 0,
+
+    virtual void outGLGpuTex(const GLOutGpuTex& outTex, uint32_t texType = 0,
                              int32_t outIndex = 0) = 0;
-#endif
+
 };
 
 // 在AoceManager注册vulkan/dx11/cuda类型的LayerFactory
@@ -63,10 +61,10 @@ class LayerFactory {
     virtual ~LayerFactory(){};
 
    public:
-    virtual IInputLayer* crateInput() = 0;
+    virtual IInputLayer* createInput() = 0;
     virtual IOutputLayer* createOutput() = 0;
-    virtual IYUV2RGBALayer* createYUV2RGBA() = 0;
-    virtual IRGBA2YUVLayer* createRGBA2YUV() = 0;
+    virtual IYUVLayer* createYUV2RGBA() = 0;
+    virtual IYUVLayer* createRGBA2YUV() = 0;
     virtual IMapChannelLayer* createMapChannel() = 0;
     virtual IFlipLayer* createFlip() = 0;
     virtual ITransposeLayer* createTranspose() = 0;

@@ -1,5 +1,3 @@
-
-
 # 复制glsl文件到bin目录
 file(GLOB AOCE_SPV_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/target/*.spv" )
 message(STATUS "aoce_vulkan_glsl: " ${AOCE_SPV_SOURCE})           

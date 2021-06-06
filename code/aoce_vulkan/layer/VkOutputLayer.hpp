@@ -46,7 +46,7 @@ class AOCE_VULKAN_EXPORT VkOutputLayer : public OutputLayer, public VkLayer {
 
 // android api < 26不能使用GPU数据转换,只能用CPU数据传输
 #if __ANDROID__
-    virtual void outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType = 0,
+    virtual void outGLGpuTex(const GLOutGpuTex& outTex, uint32_t texType = 0,
                              int32_t outIndex = 0) override;
 #endif
 #if WIN32

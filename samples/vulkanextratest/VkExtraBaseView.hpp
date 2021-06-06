@@ -19,7 +19,7 @@ class VkExtraBaseView : public IVideoDeviceObserver {
     IPipeGraph* vkGraph = nullptr;
     IInputLayer* inputLayer = nullptr;
     IOutputLayer* outputLayer = nullptr;
-    IYUV2RGBALayer* yuv2rgbLayer = nullptr;
+    IYUVLayer* yuv2rgbLayer = nullptr;
     ITransposeLayer* transposeLayer = nullptr;
     IFlipLayer* operateLayer = nullptr;
     IReSizeLayer* resizeLayer = nullptr;

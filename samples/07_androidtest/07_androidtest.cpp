@@ -109,7 +109,7 @@ extern "C" JNIEXPORT void JNICALL
 Java_aoce_samples_androidtest_MainActivity_glCopyTex(JNIEnv* env, jobject thiz,
                                                      jint texture_id,
                                                      jint width, jint height) {
-    VkOutGpuTex outGpuTex = {};
+    GLOutGpuTex outGpuTex = {};
     outGpuTex.image = texture_id;
     outGpuTex.width = width;
     outGpuTex.height = height;

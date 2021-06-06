@@ -130,46 +130,42 @@ void VkOutputLayer::outVkGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
         }
         VulkanManager::blitFillImage(copyCmd, inTexs[0].get(), copyImage, width,
                                      height);
-    }    
+    }
 }
 
 #if __ANDROID__
-void VkOutputLayer::outGLGpuTex(const VkOutGpuTex& outTex, uint32_t texType,
+void VkOutputLayer::outGLGpuTex(const GLOutGpuTex& outTex, uint32_t texType,
                                 int32_t outIndex) {
+    if (!vkPipeGraph->resourceReady()) {
+        return;
+    }
     int bindType = GL_TEXTURE_2D;
     if (texType > 0) {
         bindType = texType;
     }
-    if (paramet.bCpu && !paramet.bGpu) {
-        if (outBuffer) {     
-            if (outTex.commandbuffer) {
-                uint8_t* tempPtr = (uint8_t*)outTex.commandbuffer;
-                outBuffer->download(tempPtr);
-                // memcpy(outTex.commandbuffer,cpuData.data(),cpuData.size());
-            } else if (outBuffer->getCpuData()) {
-                // outBuffer->download(cpuData.data());
-                // UE4(Unbind different texture target on the same stage, to
-                // avoid OpenGL keeping its data, and potential driver
-                // problems.)
-                glBindTexture(bindType, 0);
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(bindType, outTex.image);
-                glTexSubImage2D(bindType, 0, 0, 0, inFormats[0].width,
-                                inFormats[0].height, GL_RGBA, GL_UNSIGNED_BYTE,
-                                outBuffer->getCpuData());
-                glBindTexture(bindType, 0);
-            }
+    if (paramet.bCpu && !paramet.bGpu && !observer) {
+        if (outBuffer && outBuffer->getCpuData()) {
+            glBindTexture(bindType, 0);
+            // glActiveTexture(GL_TEXTURE0);
+            glBindTexture(bindType, outTex.image);
+            glTexSubImage2D(bindType, 0, 0, 0, inFormats[0].width,
+                            inFormats[0].height, GL_RGBA, GL_UNSIGNED_BYTE,
+                            outBuffer->getCpuData());
+            glBindTexture(bindType, 0);
         }
     }
 #if __ANDROID_API__ >= 26
-    if (!vkPipeGraph->resourceReady()) {
-        return;
-    }
     if (VulkanManager::Get().bInterpGLES && paramet.bGpu) {
         ImageFormat format = hardwareImage->getFormat();
-        if (format.width != outTex.width || format.height != outTex.height) {
-            format.width = outTex.width;
-            format.height = outTex.height;
+        int32_t width = outTex.width;
+        int32_t height = outTex.height;
+        if (width == 0 || height == 0) {
+            width = inFormats[0].width;
+            height = inFormats[0].height;
+        }
+        if (format.width != width || format.height != height) {
+            format.width = width;
+            format.height = height;
             format.imageType = ImageType::rgba8;
             // hardwareImage->createAndroidBuffer(format);
             outFormat = format;

@@ -49,9 +49,9 @@ class VideoProcess : public IVideoDeviceObserver {
     std::unique_ptr<IOutputLayer> outputLayer;
     std::unique_ptr<IOutputLayer> outputLayer1;
     std::unique_ptr<IOutputLayer> outputLayer2;
-    std::unique_ptr<IYUV2RGBALayer> yuv2rgbLayer;
+    std::unique_ptr<IYUVLayer> yuv2rgbLayer;
 	std::unique_ptr<ITexOperateLayer> operateLayer;
-    std::unique_ptr<IRGBA2YUVLayer> rgb2yuvLayer;
+    std::unique_ptr<IYUVLayer> rgb2yuvLayer;
     std::unique_ptr<IMattingLayer> mattingLayer;
 
     VideoFormat format = {};

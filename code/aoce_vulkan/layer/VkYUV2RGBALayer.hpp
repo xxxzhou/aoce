@@ -6,7 +6,7 @@
 namespace aoce {
 namespace vulkan {
 namespace layer {
-class VkYUV2RGBALayer : public VkLayer, public IYUV2RGBALayer {
+class VkYUV2RGBALayer : public VkLayer, public IYUVLayer {
     AOCE_LAYER_QUERYINTERFACE(VkYUV2RGBALayer)
    private:
     /* data */

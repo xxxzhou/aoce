@@ -16,6 +16,8 @@ android camera里的AImageReader_acquireNextImage用AImageReader_acquireLatestIm
 
 1. 过滤指定字符串，不让其显示的regex. ^(?!.*(字符串)).*$
 
+2. adb logcat -v threadtime > log.txt(adb 无过滤加载所有log)
+
 ## 注意
 
 1 有返回值的一定要设置返回置,win里的msvc可能不在乎,android里的clang会在运行时给出SIGILL或SIGTRAP.
@@ -30,4 +32,12 @@ android camera里的AImageReader_acquireNextImage用AImageReader_acquireLatestIm
 
 4 导向滤波2021.05.29版本在android上不能运行.
 
-经查在andorid中,卷积分离相关的类如VkSeparableLinearLayer(使用局部共享显存),其高度需要为16的整数倍才正常,应该线程组的分配方式有关.
+经查在andorid中,glsl代码filterRow需求其高度需要为16的整数倍才正常,应该线程组的分配方式有关.
+
+解决方式:修改filterRow逻辑,在填充shared数据之前,不做线程组与大小的验证,shared填充满.不过奇怪的是,为什么不需要宽度是16的整数倍了,并且也不需要修改filterColumn的逻辑.
+
+注意:以后如果有用到shared数据的逻辑glsl,一定在用到之前初始化/填充所有shared数据,避免这个问题.相应逻辑后期也需要全部修正,包含filterColumn.
+
+5 使用cmake + swig生成的文件直接复制到模块包里,会导致android studio每次打开把相关包变成目录,使编缉器丢掉包名引用等智能提示出现错误.
+
+可以多加一步,先复制到一个非android模块目录(最好是CMAKE的BINARY目录,否则android studio容易检测到重命),然后使用cmake里的file复制过去,可以解决.

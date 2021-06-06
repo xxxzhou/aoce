@@ -9,11 +9,16 @@
 
 
 %{
+#if __ANDROID__
+#include <jni.h>
+#endif
+
 #include "aoce/Aoce.h"
 #include "aoce/AoceDefine.h"
 #include "aoce/AoceCore.h"
 #include "aoce_vulkan_extra/AoceVkExtra.h"
 #include "aoce_vulkan_extra/VkExtraExport.h"
+
 %}
 
 #define ACOE_EXPORT
@@ -24,6 +29,9 @@
 %ignore aoce::IVideoManager::getDevices(IVideoDevice**, int32_t);
 %ignore aoce::IVideoManager::getDevices(IVideoDevice**, int32_t,int32_t);
 %ignore aoce::IVideoDevice::getFormats;
+%ignore aoce::VkOutGpuTex;
+%ignore aoce::IOutputLayer::outVkGpuTex(const VkOutGpuTex& ,int32_t);
+%ignore aoce::IOutputLayer::outVkGpuTex(const VkOutGpuTex&);
 %ignore operator==; 
 %ignore operator[];
 %ignore operator*;
@@ -34,6 +42,7 @@
 %include "stdint.i"
 // %include "arrays_csharp.i"
 %include "carrays.i" 
+%include "windows.i"
 // IntArray<->SWIGTYPE_p_int
 %array_class(int, IntArray);
 %array_class(uint8_t, UInt8Array);
@@ -48,7 +57,7 @@
 %template(AInputLayer) aoce::ITLayer<aoce::InputParamet>;
 %template(AOutputLayer) aoce::ITLayer<aoce::OutputParamet>; 
 %include "aoce/AoceCore.h" 
-%template(IRGBA2YUVLayer) aoce::ITLayer<aoce::YUVParamet>; 
+%template(IYUVLayer) aoce::ITLayer<aoce::YUVParamet>; 
 %template(IMapChannelLayer) aoce::ITLayer<aoce::MapChannelParamet>;
 %template(IFlipLayer) aoce::ITLayer<aoce::FlipParamet>;
 %template(ITransposeLayer) aoce::ITLayer<aoce::TransposeParamet>;
@@ -101,8 +110,7 @@
 %template(ISkinToneLayer) aoce::ITLayer<aoce::SkinToneParamet> ;
 %template(IToonLayer) aoce::ITLayer<aoce::ToonParamet> ;
 %template(ISmoothToonLayer) aoce::ITLayer<aoce::SmoothToonParamet> ;
-%template(ISwirlParametLayer) aoce::ITLayer<aoce::SwirlParamet> ;
-%template(ISharpenParametLayer) aoce::ITLayer<aoce::SharpenParamet> ;
+%template(ISwirlLayer) aoce::ITLayer<aoce::SwirlParamet> ;
 %template(IThresholdSobelLayer) aoce::ITLayer<aoce::ThresholdSobelParamet> ;
 %template(ITiltShiftLayer) aoce::ITLayer<aoce::TiltShiftParamet> ;
 %template(IUnsharpMaskLayer) aoce::ITLayer<aoce::UnsharpMaskParamet> ;

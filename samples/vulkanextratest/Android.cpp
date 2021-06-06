@@ -133,7 +133,7 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     boxFilterLayer1->updateParamet({5, 5});
 
     resizeLayer = createResizeLayer(ImageType::rgba8);
-    resizeLayer->updateParamet({true, 1920,16});
+    resizeLayer->updateParamet({true, 23,23});
     resizeLayer2 = createResizeLayer(ImageType::rgba8);
     resizeLayer2->updateParamet({true, 1920, 1080});
 
@@ -230,10 +230,10 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     // layers.push_back(gaussianLayer->getLayer());
     // 检测resize效果
     //layers.push_back(convertLayer);
-    layers.push_back(resizeLayer->getLayer());
-    // layers.push_back(box1Layer->getLayer());
-    // layers.push_back(resizeLayer2->getLayer());
-    //layers.push_back(alphaShowLayer);
+//    layers.push_back(resizeLayer->getLayer());
+//    layers.push_back(box1Layer->getLayer());
+//    // layers.push_back(resizeLayer2->getLayer());
+//    layers.push_back(alphaShowLayer);
     // ---测试rgba32f
 //    layers.push_back(convertLayer);
 //    layers.push_back(box1Layer->getLayer());
@@ -248,9 +248,9 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
 //         layers.push_back(boxFilterLayer1->getLayer());
 //         layers.push_back(alphaShow2Layer);
     // ---查看导向滤波效果
-//        layers.push_back(chromKeyLayer->getLayer());
-//        layers.push_back(guidedLayer->getLayer());
-//        layers.push_back(alphaShowLayer);
+        layers.push_back(chromKeyLayer->getLayer());
+        layers.push_back(guidedLayer->getLayer());
+        layers.push_back(alphaShowLayer);
     // ---平均亮度调整阈值
     // layers.push_back(averageLT->getLayer());
     // layers.push_back(alphaShowLayer);
@@ -271,11 +271,12 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     // ---CGAColorspace效果
     //layers.push_back(cgaLayer);
     // ---dilation/erosion
-    layers.push_back(cedLayer->getLayer());
+    // layers.push_back(cedLayer->getLayer());
+    //layers.push_back(luminanceLayer);
     // // layers.push_back(dilationLayer->getLayer());
     // // layers.push_back(erosionLayer->getLayer());
-    layers.push_back(closingLayer->getLayer());
-    layers.push_back(alphaShowLayer);
+//    layers.push_back(closingLayer->getLayer());
+//    layers.push_back(alphaShowLayer);
     // ---高斯选择模糊1
     //layers.push_back(blurSelectiveLayer->getLayer());
     // ---高斯选择模糊2
@@ -338,7 +339,7 @@ Java_aoce_samples_vulkanextratest_MainActivity_glCopyTex(
     if (!view) {
         return;
     }
-    VkOutGpuTex outGpuTex = {};
+    GLOutGpuTex outGpuTex = {};
     outGpuTex.image = texture_id;
     outGpuTex.width = width;
     outGpuTex.height = height;

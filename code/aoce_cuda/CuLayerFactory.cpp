@@ -14,15 +14,15 @@ CuLayerFactory::CuLayerFactory(/* args */) {}
 
 CuLayerFactory::~CuLayerFactory() {}
 
-IInputLayer* CuLayerFactory::crateInput() { return new CuInputLayer(); }
+IInputLayer* CuLayerFactory::createInput() { return new CuInputLayer(); }
 
 IOutputLayer* CuLayerFactory::createOutput() { return new CuOutputLayer(); }
 
-IYUV2RGBALayer* CuLayerFactory::createYUV2RGBA() {
+IYUVLayer* CuLayerFactory::createYUV2RGBA() {
     return new CuYUV2RGBALayer();
 }
 
-IRGBA2YUVLayer* CuLayerFactory::createRGBA2YUV() {
+IYUVLayer* CuLayerFactory::createRGBA2YUV() {
     return new CuRGBA2YUVLayer();
 }
 

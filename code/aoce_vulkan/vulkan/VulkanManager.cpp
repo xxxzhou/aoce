@@ -50,7 +50,7 @@ VulkanManager::VulkanManager(/* args */) {}
 VulkanManager& VulkanManager::Get() {
     if (instance == nullptr) {
         instance = new VulkanManager();
-#if AOCE_DEBUG_TYPE && WIN32
+#if AOCE_DEBUG_TYPE
         // instance->bDebugMsg = true;
 #endif
     }

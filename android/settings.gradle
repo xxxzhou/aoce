@@ -1,15 +1,19 @@
 include ':aoce'
-include ":04_vulkantest"
-project(":04_vulkantest").projectDir = new File("04_vulkantest")
-
-include ":05_livetest"
-project(":05_livetest").projectDir = new File("05_livetest")
-
-include ":06_mediaplayer"
-project(":06_mediaplayer").projectDir = new File("06_mediaplayer")
-
-include ":07_androidtest"
-project(":07_androidtest").projectDir = new File("07_androidtest")
+//include ":04_vulkantest"
+//project(":04_vulkantest").projectDir = new File("04_vulkantest")
+//
+//include ":05_livetest"
+//project(":05_livetest").projectDir = new File("05_livetest")
+//
+//include ":06_mediaplayer"
+//project(":06_mediaplayer").projectDir = new File("06_mediaplayer")
+//
+//include ":07_androidtest"
+//project(":07_androidtest").projectDir = new File("07_androidtest")
+//
 
 include ":vulkanextratest"
 project(":vulkanextratest").projectDir = new File("vulkanextratest")
+
+include ":aoceswigtest"
+project(":aoceswigtest").projectDir = new File("aoceswigtest")

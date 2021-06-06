@@ -1,8 +1,10 @@
 package aoce.samples.mediaplayer;
 
 import androidx.fragment.app.FragmentActivity;
-import aoce.android.library.*;
-import aoce.samples.mediaplayer.R;
+import aoce.android.library.wrapper.GLVideoRender;
+import aoce.android.library.wrapper.IGLCopyTexture;
+import aoce.android.library.wrapper.IVKInitSurface;
+import aoce.android.library.wrapper.VKVideoRender;
 
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -13,7 +15,7 @@ import android.widget.EditText;
 import android.view.View;
 
 
-public class MainActivity extends FragmentActivity implements IGLCopyTexture,IVKInitSurface, View.OnClickListener {
+public class MainActivity extends FragmentActivity implements IGLCopyTexture, IVKInitSurface, View.OnClickListener {
     static {
         System.loadLibrary("06_mediaplayer");
     }

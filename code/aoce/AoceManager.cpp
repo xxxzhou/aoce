@@ -40,14 +40,14 @@ void AoceManager::initAndroid(const AndroidEnv &andEnv) {
     androidEnv = andEnv;
     if (androidEnv.sdkVersion == 0) {
         androidEnv.sdkVersion = JNI_VERSION_1_6;
-    }
-    jobject active = androidEnv.activity;
+    }    
     if(!androidEnv.env) {
         JNIEnv *env = getEnv(bAttach);
         androidEnv.env = env;
     }
     JNIEnv *env = androidEnv.env;
     jobject applicationContext = nullptr;
+    jobject active = androidEnv.activity;
     if (active) {
         jclass contextClass = env->FindClass("android/content/Context");
         jmethodID getApplicationContextMethod =

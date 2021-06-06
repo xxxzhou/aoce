@@ -62,12 +62,6 @@ task copyAgorg {
     }
 }
 
-tasks.whenTaskAdded { task ->
-    if (task.name ==  'bundleDebug') {
-        task.dependsOn copyAgorg
-    }
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //for permission

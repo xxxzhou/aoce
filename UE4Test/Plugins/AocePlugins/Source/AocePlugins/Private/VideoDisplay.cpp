@@ -12,17 +12,13 @@ namespace aoce {
 			return;
 		}
 		void* sourceResource = textRef->GetNativeResource();
-		VkOutGpuTex outGpuTex = {};
-#if WIN32
-		outGpuTex.image = sourceResource;
-#elif __ANDROID__
-		//outGpuTex.commandbuffer = dataPtr;
+		GLOutGpuTex outGpuTex = {};
+
+#if __ANDROID__
 		int32 textid = *reinterpret_cast<int32*>(sourceResource);
 		outGpuTex.image = textid;
-#endif
 		outGpuTex.width = width;
 		outGpuTex.height = height;
-#if __ANDROID__
 		outLayer->outGLGpuTex(outGpuTex);
 #endif
 	}
@@ -152,9 +148,6 @@ namespace aoce {
 			ENQUEUE_RENDER_COMMAND(CreateTextureCommand)([play](FRHICommandListImmediate& RHICmdList) {
 				if (play->displayTex->IsValidLowLevel()) {
 					play->textureRHI = ((FTexture2DResource*)(play->displayTex->Resource))->GetTexture2DRHI();
-#if __ANDROID__
-					UpdateAoceGLTexture(play->outLayer, play->textureRHI, play->format.width, play->format.height);
-#endif
 				}
 				else {
 					play->textureRHI = nullptr;
@@ -163,50 +156,3 @@ namespace aoce {
 		});
 	}
 }  // namespace aoce
-
-//for (uint32 row = 0; row < play->textureRHI->GetSizeY(); row++) {
-//	uint8_t* rowPtr = dataPtr;
-//	for (uint32 col = 0; col < play->textureRHI->GetSizeX(); col++) {
-//		*(rowPtr + 4 * col) = play->index;
-//		*(rowPtr + 4 * col + 1) = play->index;
-//		*(rowPtr + 4 * col + 2) = play->index;
-//		*(rowPtr + 4 * col + 3) = play->index;
-//	}
-//	dataPtr += rowStride;
-//}
-// FRHICopyTextureInfo copyInfo = {};
-// RHICmdList.CopyTexture(play->textureRHI, texRHI, copyInfo);
-
-//				ALLOC_COMMAND_CL(RHICmdList, FRHICommandGLCommand)([=]() {
-//					void* sourceResource = play->textureRHI->GetNativeResource();
-//					VkOutGpuTex outGpuTex = {};
-//#if WIN32
-//					outGpuTex.image = sourceResource;
-//#elif __ANDROID__
-//					//outGpuTex.commandbuffer = dataPtr;
-//					int32 textid = *reinterpret_cast<int32*>(sourceResource);
-//
-//					outGpuTex.image = textid;
-//					outGpuTex.width = play->format.width;
-//					outGpuTex.height = play->format.height;
-//					// GL_TEXTURE_2D_MULTISAMPLE(0x9100)/GL_TEXTURE_2D(0x0DE1)/GL_TEXTURE_EXTERNAL_OES(0x8D65)/GL_TEXTURE_RECTANGLE(0x84F5)
-//					play->outputLayer->outGLGpuTex(outGpuTex);
-//#endif
-//				});
-
-//				uint32 rowStride = 0;
-//				uint8_t* dataPtr = (uint8_t*)RHICmdList.LockTexture2D(texRHI, 0, EResourceLockMode::RLM_WriteOnly, rowStride, false);
-//				void* sourceResource = texRHI->GetNativeResource();
-//				VkOutGpuTex outGpuTex = {};
-//#if WIN32
-//				outGpuTex.image = sourceResource;
-//#elif __ANDROID__
-//				outGpuTex.commandbuffer = dataPtr;
-//				int32 textid = *reinterpret_cast<int32*>(sourceResource);
-//				outGpuTex.image = textid;
-//				outGpuTex.width = play->format.width;
-//				outGpuTex.height = play->format.height;
-//				// GL_TEXTURE_2D_MULTISAMPLE(0x9100)/GL_TEXTURE_2D(0x0DE1)/GL_TEXTURE_EXTERNAL_OES(0x8D65)/GL_TEXTURE_RECTANGLE(0x84F5)
-//				play->outputLayer->outGLGpuTex(outGpuTex);
-//#endif		
-//				RHICmdList.UnlockTexture2D(texRHI, 0, false);

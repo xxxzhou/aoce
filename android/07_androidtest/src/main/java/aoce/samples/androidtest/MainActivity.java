@@ -1,8 +1,10 @@
 package aoce.samples.androidtest;
 
 import androidx.fragment.app.FragmentActivity;
-import aoce.android.library.*;
-import aoce.samples.androidtest.R;
+import aoce.android.library.wrapper.GLVideoRender;
+import aoce.android.library.wrapper.IGLCopyTexture;
+import aoce.android.library.wrapper.IVKInitSurface;
+import aoce.android.library.wrapper.VKVideoRender;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -15,7 +17,7 @@ import android.widget.EditText;
 import android.view.View;
 
 
-public class MainActivity extends FragmentActivity implements IGLCopyTexture,IVKInitSurface, View.OnClickListener {
+public class MainActivity extends FragmentActivity implements IGLCopyTexture, IVKInitSurface, View.OnClickListener {
     static {
         System.loadLibrary("07_androidtest");
     }

@@ -209,8 +209,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---高斯模糊
     // layers.push_back(gaussianLayer->getLayer());
     // 检测resize效果
-    layers.push_back(resizeLayer->getLayer());
-    layers.push_back(box1Layer->getLayer());
+    // layers.push_back(resizeLayer->getLayer());
+    // layers.push_back(box1Layer->getLayer());
     // layers.push_back(resizeLayer2->getLayer());
     // ---查看自适应阈值化效果
     // layers.push_back(adaptiveLayer->getLayer());
@@ -222,9 +222,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(boxFilterLayer1->getLayer());
     // layers.push_back(alphaShow2Layer);
     // ---查看导向滤波效果
-    // layers.push_back(chromKeyLayer->getLayer());
-    // layers.push_back(guidedLayer->getLayer());
-    // layers.push_back(alphaShowLayer);
+    layers.push_back(chromKeyLayer->getLayer());
+    layers.push_back(guidedLayer->getLayer());
+    layers.push_back(alphaShowLayer);
     // ---平均亮度调整阈值
     // layers.push_back(averageLT->getLayer());
     // layers.push_back(alphaShowLayer);

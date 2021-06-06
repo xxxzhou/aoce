@@ -41,7 +41,7 @@ void Dx11Window::initDevice() {
     RECT rc = {};
     GetClientRect(hwnd, &rc);
     UINT createDeviceFlags = 0;
-#ifdef _DEBUG
+#if AOCE_DEBUG_TYPE
     createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 

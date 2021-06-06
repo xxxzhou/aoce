@@ -1,4 +1,4 @@
-package aoce.android.library;
+package aoce.android.library.wrapper;
 
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;

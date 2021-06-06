@@ -23,6 +23,26 @@ elseif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND ANDROID)
 endif()
 message(STATUS "install:" ${CMAKE_INSTALL_PREFIX})
 
+if(ANDROID)
+    message(STATUS "android abi:" ${ANDROID_ABI})
+endif()
+# 检查32bit or 64bit system
+include(CheckTypeSize)
+CHECK_TYPE_SIZE("void*" AOCE_PTR_SIZE BUILTIN_TYPES_ONLY)
+if (AOCE_PTR_SIZE EQUAL 8)
+    set(AOCE_PLATFORM_X64 TRUE)
+else ()
+    set(AOCE_PLATFORM_X64 FALSE)
+endif ()
+
+# CLANG加上debug编译符
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DAOCE_DEBUG_TYPE=1" )
+endif()
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DAOCE_DEBUG_TYPE=1" )
+endif()
+
 # 添加win32平台下的编译符号
 if(WIN32)
     set(CMAKE_CXX_STANDARD 14)
@@ -111,11 +131,12 @@ add_subdirectory(code)
 add_subdirectory(samples)
 add_subdirectory(glsl)
 
-find_package(SWIG 4.0)
-if(SWIG_FOUND AND WIN32)
-    message(STATUS "SWIG found: ${SWIG_EXECUTABLE}")
-    add_subdirectory(CSharp)
-endif()
+# REQUIRED
+find_package(SWIG)
+if(SWIG_FOUND)
+    message(STATUS "SWIG found:${SWIG_EXECUTABLE}")
+    add_subdirectory(swig)
+endif(SWIG_FOUND)
 
 
 

@@ -7,7 +7,7 @@
 namespace aoce {
 namespace cuda {
 
-class CuRGBA2YUVLayer : public CuLayer, public IRGBA2YUVLayer {
+class CuRGBA2YUVLayer : public CuLayer, public IYUVLayer {
     AOCE_LAYER_QUERYINTERFACE(CuRGBA2YUVLayer)
    private:
     /* data */

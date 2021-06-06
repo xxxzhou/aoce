@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        aa {
+            storeFile file('D:\\WorkSpace\\github\\aoce\\aoce_android_install.jks')
+            storePassword 'a123456'
+            keyPassword 'a123456'
+            keyAlias 'key0'
+        }
+    }
     publishNonDefault  true //this line
     compileSdkVersion 28
     defaultConfig {
@@ -10,7 +18,7 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters "armeabi-v7a"
+            abiFilters "armeabi-v7a", "arm64-v8a"
         }
         externalNativeBuild {
             cmake {
@@ -18,6 +26,7 @@ android {
                 arguments "-DANDROID_STL=c++_shared","-DANDROID_TOOLCHAIN=clang"
             }
         }
+        signingConfig signingConfigs.aa
     }
     sourceSets {
         main {
@@ -27,8 +36,10 @@ android {
     }
     buildTypes {
         release {
+            // debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.aa
         }
         debug {
             jniDebuggable true
@@ -63,11 +74,11 @@ task copyAgorg {
     }
 }
 
-tasks.whenTaskAdded { task ->
-    if (task.name ==  'bundleDebug') {
-        task.dependsOn copyAgorg
-    }
-}
+//tasks.whenTaskAdded { task ->
+//    if (task.name ==  'bundleDebug') {
+//        task.dependsOn copyAgorg
+//    }
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

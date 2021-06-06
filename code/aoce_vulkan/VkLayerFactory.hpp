@@ -14,10 +14,10 @@ class VkLayerFactory : public LayerFactory {
     virtual ~VkLayerFactory() override;
 
    public:
-    virtual IInputLayer* crateInput() override;
+    virtual IInputLayer* createInput() override;
     virtual IOutputLayer* createOutput() override;
-    virtual IYUV2RGBALayer* createYUV2RGBA() override;
-    virtual IRGBA2YUVLayer* createRGBA2YUV() override;
+    virtual IYUVLayer* createYUV2RGBA() override;
+    virtual IYUVLayer* createRGBA2YUV() override;
     virtual IMapChannelLayer* createMapChannel() override;
     virtual IFlipLayer* createFlip() override;
     virtual ITransposeLayer* createTranspose() override;

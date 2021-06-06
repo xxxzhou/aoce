@@ -12,7 +12,7 @@ class VideoView {
     std::unique_ptr<IPipeGraph> graph = nullptr;
     std::unique_ptr<IInputLayer> inputLayer = nullptr;
     std::unique_ptr<IOutputLayer> outputLayer = nullptr;
-    std::unique_ptr<IYUV2RGBALayer> yuv2rgbLayer = nullptr;
+    std::unique_ptr<IYUVLayer> yuv2rgbLayer = nullptr;
 
     GpuType gpuType = GpuType::other;
     VideoFormat format = {};

@@ -1,8 +1,5 @@
 package aoce.samples.livetest;
 
-import androidx.appcompat.app.AppCompatActivity;
-import aoce.android.library.*;
-
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -13,6 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.fragment.app.FragmentActivity;
+import aoce.android.library.wrapper.GLVideoRender;
+import aoce.android.library.wrapper.IGLCopyTexture;
+import aoce.android.library.wrapper.IVKInitSurface;
+import aoce.android.library.wrapper.VKVideoRender;
 import aoce.samples.vulkantest.R;
 
 public class MainActivity extends FragmentActivity implements IGLCopyTexture, IVKInitSurface, View.OnClickListener {

@@ -233,7 +233,8 @@ void HardwareImage::bindVK(AHardwareBuffer *buffer, bool useExternalFormat) {
     EGLClientBuffer native_buffer = eglGetNativeClientBufferANDROID(buffer);
     assert(native_buffer);
     EGLint attrs[] = {EGL_NONE};
-    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);  // eglGetCurrentDisplay(); //
+    // eglGetCurrentDisplay()/eglGetDisplay(EGL_DEFAULT_DISPLAY)
+    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);  
     image = eglCreateImageKHR(display, EGL_NO_CONTEXT,
                               EGL_NATIVE_BUFFER_ANDROID, native_buffer, attrs);
     // assert(image != EGL_NO_IMAGE_KHR);

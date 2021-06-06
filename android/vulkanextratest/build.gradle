@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        aa {
+            storeFile file('D:\\WorkSpace\\github\\aoce\\aoce_android_install.jks')
+            storePassword 'a123456'
+            keyPassword 'a123456'
+            keyAlias 'key0'
+        }
+    }
     publishNonDefault true
     compileSdkVersion 28
     defaultConfig {
@@ -10,7 +18,7 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters "armeabi-v7a"
+            abiFilters "armeabi-v7a", "arm64-v8a"
         }
         externalNativeBuild {
             cmake {
@@ -18,6 +26,7 @@ android {
                 arguments "-DANDROID_STL=c++_shared","-DANDROID_TOOLCHAIN=clang"
             }
         }
+        signingConfig signingConfigs.aa
     }
     sourceSets {
         main {
@@ -29,6 +38,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.aa
         }
         debug {
             renderscriptDebuggable true
@@ -44,7 +54,6 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
-    // ndkVersion '21.1.6352462'
 }
 
 task copyTask {
@@ -60,12 +69,6 @@ task copyAgorg {
         from '../../thirdparty/ffmpeg/android'
         into 'libs'
         include('**/*.*')
-    }
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name ==  'bundleDebug') {
-        task.dependsOn copyAgorg
     }
 }
 

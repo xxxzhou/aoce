@@ -28,7 +28,7 @@ static std::unique_ptr<VulkanWindow> window = nullptr;
 static IPipeGraph *vkGraph;
 static IInputLayer *inputLayer;
 static IOutputLayer *outputLayer;
-static IYUV2RGBALayer *yuv2rgbLayer;
+static IYUVLayer *yuv2rgbLayer;
 static VideoFormat format = {};
 
 static GpuType gpuType = GpuType::vulkan;
@@ -169,7 +169,7 @@ void android_main(struct android_app *app)
     // 生成一张执行图
     vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto layerFactory = AoceManager::Get().getLayerFactory(gpuType);
-    inputLayer = layerFactory->crateInput();
+    inputLayer = layerFactory->createInput();
     outputLayer = layerFactory->createOutput();
     // 输出GPU数据
     outputLayer->updateParamet({false, true});
@@ -230,7 +230,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_initEngine(
     logMessage(LogLevel::info, "have graph factory");
     vkGraph = graphFactory->createGraph();
     auto *layerFactory = AoceManager::Get().getLayerFactory(gpuType);
-    inputLayer = layerFactory->crateInput();
+    inputLayer = layerFactory->createInput();
     outputLayer = layerFactory->createOutput();
     // 输出GPU数据
     outputLayer->updateParamet({false, true});
@@ -259,7 +259,7 @@ JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_vkInitSurface(
 
 JNIEXPORT void JNICALL Java_aoce_samples_livetest_MainActivity_glCopyTex(
     JNIEnv *env, jobject thiz, jint textureId, jint width, jint height) {
-    VkOutGpuTex outGpuTex = {};
+    GLOutGpuTex outGpuTex = {};
     outGpuTex.image = textureId;
     outGpuTex.width = width;
     outGpuTex.height = height;

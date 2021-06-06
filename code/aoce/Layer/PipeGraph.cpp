@@ -289,7 +289,7 @@ bool PipeGraph::run() {
     std::lock_guard<std::mutex> mtx_locker(mtx);
     if (bReset) {
         logMessage(LogLevel::info, "start build graph.");
-#if AOCE_DEBUG_TYPE
+#if AOCE_DEBUG_TYPE 
         logMessage(LogLevel::info, "---the graph all node name.");
         for (auto node : nodes) {
             logMessage(LogLevel::info, node->layer->getMark());

@@ -16,7 +16,7 @@ static int formatIndex = 0;
 static IPipeGraph* vkGraph;
 static IInputLayer* inputLayer;
 static IOutputLayer* outputLayer;
-static IYUV2RGBALayer* yuv2rgbLayer;
+static IYUVLayer* yuv2rgbLayer;
 // box模糊
 static ITLayer<KernelSizeParamet>* boxFilterLayer;
 static ITLayer<ChromaKeyParamet>* chromKeyLayer;
@@ -74,7 +74,7 @@ int main() {
     // 生成一张执行图
     vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
-    inputLayer = layerFactory->crateInput();
+    inputLayer = layerFactory->createInput();
     outputLayer = layerFactory->createOutput();
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     boxFilterLayer = createBoxFilterLayer();
