@@ -202,6 +202,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     pdLayer = createPinchDistortionLayer();
 
+    ILMetadata* x1 = getLayerMetadata("FlipLayer");
+    auto x11 = x1->getLayerType();
+    ILMetadata* x2 = getLayerMetadata("BrightnessLayer");
+    auto x12 = x2->getLayerType();
+    ILMetadata* x3 = getLayerMetadata("ExposureLayer");
+    auto x13 = x3->getLayerType();
+
     std::vector<uint8_t> lutData;
     std::vector<IBaseLayer*> layers;
     // 如果为true,层需要二个输入,用原始图像做第二个输入

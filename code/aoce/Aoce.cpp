@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "Aoce.hpp"
+#include "metadata/LayerMetadata.hpp"
 #include "module/ModuleManager.hpp"
 #if WIN32
 #include <Shlwapi.h>
@@ -604,6 +605,7 @@ void loadAoce() {
 #endif
 
     ModuleManager::Get().regAndLoad("aoce_vulkan");
+    ModuleManager::Get().regAndLoad("aoce_vulkan_extra");
 #if WIN32
     ModuleManager::Get().regAndLoad("aoce_win_mf");
     ModuleManager::Get().regAndLoad("aoce_cuda");
@@ -617,6 +619,7 @@ void loadAoce() {
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().regAndLoad("aoce_ffmpeg");
 #endif
+    loadLayerMetadata();
 }
 
 void unloadAoce() {
@@ -625,6 +628,7 @@ void unloadAoce() {
     }
     bLoad = false;
     ModuleManager::Get().unloadModule("aoce_vulkan");
+    ModuleManager::Get().unloadModule("aoce_vulkan_extra");
 #if WIN32
     ModuleManager::Get().unloadModule("aoce_win_mf");
     ModuleManager::Get().unloadModule("aoce_cuda");
@@ -638,12 +642,28 @@ void unloadAoce() {
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().unloadModule("aoce_ffmpeg");
 #endif
+    LayerMetadataManager::Get().clean();
 }
 
 #if __ANDROID__
+static JavaVM* g_vm = nullptr;
+jint JNI_OnLoad(JavaVM* jvm, void*) {
+    g_vm = jvm;
+    return JNI_VERSION_1_6;
+}
+void JNI_OnUnload(JavaVM* jvm, void*) {}
+
 void initAndroid(const AndroidEnv& andEnv) {
     AoceManager::Get().initAndroid(andEnv);
 }
 #endif
+
+void initPlatform() {
+#if __ANDROID__
+    AndroidEnv aEnv = {};
+    aEnv.vm = g_vm;
+    initAndroid(aEnv);
+#endif
+}
 
 }  // namespace aoce

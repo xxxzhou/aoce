@@ -53,4 +53,6 @@
 
 ## SWIG
 
-swig在处理里添加特有的宏(#ifdef SWIG)
+swig在处理里添加特有的宏(#ifdef SWIG).
+
+[jni-faiss](https://github.com/gameofdimension/jni-faiss/blob/master/jni/swigfaiss.swig)不同语言处理.#ifdef SWIGJAVA/#ifdef SWIGPYTHON/#ifdef SWIGLUA

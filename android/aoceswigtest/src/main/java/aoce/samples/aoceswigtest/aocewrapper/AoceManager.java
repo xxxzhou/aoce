@@ -32,6 +32,11 @@ public class AoceManager extends IVideoDeviceObserver {
         tp.setBFlipX(1);
         tp.setBFlipY(1);
         transposeLayer.updateParamet(tp);
+
+        OutputParamet op = outputLayer.getParamet();
+        op.setBGpu(1);
+        op.setBCpu(0);
+        outputLayer.updateParamet(op);
     }
 
     public void openCamera(){openCamera(false);}

@@ -445,7 +445,7 @@ struct SkinToneParamet {
     // 要移动的最大饱和量(使用橙色时).默认值:0.4
     float maxSaturationShift = 0.4f;
     // Green/Orange[0,1]
-    int upperSkinToneColor = 0;
+    int32_t upperSkinToneColor = 0;
 
     inline bool operator==(const SkinToneParamet& right) {
         return this->skinToneAdjust == right.skinToneAdjust &&

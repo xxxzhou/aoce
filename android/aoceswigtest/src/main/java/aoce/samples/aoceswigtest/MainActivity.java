@@ -4,8 +4,10 @@ import androidx.fragment.app.FragmentActivity;
 import aoce.android.library.xswig.AoceWrapper;
 import aoce.android.library.wrapper.GLVideoRender;
 import aoce.android.library.wrapper.IGLCopyTexture;
+import aoce.android.library.xswig.IBaseLayer;
+import aoce.android.library.xswig.IChromaKeyLayer;
 import aoce.samples.aoceswigtest.aocewrapper.AoceManager;
-//import aoce.android.library.xswig.*;
+import aoce.android.library.xswig.*;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -16,6 +18,8 @@ import android.view.ViewManager;
 import android.widget.*;
 import android.view.View;
 
+import java.util.List;
+import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity implements IGLCopyTexture, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     static {
@@ -35,6 +39,7 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, Vi
     private SeekBar dscaleBar = null;
 
     private AoceManager aoceManager = null;
+    private IChromaKeyLayer chromaKeyLayer = null;
 
     private static final int PERMISSION_REQUEST_CODE_CAMERA = 1;
 
@@ -62,11 +67,15 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, Vi
                     PERMISSION_REQUEST_CODE_CAMERA);
             return;
         }
-
+        AoceWrapper.initPlatform();
         AoceWrapper.loadAoce();
         aoceManager = new AoceManager();
         aoceManager.initGraph();
-        aoceManager.initLayers(null,false);
+
+        chromaKeyLayer = AoceWrapper.createChromaKeyLayer();
+        ArrayList<IBaseLayer> layers = new ArrayList<IBaseLayer>();
+        layers.add(chromaKeyLayer.getLayer());
+        aoceManager.initLayers(layers,false);
 
         glVideoRender = new GLVideoRender();
         GLSurfaceView glSurfaceView = findViewById(R.id.es_surface_view);
@@ -100,34 +109,36 @@ public class MainActivity extends FragmentActivity implements IGLCopyTexture, Vi
     public void copyTex(int textureId, int width, int height) {
         //glCopyTex(textureId,width,height);
         if(aoceManager != null){
-            // aoceManager.showGL(textureId,width,height);
+            aoceManager.showGL(textureId,width,height);
         }
     }
 
     @Override
     public void onClick(View view) {
         try {
-            aoceManager.openCamera(cameraButton.isChecked());
+            aoceManager.openCamera(!cameraButton.isChecked());
         } catch (NumberFormatException e) {
         }
     }
 
     public void update(){
-        boolean green = greenButton.isChecked();
-        float luma = (float)lumaBar.getProgress()/lumaBar.getMax()*10.0f;
-        float min =(float)minBar.getProgress()/minBar.getMax();
-        float scale = (float)maxBar.getProgress()/maxBar.getMax()*100;
-        float exponent = (float)scaleBar.getProgress()/scaleBar.getMax()*10;
-        float dscale = (float)dscaleBar.getProgress()/dscaleBar.getMax()*100;
-        //updateParamet(green,luma,min,scale,exponent,dscale);
+        ChromaKeyParamet cp = chromaKeyLayer.getParamet();
+        vec3 green = new vec3();
+        green.setX(0.15f);
+        green.setY(0.6f);
+        vec3 blue = new vec3();
+        blue.setX(0.15f);
+        blue.setY(0.2f);
+        blue.setZ(0.8f);
+        vec3 chromeColor = greenButton.isChecked() ? green:blue;
+        cp.setChromaColor(chromeColor);
+        cp.setLumaMask((float)lumaBar.getProgress()/lumaBar.getMax()*10.0f);
+        cp.setAlphaCutoffMin((float)minBar.getProgress()/minBar.getMax());
+        cp.setAlphaScale((float)maxBar.getProgress()/maxBar.getMax()*100);
+        cp.setAlphaExponent((float)scaleBar.getProgress()/scaleBar.getMax()*10);
+        cp.setDespillScale((float)dscaleBar.getProgress()/dscaleBar.getMax()*100);
+        chromaKeyLayer.updateParamet(cp);
     }
-
-//    public native void initEngine();
-//    public native void glCopyTex(int textureId, int width, int height);
-//    public native void openCamera(int index);
-//
-//    public native void enableLayer(boolean enable);
-//    public native void updateParamet(boolean green,float luma,float min,float scale,float exponent,float dscale);
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {

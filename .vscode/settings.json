@@ -90,7 +90,9 @@
         "aocedefine.h": "c",
         "aocecore.h": "c",
         "stdint.h": "c",
-        "aocemedia.h": "c"
+        "aocemedia.h": "c",
+        "aocemath.h": "c",
+        "*.rh": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,

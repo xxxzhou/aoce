@@ -16,13 +16,14 @@ file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURC
 # endfunction(add_sub_path relativePath)
 
 # 添加module
-add_sub_path(module AOCE_HEADER AOCE_SOURCE) 
+add_sub_path(module AOCE_HEADER AOCE_SOURCE)
 add_sub_path(videoDevice AOCE_HEADER AOCE_SOURCE)
 add_sub_path(layer AOCE_HEADER AOCE_SOURCE)
 add_sub_path(live AOCE_HEADER AOCE_SOURCE)  
 add_sub_path(media AOCE_HEADER AOCE_SOURCE)  
 add_sub_path(fixgraph AOCE_HEADER AOCE_SOURCE)  
-add_sub_path(math AOCE_HEADER AOCE_SOURCE)   
+add_sub_path(math AOCE_HEADER AOCE_SOURCE)  
+add_sub_path(metadata AOCE_HEADER AOCE_SOURCE)  
 
 message("aoce head--" ${AOCE_HEADER})
 message("aoce source--" ${AOCE_SOURCE}) 

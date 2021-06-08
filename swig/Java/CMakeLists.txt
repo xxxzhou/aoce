@@ -4,7 +4,6 @@ include(AoceHelper)
 include_directories("../../code")
 include_directories(${ANDROID_NDK}/sources/android/native_app_glue)
 
-
 set(WRAPPERLIST ../aocewrapper.i)
 
 SET_SOURCE_FILES_PROPERTIES(${WRAPPERLIST} PROPERTIES CPLUSPLUS ON)

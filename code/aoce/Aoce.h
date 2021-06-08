@@ -90,6 +90,15 @@ enum class MediaType : int32_t {
     ffmpeg,
 };
 
+enum class LayerMetadataType : int32_t {
+    other = 0,
+    aint,
+    afloat,
+    abool,
+    astring,
+    agroup,
+};
+
 // 视频设备输出格式
 struct VideoFormat {
     int32_t index = -1;
@@ -270,8 +279,8 @@ ACOE_EXPORT void loadAoce();
 ACOE_EXPORT void unloadAoce();
 
 #if __ANDROID__
-// ACOE_EXPORT jint JNI_OnLoad(JavaVM *jvm, void *);
-// ACOE_EXPORT void JNI_OnUnload(JavaVM *jvm, void *);
+ACOE_EXPORT jint JNI_OnLoad(JavaVM *jvm, void *);
+ACOE_EXPORT void JNI_OnUnload(JavaVM *jvm, void *);
 struct AndroidEnv {
     JavaVM *vm = nullptr;
     // 在调用initAndroid里线程,注意不同线程这值不同
@@ -282,8 +291,10 @@ struct AndroidEnv {
     AAssetManager *assetManager = nullptr;
 };
 ACOE_EXPORT void initAndroid(const AndroidEnv &andEnv);
-
 #endif
+
+// 现只安卓平台使用,传入主activity
+ACOE_EXPORT void initPlatform();
 }
 
 }  // namespace aoce
