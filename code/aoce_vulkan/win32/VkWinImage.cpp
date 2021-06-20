@@ -53,8 +53,10 @@ void VkWinImage::bindDx11(ID3D11Device* device, ImageFormat format) {
     this->format = format;
     // 创建一个dx11可以多上下文共享访问的资源
     DXGI_FORMAT dxFormat = getImageDXFormt(format.imageType);
+    // vulkan需要NT共享dx11纹理
     bInit =
         shardTex->restart(device, format.width, format.height, dxFormat, true);
+    // tempTex用于与外部DX11线程上的纹理交互,隔开vulkan线程影响
     bInit &= tempTex->restart(device, format.width, format.height, dxFormat);
     if (!bInit) {
         return;
@@ -160,6 +162,22 @@ void VkWinImage::tempCopyDx11(ID3D11Device* device, ID3D11Texture2D* dx11Tex) {
         copySharedToTexture(device, tempTex->sharedHandle, dx11Tex);
         tempTex->bGpuUpdate = false;
     }
+}
+
+void VkWinImage::tempCopyVk(ID3D11Device* device) {
+    if (tempTex->bGpuUpdate) {
+        copySharedToTexture(device, tempTex->sharedHandle,
+                            shardTex->texture->texture);
+        tempTex->bGpuUpdate = false;
+    }
+}
+
+void VkWinImage::dx11CopyTemp(ID3D11Device* device, ID3D11Texture2D* dx11Tex) {
+    if (!device || !dx11Tex) {
+        return;
+    }
+    copyTextureToShared(device, tempTex->sharedHandle, dx11Tex);
+    tempTex->bGpuUpdate = true;
 }
 
 }  // namespace vulkan

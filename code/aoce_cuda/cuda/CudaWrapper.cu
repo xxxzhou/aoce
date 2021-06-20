@@ -23,6 +23,11 @@ void rgba2bgr_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar3> dest, cudaStream_t
 	rgba2bgr << <grid, block, 0, stream >> > (source, dest);
 }
 
+void bgra2rgba_gpu(PtrStepSz<uchar4> source,PtrStepSz<uchar4> dest, cudaStream_t stream) {
+	dim3 grid(divUp(dest.width, block.x), divUp(dest.height, block.y));
+	bgra2rgba << <grid, block, 0, stream >> > (source, dest);	
+}
+
 void argb2rgba_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, cudaStream_t stream) {
 	dim3 grid(divUp(dest.width, block.x), divUp(dest.height, block.y));
 	argb2rgba << <grid, block, 0, stream >> > (source, dest);

@@ -46,6 +46,7 @@ UE4Test/Content/Blueprints
 UE4Test/UE4Test.zip
 swig/CSharp/swig
 swig/Java/swig
+swig/CSharp/CSharpTest
 
 out/
 .vs/

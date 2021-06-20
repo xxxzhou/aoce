@@ -6,7 +6,36 @@
 
 namespace aoce {
 
-class BMetaData : virtual public ILMetadata {
+template <typename T>
+inline LayerMetadataType getMetaType() {
+    return LayerMetadataType::other;
+};
+
+// 特化
+template <>
+inline LayerMetadataType getMetaType<const char*>() {
+    return LayerMetadataType::astring;
+};
+
+// 特化
+template <>
+inline LayerMetadataType getMetaType<bool>() {
+    return LayerMetadataType::abool;
+};
+
+// 特化
+template <>
+inline LayerMetadataType getMetaType<int32_t>() {
+    return LayerMetadataType::aint;
+};
+
+// 特化
+template <>
+inline LayerMetadataType getMetaType<float>() {
+    return LayerMetadataType::afloat;
+};
+
+class BMetadata {
     friend class LayerMetadataManager;
     friend class BGroupMetadata;
 
@@ -15,59 +44,27 @@ class BMetaData : virtual public ILMetadata {
     std::string parametName = "";
 
    public:
-    BMetaData(/* args */){};
-    virtual ~BMetaData(){};
-
-    virtual const char* getText() override { return text.c_str(); }
-    virtual const char* getParametName() override {
-        return parametName.c_str();
-    };
-    virtual LayerMetadataType getLayerType() override {
-        return LayerMetadataType::other;
-    }
+    BMetadata(/* args */){};
+    virtual ~BMetadata(){};
 };
 
 template <typename T>
-class BTMetaData : public BMetaData,virtual public ILTMetadata<T> {
+class BTMetaData : public BMetadata, public ILTMetadata<T> {
     friend class LayerMetadataManager;
     friend class BGroupMetadata;
 
    protected:
     T defaultValue = {};
 
-   protected:
-    template <typename T1>
-    LayerMetadataType getMetaType() {
-        return LayerMetadataType::other;
-    };
-
-    template <>
-    LayerMetadataType getMetaType<const char*>() {
-        return LayerMetadataType::astring;
-    };
-
-    template <>
-    LayerMetadataType getMetaType<bool>() {
-        return LayerMetadataType::abool;
-    };
-
-    // 特化
-    template <>
-    LayerMetadataType getMetaType<int32_t>() {
-        return LayerMetadataType::aint;
-    };
-
-    // 特化
-    template <>
-    LayerMetadataType getMetaType<float>() {
-        return LayerMetadataType::afloat;
-    };
-
    public:
     BTMetaData(/* args */){};
     virtual ~BTMetaData(){};
 
    public:
+    virtual const char* getText() override { return text.c_str(); }
+    virtual const char* getParametName() override {
+        return parametName.c_str();
+    };
     virtual T getDefaultVaule() override { return defaultValue; }
     virtual LayerMetadataType getLayerType() override {
         return getMetaType<T>();
@@ -75,11 +72,12 @@ class BTMetaData : public BMetaData,virtual public ILTMetadata<T> {
 };
 
 template <typename T>
-class BTRangeMetaData : public BTMetaData<T>,virtual public ILTRangeMetadata<T> {
+class BTRangeMetaData : public BMetadata, public ILTRangeMetadata<T> {
     friend class LayerMetadataManager;
     friend class BGroupMetadata;
 
    protected:
+    T defaultValue = {};
     T minValue = {};
     T maxVluae = {};
 
@@ -87,31 +85,44 @@ class BTRangeMetaData : public BTMetaData<T>,virtual public ILTRangeMetadata<T> 
     BTRangeMetaData(/* args */){};
     virtual ~BTRangeMetaData(){};
 
+    virtual const char* getText() override { return text.c_str(); }
+    virtual const char* getParametName() override {
+        return parametName.c_str();
+    };
+    virtual T getDefaultVaule() override { return defaultValue; }
+    virtual LayerMetadataType getLayerType() override {
+        return getMetaType<T>();
+    }
+
     virtual T getMinValue() override { return minValue; }
     virtual T getMaxValue() override { return maxVluae; }
 };
 
-class ACOE_EXPORT BGroupMetadata : public BMetaData, public ILGroupMetadata {
+class ACOE_EXPORT BGroupMetadata : public BMetadata, public ILGroupMetadata {
     friend class LayerMetadataManager;
     friend class BGroupMetadata;
 
    private:
     /* data */
-    std::vector<std::shared_ptr<BMetaData>> metadatas;
+    std::vector<std::shared_ptr<ILMetadata>> metadatas;
     std::string parametClass = "";
 
    public:
     BGroupMetadata(const char* paramet_class);
     ~BGroupMetadata();
 
+    virtual const char* getText() override { return text.c_str(); }
+    virtual const char* getParametName() override {
+        return parametName.c_str();
+    };
+    virtual LayerMetadataType getLayerType() override {
+        return LayerMetadataType::agroup;
+    }
     virtual int32_t getCount() override;
     virtual ILMetadata* getLMetadata(int32_t index) override;
     virtual const char* getParametClass() override {
         return parametClass.c_str();
     };
-    virtual LayerMetadataType getLayerType() override {
-        return LayerMetadataType::agroup;
-    }
 
    public:
     void addMetadata(const char* parametName, const char* text,
@@ -139,7 +150,7 @@ class LayerMetadata {
 
    private:
     const char* layerName = "";
-    std::unique_ptr<BMetaData> metadata = nullptr;
+    std::unique_ptr<ILMetadata> metadata = nullptr;
 
    public:
     LayerMetadata(/* args */);
@@ -147,7 +158,6 @@ class LayerMetadata {
 };
 
 class ACOE_EXPORT LayerMetadataManager {
-
    public:
     static LayerMetadataManager& Get();
     static void clean();

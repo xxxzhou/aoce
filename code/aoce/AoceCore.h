@@ -11,8 +11,9 @@
 #include "AoceLive.h"
 #include "AoceMath.h"
 #include "AoceMedia.h"
-#include "AoceVideoDevice.h"
 #include "AoceMetadata.h"
+#include "AoceVideoDevice.h"
+#include "AoceWindow.h"
 
 namespace aoce {
 
@@ -35,14 +36,16 @@ typedef ILTRangeMetadata<float> ILFloatMetadata;
 class IInputLayer : public AInputLayer {
    public:
     virtual ~IInputLayer(){};
-    // inputCpuData(uint8_t* data)这个版本没有提供长宽,需要这个方法指定
-    virtual void setImage(VideoFormat newFormat) = 0;
+    // inputCpuData(uint8_t* data)/inputGpuData()没有提供长宽,需要这个方法指定
+    virtual void setImage(const ImageFormat& newFormat) = 0;
+    virtual void setImage(const VideoFormat& newFormat) = 0;
     // 输入CPU数据,这个data需要与pipegraph同线程,因为从各方面考虑这个不会复制data里的数据.
     virtual void inputCpuData(uint8_t* data, bool bSeparateRun = false) = 0;
     virtual void inputCpuData(const VideoFrame& videoFrame,
                               bool bSeparateRun = false) = 0;
     virtual void inputCpuData(uint8_t* data, const ImageFormat& imageFormat,
                               bool bSeparateRun = false) = 0;
+    virtual void inputGpuData(void* device, void* tex) = 0;
 };
 
 class IOutputLayer : public AOutputLayer {
@@ -56,10 +59,8 @@ class IOutputLayer : public AOutputLayer {
 
     virtual void outDx11GpuTex(void* device, void* tex) = 0;
 
-
     virtual void outGLGpuTex(const GLOutGpuTex& outTex, uint32_t texType = 0,
                              int32_t outIndex = 0) = 0;
-
 };
 
 // 在AoceManager注册vulkan/dx11/cuda类型的LayerFactory
@@ -107,8 +108,19 @@ ACOE_EXPORT MediaFactory* getMediaFactory(const MediaType& mediaType);
 // 得到直播模块提供的管理对象,请不要手动释放这个对象,这个对象由aoce管理
 ACOE_EXPORT ILiveRoom* getLiveRoom(const LiveType& liveType);
 
-// 得到对应计算层的参数元数据信息
+// 得到窗口管理对象,请不要手动释放这个对象,这个对象由aoce管理
+ACOE_EXPORT IWindowManager* getWindowManager(const WindowType& windowType);
+
+// 得到窗口捕获对象,请不要手动释放这个对象,这个对象由aoce管理
+ACOE_EXPORT ICaptureWindow* getWindowCapture(const CaptureType& captureType);
+
+// 得到对应计算层的参数元数据信息(swig转换后的类,虽然继承关系还在,但是向下转换在运行时得不到相关信息)
 ACOE_EXPORT ILMetadata* getLayerMetadata(const char* layerName);
+ACOE_EXPORT ILGroupMetadata* getLGroupMetadata(ILMetadata* lmeta);
+ACOE_EXPORT ILBoolMetadata* getLBoolMetadata(ILMetadata* lmeta);
+ACOE_EXPORT ILStringMetadata* getLStringMetadata(ILMetadata* lmeta);
+ACOE_EXPORT ILIntMetadata* getLIntMetadata(ILMetadata* lmeta);
+ACOE_EXPORT ILFloatMetadata* getLFloatMetadata(ILMetadata* lmeta);
 }
 
 }  // namespace aoce

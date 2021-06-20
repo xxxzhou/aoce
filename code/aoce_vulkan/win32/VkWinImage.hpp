@@ -5,8 +5,8 @@
 // https://github.com/krOoze/Hello_Triangle/blob/dxgi_interop/src/WSI/DxgiWsi.h
 // https://github.com/roman380/VulkanSdkDemos/blob/d3d11-image-interop/BindImageMemory2/BindImageMemory2.cpp#L154
 #include "../vulkan/VulkanTexture.hpp"
-#include "aoce_win/DX11/Dx11Helper.hpp"
-#include "aoce_win/DX11/Dx11Resource.hpp"
+#include "aoce_win/dx11/Dx11Helper.hpp"
+#include "aoce_win/dx11/Dx11Resource.hpp"
 
 namespace aoce {
 namespace vulkan {
@@ -39,6 +39,9 @@ class VkWinImage {
     void bindDx11(ID3D11Device* device, ImageFormat format);
     void vkCopyTemp(ID3D11Device* device);
     void tempCopyDx11(ID3D11Device* device,ID3D11Texture2D* dx11Tex);
+
+    void tempCopyVk(ID3D11Device* device);
+    void dx11CopyTemp(ID3D11Device* device,ID3D11Texture2D* dx11Tex);
 };
 
 }  // namespace vulkan

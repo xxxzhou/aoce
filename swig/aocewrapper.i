@@ -6,8 +6,7 @@
 %feature("director") IMediaPlayerObserver;
 %feature("director") ILiveObserver;
 %feature("director") IVideoDeviceObserver;
-
-
+%feature("director") ICaptureObserver;
 %{
 #if __ANDROID__
 #include <jni.h> 
@@ -54,6 +53,7 @@
 %include "aoce/AoceVideoDevice.h"
 %include "aoce/AoceLayer.h"
 %include "aoce/AoceMetadata.h"  
+%include "aoce/AoceWindow.h"  
 // 针对ITLayer需预先实例化二个类告诉swig
 %template(AInputLayer) aoce::ITLayer<aoce::InputParamet>;
 %template(AOutputLayer) aoce::ITLayer<aoce::OutputParamet>; 
@@ -68,7 +68,13 @@
 %template(ILBoolMetadata) aoce::ILTMetadata<bool>; 
 %template(ILStringMetadata) aoce::ILTMetadata<const char*>; 
 %template(ILIntMetadata) aoce::ILTRangeMetadata<int32_t>; 
-%template(ILFloatMetadata) aoce::ILTRangeMetadata<float>;  
+%template(ILFloatMetadata) aoce::ILTRangeMetadata<float>; 
+
+// %extend aoce::BGroupMetadata {
+//     static aoce::BGroupMetadata* dynamic_cast(aoce::ILMetadata *lmeta) {
+//         return dynamic_cast<aoce::BGroupMetadata*>(lmeta);
+//     }
+// };
 
 %template(ASoftEleganceLayer) aoce::ITLayer<aoce::SoftEleganceParamet>;
 %template(AFloatLayer) aoce::ITLayer<float>;

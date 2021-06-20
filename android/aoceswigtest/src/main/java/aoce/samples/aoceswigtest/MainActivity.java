@@ -1,5 +1,6 @@
 package aoce.samples.aoceswigtest;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
 import aoce.android.library.xswig.AoceWrapper;
 import aoce.android.library.wrapper.GLVideoRender;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 public class MainActivity extends FragmentActivity implements IGLCopyTexture, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     static {
         System.loadLibrary("aoce_swig_java");
+
     }
     private GLVideoRender glVideoRender = null;
     private Button btnOpen = null;

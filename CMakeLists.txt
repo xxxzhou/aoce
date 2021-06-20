@@ -45,7 +45,7 @@ endif()
 
 # 添加win32平台下的编译符号
 if(WIN32)
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
     # 下面这些选项会导致aoce_cuda里nvcc编译不通过
@@ -121,6 +121,8 @@ install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceLive.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceMath.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceMedia.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceVideoDevice.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceMetadata.h DESTINATION include/aoce) 
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceWindow.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_vulkan_extra/AoceVkExtra.h DESTINATION include/aoce_vulkan_extra)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_vulkan_extra/VkExtraExport.h DESTINATION include/aoce_vulkan_extra) 
 if(AOCE_TALKTO_EXIST)

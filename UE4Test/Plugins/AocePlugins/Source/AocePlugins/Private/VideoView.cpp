@@ -15,13 +15,13 @@ namespace aoce {
 		graph = std::unique_ptr<IPipeGraph>(
 			getPipeGraphFactory(gpuType)->createGraph());
 		auto* layerFactory = getLayerFactory(gpuType);
-		inputLayer = std::unique_ptr<IInputLayer>(layerFactory->crateInput());
+		inputLayer = std::unique_ptr<IInputLayer>(layerFactory->createInput());
 		outputLayer = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
 // #if WIN32
 		outputLayer->updateParamet({ false,true });
 // #endif
 		yuv2rgbLayer =
-			std::unique_ptr<IYUV2RGBALayer>(layerFactory->createYUV2RGBA());
+			std::unique_ptr<IYUVLayer>(layerFactory->createYUV2RGBA());
 		// 链接图
 		graph->addNode(inputLayer.get())
 			->addNode(yuv2rgbLayer.get())

@@ -318,6 +318,11 @@ void VulkanManager::blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
 
 void VulkanManager::copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
                               VkImage dest) {
+    copyImage(cmd, src->image, dest, src->width, src->height);
+}
+
+void VulkanManager::copyImage(VkCommandBuffer cmd, VkImage src, VkImage dest,
+                              int32_t width, int32_t height) {
     VkImageCopy copyRegion = {};
 
     copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -332,11 +337,11 @@ void VulkanManager::copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
     copyRegion.dstSubresource.layerCount = 1;
     copyRegion.dstOffset = {0, 0, 0};
 
-    copyRegion.extent.width = src->width;
-    copyRegion.extent.height = src->height;
+    copyRegion.extent.width = width;
+    copyRegion.extent.height = height;
     copyRegion.extent.depth = 1;
 
-    vkCmdCopyImage(cmd, src->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dest,
+    vkCmdCopyImage(cmd, src, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dest,
                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 }
 

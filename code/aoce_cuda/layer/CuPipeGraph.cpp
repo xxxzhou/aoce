@@ -32,7 +32,7 @@ CudaMatRef CuPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
 }
 
 void CuPipeGraph::onReset(){
-
+    cuLayers.clear();
 }
 
 bool CuPipeGraph::onInitBuffers() {

@@ -8,15 +8,12 @@ BGroupMetadata::BGroupMetadata(const char* paramet_class) {
     parametClass = paramet_class;
 }
 
-BGroupMetadata::~BGroupMetadata(){
-    
-}
+BGroupMetadata::~BGroupMetadata() {}
 
 int32_t BGroupMetadata::getCount() { return metadatas.size(); }
 
 ILMetadata* BGroupMetadata::getLMetadata(int32_t index) {
-    assert(index > 0 && index < metadatas.size());
-
+    assert(index >= 0 && index < metadatas.size());
     return metadatas[index].get();
 }
 
@@ -44,8 +41,7 @@ void BGroupMetadata::addMetadata(const char* parametName, const char* text,
     auto metadata = std::make_shared<LIntMetadata>();
     metadata->parametName = parametName;
     metadata->text = text;
-    metadata->defaultValue = defaultValue;
-    metadatas.push_back(metadata);
+    metadata->defaultValue = defaultValue; 
     metadata->minValue = minValue;
     metadata->maxVluae = maxVluae;
     metadatas.push_back(metadata);
@@ -57,8 +53,7 @@ void BGroupMetadata::addMetadata(const char* parametName, const char* text,
     auto metadata = std::make_shared<LFloatMetadata>();
     metadata->parametName = parametName;
     metadata->text = text;
-    metadata->defaultValue = defaultValue;
-    metadatas.push_back(metadata);
+    metadata->defaultValue = defaultValue;    
     metadata->minValue = minValue;
     metadata->maxVluae = maxVluae;
     metadatas.push_back(metadata);
@@ -164,6 +159,20 @@ ILMetadata* LayerMetadataManager::getMetadata(const char* layerName) {
     for (auto& lm : layerMetadatas) {
         if (strcmp(layerName, lm->layerName) == 0) {
             return lm->metadata.get();
+            // LayerMetadataType metaType =
+            //     lm->metadata->getLayerType();
+            // switch (metaType) {
+            //     case LayerMetadataType::abool:
+            //         return (BTMetaData<bool>*)lm->metadata.get();
+            //     case LayerMetadataType::astring:
+            //         return (BTMetaData<const char*>*)lm->metadata.get();
+            //     case LayerMetadataType::aint:
+            //         return (BTMetaData<int32_t>*)lm->metadata.get();
+            //     case LayerMetadataType::afloat:
+            //         return (BTMetaData<bool>*)lm->metadata.get();
+            //     case LayerMetadataType::agroup:
+            //         return (BGroupMetadata*)lm->metadata.get();
+            // }
         }
     }
     return nullptr;
@@ -179,6 +188,37 @@ void loadLayerMetadata() {
 
 ILMetadata* getLayerMetadata(const char* layerName) {
     return LayerMetadataManager::Get().getMetadata(layerName);
+}
+
+ILGroupMetadata* getLGroupMetadata(ILMetadata* lmeta) {   
+    if (lmeta->getLayerType() == LayerMetadataType::agroup) {
+        return (ILGroupMetadata*)lmeta;
+    }
+    return nullptr;
+}
+ILBoolMetadata* getLBoolMetadata(ILMetadata* lmeta) {   
+    if (lmeta->getLayerType() == LayerMetadataType::abool) {
+        return (ILBoolMetadata*)lmeta;
+    }
+    return nullptr;
+}
+ILStringMetadata* getLStringMetadata(ILMetadata* lmeta) {
+    if (lmeta->getLayerType() == LayerMetadataType::astring) {
+        return (ILStringMetadata*)lmeta;
+    }
+    return nullptr;
+}
+ILIntMetadata* getLIntMetadata(ILMetadata* lmeta) {
+    if (lmeta->getLayerType() == LayerMetadataType::aint) {
+        return (ILIntMetadata*)lmeta;
+    }
+    return nullptr;
+}
+ILFloatMetadata* getLFloatMetadata(ILMetadata* lmeta) {
+    if (lmeta->getLayerType() == LayerMetadataType::afloat) {
+        return (ILFloatMetadata*)lmeta;
+    }
+    return nullptr;
 }
 
 }  // namespace aoce

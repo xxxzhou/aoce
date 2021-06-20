@@ -10,6 +10,7 @@ if(WIN32)
     set(AOCE_WIN_HEADER_DIR "${CMAKE_SOURCE_DIR}/code/aoce_win")
     # dx11
     add_subdirectory(aoce_win) 
+    add_subdirectory(aoce_winrt)
     add_subdirectory(aoce_win_mf)
     if(AOCE_CUDA_MODULE)
         add_subdirectory(aoce_cuda)    

@@ -28,7 +28,7 @@ class AOCE_VULKAN_EXPORT VulkanContext {
     ~VulkanContext();
 
    private:
-    void createSampler(bool bLinear,VkSampler& sampler);
+    void createSampler(bool bLinear, VkSampler& sampler);
 
    public:
     void initContext();
@@ -39,6 +39,8 @@ class AOCE_VULKAN_EXPORT VulkanContext {
                        const VulkanTexture* texture);
     void imageToBuffer(VkCommandBuffer cmd, const VulkanTexture* texture,
                        const VulkanBuffer* buffer);
+    void imageToBuffer(VkCommandBuffer cmd, VkImage texture, VkBuffer buffer,
+                       int32_t width, int32_t height);
     void blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,
                        const VulkanTexture* dest);
     void blitFillImage(

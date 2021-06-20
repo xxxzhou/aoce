@@ -23,28 +23,39 @@ void InputLayer::dataReady(uint8_t* data, bool bCopy) {
     onDataReady();
 }
 
-void InputLayer::checkImageFormat(int32_t width, int32_t height,
-                                  VideoType videoType) {
-    assert(getLayer() != nullptr);
-    assert(getLayer()->bAttachGraph());
-    if (width != videoFormat.width || height != videoFormat.height ||
-        videoType != videoFormat.videoType) {
-        videoFormat.width = width;
-        videoFormat.height = height;
-        videoFormat.videoType = videoType;
-        ImageFormat iformat = videoFormat2ImageFormat(videoFormat);
-        BaseLayer* layer = static_cast<BaseLayer*>(getLayer());
-        layer->inFormats[0] = iformat;
-        layer->outFormats[0] = iformat;
-        dataSize = iformat.width * iformat.height *
-                   getImageTypeSize(iformat.imageType);
-        // 重新组织图
-        layer->resetGraph();
-    }
+void InputLayer::checkImageFormat(const ImageFormat& imageFormat) {
+    checkImageFormat(imageFormat, imageType2VideoType(imageFormat.imageType));
 }
 
-void InputLayer::setImage(VideoFormat newFormat) {
-    checkImageFormat(newFormat.width, newFormat.height, newFormat.videoType);
+void InputLayer::checkImageFormat(const ImageFormat& newFormat,
+                                  const VideoType& newVideo) {
+    if (imageFormat == newFormat) {
+        return;
+    }
+    assert(getLayer() != nullptr);
+    assert(getLayer()->bAttachGraph());
+    imageFormat = newFormat;
+    videoType = newVideo;
+    BaseLayer* layer = static_cast<BaseLayer*>(getLayer());
+    layer->inFormats[0] = imageFormat;
+    layer->outFormats[0] = imageFormat;
+    // 输入层负责把bgra转化成rgba
+    if (layer->outFormats[0].imageType == ImageType::bgra8) {
+        layer->outFormats[0].imageType = ImageType::rgba8;
+    }
+    dataSize = imageFormat.width * imageFormat.height *
+               getImageTypeSize(imageFormat.imageType);
+    // 重新组织图
+    layer->resetGraph();
+}
+
+void InputLayer::setImage(const ImageFormat& newFormat) {
+    checkImageFormat(newFormat);
+}
+
+void InputLayer::setImage(const VideoFormat& newFormat) {
+    ImageFormat iformat = videoFormat2ImageFormat(newFormat);
+    checkImageFormat(iformat, newFormat.videoType);
 }
 
 void InputLayer::inputCpuData(uint8_t* data, bool bSeparateRun) {
@@ -52,7 +63,12 @@ void InputLayer::inputCpuData(uint8_t* data, bool bSeparateRun) {
 }
 
 void InputLayer::inputCpuData(const VideoFrame& videoFrame, bool bSeparateRun) {
-    checkImageFormat(videoFrame.width, videoFrame.height, videoFrame.videoType);
+    VideoFormat vf = {};
+    vf.width = videoFrame.width;
+    vf.height = videoFrame.height;
+    vf.videoType = videoFrame.videoType;
+    ImageFormat iformat = videoFormat2ImageFormat(vf);
+    checkImageFormat(iformat, vf.videoType);
     int32_t size = getVideoFrame(videoFrame, nullptr);
     if (size == 0) {
         dataReady(videoFrame.data[0], bSeparateRun);
@@ -67,9 +83,10 @@ void InputLayer::inputCpuData(const VideoFrame& videoFrame, bool bSeparateRun) {
 
 void InputLayer::inputCpuData(uint8_t* data, const ImageFormat& imageFormat,
                               bool bSeparateRun) {
-    VideoType vty = imageType2VideoType(imageFormat.imageType);
-    checkImageFormat(imageFormat.width, imageFormat.height, vty);
+    checkImageFormat(imageFormat);
     dataReady(data, bSeparateRun);
 }
+
+void InputLayer::inputGpuData(void* device, void* tex) {}
 
 }  // namespace aoce

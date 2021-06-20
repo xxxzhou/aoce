@@ -66,5 +66,13 @@ ACOE_WIN_EXPORT void copyTextureToShared(ID3D11Device* d3ddevice,
                                          bool bNT = false);
 
 ACOE_WIN_EXPORT int32_t sizeDxFormatElement(DXGI_FORMAT format);
+
+ACOE_WIN_EXPORT bool createAndCopyToDebugBuf(ID3D11Device* deviceDx11,
+                                             ID3D11Texture2D* texture,
+                                             ID3D11Texture2D** debugTex);
+ACOE_WIN_EXPORT bool getTextureData(ID3D11Device* deviceDx11,
+                                    ID3D11Texture2D* texture, uint8_t** data);
+
+ACOE_WIN_EXPORT bool getSuitAdapter(IDXGIAdapter1** adapter);                                    
 }  // namespace win
 }  // namespace aoce

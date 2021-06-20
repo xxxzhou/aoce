@@ -1,6 +1,6 @@
 # aoce([oeip](https://github.com/xxxzhou/oeip)的android平台扩展版)
 
-android/window 多媒体与游戏引擎交互.
+android/window 图像处理,多媒体以及游戏引擎交互.
 
 ## 配置项目
 

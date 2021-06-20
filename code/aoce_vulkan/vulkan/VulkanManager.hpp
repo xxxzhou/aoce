@@ -34,6 +34,8 @@ class AOCE_VULKAN_EXPORT VulkanManager {
         VkImageLayout destLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     static void copyImage(VkCommandBuffer cmd, const VulkanTexture* src,
                           VkImage dest);
+    static void copyImage(VkCommandBuffer cmd, VkImage src, VkImage dest,
+                          int32_t width, int32_t height);
     // 选用的渲染通道索引
     int32_t graphicsIndex = -1;
     // 选用的计算通道过些

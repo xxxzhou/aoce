@@ -9,7 +9,7 @@
 #include <cuda_d3d11_interop.h>
 #include <d3d11.h>
 
-#include "../aoce_win/DX11/Dx11Resource.hpp"
+#include "../aoce_win/dx11/Dx11Resource.hpp"
 #endif
 
 #define SAFE_AOCE_CUDA_DELETE(p) \

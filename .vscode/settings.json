@@ -92,7 +92,14 @@
         "stdint.h": "c",
         "aocemedia.h": "c",
         "aocemath.h": "c",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "aocevideodevice.h": "c",
+        "aocelayer.h": "c",
+        "charconv": "cpp",
+        "bit": "cpp",
+        "format": "cpp",
+        "forward_list": "cpp",
+        "stop_token": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,

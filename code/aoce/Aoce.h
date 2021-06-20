@@ -17,7 +17,7 @@ enum class LogLevel : int32_t {
 };
 
 // 完成win32端vulkan与dx11交互,
-// 经测试性能与dx11性能还高一些,比不上cuda,不过作为通用备份选择足够了
+// 经测试vulkan性能比dx11性能还高一些,比不上cuda,不过作为通用备份选择足够了
 enum class GpuType : int32_t {
     other = 0,
     cuda,

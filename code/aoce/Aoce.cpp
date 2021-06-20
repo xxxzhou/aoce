@@ -343,8 +343,9 @@ aoce::ImageType videoType2ImageType(const aoce::VideoType& videoType) {
         // 这几个信息需要在InputLayer输出中转化成rgba
         case VideoType::argb8:
         case VideoType::rgb8:
-        case VideoType::bgra8:
             return ImageType::rgba8;
+        case VideoType::bgra8:
+            return ImageType::bgra8;
         case VideoType::depth16u:
             return ImageType::r16;
         case VideoType::other:
@@ -607,6 +608,8 @@ void loadAoce() {
     ModuleManager::Get().regAndLoad("aoce_vulkan");
     ModuleManager::Get().regAndLoad("aoce_vulkan_extra");
 #if WIN32
+    ModuleManager::Get().regAndLoad("aoce_win");
+    ModuleManager::Get().regAndLoad("aoce_winrt");
     ModuleManager::Get().regAndLoad("aoce_win_mf");
     ModuleManager::Get().regAndLoad("aoce_cuda");
 #elif __ANDROID__
@@ -630,6 +633,8 @@ void unloadAoce() {
     ModuleManager::Get().unloadModule("aoce_vulkan");
     ModuleManager::Get().unloadModule("aoce_vulkan_extra");
 #if WIN32
+    ModuleManager::Get().unloadModule("aoce_win");
+    ModuleManager::Get().unloadModule("aoce_winrt");
     ModuleManager::Get().unloadModule("aoce_win_mf");
     ModuleManager::Get().unloadModule("aoce_cuda");
 #elif __ANDROID__

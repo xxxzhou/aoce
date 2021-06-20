@@ -265,10 +265,10 @@ HRESULT MFVideoDevice::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex,
             auto hr = pBuffer->Lock(&data, &length, &length);
             VideoFrame frame = {};
             frame.data[0] = data;
-            // mjpg会自动转化成YUV2P格式
+            // mjpg会自动转化成YUV2I格式
             frame.videoType = selectFormat.videoType;
             if (selectFormat.videoType == VideoType::mjpg) {
-                frame.videoType = VideoType::yuy2P;
+                frame.videoType = VideoType::yuv2I;
             }            
             frame.width = selectFormat.width;
             frame.height = selectFormat.height;

@@ -2,7 +2,7 @@
 set(targets 01_findmodule)
 set(targetopencvs 02_showdevice 03_findvulkan) 
 set(targetvulkans 04_vulkantest 06_mediaplayer)
-set(targetdx11 07_wintest)
+set(targetdx11 07_wintest 09_wincapture)
 
 if(WIN32)
     SET(OpenCV_DIR D:/WorkSpace/C++/opencv/opencv41/build/install)
@@ -48,7 +48,7 @@ function(sample)
         endif()  
     endforeach() 
     foreach(target ${targetdx11})
-        generate(${target} FALSE TRUE aoce_win aoce)
+        generate(${target} FALSE TRUE aoce_win aoce_vulkan aoce)
     endforeach()
 endfunction(sample) 
 

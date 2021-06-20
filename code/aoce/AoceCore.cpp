@@ -4,7 +4,7 @@
 #include "module/ModuleManager.hpp"
 
 namespace aoce {
- 
+
 bool checkLoadModel(const char* modelName) {
     return ModuleManager::Get().checkLoadModel(modelName);
 }
@@ -32,6 +32,16 @@ MediaFactory* getMediaFactory(const MediaType& mediaType) {
 ILiveRoom* getLiveRoom(const LiveType& liveType) {
     LiveRoom* room = AoceManager::Get().getLiveRoom(liveType);
     return room;
+}
+
+IWindowManager* getWindowManager(const WindowType& windowType) {
+    IWindowManager* manager = AoceManager::Get().getIWindowManager(windowType);
+    return manager;
+}
+
+ICaptureWindow* getWindowCapture(const CaptureType& captureType) {
+    ICaptureWindow* capture = AoceManager::Get().getICaptureWindow(captureType);
+    return capture;
 }
 
 }  // namespace aoce

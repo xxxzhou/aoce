@@ -3,7 +3,7 @@
 file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" )
 file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
-add_sub_path(MFVideoDevice AOCE_HEADER AOCE_SOURCE)
+add_sub_path(videodevice AOCE_HEADER AOCE_SOURCE)
 
 add_library(aoce_win_mf SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
 

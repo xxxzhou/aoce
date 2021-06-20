@@ -44,10 +44,6 @@ VkPipeGraph::~VkPipeGraph() {
 
 #if WIN32
 ID3D11Device* VkPipeGraph::getD3D11Device() { return device; }
-void VkPipeGraph::addOutMemory(VkWinImage* winImage) {
-    winImages.push_back(winImage);
-    // outMemorys.push_back(winImage->getDeviceMemory());
-}
 #endif
 
 VulkanTexturePtr VkPipeGraph::getOutTex(int32_t node, int32_t outIndex) {
@@ -77,11 +73,8 @@ bool VkPipeGraph::resourceReady() {
 }
 
 void VkPipeGraph::onReset() {
-// 告诉别的线程,需要等待资源重新生成
-#if WIN32
-    // outMemorys.clear();
-    winImages.clear();
-#endif
+    vkLayers.clear();
+    // 告诉别的线程,需要等待资源重新生成
     vkResetEvent(context->device, outEvent);
     vkResetCommandBuffer(context->computerCmd,
                          VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
@@ -117,11 +110,6 @@ bool VkPipeGraph::executeOut() {
     // 等等信号
     vkWaitForFences(context->device, 1, &computerFence, VK_TRUE,
                     UINT64_MAX);  // UINT64_MAX
-#if WIN32
-    for (auto* winImage : winImages) {
-        winImage->vkCopyTemp(device);
-    }
-#endif
     // 重置无信号
     vkResetFences(context->device, 1, &computerFence);
     // 运行输出层

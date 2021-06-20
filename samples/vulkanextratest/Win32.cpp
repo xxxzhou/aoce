@@ -202,12 +202,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     pdLayer = createPinchDistortionLayer();
 
-    ILMetadata* x1 = getLayerMetadata("FlipLayer");
-    auto x11 = x1->getLayerType();
+    ILMetadata* x1 = getLayerMetadata("SkinToneLayer");
     ILMetadata* x2 = getLayerMetadata("BrightnessLayer");
     auto x12 = x2->getLayerType();
     ILMetadata* x3 = getLayerMetadata("ExposureLayer");
     auto x13 = x3->getLayerType();
+    ILGroupMetadata* igl = getLGroupMetadata(x1);
+    int32_t count = igl->getCount();
+    for (int32_t i = 0; i < count; i++) {
+        ILMetadata* xa = igl->getLMetadata(i);
+        auto xtype = xa->getLayerType();
+        logMessage(LogLevel::info,xa->getParametName());
+    }
 
     std::vector<uint8_t> lutData;
     std::vector<IBaseLayer*> layers;

@@ -47,19 +47,19 @@ ACOE_EXPORT void setLogObserver(ILogObserver* observer);
 // 检查模块aoce_cuda/aoce_vulkan/aoce_win_mf/aoce_ffmpeg是否加载成功
 ACOE_EXPORT bool checkLoadModel(const char* modelName);
 
-// 得到分配GPU管线的工厂对象,请不会手动释放这个对象,这个对象由aoce管理
+// 得到分配GPU管线的工厂对象,请不要手动释放这个对象,这个对象由aoce管理
 ACOE_EXPORT PipeGraphFactory* getPipeGraphFactory(const GpuType& gpuType);
 
-// 得到分配基本层的工厂对象,请不会手动释放这个对象,这个对象由aoce管理
+// 得到分配基本层的工厂对象,请不要手动释放这个对象,这个对象由aoce管理
 ACOE_EXPORT LayerFactory* getLayerFactory(const GpuType& gpuType);
 
-// 得到对应设备的管理对象,请不会手动释放这个对象,这个对象由aoce管理
+// 得到对应设备的管理对象,请不要手动释放这个对象,这个对象由aoce管理
 ACOE_EXPORT IVideoManager* getVideoManager(const CameraType& cameraType);
 
-// 得到分配媒体播放器的工厂对象,请不会手动释放这个对象,这个对象由aoce管理
+// 得到分配媒体播放器的工厂对象,请不要手动释放这个对象,这个对象由aoce管理
 ACOE_EXPORT MediaFactory* getMediaFactory(const MediaType& mediaType);
 
-// 得到直播模块提供的管理对象,请不会手动释放这个对象,这个对象由aoce管理
+// 得到直播模块提供的管理对象,请不要手动释放这个对象,这个对象由aoce管理
 ACOE_EXPORT ILiveRoom* getLiveRoom(const LiveType& liveType);
 
 // 得到对应计算层的参数元数据信息

@@ -53,8 +53,10 @@ struct AgoraContext {
     int32_t bSFEncoder = false;
     // 是否自己采集声卡
     int32_t bLoopback = false;
-    // andrid下需要提供context
+// andrid下需要提供context
+#if __ANDROID__
     void* context = nullptr;
+#endif
 };
 
 // 请用户继承此类,相应回调会转到此类上

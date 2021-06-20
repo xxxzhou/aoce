@@ -77,6 +77,8 @@ class ACOE_EXPORT AoceManager {
     AOCE_MANAGER_OBJ(GpuType, LayerFactory)
     AOCE_MANAGER_OBJ(LiveType, LiveRoom)
     AOCE_MANAGER_OBJ(MediaType, MediaFactory)
+    AOCE_MANAGER_OBJ(WindowType, IWindowManager)
+    AOCE_MANAGER_OBJ(CaptureType, ICaptureWindow)
 };
 
 }  // namespace aoce

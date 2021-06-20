@@ -8,7 +8,7 @@
 
 #if WIN32
 #include "../win32/VkWinImage.hpp"
-#include "aoce_win/DX11/Dx11Helper.hpp"
+#include "aoce_win/dx11/Dx11Helper.hpp"
 #endif
 
 namespace aoce {
@@ -36,7 +36,6 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
     CComPtr<ID3D11Device> device = nullptr;
     CComPtr<ID3D11DeviceContext> ctx = nullptr;
     // std::vector<VkDeviceMemory> outMemorys;
-    std::vector<VkWinImage*> winImages;
     bool bDX11Update = false;
 #endif
    public:
@@ -52,7 +51,6 @@ class AOCE_VULKAN_EXPORT VkPipeGraph : public PipeGraph {
 
 #if WIN32
     ID3D11Device* getD3D11Device();
-    void addOutMemory(VkWinImage* winImage);
 #endif
     bool executeOut();
 

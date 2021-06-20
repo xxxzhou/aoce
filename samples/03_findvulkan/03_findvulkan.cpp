@@ -9,7 +9,7 @@ using namespace cv;
 
 static cv::Mat* show = nullptr;
 static cv::Mat* show2 = nullptr;
-static int index = 0;
+static int index = 1;
 static int formatIndex = 0;
 static IPipeGraph* vkGraph;
 static IInputLayer* inputLayer;
@@ -22,7 +22,7 @@ static GpuType gpuType = GpuType::vulkan;
 class TestCameraObserver : public IVideoDeviceObserver {
     virtual void onVideoFrame(VideoFrame frame) override {
         // std::cout << "time stamp:" << frame.timeStamp << std::endl;
-        inputLayer->inputCpuData(frame.data[0]);
+        inputLayer->inputCpuData(frame);
         vkGraph->run();
     }
 };

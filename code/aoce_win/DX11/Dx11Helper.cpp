@@ -527,5 +527,72 @@ int32_t sizeDxFormatElement(DXGI_FORMAT format) {
     }
 }
 
+bool createAndCopyToDebugBuf(ID3D11Device* deviceDx11, ID3D11Texture2D* texture,
+                             ID3D11Texture2D** debugTex) {
+    D3D11_TEXTURE2D_DESC desc = {0};
+    texture->GetDesc(&desc);
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    desc.Usage = D3D11_USAGE_STAGING;
+    desc.BindFlags = 0;
+    desc.MiscFlags = 0;
+    HRESULT hr = deviceDx11->CreateTexture2D(&desc, nullptr, debugTex);
+    if (FAILED(hr)) {
+        return false;
+    }
+    CComPtr<ID3D11DeviceContext> d3dcontext = nullptr;
+    deviceDx11->GetImmediateContext(&d3dcontext);
+    if (!d3dcontext) {
+        return false;
+    }
+    d3dcontext->CopyResource(texture, *debugTex);
+    return true;
+}
+
+bool getTextureData(ID3D11Device* deviceDx11, ID3D11Texture2D* texture,
+                    uint8_t** data) {
+    CComPtr<ID3D11Texture2D> temp = nullptr;
+    D3D11_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    texture->GetDesc(&desc);
+    if (!(desc.CPUAccessFlags & D3D11_CPU_ACCESS_READ)) {
+        bool bCreate = createAndCopyToDebugBuf(deviceDx11, texture, &temp);
+        if (!bCreate) {
+            return false;
+        }
+    }
+    CComPtr<ID3D11DeviceContext> d3dcontext = nullptr;
+    deviceDx11->GetImmediateContext(&d3dcontext);
+    if (!d3dcontext) {
+        return false;
+    }
+    D3D11_MAPPED_SUBRESOURCE MappedResource;
+    d3dcontext->Map(temp ? temp : texture, 0, D3D11_MAP_READ, 0,
+                    &MappedResource);
+    *data = (uint8_t*)MappedResource.pData;
+    d3dcontext->Unmap(temp ? temp : texture, 0);
+}
+
+bool getSuitAdapter(IDXGIAdapter1** adapter) {
+    *adapter = nullptr;
+    CComPtr<IDXGIFactory1> factory = nullptr;
+    IID factoryIID = __uuidof(IDXGIFactory1);
+    HRESULT hr;
+    hr = CreateDXGIFactory1(factoryIID, (void**)&factory);
+    if (FAILED(hr)) {
+        logHResult(hr, "winrt capture CreateDXGIFactory1 failed");
+        return false;
+    }
+    int32_t index = 0;
+    // 枚举适配器
+    IDXGIAdapter* pAdapter = nullptr;
+    while (factory->EnumAdapters(index, &pAdapter) != DXGI_ERROR_NOT_FOUND) {
+        DXGI_ADAPTER_DESC adapterDesc = {};
+        hr = pAdapter->GetDesc(&adapterDesc);
+
+        ++index;
+    }
+    return true;
+}
+
 }  // namespace win
 }  // namespace aoce

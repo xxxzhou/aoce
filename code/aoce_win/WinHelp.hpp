@@ -19,7 +19,9 @@ namespace win {
 
 ACOE_WIN_EXPORT bool logHResult(HRESULT hr, const std::string& message,
                                 LogLevel level = LogLevel::error);
+ACOE_WIN_EXPORT bool validWindow(HWND hwnd);
 
 typedef std::function<void(void* device, void* backTex)> onTickHandle;
+
 }  // namespace win
 }  // namespace aoce

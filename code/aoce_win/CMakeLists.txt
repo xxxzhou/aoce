@@ -4,7 +4,8 @@ find_package(DirectX11 REQUIRED)
 
 file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" )
 file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-add_sub_path(DX11 AOCE_HEADER AOCE_SOURCE)
+add_sub_path(dx11 AOCE_HEADER AOCE_SOURCE)
+add_sub_path(window AOCE_HEADER AOCE_SOURCE)
 
 add_definitions(-DAOCE_WIN_EXPORT_DEFINE)
 include_directories(${AOCE_HEADER_DIR} ${DirectX11_INCLUDE_DIRS})

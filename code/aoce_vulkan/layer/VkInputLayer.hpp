@@ -1,6 +1,10 @@
 #pragma once
 #include <layer/InputLayer.hpp>
-
+#if WIN32
+#include "../win32/VkWinImage.hpp"
+#elif __ANDROID__
+#include "../android/HardwareImage.hpp"
+#endif
 #include "VkLayer.hpp"
 
 namespace aoce {
@@ -18,7 +22,11 @@ class AOCE_VULKAN_EXPORT VkInputLayer : public InputLayer, public VkLayer {
     // 是否需要GPU计算
     bool bUsePipe = false;
     bool bDateUpdate = false;
-
+#if WIN32
+    std::unique_ptr<VkWinImage> winImage = nullptr;
+#elif __ANDROID__
+    std::unique_ptr<HardwareImage> hardwareImage = nullptr;
+#endif
    public:
     VkInputLayer(/* args */);
     ~VkInputLayer();
@@ -26,12 +34,15 @@ class AOCE_VULKAN_EXPORT VkInputLayer : public InputLayer, public VkLayer {
     // InputLayer
    public:
     virtual void onDataReady() override;
+    virtual void inputGpuData(void* device, void* tex) override;
+
     // VkLayer
    protected:
     virtual void onInitGraph() override;
     virtual void onInitVkBuffer() override;
     virtual void onInitPipe() override;
     virtual void onCommand() override;
+    virtual void onPreFrame() override;
     virtual bool onFrame() override;
 };
 

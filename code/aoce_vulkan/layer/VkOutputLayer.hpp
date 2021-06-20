@@ -20,7 +20,7 @@ class AOCE_VULKAN_EXPORT VkOutputLayer : public OutputLayer, public VkLayer {
     VkOutGpuTex outTex = {};
     std::unique_ptr<VulkanTexture> swapTex = nullptr;
 #if WIN32
-    std::unique_ptr<VkWinImage> winImage;
+    std::unique_ptr<VkWinImage> winImage = nullptr;
     bool bWinInterop = false;
 #elif __ANDROID__
     std::unique_ptr<HardwareImage> hardwareImage = nullptr;

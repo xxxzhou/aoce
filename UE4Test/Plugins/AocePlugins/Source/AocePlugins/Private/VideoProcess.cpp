@@ -16,8 +16,8 @@ namespace aoce {
 		// 生成一张执行图
 		graph = getPipeGraphFactory(this->gpuType)->createGraph();
 		auto* layerFactory = getLayerFactory(this->gpuType);
-		inputLayer = std::unique_ptr<IInputLayer>(layerFactory->crateInput());
-		inputLayer1 = std::unique_ptr<IInputLayer>(layerFactory->crateInput());
+		inputLayer = std::unique_ptr<IInputLayer>(layerFactory->createInput());
+		inputLayer1 = std::unique_ptr<IInputLayer>(layerFactory->createInput());
 		outputLayer = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
 		outputLayer1 = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
 		outputLayer2 = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
@@ -26,6 +26,7 @@ namespace aoce {
 		operateLayer = std::unique_ptr<ITexOperateLayer>(createTexOperateLayer(this->gpuType));
 		rgb2yuvLayer =
 			std::unique_ptr<IYUVLayer>(layerFactory->createRGBA2YUV());
+		texClipLayer = std::unique_ptr<ITexClipLayer>(createTexClipLayer(this->gpuType));
 
 		outputLayer->updateParamet({ true, false });
 #if WIN32
@@ -54,6 +55,7 @@ namespace aoce {
 			->addNode(yuv2rgbLayer.get())
 			->addNode(operateLayer.get())
 			->addNode(mattingLayer.get())
+			->addNode(texClipLayer.get())
 			->addNode(rgb2yuvLayer.get())
 			->addNode(outputLayer.get());
 		graph->addNode(outputLayer1.get());
@@ -65,7 +67,7 @@ namespace aoce {
 		// outputLayer1输出原图
 		operateLayer->getLayer()->addLine(outputLayer1->getLayer());
 		// outputLayer2输出扣像图
-		mattingLayer->getLayer()->addLine(outputLayer2->getLayer());
+		texClipLayer->getLayer()->addLine(outputLayer2->getLayer());
 	}
 
 	bool VideoProcess::bOpen() {

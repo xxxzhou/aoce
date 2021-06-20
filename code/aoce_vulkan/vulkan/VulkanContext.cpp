@@ -55,11 +55,11 @@ void VulkanContext::initContext() {
     VK_CHECK_RESULT(
         vkAllocateCommandBuffers(device, &cmdBufInfo, &computerCmd));
 
-    createSampler(true,linearSampler);
-    createSampler(false,nearestSampler);    
+    createSampler(true, linearSampler);
+    createSampler(false, nearestSampler);
 }
 
-void VulkanContext::createSampler(bool bLinear,VkSampler& sampler) {
+void VulkanContext::createSampler(bool bLinear, VkSampler& sampler) {
     // 创建sampler
     VkSamplerCreateInfo samplerCreateInfo = {};
     samplerCreateInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -119,21 +119,24 @@ void VulkanContext::bufferToImage(VkCommandBuffer cmd,
 void VulkanContext::imageToBuffer(VkCommandBuffer cmd,
                                   const VulkanTexture* texture,
                                   const VulkanBuffer* buffer) {
+    imageToBuffer(cmd, texture->image, buffer->buffer, texture->width,
+                  texture->height);
+}
+
+void VulkanContext::imageToBuffer(VkCommandBuffer cmd, VkImage texture,
+                                  VkBuffer buffer, int32_t width,
+                                  int32_t height) {
     VkBufferImageCopy copyRegion = {};
     copyRegion.bufferOffset = 0;
-    // copyRegion.bufferRowLength = texture->width *
-    // getByteSize(texture->format); copyRegion.bufferImageHeight =
-    // texture->height;
     copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     copyRegion.imageSubresource.mipLevel = 0;
     copyRegion.imageSubresource.baseArrayLayer = 0;
     copyRegion.imageSubresource.layerCount = 1;
-    copyRegion.imageExtent.width = texture->width;
-    copyRegion.imageExtent.height = texture->height;
+    copyRegion.imageExtent.width = width;
+    copyRegion.imageExtent.height = height;
     copyRegion.imageExtent.depth = 1;
-    vkCmdCopyImageToBuffer(cmd, texture->image,
-                           VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer->buffer,
-                           1, &copyRegion);
+    vkCmdCopyImageToBuffer(cmd, texture, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                           buffer, 1, &copyRegion);
 }
 
 void VulkanContext::blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,

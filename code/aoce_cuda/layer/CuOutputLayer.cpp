@@ -54,9 +54,7 @@ bool CuOutputLayer::onFrame() {
     return true;
 }
 
-void CuOutputLayer::onInitCuBufffer() {
-    onFormatChanged(outFormats[0], 0);
-}
+void CuOutputLayer::onInitCuBufffer() { onFormatChanged(outFormats[0], 0); }
 
 void CuOutputLayer::onUpdateParamet() {
     if (paramet.bCpu == oldParamet.bCpu && paramet.bGpu == oldParamet.bGpu) {
@@ -66,9 +64,12 @@ void CuOutputLayer::onUpdateParamet() {
 }
 
 void CuOutputLayer::outDx11GpuTex(void* device, void* tex) {
+    if (!paramet.bGpu) {
+        return;
+    }
     ID3D11Device* dxdevice = (ID3D11Device*)device;
     ID3D11Texture2D* dxtexture = (ID3D11Texture2D*)tex;
-    if (!paramet.bGpu || dxdevice == nullptr || dxtexture == nullptr) {
+    if (dxdevice == nullptr || dxtexture == nullptr) {
         return;
     }
     // 把DX11共享资源复制到另一线程上的device的上纹理

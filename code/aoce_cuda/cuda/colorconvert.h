@@ -226,7 +226,7 @@ __global__ void rgba2yuv(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest) {
         float3 yuvrt = rgb2Yuv(make_float3(rgbart));
         float3 yuvrb = rgb2Yuv(make_float3(rgbarb));
         float3 ayuv = yuvlt + yuvlb + yuvrt + yuvrb;
- 
+
         int2 uindex = make_int2(idx, source.height + idy);
         int2 vindex = make_int2(idx, source.height * 3 / 2 + idy);
         int2 aindex1 = make_int2(idx + source.width / 2, source.height + idy);
@@ -264,6 +264,16 @@ inline __global__ void rgba2bgr(PtrStepSz<uchar4> source,
     if (idx < source.width && idy < source.height) {
         uchar4 rgba = source(idy, idx);
         dest(idy, idx) = make_uchar3(rgba.z, rgba.y, rgba.x);
+    }
+}
+
+inline __global__ void bgra2rgba(PtrStepSz<uchar4> source,
+                                 PtrStepSz<uchar4> dest) {
+    const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+    if (idx < source.width && idy < source.height) {
+        uchar4 rgba = source(idy, idx);
+        dest(idy, idx) = make_uchar4(rgba.z, rgba.y, rgba.x, rgba.w);
     }
 }
 
@@ -307,7 +317,7 @@ inline __global__ void blend(PtrStepSz<uchar4> source,
 }
 
 inline __global__ void flip(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
-                               FlipParamet paramt) {
+                            FlipParamet paramt) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
     if (idx < dest.width && idy < dest.height) {
@@ -323,8 +333,9 @@ inline __global__ void flip(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
     }
 }
 
-inline __global__ void transpose(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
-                               TransposeParamet paramt) {
+inline __global__ void transpose(PtrStepSz<uchar4> source,
+                                 PtrStepSz<uchar4> dest,
+                                 TransposeParamet paramt) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
     if (idx < dest.width && idy < dest.height) {
@@ -341,14 +352,13 @@ inline __global__ void transpose(PtrStepSz<uchar4> source, PtrStepSz<uchar4> des
 }
 
 inline __global__ void gamma(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
-                               float gamma) {
+                             float gamma) {
     const int idx = blockDim.x * blockIdx.x + threadIdx.x;
     const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-    if (idx < dest.width && idy < dest.height) {        
+    if (idx < dest.width && idy < dest.height) {
         float4 rgba = rgbauchar42float4(source(idy, idx));
-        float4 grgba =
-            make_float4(powf(rgba.x, gamma), powf(rgba.y, gamma),
-                        powf(rgba.z, gamma), rgba.w);
+        float4 grgba = make_float4(powf(rgba.x, gamma), powf(rgba.y, gamma),
+                                   powf(rgba.z, gamma), rgba.w);
         dest(idy, idx) = rgbafloat42uchar4(grgba);
     }
 }

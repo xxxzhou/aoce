@@ -46,9 +46,6 @@ void VkOutputLayer::onInitVkBuffer() {
 #if WIN32
     if (paramet.bGpu && bWinInterop) {
         winImage->bindDx11(vkPipeGraph->getD3D11Device(), outFormats[0]);
-        if (winImage->getInit()) {
-            vkPipeGraph->addOutMemory(winImage.get());
-        }
     }
 #endif
 #if __ANDROID_API__ >= 26
@@ -62,6 +59,11 @@ void VkOutputLayer::onInitVkBuffer() {
 bool VkOutputLayer::onFrame() {
     if (paramet.bCpu) {
         onImageProcessHandle(outBuffer->getCpuData(), inFormats[0], 0);
+    }
+    if (paramet.bGpu) {
+#if WIN32
+        winImage->vkCopyTemp(vkPipeGraph->getD3D11Device());
+#endif
     }
     return true;
 }

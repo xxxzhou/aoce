@@ -59,16 +59,18 @@ void d3dTexture2GpuMat(CudaMatRef frame, Dx11CudaResource& cudaResource,
                        cudaStream_t stream) {
     if (cudaResource.texture != nullptr) {
         // cuda map dx11,资源数组间map
-        cudaGraphicsMapResources(1, &cudaResource.cudaResource, stream);
+        cudaError_t cerror =
+            cudaGraphicsMapResources(1, &cudaResource.cudaResource, stream);
         // map单个资源 (dx11 bind cuda resource)->cuda
-        cudaGraphicsSubResourceGetMappedArray(&cudaResource.cuArray,
-                                              cudaResource.cudaResource, 0, 0);
-        cudaMemcpy2DFromArray(frame->ptr(), frame->getStep(),
-                              cudaResource.cuArray, 0, 0,
-                              frame->getWidth() * sizeof(int32_t),
-                              frame->getHeight(), cudaMemcpyDeviceToDevice);
+        cerror = cudaGraphicsSubResourceGetMappedArray(
+            &cudaResource.cuArray, cudaResource.cudaResource, 0, 0);
+        cerror = cudaMemcpy2DFromArray(
+            frame->ptr(), frame->getStep(), cudaResource.cuArray, 0, 0,
+            frame->getWidth() * sizeof(int32_t), frame->getHeight(),
+            cudaMemcpyDeviceToDevice);
         // cuda unmap dx11
-        cudaGraphicsUnmapResources(1, &cudaResource.cudaResource, stream);
+        cerror =
+            cudaGraphicsUnmapResources(1, &cudaResource.cudaResource, stream);
     }
 };
 

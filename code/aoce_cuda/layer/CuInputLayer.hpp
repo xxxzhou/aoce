@@ -14,8 +14,8 @@ class CuInputLayer : public InputLayer, public CuLayer {
 
     std::shared_ptr<win::Dx11SharedTex> shardTex;
     Dx11CudaResource cudaResoure = {};
-    CComPtr<ID3D11Device> device = nullptr;
-    CComPtr<ID3D11DeviceContext> ctx = nullptr;
+    // CComPtr<ID3D11Device> device = nullptr;
+    // CComPtr<ID3D11DeviceContext> ctx = nullptr;
 
    public:
     CuInputLayer(/* args */);
@@ -23,8 +23,8 @@ class CuInputLayer : public InputLayer, public CuLayer {
 
     // InputLayer
    public:
-    virtual void onDataReady() override {};
-    void onInputGpuDx11(void* device, void* tex);
+    virtual void onDataReady() override{};
+    virtual void inputGpuData(void* device, void* tex) override;
 
    public:
     virtual void onUpdateParamet() override;

@@ -5,7 +5,7 @@
 #include <AoceManager.hpp>
 #include <WinHelp.hpp>
 
-#include "MFvideodevice/MFVideoManager.hpp"
+#include "videodevice/MFVideoManager.hpp"
 
 namespace aoce {
 namespace win {

@@ -288,8 +288,14 @@ bool PipeGraph::run() {
     // 异步模式每次读取的数据可能并不在同一线程上)
     std::lock_guard<std::mutex> mtx_locker(mtx);
     if (bReset) {
-        logMessage(LogLevel::info, "start build graph.");
-#if AOCE_DEBUG_TYPE 
+        std::string smsg = "start build graph.";
+        if (gpu == GpuType::cuda) {
+            smsg = "start build cuda graph.";
+        } else if (gpu == GpuType::vulkan) {
+            smsg = "start build vulkan grahp.";
+        }
+        logMessage(LogLevel::info, smsg);
+#if AOCE_DEBUG_TYPE
         logMessage(LogLevel::info, "---the graph all node name.");
         for (auto node : nodes) {
             logMessage(LogLevel::info, node->layer->getMark());
@@ -302,7 +308,6 @@ bool PipeGraph::run() {
             logMessage(LogLevel::warn, "build graph failed.");
             return false;
         } else {
-            logMessage(LogLevel::info, "build graph success.");
 #if AOCE_DEBUG_TYPE
             logMessage(LogLevel::info,
                        "--- the order of execution of the graph.");
@@ -311,6 +316,7 @@ bool PipeGraph::run() {
             }
             logMessage(LogLevel::info, "--- end build graph.");
 #endif
+            logMessage(LogLevel::info, "build graph success.");
         }
     }
     return onRun();

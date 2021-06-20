@@ -13,13 +13,22 @@ class ILMetadata {
 };
 
 template <typename T>
-class ILTMetadata : virtual public ILMetadata {
+class ILTMetadata : public ILMetadata {
    public:
     virtual ~ILTMetadata(){};
     virtual T getDefaultVaule() = 0;
 };
 
-class ILGroupMetadata : virtual public ILMetadata {
+template <typename T>
+class ILTRangeMetadata : public ILTMetadata<T> {
+   public:
+    virtual ~ILTRangeMetadata(){};
+
+    virtual T getMinValue() = 0;
+    virtual T getMaxValue() = 0;
+};
+
+class ILGroupMetadata : public ILMetadata {
    public:
     virtual ~ILGroupMetadata(){};
 
@@ -27,15 +36,6 @@ class ILGroupMetadata : virtual public ILMetadata {
     virtual ILMetadata* getLMetadata(int32_t index) = 0;
 
     virtual const char* getParametClass() = 0;
-};
-
-template <typename T>
-class ILTRangeMetadata : virtual public ILTMetadata<T> {
-   public:
-    virtual ~ILTRangeMetadata(){};
-
-    virtual T getMinValue() = 0;
-    virtual T getMaxValue() = 0;
 };
 
 }  // namespace aoce

@@ -5,7 +5,7 @@
 #include <thread>
 
 #include "aoce/fixgraph/VideoView.hpp"
-#include "aoce_win/DX11/Dx11Window.hpp"
+#include "aoce_win/dx11/Dx11Window.hpp"
 
 // 是用摄像机还是用ffmpeg拉流
 #define USE_CAMERA 1
@@ -27,7 +27,7 @@ static std::unique_ptr<Dx11Window> window = nullptr;
 static std::unique_ptr<VideoView> viewGraph = nullptr;
 
 // cuda/vulkan 分别对接不同的DX11输出
-static GpuType gpuType = GpuType::cuda;
+static GpuType gpuType = GpuType::vulkan;
 
 static void *dx11Device = nullptr;
 static void *dx11Tex = nullptr;
