@@ -1,6 +1,2 @@
-filterColumn.comp filterColumn.comp CHANNEL_RGBA=1
-filterColumn.comp filterColumnC1.comp CHANNEL_R8=1
-filterColumn.comp filterColumnF4.comp CHANNEL_RGBA32F=1
-filterRow.comp filterRow.comp CHANNEL_RGBA=1
-filterRow.comp filterRowC1.comp CHANNEL_R8=1
-filterRow.comp filterRowF4.comp CHANNEL_RGBA32F=1
+rgba2yuvV1.comp
+yuv2rgbaV1.comp

@@ -522,6 +522,20 @@ int32_t getVideoFrame(const aoce::VideoFrame& frame, uint8_t* data) {
     return 0;
 }
 
+void createVideoFrame(aoce::VideoFrame& frame, uint8_t* data, int32_t width,
+                      int32_t height, VideoType videoType) {
+    frame.width = width;
+    frame.height = height;
+    if (videoType == VideoType::yuv420P) {
+        frame.height = height * 2 / 3;
+    } else if (videoType == VideoType::yuy2P) {
+        frame.height = height / 2;
+    }
+    frame.data[0] = data;
+    frame.timeStamp = getNowTimeStamp();
+    frame.videoType = videoType;
+}
+
 std::string getAocePath() {
 #if WIN32
     char sz[512] = {0};

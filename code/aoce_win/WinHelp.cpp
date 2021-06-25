@@ -15,10 +15,17 @@ bool logHResult(HRESULT hr, const std::string& message, LogLevel level) {
 }
 
 bool validWindow(HWND hwnd) {
+    if (hwnd == nullptr || hwnd == INVALID_HANDLE_VALUE) {
+        return false;
+    }
     RECT rect = {};
     ::GetWindowRect(hwnd, &rect);
-    if (rect.bottom <= 0 || rect.left <= 0 || rect.right <= 0 ||
-        rect.top <= 0) {
+    if (rect.bottom <= 0 || rect.right <= 0) {
+        return false;
+    }
+    int32_t height = rect.bottom - rect.top;
+    int32_t width = rect.right - rect.left;
+    if (height <= 0 || width <= 0) {
         return false;
     }
     return true;

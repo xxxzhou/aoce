@@ -99,7 +99,8 @@
         "bit": "cpp",
         "format": "cpp",
         "forward_list": "cpp",
-        "stop_token": "cpp"
+        "stop_token": "cpp",
+        "aoceaudiodevice.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,

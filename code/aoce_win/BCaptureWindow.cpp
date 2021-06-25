@@ -5,7 +5,7 @@ namespace win {
 
 BCaptureWindow::BCaptureWindow(/* args */) {}
 
-BCaptureWindow::~BCaptureWindow() {}
+BCaptureWindow::~BCaptureWindow() { hwnd = nullptr; }
 
 void BCaptureWindow::onObserverEvent(CaptureEventId eventId, LogLevel level,
                                      const char* msg) {

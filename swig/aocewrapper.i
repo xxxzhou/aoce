@@ -6,14 +6,15 @@
 %feature("director") IMediaPlayerObserver;
 %feature("director") ILiveObserver;
 %feature("director") IVideoDeviceObserver;
-%feature("director") ICaptureObserver;
+%feature("director") ICaptureObserver; 
+%feature("director") IAudioDeviceObserver;  
 %{
 #if __ANDROID__
 #include <jni.h> 
 #endif
 
 #include "aoce/Aoce.h"
-#include "aoce/AoceDefine.h"
+#include "aoce/AoceDefine.h"  
 #include "aoce/AoceCore.h"
 #include "aoce_vulkan_extra/AoceVkExtra.h"
 #include "aoce_vulkan_extra/VkExtraExport.h"
@@ -54,6 +55,7 @@
 %include "aoce/AoceLayer.h"
 %include "aoce/AoceMetadata.h"  
 %include "aoce/AoceWindow.h"  
+%include "aoce/AoceAudioDevice.h"  
 // 针对ITLayer需预先实例化二个类告诉swig
 %template(AInputLayer) aoce::ITLayer<aoce::InputParamet>;
 %template(AOutputLayer) aoce::ITLayer<aoce::OutputParamet>; 

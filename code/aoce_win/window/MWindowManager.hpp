@@ -22,6 +22,7 @@ class MWindowManager : public IWindowManager {
     virtual int32_t getWindowCount(bool bUpdate = false) override;
     virtual IWindow* getWindow(int32_t index) override;
     virtual IWindow* getDesktop() override;
+    virtual void setForeground(IWindow* window) override;
 };
 
 }  // namespace win

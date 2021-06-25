@@ -17,7 +17,7 @@ int u22u1(ivec2 uv, int step) {
 ivec2 u12u2(int index, int step) {
 	ivec2 uv;
 	uv.y = index / step;
-	uv.x = index - uv.y*step;// % 花费高?
+	uv.x = index % step;// index - uv.y*step;// % 花费高?
 	return uv;
 }
 
@@ -75,8 +75,8 @@ void yuv420p(){
         return;
     }
 	ivec2 nuv = u12u2(u22u1(uv.xy, size.x/2), size.x);
-	ivec2 uindex = ivec2(uv.x,uv.y)+nuv;
-	ivec2 vindex = ivec2(uv.x,uv.y*5/4)+nuv;
+	ivec2 uindex = ivec2(0, size.y )+nuv;
+	ivec2 vindex = ivec2(0, size.y*5/4 )+nuv;
 
 	vec4 rgba1 = imageLoad(inTex,ivec2(uv.x*2,uv.y*2));
 	vec4 rgba2 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y*2));
@@ -140,9 +140,10 @@ void yuv422p(){
     if(uv.x >= size.x/2 || uv.y >= size.y){
         return;
     }
-	ivec2 nuv = u12u2(u22u1(uv.xy, size.x/2), size.x);
-	ivec2 uindex = ivec2(uv.x,uv.y)+nuv;
-	ivec2 vindex = ivec2(uv.x,uv.y*3/2)+nuv;
+
+	ivec2 nuv = u12u2(u22u1(uv, size.x/2), size.x);
+	ivec2 uindex = ivec2(0,size.y)+nuv;
+	ivec2 vindex = ivec2(0,size.y*3/2)+nuv;
 
 	vec4 rgba1 = imageLoad(inTex,ivec2(uv.x*2,uv.y));
 	vec4 rgba2 = imageLoad(inTex,ivec2(uv.x*2+1,uv.y));
@@ -153,7 +154,7 @@ void yuv422p(){
     vec4 yuv = (yuv1 + yuv2)/2.0f;
     // uv
     imageStore(outTex, uindex,make_vec4(yuv.g)); 
-    imageStore(outTex, uindex,make_vec4(yuv.b)); 
+    imageStore(outTex, vindex,make_vec4(yuv.b)); 
     // y
 	imageStore(outTex, ivec2(uv.x*2,uv.y),make_vec4(yuv1.r)); 
 	imageStore(outTex, ivec2(uv.x*2+1,uv.y),make_vec4(yuv2.r)); 

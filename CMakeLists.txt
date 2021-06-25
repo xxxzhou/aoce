@@ -123,6 +123,7 @@ install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceMedia.h DESTINATION include/aoce
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceVideoDevice.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceMetadata.h DESTINATION include/aoce) 
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceWindow.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceAudioDevice.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_vulkan_extra/AoceVkExtra.h DESTINATION include/aoce_vulkan_extra)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_vulkan_extra/VkExtraExport.h DESTINATION include/aoce_vulkan_extra) 
 if(AOCE_TALKTO_EXIST)

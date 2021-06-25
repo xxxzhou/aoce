@@ -275,6 +275,10 @@ ACOE_EXPORT int32_t getImageTypeSize(const aoce::ImageType &imageType);
 ACOE_EXPORT int32_t getVideoFrame(const aoce::VideoFrame &frame,
                                   uint8_t *data = nullptr);
 
+ACOE_EXPORT void createVideoFrame(aoce::VideoFrame &frame, uint8_t *data,
+                                  int32_t width, int32_t height,
+                                  VideoType videoType);
+
 ACOE_EXPORT void loadAoce();
 ACOE_EXPORT void unloadAoce();
 

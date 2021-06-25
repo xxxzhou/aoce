@@ -55,6 +55,9 @@ static IBaseLayer* linerBlendLayer = nullptr;
 static IPerlinNoiseLayer* noiseLayer = nullptr;
 static ITLayer<DistortionParamet>* pdLayer = nullptr;
 
+static IYUVLayer* r2yLayer = nullptr;
+static IYUVLayer* y2rLayer = nullptr;
+
 class MotionDetectorObserver : public IMotionDetectorObserver {
     virtual void onMotion(const vec4& motion) override {
         std::cout << "x: " << motion.x << " y: " << motion.y
@@ -202,6 +205,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     pdLayer = createPinchDistortionLayer();
 
+    auto* layerFactory = AoceManager::Get().getLayerFactory(GpuType::vulkan);
+    r2yLayer = layerFactory->createRGBA2YUV();
+    y2rLayer = layerFactory->createYUV2RGBA();
+    r2yLayer->updateParamet({VideoType::yuv420P, 0});
+    y2rLayer->updateParamet({VideoType::yuv420P, 0});
+
     ILMetadata* x1 = getLayerMetadata("SkinToneLayer");
     ILMetadata* x2 = getLayerMetadata("BrightnessLayer");
     auto x12 = x2->getLayerType();
@@ -212,7 +221,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     for (int32_t i = 0; i < count; i++) {
         ILMetadata* xa = igl->getLMetadata(i);
         auto xtype = xa->getLayerType();
-        logMessage(LogLevel::info,xa->getParametName());
+        logMessage(LogLevel::info, xa->getParametName());
     }
 
     std::vector<uint8_t> lutData;
@@ -235,9 +244,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(boxFilterLayer1->getLayer());
     // layers.push_back(alphaShow2Layer);
     // ---查看导向滤波效果
-    layers.push_back(chromKeyLayer->getLayer());
-    layers.push_back(guidedLayer->getLayer());
-    layers.push_back(alphaShowLayer);
+    // layers.push_back(chromKeyLayer->getLayer());
+    // layers.push_back(guidedLayer->getLayer());
+    // layers.push_back(alphaShowLayer);
     // ---平均亮度调整阈值
     // layers.push_back(averageLT->getLayer());
     // layers.push_back(alphaShowLayer);
@@ -313,6 +322,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(bdLayer->getLayer());
     // ---收缩 ，凹面镜
     // layers.push_back(pdLayer->getLayer());
+    // ---yuv2rgb
+    layers.push_back(r2yLayer->getLayer());
+    layers.push_back(y2rLayer->getLayer());
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据

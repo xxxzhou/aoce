@@ -44,10 +44,10 @@ class IMediaPlayer {
     virtual void setObserver(IMediaPlayerObserver* observer) = 0;
     // 文件路径,URL(RTMP这些)
     virtual void setDataSource(const char* path) = 0;
+    virtual void prepare(bool bAsync) = 0;
     // 需要同步的prepare需要之后才能拿到,异步在回调里的onPrepared
     virtual const AudioStream& getAudioStream() = 0;
     virtual const VideoStream& getVideoStream() = 0;
-    virtual void prepare(bool bAsync) = 0;
     // 同步prepare可以在下面直接调用start,否则需要在observer里的prepare调用
     virtual void start() = 0;
     virtual void pause() = 0;

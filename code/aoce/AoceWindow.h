@@ -7,7 +7,6 @@ enum class CaptureEventId : int32_t {
     other,
     lost,
     failed,
-    close,
 };
 
 enum class WindowType : int32_t {
@@ -53,8 +52,8 @@ class ICaptureWindow {
     virtual void setObserver(ICaptureObserver* observer) = 0;
     virtual bool bCapturing() = 0;
     // 初始化d3d device等信息
-    virtual bool startCapture(IWindow* window) = 0;
-    // virtual bool renderCapture() = 0;
+    virtual bool startCapture(IWindow* window, bool bSync) = 0;
+    virtual bool renderCapture() = 0;
     virtual void stopCapture() = 0;
 };
 
@@ -65,6 +64,7 @@ class IWindowManager {
     virtual int32_t getWindowCount(bool bUpdate = false) = 0;
     virtual IWindow* getWindow(int32_t index) = 0;
     virtual IWindow* getDesktop() = 0;
+    virtual void setForeground(IWindow* window) = 0;
 };
 
 }  // namespace aoce

@@ -113,6 +113,10 @@ ACOE_EXPORT void copycharstr(char* dest, const char* source, int32_t maxlength);
 
 ACOE_EXPORT std::string getAocePath();
 
+//针对AudioDesc的bitsize为16，并且内部格式为AV_SAMPLE_FMT_S16的保证无问题，P格式肯定不行
+ACOE_EXPORT void getWavHeader(std::vector<uint8_t>& header, uint32_t dataSize,
+                              const AudioFormat& audioDesc);
+
 #if WIN32
 ACOE_EXPORT bool existsFile(const wchar_t* filePath);
 

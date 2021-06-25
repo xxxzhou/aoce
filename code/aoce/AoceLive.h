@@ -75,7 +75,7 @@ class ILiveObserver {
     // loginRoom的网络应答
     virtual void onLoginRoom(bool bReConnect = false){};
     // 加入的房间人数变化
-    virtual void onUserChange(int32_t userId, bool bAdd) = 0;
+    virtual void onUserChange(int32_t userId, bool bAdd){};
     // 自己pushStream/stopPushStream推流回调,code不为0应该是出错了
     virtual void onStreamUpdate(int32_t index, bool bAdd, int32_t code){};
     // 别的用户pullStream/stopPullStream拉流回调
@@ -114,9 +114,10 @@ class ILiveRoom {
     virtual void setPlayVolume(int32_t value) = 0;
     // 因为每个直播SDK初始化信息不相同,简单使用void*表示
     virtual bool initRoom(void* liveContext, ILiveObserver* liveBack) = 0;
+    // 登陆房间,pushCount指明需要推流个数
     virtual bool loginRoom(const char* roomName, int32_t useId,
                            int32_t pushCount) = 0;
-
+    // 指定推流与推流设置
     virtual bool pushStream(int32_t index, const PushSetting& setting) = 0;
     virtual void stopPushStream(int32_t index) = 0;
 
@@ -124,7 +125,7 @@ class ILiveRoom {
                                 const VideoFrame& videoFrame) = 0;
     virtual bool pushAudioFrame(int32_t index,
                                 const AudioFrame& audioFrame) = 0;
-
+    // 拉流以及拉流设置
     virtual bool pullStream(int32_t userId, int32_t index,
                             const PullSetting& setting) = 0;
     virtual void stopPullStream(int32_t userId, int32_t index) = 0;

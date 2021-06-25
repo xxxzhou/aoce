@@ -16,9 +16,8 @@ MfModule::MfModule(/* args */) {}
 MfModule::~MfModule() {}
 
 bool MfModule::loadModule() {
-    HRESULT hr = CoInitialize(NULL);
-    if (SUCCEEDED(hr)) {
-        hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    if (SUCCEEDED(hr)) {        
         hr = MFStartup(MF_VERSION);
     }
     logHResult(hr, "coInitialize");

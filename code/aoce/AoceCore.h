@@ -14,6 +14,7 @@
 #include "AoceMetadata.h"
 #include "AoceVideoDevice.h"
 #include "AoceWindow.h"
+#include "AoceAudioDevice.h"
 
 namespace aoce {
 

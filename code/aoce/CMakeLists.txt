@@ -24,6 +24,7 @@ add_sub_path(media AOCE_HEADER AOCE_SOURCE)
 add_sub_path(fixgraph AOCE_HEADER AOCE_SOURCE)  
 add_sub_path(math AOCE_HEADER AOCE_SOURCE)  
 add_sub_path(metadata AOCE_HEADER AOCE_SOURCE)  
+add_sub_path(audioDevice AOCE_HEADER AOCE_SOURCE)
 
 message("aoce head--" ${AOCE_HEADER})
 message("aoce source--" ${AOCE_SOURCE}) 

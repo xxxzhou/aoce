@@ -24,7 +24,7 @@ bool WinRTModule::loadModule() {
             IsSupported()) {
         return false;
     }
-    winrt::init_apartment(winrt::apartment_type::multi_threaded);
+    // winrt::init_apartment(winrt::apartment_type::multi_threaded);    
     AoceManager::Get().addICaptureWindow(CaptureType::win_rt,
                                          new RTCaptureWindow());
     return true;
@@ -32,7 +32,7 @@ bool WinRTModule::loadModule() {
 
 void WinRTModule::unloadModule() {
     AoceManager::Get().removeICaptureWindow(CaptureType::win_rt);
-    winrt::uninit_apartment();
+    // winrt::uninit_apartment();
 }
 
 ADD_MODULE(WinRTModule, aoce_winrt)

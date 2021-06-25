@@ -14,17 +14,16 @@ class MCaptureWindow : public BCaptureWindow {
     //
     std::mutex stopMtx;
     std::condition_variable stopSignal;
+    bool bSync = false;
 
    public:
     MCaptureWindow(/* args */);
     ~MCaptureWindow();
 
-   private:
-    bool renderCapture();
-
    public:
     // 初始化d3d device等信息
-    virtual bool startCapture(IWindow* window) override;
+    virtual bool startCapture(IWindow* window, bool bSync) override;
+    virtual bool renderCapture() override;
     virtual void stopCapture() override;
 };
 

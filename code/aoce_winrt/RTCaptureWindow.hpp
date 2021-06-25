@@ -41,17 +41,23 @@ class RTCaptureWindow : public BCaptureWindow {
     // winrt::com_ptr<IInspectable> inspectable;
     // winrt::com_ptr<IGraphicsCaptureItemInterop> interop = nullptr;
 
+    // std::mutex stopMtx;
+    // std::condition_variable stopSignal;
+
    public:
     RTCaptureWindow(/* args */);
     virtual ~RTCaptureWindow();
+    // bool renderCapture();
+
     void onClosed(winrt::GraphicsCaptureItem const& sender,
                   winrt::IInspectable const& inspectable);
-    void renderCapture(winrt::Direct3D11CaptureFramePool framePool,
-                       winrt::IInspectable const& inspectable);
+    void onFrameArrived(winrt::Direct3D11CaptureFramePool framePool,
+                        winrt::IInspectable const& inspectable);
 
    public:
     // 初始化d3d device等信息
-    virtual bool startCapture(IWindow* window) override;
+    virtual bool startCapture(IWindow* window, bool bSync) override;
+    virtual bool renderCapture() override;
     virtual void stopCapture() override;
 };
 

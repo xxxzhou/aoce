@@ -4,15 +4,15 @@
 
 extern "C" {
 HRESULT __stdcall CreateDirect3D11DeviceFromDXGIDevice(
-    ::IDXGIDevice *dxgiDevice, ::IInspectable **graphicsDevice);
+    ::IDXGIDevice* dxgiDevice, ::IInspectable** graphicsDevice);
 
 HRESULT __stdcall CreateDirect3D11SurfaceFromDXGISurface(
-    ::IDXGISurface *dgxiSurface, ::IInspectable **graphicsSurface);
+    ::IDXGISurface* dgxiSurface, ::IInspectable** graphicsSurface);
 }
 
 struct __declspec(uuid("A9B3D012-3DF2-4EE3-B8D1-8695F457D3C1"))
     IDirect3DDxgiInterfaceAccess : ::IUnknown {
-    virtual HRESULT __stdcall GetInterface(GUID const &id, void **object) = 0;
+    virtual HRESULT __stdcall GetInterface(GUID const& id, void** object) = 0;
 };
 
 using namespace aoce::win;
@@ -26,7 +26,7 @@ RTCaptureWindow::RTCaptureWindow(/* args */) {
     CComPtr<IDXGIAdapter1> adapter = nullptr;
     IID factoryIID = __uuidof(IDXGIFactory1);
     HRESULT hr;
-    hr = CreateDXGIFactory1(factoryIID, (void **)&factory);
+    hr = CreateDXGIFactory1(factoryIID, (void**)&factory);
     if (FAILED(hr)) {
         logHResult(hr, "winrt capture CreateDXGIFactory1 failed");
     }
@@ -61,7 +61,10 @@ RTCaptureWindow::RTCaptureWindow(/* args */) {
 
 RTCaptureWindow::~RTCaptureWindow() {}
 
-bool RTCaptureWindow::startCapture(IWindow *window) {
+bool RTCaptureWindow::startCapture(IWindow* window, bool bSync) {
+    if (bCapture) {
+        return true;
+    }
     hwnd = (HWND)window->getHwnd();
     // get winrt d3ddevice
     CComPtr<IDXGIDevice> dxgiDevice = nullptr;
@@ -82,46 +85,50 @@ bool RTCaptureWindow::startCapture(IWindow *window) {
         winrt::get_activation_factory<winrt::GraphicsCaptureItem>();
     auto interopFactory = activationFactory.as<IGraphicsCaptureItemInterop>();
     winrt::GraphicsCaptureItem item{nullptr};
+    winrt::guid captureItemGuid =
+        winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>();
     hr = interopFactory->CreateForWindow(
-        hwnd,
-        winrt::guid_of<ABI::Windows::Graphics::Capture::IGraphicsCaptureItem>(),
-        reinterpret_cast<void **>(winrt::put_abi(item)));
+        hwnd, captureItemGuid, reinterpret_cast<void**>(winrt::put_abi(item)));
     if (FAILED(hr)) {
         logHResult(hr, "winrt capture failed to CreateForWindow");
         return false;
     }
-    item.Closed({this, &RTCaptureWindow::onClosed});
+    // item.Closed({this, &RTCaptureWindow::onClosed});
     framePool = winrt::Direct3D11CaptureFramePool::Create(
         rtDevice, winrt::DirectXPixelFormat::B8G8R8A8UIntNormalized, 2,
         item.Size());
     session = framePool.CreateCaptureSession(item);
-    framePool.FrameArrived({this, &RTCaptureWindow::renderCapture});
-
+    if (bSync) {
+        framePool.FrameArrived({this, &RTCaptureWindow::onFrameArrived});
+    }
     bCapture = true;
     videoFormat.width = 0;   // item.Size().Width;
     videoFormat.height = 0;  // item.Size().Height;
+    videoFormat.fps = 30;
     session.StartCapture();
     return true;
 }
 
-void RTCaptureWindow::onClosed(winrt::GraphicsCaptureItem const &sender,
-                               winrt::IInspectable const &inspectable) {
-    onObserverEvent(CaptureEventId::close, LogLevel::warn,
-                    "winrt capture window closed");
+void RTCaptureWindow::onClosed(winrt::GraphicsCaptureItem const& sender,
+                               winrt::IInspectable const& inspectable) {
+    // onObserverEvent(CaptureEventId::close, LogLevel::warn,
+    //                 "winrt capture window closed");
     // stopCapture();
 }
 
-void RTCaptureWindow::renderCapture(winrt::Direct3D11CaptureFramePool sender,
-                                    winrt::IInspectable const &inspectable) {
+bool RTCaptureWindow::renderCapture() {
     if (!bCapture) {
-        return;
+        return false;
     }
     if (!validWindow(hwnd)) {
         onObserverEvent(CaptureEventId::lost, LogLevel::warn,
                         "winrt capture window is lost");
-        return;
+        return false;
     }
-    winrt::Direct3D11CaptureFrame frame = sender.TryGetNextFrame();
+    winrt::Direct3D11CaptureFrame frame = framePool.TryGetNextFrame();
+    if (!frame) {
+        return true;
+    }
     winrt::SizeInt32 frameSize = frame.ContentSize();
     winrt::com_ptr<ID3D11Texture2D> frameSurface = nullptr;
     auto access = frame.Surface().as<IDirect3DDxgiInterfaceAccess>();
@@ -134,12 +141,12 @@ void RTCaptureWindow::renderCapture(winrt::Direct3D11CaptureFramePool sender,
     if (width == 0 || height == 0) {
         onObserverEvent(CaptureEventId::failed, LogLevel::warn,
                         "winrt capture window rect is zero");
-        return;
+        return false;
     }
     if (width != videoFormat.width || height != videoFormat.height) {
-        sender.Recreate(rtDevice,
-                        winrt::DirectXPixelFormat::B8G8R8A8UIntNormalized, 2,
-                        frameSize);
+        framePool.Recreate(rtDevice,
+                           winrt::DirectXPixelFormat::B8G8R8A8UIntNormalized, 2,
+                           frameSize);
         // 释放原来纹理
         gdiTexture.Release();
         videoFormat.width = width;
@@ -158,14 +165,28 @@ void RTCaptureWindow::renderCapture(winrt::Direct3D11CaptureFramePool sender,
     if (observer) {
         observer->onCapture(videoFormat, device, gdiTexture);
     }
+    return true;
+}
+
+void RTCaptureWindow::onFrameArrived(winrt::Direct3D11CaptureFramePool sender,
+                                     winrt::IInspectable const& inspectable) {
+    renderCapture();
 }
 
 void RTCaptureWindow::stopCapture() {
     bCapture = false;
-    session.Close();
-    framePool.Close();
-    session = nullptr;
-    framePool = nullptr;
+    try {
+        if (framePool) {
+            framePool.Close();
+            framePool = nullptr;
+        }
+        if (session) {
+            session.Close();
+            session = nullptr;
+        }
+    } catch (...) {
+        logMessage(LogLevel::info, "stop capture catch ...");
+    }
     videoFormat.width = 0;
     videoFormat.height = 0;
 }

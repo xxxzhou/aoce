@@ -10,23 +10,27 @@ MCaptureWindow::MCaptureWindow(/* args */) {
 
 MCaptureWindow::~MCaptureWindow() {}
 
-bool MCaptureWindow::startCapture(IWindow* window) {
+bool MCaptureWindow::startCapture(IWindow* window, bool bSync) {
     if (bCapture) {
         return true;
     }
     hwnd = (HWND)window->getHwnd();
+    this->bSync = bSync;
+
     bCapture = true;
     videoFormat.width = 0;
     videoFormat.height = 0;
     videoFormat.fps = 30;
-    std::thread runThread([&]() {
-        while (bCapture) {
-            renderCapture();
-            std::this_thread::sleep_for(std::chrono::milliseconds(30));
-        }
-        stopSignal.notify_all();
-    });
-    runThread.detach();
+    if (bSync) {
+        std::thread runThread([&]() {
+            while (bCapture) {
+                renderCapture();
+                std::this_thread::sleep_for(std::chrono::milliseconds(30));
+            }
+            stopSignal.notify_all();
+        });
+        runThread.detach();
+    }
     return true;
 }
 
@@ -113,11 +117,13 @@ void MCaptureWindow::stopCapture() {
         return;
     }
     bCapture = false;
-    std::unique_lock<std::mutex> lck(stopMtx);
-    // 等待preSignal信号回传
-    auto status = stopSignal.wait_for(lck, std::chrono::seconds(2));
-    if (status == std::cv_status::timeout) {
-        logMessage(LogLevel::warn, "capturing window close time out.");
+    if (bSync) {
+        std::unique_lock<std::mutex> lck(stopMtx);
+        // 等待preSignal信号回传
+        auto status = stopSignal.wait_for(lck, std::chrono::seconds(2));
+        if (status == std::cv_status::timeout) {
+            logMessage(LogLevel::warn, "capturing window close time out.");
+        }
     }
     videoFormat.width = 0;
     videoFormat.height = 0;

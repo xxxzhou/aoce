@@ -1,7 +1,7 @@
 // 需要实现特定的直播模块,如果没有,这个模块不能运行
 #include <AoceManager.hpp>
-#include <live/LiveRoom.hpp>
 #include <iostream>
+#include <live/LiveRoom.hpp>
 #include <memory>
 #include <module/ModuleManager.hpp>
 #include <string>
@@ -30,8 +30,12 @@ static IInputLayer *inputLayer;
 static IOutputLayer *outputLayer;
 static IYUVLayer *yuv2rgbLayer;
 static VideoFormat format = {};
-
+static AudioFormat audioFormat = {};
+static std::vector<uint8_t> mixData;
 static GpuType gpuType = GpuType::vulkan;
+
+// 是否记录音频
+static bool bRecordAudio = false;
 
 class TestLive : public ILiveObserver {
    private:
@@ -62,6 +66,7 @@ class TestLive : public ILiveObserver {
         setting.bAudio = 1;
         room->pushStream(0, setting);
         room->setPlayVolume(100);
+        mixData.clear();
     };
 
     // 加入的房间人数变化
@@ -95,11 +100,12 @@ class TestLive : public ILiveObserver {
     // 用户对应流的视频桢数据
     virtual void onVideoFrame(int32_t userId, int32_t index,
                               const VideoFrame &videoFrame) {
-//        std::string str;
-//        string_format(str, "width:", videoFrame.width,
-//                      " height:", videoFrame.height,
-//                      " yuvtype:", getVideoType(videoFrame.videoType));
-//        logMessage(LogLevel::info, str);
+        //        std::string str;
+        //        string_format(str, "width:", videoFrame.width,
+        //                      " height:", videoFrame.height,
+        //                      " yuvtype:",
+        //                      getVideoType(videoFrame.videoType));
+        //        logMessage(LogLevel::info, str);
         if (yuv2rgbLayer->getParamet().type != videoFrame.videoType) {
             yuv2rgbLayer->updateParamet({videoFrame.videoType, true});
         }
@@ -115,7 +121,13 @@ class TestLive : public ILiveObserver {
     // 用户对应流的音频桢数据
     virtual void onAudioFrame(int32_t userId, int32_t index,
                               const AudioFrame &audioFrame) {
-        // logMessage(LogLevel::info, "audio frame.");
+        if (bRecordAudio) {
+            audioFormat.channel = audioFrame.channel;
+            audioFormat.depth = audioFrame.depth;
+            audioFormat.sampleRate = audioFrame.sampleRate;
+            mixData.insert(mixData.end(), audioFrame.data[0],
+                           audioFrame.data[0] + audioFrame.dataSize);
+        }
     };
 
     // 推流的质量
@@ -126,8 +138,17 @@ class TestLive : public ILiveObserver {
     virtual void onPullQuality(int32_t userId, int32_t index, int32_t quality,
                                float fps, float kbs){};
 
-    // 拿出房间
-    virtual void onLogoutRoom(){};
+    // 登出房间
+    virtual void onLogoutRoom() {
+        if (bRecordAudio) {
+            std::vector<uint8_t> chead;
+            getWavHeader(chead, mixData.size(), audioFormat);
+            mixData.insert(mixData.begin(), chead.begin(), chead.end());
+#if WIN32
+            saveFileBinary(L"D:/1.wav", mixData.data(), mixData.size());
+#endif
+        }
+    };
 };
 
 void onPreCommand(uint32_t index) {
@@ -176,22 +197,34 @@ void android_main(struct android_app *app)
     yuv2rgbLayer = layerFactory->createYUV2RGBA();
     // 生成图
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer)->addNode(outputLayer);
+    LiveRoom *room = AoceManager::Get().getLiveRoom(LiveType::agora);
     // 这段在android需要窗口创建后才能用
     std::function<void()> winINit([&]() {
         while (!window->windowCreate()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        LiveRoom *room = AoceManager::Get().getLiveRoom(LiveType::agora);
         live = new TestLive(room);
         AgoraContext contex = {};
         contex.bLoopback = false;
 #if __ANDROID__
-        contex.context =
-            nullptr;  // AoceManager::Get().getAppEnv().application;
+        // AoceManager::Get().getAppEnv().application;
+        contex.context = nullptr;
 #endif
         room->initRoom(&contex, live);
         room->loginRoom("123", 701, 1);
     });
+    if (bRecordAudio) {
+        std::thread logOutThd([&]() {
+            std::this_thread::sleep_for(std::chrono::seconds(10));
+            room->logoutRoom();
+        });
+        logOutThd.detach();
+    }
+    // std::thread stopThd([&]() {
+    //     std::this_thread::sleep_for(std::chrono::seconds(10));
+    //     room->stopPushStream(0);
+    // });
+    // stopThd.detach();
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
     window =
         std::make_unique<VulkanWindow>(onPreCommand, false);  // onPreCommand
