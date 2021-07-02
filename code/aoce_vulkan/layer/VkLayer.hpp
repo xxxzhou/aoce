@@ -90,6 +90,7 @@ class AOCE_VULKAN_EXPORT VkLayer : public BaseLayer {
     // 根据输入节点返回是否需要sampled
     virtual bool getSampled(int32_t inIndex) { return false; };
     virtual bool sampledNearest(int32_t inIndex) { return false; };
+    virtual void onUnInit() override;
 
    protected:
     // vulkan层在onInit后,shader可以放这编译,如果参数影响shader编译,需要放入onInitPipe

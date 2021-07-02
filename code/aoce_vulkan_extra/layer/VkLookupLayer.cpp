@@ -32,6 +32,8 @@ void VkLookupLayer::loadLookUp(uint8_t* data, int32_t size) {
     lookupLayer->inputCpuData(data);
 }
 
+IInputLayer* VkLookupLayer::getLookUpInputLayer() { return lookupLayer.get(); }
+
 bool VkLookupLayer::getSampled(int inIndex) {
     if (inIndex == 1) {
         return true;
@@ -65,6 +67,14 @@ void VkSoftEleganceLayer::loadLookUp1(uint8_t* data, int32_t size) {
 
 void VkSoftEleganceLayer::loadLookUp2(uint8_t* data, int32_t size) {
     lookupLayer2->loadLookUp(data, size);
+}
+
+IInputLayer* VkSoftEleganceLayer::getLookUpInputLayer1() {
+    return lookupLayer1->getLookUpInputLayer();
+}
+
+IInputLayer* VkSoftEleganceLayer::getLookUpInputLayer2() {
+    return lookupLayer2->getLookUpInputLayer();
 }
 
 void VkSoftEleganceLayer::onUpdateParamet() {

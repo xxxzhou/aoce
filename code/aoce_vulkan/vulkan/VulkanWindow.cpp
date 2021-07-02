@@ -58,7 +58,9 @@ LRESULT VulkanWindow::handleMessage(UINT msg, WPARAM wparam, LPARAM lparam) {
         case WM_SIZE: {
             this->width = LOWORD(lparam);
             this->height = HIWORD(lparam);
-            onSizeChange();
+            if (width > 0 && height > 0) {
+                onSizeChange();
+            }
         } break;
         case WM_DESTROY:
             PostQuitMessage(0);
@@ -314,7 +316,8 @@ void VulkanWindow::reSwapChainBefore() {
         desiredNumberOfSwapchainImages = surfCapabilities.maxImageCount;
     }
     // Find the transformation of the surface
-    VkSurfaceTransformFlagsKHR preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    VkSurfaceTransformFlagsKHR preTransform =
+        VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     if (surfCapabilities.supportedTransforms &
         VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) {
         // We prefer a non-rotated transform
@@ -550,7 +553,8 @@ void VulkanWindow::tick() {
             vkCmdSetScissor(cmdBuffers[currentIndex], 0, 1, &scissor);
             renderPassBeginInfo.framebuffer = frameBuffers[currentIndex];
             // renderpass关联渲染目标 BlitImage不能包含在RenderPass里面
-            // vkCmdBeginRenderPass(cmdBuffers[currentIndex], &renderPassBeginInfo,
+            // vkCmdBeginRenderPass(cmdBuffers[currentIndex],
+            // &renderPassBeginInfo,
             //                      VK_SUBPASS_CONTENTS_INLINE);
             if (onCmdExecuteEvent) {
                 onCmdExecuteEvent(currentIndex);

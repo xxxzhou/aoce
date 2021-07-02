@@ -54,11 +54,12 @@ void VkWinImage::bindDx11(ID3D11Device* device, ImageFormat format) {
     // 创建一个dx11可以多上下文共享访问的资源
     DXGI_FORMAT dxFormat = getImageDXFormt(format.imageType);
     // vulkan需要NT共享dx11纹理
-    bInit =
+    bool bInitRes =
         shardTex->restart(device, format.width, format.height, dxFormat, true);
     // tempTex用于与外部DX11线程上的纹理交互,隔开vulkan线程影响
-    bInit &= tempTex->restart(device, format.width, format.height, dxFormat);
-    if (!bInit) {
+    bInitRes &= tempTex->restart(device, format.width, format.height, dxFormat);
+    if (!bInitRes) {
+        bInit = false;
         return;
     }
     VkExternalMemoryHandleTypeFlagBits handleType =
@@ -168,6 +169,16 @@ void VkWinImage::tempCopyVk(ID3D11Device* device) {
     if (tempTex->bGpuUpdate) {
         copySharedToTexture(device, tempTex->sharedHandle,
                             shardTex->texture->texture);
+        // uint8_t* data = nullptr;
+        // bool bGet = getTextureData(device, shardTex->texture->texture,
+        // &data); if (bGet) {
+        //     uint32_t* pdata = (uint32_t*)data;
+        //     std::string msg;
+        //     string_format(msg, "interp dx data:", pdata[1000], " ",
+        //     pdata[3212],
+        //                   " ", pdata[53253]);
+        //     logMessage(LogLevel::info, msg);
+        // }
         tempTex->bGpuUpdate = false;
     }
 }

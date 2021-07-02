@@ -44,6 +44,8 @@ class AOCE_VULKAN_EXPORT VkInputLayer : public InputLayer, public VkLayer {
     virtual void onCommand() override;
     virtual void onPreFrame() override;
     virtual bool onFrame() override;
+
+    virtual void onUnInit() override;
 };
 
 }  // namespace layer

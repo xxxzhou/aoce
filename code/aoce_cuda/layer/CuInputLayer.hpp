@@ -29,9 +29,10 @@ class CuInputLayer : public InputLayer, public CuLayer {
    public:
     virtual void onUpdateParamet() override;
 
-   public:
+   protected:
     virtual void onInitCuBufffer() override;
     virtual bool onFrame() override;
+    virtual void onUnInit() override;
 };
 
 }  // namespace cuda

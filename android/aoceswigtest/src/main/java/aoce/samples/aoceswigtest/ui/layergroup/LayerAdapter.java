@@ -1,6 +1,7 @@
 package aoce.samples.aoceswigtest.ui.layergroup;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -8,15 +9,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import aoce.samples.aoceswigtest.DataManager;
+import aoce.samples.aoceswigtest.MainActivity2;
 import aoce.samples.aoceswigtest.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class LayerFragmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class LayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     Context context = null;
     DataManager.LayerGroup layerGroup = null;
-    public LayerFragmentAdapter(Context context, int groupIndex) {
+    int groupIndex = 0;
+    public LayerAdapter(Context context, int groupIndex) {
         this.context = context;
+        this.groupIndex = groupIndex;
         this.layerGroup = DataManager.getInstance().getIndex(groupIndex);;
     }
 
@@ -30,6 +34,15 @@ public class LayerFragmentAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         LayerViewHolder item = (LayerViewHolder)holder;
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, MainActivity2.class);
+                intent.putExtra("groupIndex",groupIndex);
+                intent.putExtra("layerIndex",position);
+                context.startActivity(intent);
+            }
+        });
         item.bindItem(layerGroup.layers.get(position));
     }
 

@@ -1,4 +1,4 @@
-package aoce.samples.aoceswigtest;
+package aoce.samples.aoceswigtest.ui.layergroup;
 
 import android.os.Bundle;
 
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-import aoce.samples.aoceswigtest.ui.layergroup.LayerFragment;
+import aoce.samples.aoceswigtest.DataManager;
 
 public class LayerGroupAdapter extends FragmentStateAdapter {
     int groupCount = 0;

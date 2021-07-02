@@ -179,6 +179,17 @@ bool BaseLayer::getInFormat(ImageFormat& format, int32_t index) {
     return false;
 }
 
+void BaseLayer::unAttachGraph() {
+    onUnInit();
+    inLayers.clear();
+    for (int i = 0; i < outLayers.size(); i++) {
+        outLayers[i].clear();
+    }
+    outLayers.clear();
+    pipeGraph = nullptr;
+    pipeNode.reset();
+}
+
 const char* BaseLayer::getName() { return "no define name"; }
 
 const char* BaseLayer::getMark() {

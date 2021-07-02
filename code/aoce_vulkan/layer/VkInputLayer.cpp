@@ -76,7 +76,7 @@ void VkInputLayer::onInitVkBuffer() {
                           VK_BUFFER_USAGE_TRANSFER_SRC_BIT, frameData);
 #if WIN32
     if (paramet.bGpu) {
-        winImage->bindDx11(vkPipeGraph->getD3D11Device(), inFormats[0]);        
+        winImage->bindDx11(vkPipeGraph->getD3D11Device(), inFormats[0]);
     }
 #endif
 #if __ANDROID_API__ >= 26
@@ -157,6 +157,12 @@ bool VkInputLayer::onFrame() {
         return true;
     }
     return false;
+}
+
+void VkInputLayer::onUnInit() {
+    VkLayer::onUnInit();
+    // 重置imageFormat
+    imageFormat = {};
 }
 
 void VkInputLayer::inputGpuData(void* device, void* tex) {

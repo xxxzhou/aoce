@@ -74,7 +74,7 @@ void MWindowManager::setForeground(IWindow* window) {
     DWORD dwThisTID = ::GetCurrentThreadId();
     DWORD dwCurrTID = ::GetWindowThreadProcessId(hCurrWnd, 0);
 
-    //我们需要绕过微软的一些限制
+    // 我们需要绕过微软的一些限制
     if (dwThisTID != dwCurrTID) {
         ::AttachThreadInput(dwThisTID, dwCurrTID, TRUE);
         ::SystemParametersInfo(SPI_GETFOREGROUNDLOCKTIMEOUT, 0, &lockTimeOut,

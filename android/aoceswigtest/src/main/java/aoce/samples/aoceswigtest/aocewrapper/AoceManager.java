@@ -83,6 +83,10 @@ public class AoceManager extends IVideoDeviceObserver {
         extraLayer.addNode(transposeLayer).addNode(outputLayer);
     }
 
+    public void clearLayers(){
+        pipeGraph.clear();
+    }
+
     @Override
     public void onVideoFrame(VideoFrame frame){
         if(AoceWrapper.getYuvIndex(frame.getVideoType()) < 0){

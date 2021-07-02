@@ -11,8 +11,9 @@ int main() {
 
     loadAoce();
     std::vector<std::string> models = {
-        "aoce_vulkan", "aoce_vulkan_extra", "aoce_win",   "aoce_winrt",
-        "aoce_win_mf", "aoce_cuda",         "aoce_agora", "aoce_talkto"};
+        "aoce_vulkan", "aoce_vulkan_extra", "aoce_win",
+        "aoce_winrt",  "aoce_win_mf",       "aoce_cuda",
+        "aoce_agora",  "aoce_talkto",       "aoce_talkto_cuda"};
     std::cout << "---check failed module resutl" << std::endl;
     for (const auto& name : models) {
         if (!checkLoadModel(name.c_str())) {

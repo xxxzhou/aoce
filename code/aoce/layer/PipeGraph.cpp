@@ -34,7 +34,6 @@ IBaseLayer* PipeGraph::addNode(IBaseLayer* ilayer) {
                   "node layer gpu type no equal graph");
     }
     if (layer->pipeGraph != nullptr) {
-        logAssert(layer->pipeGraph != this, "layer have attach other graph.");
         std::string message;
         string_format(
             message,
@@ -110,17 +109,18 @@ bool PipeGraph::getLayerInFormat(int32_t nodeIndex, int32_t inputIndex,
     return false;
 }
 
-void PipeGraph::clearLines() {
+void PipeGraph::clearLines() {    
     lines.clear();
     validLines.clear();
     bReset = true;
 }
 
-void PipeGraph::clear() {
-    clearLines();
+void PipeGraph::clear() {    
+    lines.clear();
+    validLines.clear();
     // 置空,免指向野指针
     for (auto& node : nodes) {
-        node->getLayer()->pipeGraph = nullptr;
+        node->getLayer()->unAttachGraph();
     }
     // layer weak_ptr node,故node清空后,layer的node指向自动不可用
     nodes.clear();
@@ -300,7 +300,7 @@ bool PipeGraph::run() {
         for (auto node : nodes) {
             logMessage(LogLevel::info, node->layer->getMark());
         }
-        logMessage(LogLevel::info, "--- end all graph.");
+        logMessage(LogLevel::info, "---end node graph.");
 #endif
         bReset = false;
         onReset();
@@ -310,11 +310,11 @@ bool PipeGraph::run() {
         } else {
 #if AOCE_DEBUG_TYPE
             logMessage(LogLevel::info,
-                       "--- the order of execution of the graph.");
+                       "---the order of execution of the graph.");
             for (auto index : nodeExcs) {
                 logMessage(LogLevel::info, nodes[index]->layer->getMark());
             }
-            logMessage(LogLevel::info, "--- end build graph.");
+            logMessage(LogLevel::info, "---end order graph.");
 #endif
             logMessage(LogLevel::info, "build graph success.");
         }

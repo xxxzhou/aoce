@@ -1,5 +1,15 @@
 # Android界面
 
+## 基本知识
+
+1 创建Fragment所需要参数.
+
+创建一个Bundle对象,其参数使用putT相关方法写入,然后调用Fragment的setArguments关联这个Bundle对象.
+
+2 启用Activity及所需参数.
+
+创建一个Intent对象并给相应的Context/Activity.class,其参数使用putT相关方法写入,然后调用Context的startActivity启动Activity对象.
+
 ## RecyclerView界面开发
 
 [RecyclerView的基本使用](https://www.jianshu.com/p/7a7d9301b2f1)
@@ -24,7 +34,7 @@ RecyclerView 通过setAdapter,绑定与RecyclerView.Adapter关系.
 
 [ViewPager使用详解(二)](https://www.jianshu.com/p/d86e31dcc97b)
 
-FragmentPagerAdapter:
+FragmentStatePagerAdapter/FragmentPagerAdapter: 其getItem(int position)返回具体的fragment.
 
 TabLayout通过setupWithViewPager与ViewPager关联起来.
 

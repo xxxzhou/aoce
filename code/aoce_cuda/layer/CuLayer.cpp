@@ -44,5 +44,12 @@ void CuLayer::onInitBuffer() {
 
 bool CuLayer::onFrame() { return true; }
 
+void CuLayer::onUnInit() {
+    for (int i = 0; i < outCount; i++) {
+        outTexs[i].reset();
+    }
+    outTexs.clear();
+}
+
 }  // namespace cuda
 }  // namespace aoce

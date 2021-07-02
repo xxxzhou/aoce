@@ -36,6 +36,16 @@
 %ignore operator[];
 %ignore operator*;
 
+#ifdef SWIGJAVA
+// https://forge.naos-cluster.tech/aquinetic/f2i-consulting/fesapi/-/blob/c0a52292680e4ec316d2e3447b52f365a54cc400/cmake/swigModule.i
+// getCPtr由protected改成public
+SWIG_JAVABODY_PROXY(protected, public, SWIGTYPE)
+SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
+#endif
+
+#ifdef SWIGCSHARP
+#endif
+
 // 将C++ 中 void*/uint8_t*转C# IntPtr
 %apply void *VOID_INT_PTR { void *,uint8_t * }
 // 没有的话,int32_t对应不了int

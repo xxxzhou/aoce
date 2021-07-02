@@ -103,7 +103,7 @@ bool MFVideoDevice::setPlay(bool play) {
         int i = 0;
         hr = sourceReader->ReadSample(videoIndex, 0, nullptr, nullptr, nullptr,
                                       nullptr);
-        //最多试验三次
+        // 最多试验三次
         while (FAILED(hr) && i++ < 3) {
             hr = sourceReader->ReadSample(videoIndex, 0, nullptr, nullptr,
                                           nullptr, nullptr);

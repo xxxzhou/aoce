@@ -24,6 +24,7 @@ class VkLookupLayer : public VkLayer, public ILookupLayer {
 
    public:
     virtual void loadLookUp(uint8_t* data, int32_t size) override;
+    virtual IInputLayer* getLookUpInputLayer() override;
 
    protected:
     virtual bool getSampled(int inIndex) override;
@@ -48,6 +49,8 @@ class VkSoftEleganceLayer : public GroupLayer, public ISoftEleganceLayer {
     virtual void loadLookUp1(uint8_t* data, int32_t size) override;
     virtual void loadLookUp2(uint8_t* data, int32_t size) override;
 
+    virtual IInputLayer* getLookUpInputLayer1() override;
+    virtual IInputLayer* getLookUpInputLayer2() override;
    protected:
     virtual void onUpdateParamet() override;
     virtual void onInitNode() override;

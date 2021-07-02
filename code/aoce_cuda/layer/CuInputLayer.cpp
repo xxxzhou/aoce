@@ -83,6 +83,11 @@ bool CuInputLayer::onFrame() {
     return true;
 }
 
+void CuInputLayer::onUnInit(){
+    CuLayer::onUnInit();
+    imageFormat = {};
+}
+
 void CuInputLayer::inputGpuData(void* device, void* tex) {
     if (!paramet.bGpu) {
         return;

@@ -1,11 +1,9 @@
-package aoce.samples.aoceswigtest.ui.home;
+package aoce.samples.aoceswigtest.ui.layergroup;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TableLayout;
-import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -13,18 +11,13 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
-import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback;
 import aoce.samples.aoceswigtest.DataManager;
-import aoce.samples.aoceswigtest.LayerGroupAdapter;
 import aoce.samples.aoceswigtest.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeFragment extends Fragment {
+public class LayerGroupFragment extends Fragment {
     @BindView(R.id.viewpage)
     ViewPager2 viewPager2;
     @BindView(R.id.homeTabLayout)
@@ -32,7 +25,7 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_layer_group, container, false);
         ButterKnife.bind(this, view);
         return view;
     }

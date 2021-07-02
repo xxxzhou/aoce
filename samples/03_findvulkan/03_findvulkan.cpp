@@ -57,6 +57,7 @@ int main() {
                   << " hight:" << vf.height << " fps:" << vf.fps
                   << " format:" << getVideoType(vf.videoType) << std::endl;
     }
+    formatIndex = video->findFormatIndex(1920, 1080);
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();
@@ -97,6 +98,10 @@ int main() {
         } else if (key == 'c') {
             video->close();
         } else if (key == 'o') {
+            vkGraph->clear();
+            vkGraph->addNode(inputLayer)
+                ->addNode(yuv2rgbLayer)               
+                ->addNode(outputLayer);
             video->open();
         } else if (key == 'p') {
             vkGraph->reset();

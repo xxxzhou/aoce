@@ -631,7 +631,15 @@ void loadAoce() {
 #endif
 #if defined(AOCE_INSTALL_AGORA)
     ModuleManager::Get().regAndLoad("aoce_agora");
-    ModuleManager::Get().regAndLoad("aoce_talkto");
+#if WIN32
+    ModuleManager::Get().regAndLoad("aoce_talkto_cuda");
+    // 如果cuda版本加载不上,就加载只有vulkan版本的
+    if (!checkLoadModel("aoce_talkto_cuda")) {
+#endif
+        ModuleManager::Get().regAndLoad("aoce_talkto");
+#if WIN32
+    }
+#endif
 #endif
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().regAndLoad("aoce_ffmpeg");
@@ -657,6 +665,7 @@ void unloadAoce() {
 #if defined(AOCE_INSTALL_AGORA)
     ModuleManager::Get().unloadModule("aoce_agora");
     ModuleManager::Get().unloadModule("aoce_talkto");
+    ModuleManager::Get().unloadModule("aoce_talkto_cuda");
 #endif
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().unloadModule("aoce_ffmpeg");

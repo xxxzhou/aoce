@@ -14,6 +14,8 @@
 
 [swig typemap](http://www.swig.org/Doc4.0/Typemaps.html#Typemaps)
 
+[swig 高级用法代码](https://forge.naos-cluster.tech/aquinetic/f2i-consulting/fesapi/-/blob/c0a52292680e4ec316d2e3447b52f365a54cc400/cmake/swigModule.i)
+
 ## 问题
 
 1. 回调类如何用C#的类继承并可以处理逻辑.

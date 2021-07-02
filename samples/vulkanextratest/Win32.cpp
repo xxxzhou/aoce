@@ -54,6 +54,7 @@ static ITLayer<PoissonParamet>* poissonLayer = nullptr;
 static IBaseLayer* linerBlendLayer = nullptr;
 static IPerlinNoiseLayer* noiseLayer = nullptr;
 static ITLayer<DistortionParamet>* pdLayer = nullptr;
+static ISoftEleganceLayer* seLayer = nullptr;
 
 static IYUVLayer* r2yLayer = nullptr;
 static IYUVLayer* y2rLayer = nullptr;
@@ -205,6 +206,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     pdLayer = createPinchDistortionLayer();
 
+    seLayer = createSoftEleganceLayer();
+
     auto* layerFactory = AoceManager::Get().getLayerFactory(GpuType::vulkan);
     r2yLayer = layerFactory->createRGBA2YUV();
     y2rLayer = layerFactory->createYUV2RGBA();
@@ -325,12 +328,18 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---yuv2rgb
     layers.push_back(r2yLayer->getLayer());
     layers.push_back(y2rLayer->getLayer());
+    // ---softEleganceLayer
+    // layers.push_back(seLayer->getLayer());
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据
     if (lutLayer != nullptr && lutData.size() > 0) {
         lutLayer->loadLookUp(lutData.data(), lutData.size());
     }
+    // ImageFormat iform = {};
+    // iform.width = 100;
+    // seLayer->getLookUpInputLayer1()->setImage(iform);
+
     view->openDevice();
 
     // std::thread trd([&]() {

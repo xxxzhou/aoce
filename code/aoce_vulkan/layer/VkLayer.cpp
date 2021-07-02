@@ -78,7 +78,18 @@ void VkLayer::onInit() {
                               VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                               constBufCpu.data());
     }
-    onInitGraph();    
+    onInitGraph();
+}
+
+void VkLayer::onUnInit() {
+    // 从pipegraph拿下时重置所有
+    layout.reset();
+    shader.reset();
+    constBuf.reset();
+    for (int i = 0; i < outCount; i++) {
+        outTexs[i].reset();
+    }
+    outTexs.clear();
 }
 
 void VkLayer::onInitLayer() {

@@ -2,8 +2,8 @@ include ':aoce'
 //include ":04_vulkantest"
 //project(":04_vulkantest").projectDir = new File("04_vulkantest")
 //
-include ":05_livetest"
-project(":05_livetest").projectDir = new File("05_livetest")
+//include ":05_livetest"
+//project(":05_livetest").projectDir = new File("05_livetest")
 //
 //include ":06_mediaplayer"
 //project(":06_mediaplayer").projectDir = new File("06_mediaplayer")

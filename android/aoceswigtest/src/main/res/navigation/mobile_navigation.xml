@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_layer">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="aoce.samples.aoceswigtest.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/nav_layer"
+        android:name="aoce.samples.aoceswigtest.ui.layergroup.LayerGroupFragment"
+        android:label="@string/menu_layer"
+        tools:layout="@layout/fragment_layer_group" />
 
     <fragment
         android:id="@+id/nav_gallery"

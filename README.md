@@ -33,6 +33,28 @@ cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/
 
 各模块现主要通过CMake动态链接,通过相应选项可以选择去除不需要模块,后期完善静态编译成一个文件功能.
 
+## [文档](doc)
+
+[Vulkan移植GpuImage(一)高斯模糊与自适应阈值](doc/Vulkan移植GpuImage1.md)
+
+[Vulkan移植GpuImage(二)Harris角点检测与导向滤波](doc/Vulkan移植GpuImage2.md)
+
+[Vulkan移植GpuImage(三)从A到C的滤镜](doc/Vulkan移植GpuImage3.md)
+
+[Vulkan移植GpuImage(四)从D到M的滤镜](doc/Vulkan移植GpuImage4.md)
+
+[Vulkan移植GPUImage(五)从P到Z的滤镜](doc/Vulkan移植GpuImage5.md)
+
+[Vulkan移植GPUImage总结](doc/GPUImage移植总结.md)
+
+[ChromaKey](doc/ChromaKey.md)
+
+[Vulkan与DX11交互](doc/Vulkan与DX11交互.md)
+
+[PC平台Vulkan运算层时间记录](doc/PC平台Vulkan运算层时间记录.md)
+
+[使用Swig转换C++到别的编程语言](doc/使用Swig转换成别的语言.md)
+
 ## [模块](code)
 
 ### [aoce](code/aoce)
@@ -68,26 +90,6 @@ win平台下aoce图像获取设备的Media Foundation实现
 用vulkan的compute shader实现gpuimage
 
 ## [例子](samples)
-
-## [文档](doc)
-
-[Vulkan移植GpuImage(一)高斯模糊与自适应阈值](doc/Vulkan移植GpuImage1.md)
-
-[Vulkan移植GpuImage(二)Harris角点检测与导向滤波](doc/Vulkan移植GpuImage2.md)
-
-[Vulkan移植GpuImage(三)从A到C的滤镜](doc/Vulkan移植GpuImage3.md)
-
-[Vulkan移植GpuImage(四)从D到M的滤镜](doc/Vulkan移植GpuImage4.md)
-
-[Vulkan移植GPUImage(五)从P到Z的滤镜](doc/Vulkan移植GpuImage5.md)
-
-[GPUImage移植总结](doc/GPUImage移植总结.md)
-
-[ChromaKey](doc/ChromaKey.md)
-
-[Vulkan与DX11交互](doc/Vulkan与DX11交互.md)
-
-[PC平台Vulkan运算层时间记录](doc/PC平台Vulkan运算层时间记录.md)
 
 ## [GPUImage移植模块](code/aoce_vulkan_extra)
 

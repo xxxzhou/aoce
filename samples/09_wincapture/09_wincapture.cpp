@@ -12,11 +12,11 @@ using namespace aoce;
 using namespace aoce::win;
 using namespace aoce::vulkan;
 
-#define USE_DX11WINDOW 0
+#define USE_DX11WINDOW 1
 
 #if USE_DX11WINDOW
 static std::unique_ptr<Dx11Window> window = nullptr;
-static GpuType gpuType = GpuType::cuda;
+static GpuType gpuType = GpuType::vulkan;
 #else
 static std::unique_ptr<VulkanWindow> window = nullptr;
 static GpuType gpuType = GpuType::vulkan;
@@ -35,6 +35,9 @@ static ICaptureWindow* cw = nullptr;
 
 static int32_t width = 1280;
 static int32_t height = 720;
+
+static bool bSecond = false;
+static std::mutex mtx;
 
 #if USE_DX11WINDOW
 static void onTick(void* dx11, void* tex) {
@@ -63,7 +66,6 @@ void onPreCommand(uint32_t index) {
                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
                  VK_PIPELINE_STAGE_TRANSFER_BIT,
                  VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT);
-    cw->renderCapture();
 }
 #endif
 
@@ -84,7 +86,7 @@ class wincaptureObserver : public ICaptureObserver {
         logMessage(level, msg);
     };
     virtual void onCapture(const VideoFormat& videoFormat, void* device,
-                           void* texture) override {
+                           void* texture) override {   
         inputLayer->setImage(videoFormat);
         inputLayer->inputGpuData(device, texture);
         graph->run();
@@ -123,34 +125,61 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     for (int32_t i = 0; i < winCount; i++) {
         std::string title = wm->getWindow(i)->getTitle();
         // Microsoft Visual/Visual Studio Code
-        if (title.find("Microsoft Visual") != title.npos) {
+        if (title.find("Visual Studio Code") != title.npos) {
             iw = wm->getWindow(i);
             break;
         }
     }
+    cw->setObserver(new wincaptureObserver());
     // -----1-----
     // if (iw) {
     //     logMessage(LogLevel::info, iw->getTitle());
-    //     cw->setObserver(new wincaptureObserver());
     //     cw->startCapture(iw, true);
     // }
     // -----2-----
-    logMessage(LogLevel::info, iw->getTitle());
-    cw->setObserver(new wincaptureObserver());
-    cw->startCapture(iw, false);
-    std::thread pp([&]() {
+    // logMessage(LogLevel::info, iw->getTitle());
+    // cw->startCapture(iw, false);
+    // std::thread pp([&]() {
+    //     while (true) {
+    //         cw->renderCapture();
+    //         std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    //     }
+    // });
+    // pp.detach();
+    // -----3-----
+    // if (iw) {
+    //     logMessage(LogLevel::info, iw->getTitle());
+    //     cw->startCapture(iw, false);
+    // }
+    // -----4-----
+    std::thread testTh([&]() {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        cw->stopCapture();
+        bSecond = true;
+        // graph->clearLines();
+        // inputLayer->getLayer()->addLine(resizeLayer->getLayer());
+        // resizeLayer->getLayer()->addLine(r2yLayer->getLayer());
+        // r2yLayer->getLayer()->addLine(y2rLayer->getLayer());
+        // y2rLayer->getLayer()->addLine(outputLayer->getLayer());
+
+        graph->clear();
+        graph->addNode(inputLayer)->addNode(resizeLayer)->addNode(outputLayer);
+
+        cw->startCapture(iw, false);
+        int i = 0;
+        while (i++ < 100) {
+            cw->renderCapture();
+            std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        }
+        
+        graph->clear();
+        graph->addNode(inputLayer)->addNode(resizeLayer)->addNode(outputLayer);
         while (true) {
             cw->renderCapture();
             std::this_thread::sleep_for(std::chrono::milliseconds(30));
         }
     });
-    pp.detach();
-    // -----3-----
-    // if (iw) {
-    //     logMessage(LogLevel::info, iw->getTitle());
-    //     cw->setObserver(new wincaptureObserver());
-    //     cw->startCapture(iw, false);
-    // }
+    testTh.detach();
 #if USE_DX11WINDOW
     window = std::make_unique<Dx11Window>();
     window->initWindow(hInstance, width, height, "dx11 caputure", onTick);

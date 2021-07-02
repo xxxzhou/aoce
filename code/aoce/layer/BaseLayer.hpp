@@ -116,6 +116,7 @@ class ACOE_EXPORT BaseLayer : public IBaseLayer {
     void initLayer();
     void resetGraph();
     bool getInFormat(ImageFormat& format, int32_t index = 0);
+    void unAttachGraph();
 
    protected:
     // 添加进pipeGraph时调用
@@ -129,8 +130,10 @@ class ACOE_EXPORT BaseLayer : public IBaseLayer {
     // 根据inputFormats初始化buffer
     virtual void onInitBuffer(){};
     // 更新参数,子类会有updateParamet(T t)保存参数,等到运行前提交执行
-    virtual void onUpdateParamet() override {};
+    virtual void onUpdateParamet() override{};
     virtual bool onFrame() = 0;
+
+    virtual void onUnInit(){};
 };
 
 // GroupLayer自身不处理任何运算,只是组合运算层

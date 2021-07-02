@@ -10,6 +10,7 @@ class ILookupLayer : public ILayer {
    public:
     virtual ~ILookupLayer(){};
     virtual void loadLookUp(uint8_t* data, int32_t size) = 0;
+    virtual IInputLayer* getLookUpInputLayer() = 0;
 };
 
 class ISoftEleganceLayer : public ITLayer<SoftEleganceParamet> {
@@ -19,6 +20,9 @@ class ISoftEleganceLayer : public ITLayer<SoftEleganceParamet> {
    public:
     virtual void loadLookUp1(uint8_t* data, int32_t size) = 0;
     virtual void loadLookUp2(uint8_t* data, int32_t size) = 0;
+
+    virtual IInputLayer* getLookUpInputLayer1() = 0;
+    virtual IInputLayer* getLookUpInputLayer2() = 0;
 };
 
 class IHSBLayer : public ILayer {

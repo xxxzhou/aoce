@@ -117,7 +117,7 @@ int main() {
     // 设定输出函数回调
     OutputLayerObserver outputObserver = {};
     outputLayer->setObserver(&outputObserver);
-    //显示
+    // 显示
     show = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
     show2 = new cv::Mat(selectFormat.height, selectFormat.width, CV_8UC4);
     while (int key = cv::waitKey(30)) {
@@ -126,8 +126,13 @@ int main() {
         if (key == 'q') {
             break;
         } else if (key == 'c') {
-            video->close();
+            video->close();            
         } else if (key == 'o') {
+            vkGraph->clear();
+            vkGraph->addNode(inputLayer)
+                ->addNode(yuv2rgbLayer)
+                ->addNode(chromKeyLayer)
+                ->addNode(outputLayer);
             video->open();
         }
     }

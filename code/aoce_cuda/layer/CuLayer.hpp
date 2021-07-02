@@ -15,7 +15,7 @@ class AOCE_CUDA_EXPORT CuLayer : public BaseLayer {
 
    protected:
     int32_t groupX = 32;
-    int32_t groupY = 8;    
+    int32_t groupY = 8;
     class CuPipeGraph* cuPipeGraph = nullptr;
     cudaStream_t stream = nullptr;
     std::vector<CudaMatRef> inTexs;
@@ -30,6 +30,7 @@ class AOCE_CUDA_EXPORT CuLayer : public BaseLayer {
     // virtual void onInitLayer() override;
     virtual void onInitBuffer() final;
     virtual bool onFrame() override;
+    virtual void onUnInit() override;
 
    protected:
     virtual void onInitCuBufffer(){};

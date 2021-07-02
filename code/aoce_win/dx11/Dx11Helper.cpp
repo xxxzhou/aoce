@@ -570,6 +570,7 @@ bool getTextureData(ID3D11Device* deviceDx11, ID3D11Texture2D* texture,
                     &MappedResource);
     *data = (uint8_t*)MappedResource.pData;
     d3dcontext->Unmap(temp ? temp : texture, 0);
+    return true;
 }
 
 bool getSuitAdapter(IDXGIAdapter1** adapter) {

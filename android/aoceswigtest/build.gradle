@@ -11,7 +11,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            // minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -24,10 +24,25 @@ android {
         targetCompatibility = 1.8
         encoding="UTF-8"
     }
+    sourceSets {
+        main {
+            assets.srcDirs = ['assets']
+        }
+    }
     // ndkVersion '21.1.6352462'
 }
 
 dependencies {
+    implementation 'com.jakewharton:butterknife:10.0.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.navigation:navigation-fragment:2.3.0'
+    implementation 'androidx.navigation:navigation-ui:2.3.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //for permission
     implementation 'com.yanzhenjie:permission:2.0.3'
