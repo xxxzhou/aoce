@@ -41,7 +41,7 @@ static ITLayer<int>* dilationLayer = nullptr;
 static ITLayer<int>* erosionLayer = nullptr;
 static ITLayer<int>* closingLayer = nullptr;
 static ITLayer<BlurSelectiveParamet>* blurSelectiveLayer = nullptr;
-static ITLayer<BulrPositionParamet>* blurPositionLayer = nullptr;
+static ITLayer<BlurPositionParamet>* blurPositionLayer = nullptr;
 static ITLayer<UnsharpMaskParamet>* unsharpLayer = nullptr;
 static ITLayer<SphereRefractionParamet>* srLayer = nullptr;
 static ITLayer<PixellateParamet>* ppLayer = nullptr;
@@ -172,7 +172,7 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     blurSelectiveLayer->updateParamet(bsp);
 
     blurPositionLayer = createBlurPositionLayer();
-//    BulrPositionParamet bpp = {};
+//    BlurPositionParamet bpp = {};
 //    bpp.gaussian.blurRadius = 10;
 //    blurPositionLayer->updateParamet(bpp);
 

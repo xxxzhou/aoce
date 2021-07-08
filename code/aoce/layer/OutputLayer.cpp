@@ -5,7 +5,7 @@ namespace aoce {
 void OutputLayer::onImageProcessHandle(uint8_t* data,
                                        const ImageFormat& imageFormat,
                                        int32_t outIndex) {
-    if (observer) {
+    if (observer && data) {
         observer->onImageProcess(data, imageFormat, outIndex);
     }
 }

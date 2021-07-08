@@ -1,1 +1,1 @@
-whiteBalance.comp
+pixellatePosition.comp

@@ -207,6 +207,7 @@ class VkFalseColorLayer : public VkLayer, public ITLayer<FalseColorParamet> {
 
 class VkHueLayer : public VkLayer, public ITLayer<float> {
     AOCE_LAYER_QUERYINTERFACE(VkHueLayer)
+
    private:
     /* data */
    public:
@@ -222,6 +223,7 @@ class VkHueLayer : public VkLayer, public ITLayer<float> {
 
 class VkLevelsLayer : public VkLayer, public ITLayer<LevelsParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkLevelsLayer)
+    AOCE_VULKAN_PARAMETUPDATE()
    private:
     /* data */
    public:

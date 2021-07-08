@@ -137,6 +137,10 @@ class ACOE_EXPORT BGroupMetadata : public BMetadata, public ILGroupMetadata {
     BGroupMetadata* addGroupMetadata(const char* parametName,
                                      const char* parametClass,
                                      const char* text);
+    void addColorMetadate(const char* parametName, const char* text,
+                          vec3 defaultVaule);
+    void addUVMetadate(const char* parametName, const char* text,
+                       vec2 defaultVaule);
 };
 
 typedef BTMetaData<bool> LBoolMetadata;

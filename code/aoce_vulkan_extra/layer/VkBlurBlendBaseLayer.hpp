@@ -28,7 +28,7 @@ class VkBlurBlendBaseLayer : public VkLayer {
 };
 
 class VkGaussianBlurPositionLayer : public VkBlurBlendBaseLayer,
-                                    public ITLayer<BulrPositionParamet> {
+                                    public ITLayer<BlurPositionParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkGaussianBlurPositionLayer)
    public:
     VkGaussianBlurPositionLayer(/* args */);

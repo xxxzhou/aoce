@@ -26,7 +26,7 @@ void main(){
     coord = suv;
     if(dist < ubo.radius){
         vec2 sampleDivisor = vec2(ubo.size, ubo.size / ubo.aspectRatio);
-        vec2 coord = coord - mod(coord, sampleDivisor) + 0.5 * sampleDivisor;
+        coord = coord - mod(coord, sampleDivisor) + 0.5 * sampleDivisor;
     }
     vec4 inColor = textureLod(inSampler, coord,0);  
     imageStore(outTex,uv,inColor);

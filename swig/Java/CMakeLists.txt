@@ -20,8 +20,8 @@ SET(CMAKE_SWIG_OUTDIR ${AOCE_SWIG_TEMP_DIR})
 file(GLOB JAVA_TEMP_FILES ${AOCE_SWIG_TEMP_DIR}/*.java)
 file(GLOB JAVA_OUTPUT_FILES ${CMAKE_SOURCE_DIR}/*.java)
 # force rebuild after CMake run
-# file(REMOVE ${JAVA_TEMP_FILES} "")
-# file(REMOVE ${JAVA_OUTPUT_FILES} "")
+file(REMOVE ${JAVA_TEMP_FILES} "")
+file(REMOVE ${JAVA_OUTPUT_FILES} "")
 
 swig_add_library(aoce_swig_java LANGUAGE java SOURCES ${WRAPPERLIST})
 target_link_libraries(aoce_swig_java android aoce aoce_vulkan_extra)
@@ -29,12 +29,17 @@ target_link_libraries(aoce_swig_java android aoce aoce_vulkan_extra)
 aoce_output(aoce_swig_java) 
 install_aoce_module(aoce_swig_java FALSE)
 
+message(STATUS "android swig src: ${AOCE_SWIG_TEMP_DIR}")
+message(STATUS "android swig dst: ${AOCE_SWIG_OUTPUT_DIR}")
 # 直接复制过去,会导致android studio每次打开把相关包变成目录,使编缉器丢掉包名引用等智能提示出现错误
 file(GLOB JAVA_TEMP_FILES ${AOCE_SWIG_TEMP_DIR}/*.java)
-if(JAVA_TEMP_FILES)
+if(EXISTS ${AOCE_SWIG_TEMP_DIR})
+    message(STATUS "android swig start copy")
     file(COPY ${JAVA_TEMP_FILES}
         DESTINATION ${AOCE_SWIG_OUTPUT_DIR})
 endif()
+message(STATUS "android swig remove temp file")
+file(REMOVE ${JAVA_TEMP_FILES} "")
 #add_custom_command(TARGET aoce_swig_java POST_BUILD
 #    COMMAND ${CMAKE_COMMAND} -E copy ${AOCE_SWIG_TEMP_DIR} ${AOCE_SWIG_OUTPUT_DIR})
 

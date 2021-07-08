@@ -11,9 +11,9 @@ include ':aoce'
 //include ":07_androidtest"
 //project(":07_androidtest").projectDir = new File("07_androidtest")
 //
-
-include ":vulkanextratest"
-project(":vulkanextratest").projectDir = new File("vulkanextratest")
+//
+//include ":vulkanextratest"
+//project(":vulkanextratest").projectDir = new File("vulkanextratest")
 
 include ":aoceswigtest"
 project(":aoceswigtest").projectDir = new File("aoceswigtest")

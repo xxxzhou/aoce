@@ -79,11 +79,15 @@ aoce图像计算层的vulkan实现
 
 ### [aoce_win](code/aoce_win)
 
-win平台下特定功能,现包含Media Foundation,dx11t各种资源定义等.
+win平台下特定功能,现包含Media Foundation,dx11各种资源定义等.
 
 ### [aoce_win_mf](code/aoce_win_mf)
 
-win平台下aoce图像获取设备的Media Foundation实现
+win平台下aoce图像获取设备的Media Foundation实现,以及window平台窗口抓取.
+
+### [aoce_winrt](code/aoce_winrt)
+
+win平台有些窗口使用bitblt抓取不到,添加winrt抓取窗口方式.
 
 ### [aoce_vulkan_extra](code/aoce_vulkan_extra)
 

@@ -41,3 +41,5 @@ android camera里的AImageReader_acquireNextImage用AImageReader_acquireLatestIm
 5 使用cmake + swig生成的文件直接复制到模块包里,会导致android studio每次打开把相关包变成目录,使编缉器丢掉包名引用等智能提示出现错误.
 
 可以多加一步,先复制到一个非android模块目录(最好是CMAKE的BINARY目录,否则android studio容易检测到重命),然后使用cmake里的file复制过去,可以解决.
+
+6 对应Cmake输出文件在如下目录-project\.cxx\cmake\{build type}\{abi}\build_output.txt,如deubg/v8下对应(project\.cxx\cmake\debug\arm64-v8a\build_output.txt).

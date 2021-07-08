@@ -41,7 +41,7 @@ void BGroupMetadata::addMetadata(const char* parametName, const char* text,
     auto metadata = std::make_shared<LIntMetadata>();
     metadata->parametName = parametName;
     metadata->text = text;
-    metadata->defaultValue = defaultValue; 
+    metadata->defaultValue = defaultValue;
     metadata->minValue = minValue;
     metadata->maxVluae = maxVluae;
     metadatas.push_back(metadata);
@@ -53,7 +53,7 @@ void BGroupMetadata::addMetadata(const char* parametName, const char* text,
     auto metadata = std::make_shared<LFloatMetadata>();
     metadata->parametName = parametName;
     metadata->text = text;
-    metadata->defaultValue = defaultValue;    
+    metadata->defaultValue = defaultValue;
     metadata->minValue = minValue;
     metadata->maxVluae = maxVluae;
     metadatas.push_back(metadata);
@@ -67,6 +67,23 @@ BGroupMetadata* BGroupMetadata::addGroupMetadata(const char* parametName,
     metadata->text = text;
     metadatas.push_back(metadata);
     return (BGroupMetadata*)metadata.get();
+}
+
+void BGroupMetadata::addColorMetadate(const char* parametName, const char* text,
+                                      vec3 defaultVaule) {
+    std::string strTex = text;
+    auto vec3Mt = addGroupMetadata(parametName, "vec3", text);
+    vec3Mt->addMetadata("x", (strTex + ".R").c_str(), defaultVaule.x);
+    vec3Mt->addMetadata("y", (strTex + ".G").c_str(), defaultVaule.y);
+    vec3Mt->addMetadata("z", (strTex + ".B").c_str(), defaultVaule.z);
+}
+
+void BGroupMetadata::addUVMetadate(const char* parametName, const char* text,
+                                   vec2 defaultVaule) {
+    std::string strTex = text;
+    auto vec3Mt = addGroupMetadata(parametName, "vec2", text);
+    vec3Mt->addMetadata("x", (strTex + ".X").c_str(), defaultVaule.x);
+    vec3Mt->addMetadata("y", (strTex + ".Y").c_str(), defaultVaule.y);
 }
 
 LayerMetadata::LayerMetadata(/* args */) {}
@@ -190,13 +207,13 @@ ILMetadata* getLayerMetadata(const char* layerName) {
     return LayerMetadataManager::Get().getMetadata(layerName);
 }
 
-ILGroupMetadata* getLGroupMetadata(ILMetadata* lmeta) {   
+ILGroupMetadata* getLGroupMetadata(ILMetadata* lmeta) {
     if (lmeta->getLayerType() == LayerMetadataType::agroup) {
         return (ILGroupMetadata*)lmeta;
     }
     return nullptr;
 }
-ILBoolMetadata* getLBoolMetadata(ILMetadata* lmeta) {   
+ILBoolMetadata* getLBoolMetadata(ILMetadata* lmeta) {
     if (lmeta->getLayerType() == LayerMetadataType::abool) {
         return (ILBoolMetadata*)lmeta;
     }

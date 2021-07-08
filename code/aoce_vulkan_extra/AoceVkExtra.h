@@ -208,15 +208,15 @@ struct SelectiveParamet {
 };
 
 // 圆形区域模糊
-struct BulrPositionParamet {
+struct BlurPositionParamet {
     GaussianBlurParamet gaussian = {};
-    PositionParamet bulrPosition = {};
+    PositionParamet blurPosition = {};
 };
 
 // 圆形区域不模糊
 struct BlurSelectiveParamet {
     GaussianBlurParamet gaussian = {};
-    SelectiveParamet bulrPosition = {};
+    SelectiveParamet blurPosition = {};
 };
 
 struct SphereRefractionParamet {
@@ -346,7 +346,13 @@ struct LevelsParamet {
     vec3 gammaVec = {1.0, 1.0, 1.0};
     vec3 maxVec = {1.0, 1.0, 1.0};
     vec3 minOut = {0.0, 0.0, 0.0};
-    vec3 maxOunt = {1.0, 1.0, 1.0};
+    vec3 maxOut = {1.0, 1.0, 1.0};
+    inline bool operator==(const LevelsParamet& right) {
+        return this->minVec == right.minVec &&
+               this->gammaVec == right.gammaVec &&
+               this->maxVec == right.maxVec && this->minOut == right.minOut &&
+               this->maxOut == right.maxOut;
+    }
 };
 
 // 根据每个像素的亮度将图像转换为单色版本
@@ -423,7 +429,7 @@ struct PolkaDotParamet {
 
 // 图像锐化
 struct SharpenParamet {
-    int offset = 1;
+    int32_t offset = 1;
     // 要应用的清晰度调整(-4.0-4.0,默认值为0.0)
     float sharpness = 0.0f;
     inline bool operator==(const SharpenParamet& right) {
@@ -604,7 +610,7 @@ typedef ITLayer<BilateralParamet> IBilateralLayer;
 typedef ITLayer<DistortionParamet> IDistortionLayer;
 typedef ITLayer<PositionParamet> IPositionLayer;
 typedef ITLayer<SelectiveParamet> ISelectiveLayer;
-typedef ITLayer<BulrPositionParamet> IBulrPositionLayer;
+typedef ITLayer<BlurPositionParamet> IBulrPositionLayer;
 typedef ITLayer<BlurSelectiveParamet> IBlurSelectiveLayer;
 typedef ITLayer<SphereRefractionParamet> ISphereRefractionLayer;
 typedef ITLayer<PixellateParamet> IPixellateLayer;

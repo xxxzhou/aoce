@@ -104,7 +104,7 @@
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,
-    "C_Cpp.errorSquiggles": "Enabled",
+    "C_Cpp.errorSquiggles": "Disabled",
     "cmake.configureSettings": {
         "CMAKE_BUILD_TYPE": "${buildType}"
     },

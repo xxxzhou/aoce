@@ -200,7 +200,7 @@ ITLayer<CropParamet>* createCropLayer() {
     return layer;
 }
 
-ITLayer<BulrPositionParamet>* createBlurPositionLayer() {
+ITLayer<BlurPositionParamet>* createBlurPositionLayer() {
     VkGaussianBlurPositionLayer* layer = new VkGaussianBlurPositionLayer();
     return layer;
 }

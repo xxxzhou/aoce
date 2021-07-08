@@ -30,17 +30,17 @@ void VkBlurBlendBaseLayer::baseParametChange(
 }
 
 VkGaussianBlurPositionLayer::VkGaussianBlurPositionLayer(/* args */) {
-    glslPath = "glsl/bulrPosition.comp.spv";
-    setUBOSize(sizeof(paramet.bulrPosition));
-    updateUBO(&paramet.bulrPosition);
+    glslPath = "glsl/blurPosition.comp.spv";
+    setUBOSize(sizeof(paramet.blurPosition));
+    updateUBO(&paramet.blurPosition);
     baseParametChange(paramet.gaussian);
 }
 
 VkGaussianBlurPositionLayer::~VkGaussianBlurPositionLayer() {}
 
 void VkGaussianBlurPositionLayer::onUpdateParamet() {
-    if (!(paramet.bulrPosition == oldParamet.bulrPosition)) {
-        updateUBO(&paramet.bulrPosition);
+    if (!(paramet.blurPosition == oldParamet.blurPosition)) {
+        updateUBO(&paramet.blurPosition);
         bParametChange = true;
     }
     if (!(paramet.gaussian == oldParamet.gaussian)) {
@@ -54,16 +54,16 @@ bool VkGaussianBlurPositionLayer::getSampled(int32_t inIndex) {
 
 VkGaussianBlurSelectiveLayer::VkGaussianBlurSelectiveLayer(/* args */) {
     glslPath = "glsl/blurSelective.comp.spv";
-    setUBOSize(sizeof(paramet.bulrPosition));
-    updateUBO(&paramet.bulrPosition);
+    setUBOSize(sizeof(paramet.blurPosition));
+    updateUBO(&paramet.blurPosition);
     baseParametChange(paramet.gaussian);
 }
 
 VkGaussianBlurSelectiveLayer::~VkGaussianBlurSelectiveLayer() {}
 
 void VkGaussianBlurSelectiveLayer::onUpdateParamet() {
-    if (!(paramet.bulrPosition == oldParamet.bulrPosition)) {
-        updateUBO(&paramet.bulrPosition);
+    if (!(paramet.blurPosition == oldParamet.blurPosition)) {
+        updateUBO(&paramet.blurPosition);
         bParametChange = true;
     }
     if (!(paramet.gaussian == oldParamet.gaussian)) {

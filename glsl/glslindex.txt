@@ -67,7 +67,7 @@ dissolveBlend.comp
 divideBlend.comp
 gamma.comp
 blurSelective.comp
-bulrPosition.comp
+blurPosition.comp
 sphereRefraction.comp
 glassSphere.comp
 halftone.comp

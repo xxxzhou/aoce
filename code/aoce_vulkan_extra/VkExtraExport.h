@@ -172,7 +172,7 @@ AOCE_VE_EXPORT ITLayer<KernelSizeParamet>* createBoxFilterLayer(
 // 高斯模糊,在特定圆形区域不模糊
 AOCE_VE_EXPORT ITLayer<BlurSelectiveParamet>* createBlurSelectiveLayer();
 // 只在特定圆形区域高斯模糊
-AOCE_VE_EXPORT ITLayer<BulrPositionParamet>* createBlurPositionLayer();
+AOCE_VE_EXPORT ITLayer<BlurPositionParamet>* createBlurPositionLayer();
 // 应用IOSBlur
 AOCE_VE_EXPORT ITLayer<IOSBlurParamet>* createIOSBlurLayer();
 // 不定长区域的中值模糊,不推荐,慢
