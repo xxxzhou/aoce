@@ -35,7 +35,7 @@ static ITLayer<int>* dilationLayer = nullptr;
 static ITLayer<int>* erosionLayer = nullptr;
 static ITLayer<int>* closingLayer = nullptr;
 static ITLayer<BlurSelectiveParamet>* blurSelectiveLayer = nullptr;
-static ITLayer<BulrPositionParamet>* blurPositionLayer = nullptr;
+static ITLayer<BlurPositionParamet>* blurPositionLayer = nullptr;
 static ITLayer<SphereRefractionParamet>* srLayer = nullptr;
 static ITLayer<PixellateParamet>* ppLayer = nullptr;
 static ITLayer<PixellateParamet>* halftoneLayer = nullptr;
@@ -158,7 +158,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     blurSelectiveLayer->updateParamet(bsp);
 
     blurPositionLayer = createBlurPositionLayer();
-    BulrPositionParamet bpp = {};
+    BlurPositionParamet bpp = {};
     bpp.gaussian.blurRadius = 20;
     blurPositionLayer->updateParamet(bpp);
 
@@ -212,20 +212,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     r2yLayer = layerFactory->createRGBA2YUV();
     y2rLayer = layerFactory->createYUV2RGBA();
     r2yLayer->updateParamet({VideoType::yuv420P, 0});
-    y2rLayer->updateParamet({VideoType::yuv420P, 0});
-
-    ILMetadata* x1 = getLayerMetadata("SkinToneLayer");
-    ILMetadata* x2 = getLayerMetadata("BrightnessLayer");
-    auto x12 = x2->getLayerType();
-    ILMetadata* x3 = getLayerMetadata("ExposureLayer");
-    auto x13 = x3->getLayerType();
-    ILGroupMetadata* igl = getLGroupMetadata(x1);
-    int32_t count = igl->getCount();
-    for (int32_t i = 0; i < count; i++) {
-        ILMetadata* xa = igl->getLMetadata(i);
-        auto xtype = xa->getLayerType();
-        logMessage(LogLevel::info, xa->getParametName());
-    }
+    y2rLayer->updateParamet({VideoType::yuv420P, 0});   
 
     std::vector<uint8_t> lutData;
     std::vector<IBaseLayer*> layers;
@@ -326,8 +313,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---收缩 ，凹面镜
     // layers.push_back(pdLayer->getLayer());
     // ---yuv2rgb
-    layers.push_back(r2yLayer->getLayer());
-    layers.push_back(y2rLayer->getLayer());
+    // layers.push_back(r2yLayer->getLayer());
+    // layers.push_back(y2rLayer->getLayer());
     // ---softEleganceLayer
     // layers.push_back(seLayer->getLayer());
 

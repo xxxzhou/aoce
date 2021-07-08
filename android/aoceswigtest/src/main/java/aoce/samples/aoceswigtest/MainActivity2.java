@@ -139,7 +139,7 @@ public class MainActivity2 extends AppCompatActivity implements IGLCopyTexture, 
 //        try {
 //            layerMetaTag.setMethod.invoke(layerMetaTag.layerObj,b ? 1:0);
 //        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
+//            e.pintStackTrace();
 //        } catch (InvocationTargetException e) {
 //            e.printStackTrace();
 //        }

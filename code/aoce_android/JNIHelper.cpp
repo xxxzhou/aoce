@@ -16,9 +16,8 @@ Java_aoce_android_library_JNIHelper_loadBitmap(JNIEnv *env, jclass clazz, jlong 
         logMessage(LogLevel::warn,"android bitmap getInfo error");
         return false;
     }
-    // 获取源Bitmap像素数据 这里用的是32位的int类型 argb每个8位
+    // 获取源Bitmap像素数据
     uint8_t * sourceData;
-    // 锁定像素的地址（不锁定的话地址可能会发生改变）
     result = AndroidBitmap_lockPixels(env, bitmap, (void**)& sourceData);
     if (result < 0) {
         logMessage(LogLevel::warn,"android bitmap lockPixels error");

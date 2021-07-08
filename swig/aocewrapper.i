@@ -7,7 +7,8 @@
 %feature("director") ILiveObserver;
 %feature("director") IVideoDeviceObserver;
 %feature("director") ICaptureObserver; 
-%feature("director") IAudioDeviceObserver;  
+%feature("director") IAudioDeviceObserver;
+%feature("director") IMotionDetectorObserver;
 %{
 #if __ANDROID__
 #include <jni.h> 
@@ -41,6 +42,16 @@
 // getCPtr由protected改成public
 SWIG_JAVABODY_PROXY(protected, public, SWIGTYPE)
 SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
+%pragma(java) jniclasscode=%{
+  static {
+    try {
+        System.loadLibrary("aoce_swig_java");
+    } catch (UnsatisfiedLinkError e) {
+      System.err.println("Native code library failed to load. \n" + e);
+      System.exit(1);
+    }
+  }
+%}
 #endif
 
 #ifdef SWIGCSHARP
@@ -112,7 +123,7 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
 %template(IDistortionLayer) aoce::ITLayer<aoce::DistortionParamet> ;
 %template(IPositionLayer) aoce::ITLayer<aoce::PositionParamet> ;
 %template(ISelectiveLayer) aoce::ITLayer<aoce::SelectiveParamet> ;
-%template(IBulrPositionLayer) aoce::ITLayer<aoce::BulrPositionParamet> ;
+%template(IBlurPositionLayer) aoce::ITLayer<aoce::BlurPositionParamet> ;
 %template(IBlurSelectiveLayer) aoce::ITLayer<aoce::BlurSelectiveParamet> ;
 %template(ISphereRefractionLayer) aoce::ITLayer<aoce::SphereRefractionParamet> ;
 %template(IPixellateLayer) aoce::ITLayer<aoce::PixellateParamet> ;

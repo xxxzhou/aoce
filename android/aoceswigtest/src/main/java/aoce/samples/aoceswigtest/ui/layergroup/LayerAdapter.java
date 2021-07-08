@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import aoce.samples.aoceswigtest.DataManager;
-import aoce.samples.aoceswigtest.MainActivity2;
+import aoce.samples.aoceswigtest.LayerActivity;
 import aoce.samples.aoceswigtest.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,7 +37,7 @@ public class LayerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, MainActivity2.class);
+                Intent intent = new Intent(context, LayerActivity.class);
                 intent.putExtra("groupIndex",groupIndex);
                 intent.putExtra("layerIndex",position);
                 context.startActivity(intent);

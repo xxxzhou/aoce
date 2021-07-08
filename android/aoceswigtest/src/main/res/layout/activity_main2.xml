@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity2">
+    tools:context=".LayerActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,6 +19,26 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/textView14"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="layer name"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_blue_bright"
+        android:textSize="24sp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton1"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|left"
+        android:layout_marginBottom="56dp"
+        android:layout_marginLeft="56dp"
+        android:clickable="true"
+        android:src="@android:color/transparent"
+        tools:layout_editor_absoluteY="100dp" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
         android:layout_width="56dp"
@@ -28,5 +48,43 @@
         android:layout_marginRight="56dp"
         android:clickable="true"
         tools:layout_editor_absoluteY="731dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:src="@android:color/transparent" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|center"
+        android:layout_marginBottom="56dp"
+        android:layout_marginRight="56dp"
+        android:elevation="16dp"
+        android:text="参数"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/white"
+        app:layout_anchor="@+id/floatingActionButton"
+        app:layout_anchorGravity="center|center" />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|center"
+        android:layout_marginBottom="56dp"
+        android:layout_marginRight="56dp"
+        android:elevation="16dp"
+        android:text="返回"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/white"
+        app:layout_anchor="@+id/floatingActionButton1"
+        app:layout_anchorGravity="center|center" />
+
+    <TextView
+        android:id="@+id/textView12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:text="" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

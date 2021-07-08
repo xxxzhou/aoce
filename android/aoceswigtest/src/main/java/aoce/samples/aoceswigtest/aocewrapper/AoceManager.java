@@ -17,8 +17,10 @@ public class AoceManager extends IVideoDeviceObserver {
     private IVideoDevice videoDevice = null;
     private VideoFormat videoFormat = null;
     private GLOutGpuTex gpuTex = new GLOutGpuTex();
+    private int width = 1280;
+    private int height = 720;
 
-    public void initGraph(){
+    public void initGraph() {
         pipeGraph = AoceWrapper.getPipeGraphFactory(GpuType.vulkan).createGraph();
         layerFactory = AoceWrapper.getLayerFactory(GpuType.vulkan);
         inputLayer = layerFactory.createInput();
@@ -39,21 +41,23 @@ public class AoceManager extends IVideoDeviceObserver {
         outputLayer.updateParamet(op);
     }
 
-    public void openCamera(){openCamera(false);}
+    public void openCamera() {
+        openCamera(false);
+    }
 
-    public void openCamera(boolean bFront){
-        if(videoDevice != null && videoDevice.bOpen()){
+    public void openCamera(boolean bFront) {
+        if (videoDevice != null && videoDevice.bOpen()) {
             videoDevice.close();
         }
         int deviceCount = AoceWrapper.getVideoManager(CameraType.and_camera2).getDeviceCount();
-        for(int i=0;i<deviceCount;i++){
+        for (int i = 0; i < deviceCount; i++) {
             videoDevice = AoceWrapper.getVideoManager(CameraType.and_camera2).getDevice(i);
-            if(videoDevice.back() != bFront){
+            if (videoDevice.back() != bFront) {
                 break;
             }
         }
-        int formatIndex = videoDevice.findFormatIndex(1280,720);
-        if(formatIndex < 0){
+        int formatIndex = videoDevice.findFormatIndex(width, height);
+        if (formatIndex < 0) {
             formatIndex = 0;
         }
         videoDevice.setFormat(formatIndex);
@@ -63,16 +67,16 @@ public class AoceManager extends IVideoDeviceObserver {
         videoDevice.setObserver(this);
     }
 
-    public void closeCamera(){
-        if(videoDevice != null){
+    public void closeCamera() {
+        if (videoDevice != null) {
             videoDevice.close();
         }
     }
 
-    public void initLayers(List<IBaseLayer> baseLayers,boolean bAutoIn){
+    public void initLayers(List<IBaseLayer> baseLayers, boolean bAutoIn) {
         pipeGraph.clear();
         extraLayer = pipeGraph.addNode(inputLayer).addNode(yuv2RGBALayer);
-        if(baseLayers != null) {
+        if (baseLayers != null) {
             for (IBaseLayer baseLayer : baseLayers) {
                 extraLayer = extraLayer.addNode(baseLayer);
             }
@@ -83,16 +87,28 @@ public class AoceManager extends IVideoDeviceObserver {
         extraLayer.addNode(transposeLayer).addNode(outputLayer);
     }
 
-    public void clearLayers(){
+    public void initLayers(IBaseLayer blendLayer, AInputLayer inputLayer1) {
+        pipeGraph.clear();
+        pipeGraph.addNode(inputLayer).addNode(yuv2RGBALayer).addNode(blendLayer).addNode(transposeLayer).addNode(outputLayer);
+        pipeGraph.addNode(inputLayer1).addNode(reSizeLayer);
+        ReSizeParamet sizeParamet = reSizeLayer.getParamet();
+        sizeParamet.setNewWidth(width);
+        sizeParamet.setNewHeight(height);
+        sizeParamet.setBLinear(1);
+        reSizeLayer.updateParamet(sizeParamet);
+        reSizeLayer.getLayer().addLine(blendLayer,0,1);
+    }
+
+    public void clearLayers() {
         pipeGraph.clear();
     }
 
     @Override
-    public void onVideoFrame(VideoFrame frame){
-        if(AoceWrapper.getYuvIndex(frame.getVideoType()) < 0){
+    public void onVideoFrame(VideoFrame frame) {
+        if (AoceWrapper.getYuvIndex(frame.getVideoType()) < 0) {
             yuv2RGBALayer.getLayer().setVisable(false);
-        }else if(videoFormat != null){
-            if(yuv2RGBALayer.getParamet().getType() != frame.getVideoType()){
+        } else if (videoFormat != null) {
+            if (yuv2RGBALayer.getParamet().getType() != frame.getVideoType()) {
                 yuv2RGBALayer.getLayer().setVisable(true);
                 YUVParamet yp = yuv2RGBALayer.getParamet();
                 yp.setType(frame.getVideoType());
@@ -103,7 +119,7 @@ public class AoceManager extends IVideoDeviceObserver {
         pipeGraph.run();
     }
 
-    public void showGL(int textureId, int width, int height){
+    public void showGL(int textureId, int width, int height) {
         gpuTex.setImage(textureId);
         gpuTex.setWidth(width);
         gpuTex.setHeight(height);
