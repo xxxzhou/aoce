@@ -8,7 +8,6 @@ android/.idea/
 android/.gradle/
 android/*/.cxx/
 android/*/build/
-android/*/assets/
 android/*/.externalNativeBuild/
 android/*/libs/
 android/*/.settings/
