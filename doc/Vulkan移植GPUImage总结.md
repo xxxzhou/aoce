@@ -1,8 +1,12 @@
-# GPUImage移植总结
+# Vulkan移植GPUImage总结
 
 项目github地址: [aoce](https://github.com/xxxzhou/aoce)
 
 我是去年年底才知道有GPUImage这个项目,以前也一直没有在移动平台开发过,但是我在win平台有编写一个类似的项目[oeip](https://github.com/xxxzhou/oeip)(不要关注了,所有功能都移植或快移植到aoce里了),移动平台是大势所趋,开始是想着把oeip移植到android平台上,后面发现不现实,就直接重开项目,从头开始,从Vulkan到CMake,再到GPUImage,开发主力平台也从Visual Studio 2017换到VSCode了,这也算是前半年的总结了.
+
+[Vulkan移植GPUImage的安卓Demo展示](Vulkan移植GPUImage的安卓Demo展示.md)
+
+[使用Swig转换成别的语言](使用Swig转换成别的语言.md)
 
 [Vulkan移植GPUImage(一)高斯模糊与自适应阈值](Vulkan移植GPUImage1.md)
 

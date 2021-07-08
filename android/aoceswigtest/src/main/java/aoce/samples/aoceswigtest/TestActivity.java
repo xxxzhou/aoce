@@ -22,11 +22,8 @@ import android.view.View;
 import java.util.List;
 import java.util.ArrayList;
 
-public class MainActivity extends FragmentActivity implements IGLCopyTexture, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
-    static {
-        System.loadLibrary("aoce_swig_java");
+public class TestActivity extends FragmentActivity implements IGLCopyTexture, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
-    }
     private GLVideoRender glVideoRender = null;
     private Button btnOpen = null;
     private EditText uri = null;
