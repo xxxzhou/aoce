@@ -608,6 +608,11 @@ ITLayer<ZoomBlurParamet>* createZoomBlurLayer() {
     return layer;
 }
 
+IBaseLayer* createEqualizeHistLayer(bool bSingle) {
+    VkEqualizeHistLayer* layer = new VkEqualizeHistLayer(bSingle);
+    return layer;
+}
+
 IBaseLayer* createAlphaShowLayer() {
     VkAlphaShowLayer* layer = new VkAlphaShowLayer();
     return layer;

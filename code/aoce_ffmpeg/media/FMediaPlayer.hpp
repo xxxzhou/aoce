@@ -3,7 +3,7 @@
 #include <media/MediaPlayer.hpp>
 #include <mutex>
 
-#include "AoceFFmpeg.hpp"
+#include "../AoceFFmpeg.hpp"
 
 namespace aoce {
 namespace ffmpeg {
@@ -42,17 +42,6 @@ class FMediaPlayer : public MediaPlayer {
     virtual void start() override;
     virtual void stop() override;
     virtual void release() override;
-};
-
-class FMediaFactory : public MediaFactory {
-   private:
-    /* data */
-   public:
-    FMediaFactory(/* args */);
-    virtual ~FMediaFactory() override;
-
-   public:
-    virtual IMediaPlayer* createPlay() override;
 };
 
 }  // namespace ffmpeg

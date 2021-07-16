@@ -366,6 +366,12 @@ AOCE_VE_EXPORT IBaseLayer* createCGAColorspaceLayer();
 AOCE_VE_EXPORT IBaseLayer* createVoronoiConsumerLayer();
 #pragma endregion
 
+// 移植OpenCV效果
+#pragma region OpenCV
+// 直方图均衡化
+AOCE_VE_EXPORT IBaseLayer* createEqualizeHistLayer(bool bSingle);
+#pragma endregion
+
 AOCE_VE_EXPORT ITLayer<SizeScaleParamet>* createSizeScaleLayer(
     ImageType imageType = ImageType::rgba8);
 AOCE_VE_EXPORT ITLayer<ReSizeParamet>* createResizeLayer(

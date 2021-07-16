@@ -17,7 +17,7 @@ set_target_properties(
     cudatest
     PROPERTIES
     CUDA_SEPARABLE_COMPILATION ON)
-target_link_libraries(cudatest aoce aoce_cuda aoce_talkto ${OpenCV_LIBS} CUDA::cudart_static CUDA::nppc CUDA::nppif)
+target_link_libraries(cudatest aoce aoce_cuda aoce_talkto ${OpenCV_LIBS} CUDA::cudart_static CUDA::nppc CUDA::nppif CUDA::npps)
 
 target_compile_options(cudatest PRIVATE
   "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:

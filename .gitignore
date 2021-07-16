@@ -10,6 +10,7 @@ android/*/.cxx/
 android/*/build/
 android/*/.externalNativeBuild/
 android/*/libs/
+android/*/assets/glsl
 android/*/.settings/
 android/*/.classpath
 android/*/.project

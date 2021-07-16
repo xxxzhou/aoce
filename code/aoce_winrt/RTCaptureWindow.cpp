@@ -55,7 +55,6 @@ RTCaptureWindow::RTCaptureWindow(/* args */) {
     if (FAILED(hr)) {
         logHResult(hr, "winrt capture D3D11CreateDevice failed");
     }
-
     videoFormat.videoType = VideoType::bgra8;
 }
 

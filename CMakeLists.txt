@@ -11,7 +11,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${CMAKE_SOURCE_DIR}/thirdparty")
 set(AOCE_THIRDPARTY_PATH ${CMAKE_PREFIX_PATH})
 
 # cmake option(cmake_dependent_option)
-include(CMakeDependentOption)
+include(CMakeDependentOption) 
 
 # 设置本项目的安装目录
 include(GNUInstallDirs)

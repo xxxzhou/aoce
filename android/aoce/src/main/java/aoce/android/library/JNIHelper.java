@@ -11,3 +11,4 @@ public class JNIHelper {
     }
     public static native boolean loadBitmap(long inputLayer,Bitmap bitmap);
 }
+

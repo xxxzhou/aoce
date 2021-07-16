@@ -137,7 +137,7 @@ public class ParametAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public interface PamaretChangeBack {
-        public void onDataChange(Object object);
+        void onDataChange(Object object);
     }
 
     public abstract class BasePamaretViewHolder extends RecyclerView.ViewHolder {

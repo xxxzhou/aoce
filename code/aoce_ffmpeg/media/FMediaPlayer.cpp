@@ -22,7 +22,7 @@ FMediaPlayer::~FMediaPlayer() { release(); }
 void FMediaPlayer::onError(PlayStatus status, const std::string& msg,
                            int32_t ret) {
     if (ret != 0) {
-        logFFmpegRet(ret, msg);
+        logFRet(ret, msg);
     }
     if (observer) {
         observer->onError(status, ret, msg.c_str());
@@ -45,9 +45,9 @@ void FMediaPlayer::prepare(bool bAsync) {
         temp->interrupt_callback.opaque = this;
         AVDictionary* dict = nullptr;
         // av_dict_set(&dict, "rw_timeout", "3000000", 0);
-        // av_dict_set(&dict, "max_delay", "3000000", 0);
+        av_dict_set(&dict, "max_delay", "3000000", 0);
         // av_dict_set(&dict, "rtsp_transport", "tcp", 0);  //采用tcp传输
-        // av_dict_set(&dict, "stimeout", "2000000", 0);
+        av_dict_set(&dict, "stimeout", "2000000", 0);
         if ((ret = avformat_open_input(&temp, uri.c_str(), 0, &dict)) < 0) {
             avformat_free_context(temp);
             av_dict_free(&dict);
@@ -82,10 +82,13 @@ void FMediaPlayer::prepare(bool bAsync) {
                 }
                 videoStream.width = st->codecpar->width;
                 videoStream.height = st->codecpar->height;
-                videoStream.fps = av_q2intfloat(videoCtx->framerate);
-                if (videoCtx->pix_fmt == AV_PIX_FMT_YUV420P) {
+                videoStream.fps =
+                    (float)st->avg_frame_rate.num / st->avg_frame_rate.den;
+                if (videoCtx->pix_fmt == AV_PIX_FMT_YUV420P ||
+                    videoCtx->pix_fmt == AV_PIX_FMT_YUVJ420P) {
                     videoStream.videoType = VideoType::yuv420P;
-                } else if (videoCtx->pix_fmt == AV_PIX_FMT_YUV422P) {
+                } else if (videoCtx->pix_fmt == AV_PIX_FMT_YUV422P ||
+                           videoCtx->pix_fmt == AV_PIX_FMT_YUVJ422P) {
                     videoStream.videoType = VideoType::yuy2P;
                 }
                 videoStream.bitrate = videoCtx->bit_rate;
@@ -281,6 +284,7 @@ void FMediaPlayer::start() {
                         }
                     }
                 }
+                av_packet_unref(&packet);
             }
         }
         status = PlayStatus::completed;
@@ -321,12 +325,6 @@ void FMediaPlayer::release() {
     videoCtx.reset();
     status = PlayStatus::end;
 }
-
-FMediaFactory::FMediaFactory(/* args */) {}
-
-FMediaFactory::~FMediaFactory() {}
-
-IMediaPlayer* FMediaFactory::createPlay() { return new FMediaPlayer(); }
 
 }  // namespace ffmpeg
 }  // namespace aoce

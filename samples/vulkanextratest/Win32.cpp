@@ -56,6 +56,9 @@ static IPerlinNoiseLayer* noiseLayer = nullptr;
 static ITLayer<DistortionParamet>* pdLayer = nullptr;
 static ISoftEleganceLayer* seLayer = nullptr;
 
+static bool boolSignalEq = false;
+static IBaseLayer* eqHistLayer = nullptr;
+
 static IYUVLayer* r2yLayer = nullptr;
 static IYUVLayer* y2rLayer = nullptr;
 
@@ -212,7 +215,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     r2yLayer = layerFactory->createRGBA2YUV();
     y2rLayer = layerFactory->createYUV2RGBA();
     r2yLayer->updateParamet({VideoType::yuv420P, 0});
-    y2rLayer->updateParamet({VideoType::yuv420P, 0});   
+    y2rLayer->updateParamet({VideoType::yuv420P, 0});
+
+    eqHistLayer = createEqualizeHistLayer(boolSignalEq);
 
     std::vector<uint8_t> lutData;
     std::vector<IBaseLayer*> layers;
@@ -317,6 +322,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(y2rLayer->getLayer());
     // ---softEleganceLayer
     // layers.push_back(seLayer->getLayer());
+    // ---直方图均衡化
+    if (boolSignalEq) {
+        layers.push_back(luminanceLayer);
+        layers.push_back(eqHistLayer);
+        layers.push_back(alphaShowLayer);
+    } else {
+        layers.push_back(eqHistLayer);
+    }
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据

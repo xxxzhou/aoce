@@ -4,40 +4,43 @@
 
 namespace aoce {
 
-struct EncoderOut {
-    int8_t* data = nullptr;
-    int32_t lenght = 0;
-    int64_t timeStamp = 0;
-};
-
-enum class VideoRateControl {
+enum class RateControl {
     none,
     cbr,
     vbr,
     qp,
 };
 
-struct VideoEncoderParamet {
-    // 码率控制 
-    VideoRateControl rateControl = VideoRateControl::none;
-    VideoStream stream = {};    
-};
+// struct VideoCodecParamet {
+//     // 码率控制
+//     RateControl rateControl = RateControl::none;
+// };
 
-class VideoEncoder {
+class ACOE_EXPORT VideoEncoder {
    protected:
-    VideoEncoderParamet paramet;
+    VideoStream stream = {};
 
    public:
-    VideoEncoder(/* args */){};
-    virtual ~VideoEncoder(){};
+    VideoEncoder(/* args */);
+    virtual ~VideoEncoder();
 
    public:
-    virtual void configure(const VideoEncoderParamet& paramet) = 0;
-    virtual void start() = 0;
-    virtual void stop() = 0;
+    bool configure(const VideoStream& stream) {
+        this->stream = stream;
+        if (this->stream.fps == 0) {
+            this->stream.fps = 30;
+        }
+        if (this->stream.bitrate == 0) {
+            this->stream.bitrate =
+                (stream.width / 10) * (stream.height / 10) * stream.fps * 10;
+        }
+        return onPrepare();
+    }
+
+   protected:
+    virtual bool onPrepare() = 0;
 
    public:
-    virtual void input(const VideoFrame& frame) = 0;
-    virtual void output(EncoderOut& packet) = 0;
+    virtual int32_t input(const VideoFrame& frame) = 0;
 };
 }  // namespace aoce

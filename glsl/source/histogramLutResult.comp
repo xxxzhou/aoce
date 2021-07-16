@@ -1,0 +1,61 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;
+#if CHANNEL_R8
+layout (binding = 0, r8) uniform readonly image2D inTex;
+#elif CHANNEL_RGBA
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+#endif
+layout (binding = 1, r32f) uniform readonly image2D lutTex;
+#if CHANNEL_R8
+layout (binding = 2, r8) uniform image2D outTex;
+#elif CHANNEL_RGBA
+layout (binding = 2, rgba8) uniform image2D outTex;
+#endif
+
+// layout (std140, binding = 2) uniform UBO {
+//     int total;
+// } ubo;
+
+// BT709(高清)
+
+vec4 rgb2Yuv(vec4 rgba) {
+	vec4 yuva;
+	//xyz -> yuv
+	yuva.x = clamp(0.2125 * rgba.r + 0.7154 * rgba.g + 0.0721 * rgba.b, 0, 1);
+	//uv (-0.5,0.5)
+	yuva.y = clamp(-0.115 * rgba.r - 0.385 * rgba.g + 0.5 * rgba.b + 0.5f, 0, 1);
+	yuva.z = clamp(0.5 * rgba.r - 0.454 * rgba.g - 0.046 * rgba.b + 0.5f, 0, 1);
+	yuva.a = clamp(rgba.w, 0, 1);
+	return yuva; 
+}
+
+vec4 yuv2Rgb(float y, float u, float v, float a) {
+	vec4 xrgba = vec4(0.f);
+	xrgba.r = clamp(y + 1.402f * v, 0.f, 1.f);
+	xrgba.g = clamp(y - 0.792f * v - 0.344f * u, 0.f, 1.f);
+	xrgba.b = clamp(y + 1.772f * u, 0.f, 1.f);
+	xrgba.a = a;
+	return xrgba;
+}
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);    
+    ivec2 size = imageSize(outTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }   
+#if CHANNEL_R8
+    int luminance = int(imageLoad(inTex,uv).r*255.0);
+#elif CHANNEL_RGBA   
+    vec4 yuva = rgb2Yuv(imageLoad(inTex,uv));
+    int luminance = int(yuva.r*255.0);
+#endif        
+    float relum = imageLoad(lutTex,ivec2(luminance,0)).r;
+#if CHANNEL_R8
+    vec4 lutlum = vec4(relum);    
+#elif CHANNEL_RGBA
+    vec4 lutlum = yuv2Rgb(relum,yuva.y-0.5f,yuva.z-0.5f,yuva.w);
+#endif    
+    imageStore(outTex,uv,lutlum);
+}

@@ -1,6 +1,7 @@
 #include "VideoDevice.hpp"
 
 namespace aoce {
+    
 VideoDevice::VideoDevice(/* args */) {
     name.resize(AOCE_VIDEO_MAX_NAME, 0);
     id.resize(AOCE_VIDEO_MAX_NAME, 0);

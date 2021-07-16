@@ -44,7 +44,7 @@ void getWavHeader(std::vector<uint8_t>& header, uint32_t dataSize,
     format.sampleBytes = format.sampleRate * format.blockAlign;
 
     uint8_t* writeIdx = header.data();
-    //先写声音基本信息
+    // 先写声音基本信息
     WAVEHEADER* waveHeader = reinterpret_cast<WAVEHEADER*>(writeIdx);
     memcpy(writeIdx, WaveHeader, sizeof(WAVEHEADER));
     writeIdx += sizeof(WAVEHEADER);

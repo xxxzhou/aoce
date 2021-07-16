@@ -158,7 +158,7 @@ struct AudioFrame {
     int32_t sampleRate = 8000;
     int32_t depth = 16;
     int64_t timeStamp;
-    // 先定义为frame里一个通道的byte长度
+    // 定义为frame里单独一个通道的byte长度
     int32_t dataSize;
     uint8_t *data[2];
 };

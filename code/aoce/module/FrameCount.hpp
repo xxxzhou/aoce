@@ -4,7 +4,7 @@
 namespace aoce {
 
 // 可用来统计桢率或是码率
-class FrameCount {
+class ACOE_EXPORT FrameCount {
    private:
     /* data */
     // 每次间隔时间 毫秒

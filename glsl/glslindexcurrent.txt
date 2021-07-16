@@ -1,1 +1,3 @@
-pixellatePosition.comp
+histogramLut.comp
+histogramLutResult.comp histogramLutResult.comp CHANNEL_RGBA=1
+histogramLutResult.comp histogramLutResultC1.comp CHANNEL_R8=1

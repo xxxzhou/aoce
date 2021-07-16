@@ -55,6 +55,19 @@ class IMediaPlayer {
     virtual void release() = 0;
 };
 
+class IMediaMuxer {
+   public:
+    virtual ~IMediaMuxer(){};
+    virtual void setOutput(const char* path) = 0;
+    virtual void setAudioStream(const AudioStream& stream) = 0;
+    virtual void setVideoStream(const VideoStream& stream) = 0;
+    virtual bool start() = 0;
+    virtual void pushAudio(const AudioFrame& audioFrame) = 0;
+    virtual void pushVideo(const VideoFrame& videoFrame) = 0;
+    virtual void stop() = 0;
+    virtual void release() = 0;
+};
+
 class MediaFactory {
    public:
     MediaFactory(){};
@@ -62,6 +75,7 @@ class MediaFactory {
 
    public:
     virtual IMediaPlayer* createPlay() = 0;
+    virtual IMediaMuxer* createMuxer() = 0;
 };
 
 }  // namespace aoce

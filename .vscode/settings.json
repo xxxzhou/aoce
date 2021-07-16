@@ -78,6 +78,7 @@
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
         "*.cuh": "cpp",
+        //"*.cu" : "cpp",
         "aoce.h": "c",
         "baselayer.hpp": "c",
         "aocemanager.hpp": "c",

@@ -537,7 +537,7 @@ void VulkanWindow::createRenderPass() {
 }
 
 void VulkanWindow::tick() {
-    // std::lock_guard<std::mutex> mtx_locker(sizeMtx);
+    // std::lock_guard<std::mutex> mtx_locker(sizeMtx); 
     if (bCanDraw) {
         // 发送信号给presentComplete
         VkResult result = vkAcquireNextImageKHR(
@@ -551,7 +551,7 @@ void VulkanWindow::tick() {
             vkBeginCommandBuffer(cmdBuffers[currentIndex], &cmdBufferBeginInfo);
             vkCmdSetViewport(cmdBuffers[currentIndex], 0, 1, &viewport);
             vkCmdSetScissor(cmdBuffers[currentIndex], 0, 1, &scissor);
-            renderPassBeginInfo.framebuffer = frameBuffers[currentIndex];
+            // renderPassBeginInfo.framebuffer = frameBuffers[currentIndex];
             // renderpass关联渲染目标 BlitImage不能包含在RenderPass里面
             // vkCmdBeginRenderPass(cmdBuffers[currentIndex],
             // &renderPassBeginInfo,

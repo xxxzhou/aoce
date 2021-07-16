@@ -1,10 +1,9 @@
 #pragma once
 
 #include "../Aoce.hpp"
+#include "MediaHelper.hpp"
 
 namespace aoce {
-
-ACOE_EXPORT MediaSourceType getMediaType(const std::string& str);
 
 class ACOE_EXPORT MediaPlayer : public IMediaPlayer {
    protected:

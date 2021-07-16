@@ -50,7 +50,7 @@ target_compile_options(aoce_cuda PRIVATE
   -gencode arch=compute_75,code=sm_75
   >")
 
-  aoce_output(aoce_cuda)  
-  install_aoce_module(aoce_cuda FLASE)   
+aoce_output(aoce_cuda)  
+install_aoce_module(aoce_cuda FLASE)   
 
 # set_property(aoce_cuda tgt PROPERTY CUDA_ARCHITECTURES 50 60 70 75 80)

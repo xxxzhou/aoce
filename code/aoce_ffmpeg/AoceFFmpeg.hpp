@@ -12,6 +12,9 @@ extern "C" {
 }
 #endif
 
+#define AOCE_AAC_BUFFER_MAX_SIZE 1024 * 16
+#define AOCE_H264_BUFFER_MAX_SIZE 1024 * 1024
+
 namespace aoce {
 namespace ffmpeg {
 
@@ -78,7 +81,7 @@ AOCE_UNIQUE_FCLASS(AVFrame)
 AOCE_UNIQUE_FCLASS(SwrContext)
 AOCE_UNIQUE_FCLASS(AVIOContext)
 
-void logFFmpegRet(int32_t ret, const std::string msg);
+void logFRet(int32_t ret, const std::string msg);
 
 std::string getRetErrorStr(int32_t ret);
 
@@ -89,6 +92,10 @@ int32_t getFormatFormSampleFmt(const char** fmt, enum AVSampleFormat sampleFmt);
 bool checkSampleFmt(AVCodec* codec, enum AVSampleFormat sampleFmt);
 
 void buildAdts(int size, uint8_t* buffer, int samplerate, int channels);
+
+void makeDsi(int frequencyInHz, int channelCount, uint8_t* dsi);
+
+int64_t rescaleTs(int64_t val, AVCodecContext* context, AVRational new_base);
 
 }  // namespace ffmpeg
 }  // namespace aoce

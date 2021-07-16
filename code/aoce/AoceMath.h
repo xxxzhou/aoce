@@ -1,6 +1,7 @@
 #pragma once
-#include "Aoce.h"
 #include <assert.h>
+
+#include "Aoce.h"
 
 namespace aoce {
 
@@ -130,6 +131,12 @@ struct Mat4x4 {
         assert(idx >= 0 && idx < 4);
         return *(&col0 + idx);
     }
+};
+
+// 图片UV间的仿射变化
+struct WrapMat {
+    vec3 uvec = {};
+    vec3 vvec = {};
 };
 
 extern "C" {

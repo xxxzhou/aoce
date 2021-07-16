@@ -51,3 +51,13 @@ Toolbar左边的三道杠,使用关联ActionBarDrawerToggle.
 [Butterknife](https://www.jianshu.com/p/ac6ee4760385)
 
 ButterKnife是一个专注于Android系统的View注入框架,以前总是要写很多findViewById来找到View对象，有了ButterKnife可以很轻松的省去这些步骤。
+
+## 界面属性
+
+[Android gravity和layout_gravity的区别](https://www.cnblogs.com/xqz0618/p/gravity.html)
+
+gravity是设置自身内部元素的对齐方式。比如一个TextView，则是设置内部文字的对齐方式。
+
+【注意】如果要用gravity属性，此组件的layout_width和layout_height不能设置为wrap_content。此时设置的gravity属性没有效果，因为组件包裹着内容，无论设置什么，也都不能有改变.
+
+layout_gravity是设置自身相当于父容器的对齐方式。比如，一个TextView设置layout_gravity属性，则表示这TextView相对于父容器的对齐方式。

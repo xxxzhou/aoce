@@ -6,7 +6,8 @@ namespace aoce {
 namespace vulkan {
 namespace layer {
 
-VkDirectionalSobelEdgeDetectionLayer::VkDirectionalSobelEdgeDetectionLayer(/* args */) {
+VkDirectionalSobelEdgeDetectionLayer::VkDirectionalSobelEdgeDetectionLayer(
+    /* args */) {
     glslPath = "glsl/directionalSobel.comp.spv";
     setUBOSize(sizeof(paramet), true);
     paramet = 1.0f;
@@ -58,7 +59,17 @@ VkCannyEdgeDetectionLayer::VkCannyEdgeDetectionLayer(/* args */) {
 
 VkCannyEdgeDetectionLayer::~VkCannyEdgeDetectionLayer() {}
 
-void VkCannyEdgeDetectionLayer::onUpdateParamet() {}
+void VkCannyEdgeDetectionLayer::onUpdateParamet() {
+    if (!(paramet.blueParamet == oldParamet.blueParamet)) {
+        gaussianBlurLayer->updateParamet(paramet.blueParamet);
+    }
+    if (paramet.minThreshold != oldParamet.minThreshold ||
+        paramet.maxThreshold != oldParamet.maxThreshold) {
+        directNMSLayer->updateParamet(
+            {paramet.minThreshold, paramet.maxThreshold});
+    }
+}
+
 void VkCannyEdgeDetectionLayer::onInitGraph() {
     VkLayer::onInitGraph();
     inFormats[0].imageType = ImageType::r32f;

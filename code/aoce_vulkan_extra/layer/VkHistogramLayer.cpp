@@ -73,6 +73,69 @@ void VkHistogramC4Layer::onInitLayer() {
     sizeY = 1;
 }
 
+VkHistogramLutLayer::VkHistogramLutLayer() {
+    glslPath = "glsl/histogramLut.comp.spv";
+    setUBOSize(sizeof(paramet), true);
+}
+
+VkHistogramLutLayer::~VkHistogramLutLayer() {}
+
+void VkHistogramLutLayer::onInitGraph() {
+    VkLayer::onInitGraph();
+    inFormats[0].imageType = ImageType::r32;
+    outFormats[0].imageType = ImageType::r32f;
+}
+
+void VkHistogramLutLayer::onInitLayer() {
+    sizeX = divUp(inFormats[0].width, 256);
+    sizeY = 1;
+}
+
+VkEqualizeHistLayer::VkEqualizeHistLayer(bool signalChannal) {
+    bSignal = signalChannal;
+    glslPath = "glsl/histogramLutResultC1.comp.spv";
+    if (!bSignal) {
+        glslPath = "glsl/histogramLutResult.comp.spv";
+        lumLayer = std::make_unique<VkLuminanceLayer>();
+    }
+    histLayer = std::make_unique<VkHistogramLayer>(true);
+    lutLayer = std::make_unique<VkHistogramLutLayer>();
+    inCount = 2;
+}
+
+VkEqualizeHistLayer::~VkEqualizeHistLayer() {}
+
+void VkEqualizeHistLayer::onInitGraph() {
+    VkLayer::onInitGraph();
+    inFormats[0].imageType = bSignal ? ImageType::r8 : ImageType::rgba8;
+    inFormats[1].imageType = ImageType::r32f;
+    outFormats[0].imageType = bSignal ? ImageType::r8 : ImageType::rgba8;
+    if (bSignal) {
+        pipeGraph->addNode(histLayer.get())->addNode(lutLayer->getLayer());
+    } else {
+        pipeGraph->addNode(lumLayer.get())
+            ->addNode(histLayer.get())
+            ->addNode(lutLayer->getLayer());
+    }
+}
+
+void VkEqualizeHistLayer::onInitNode() {
+    lutLayer->addLine(this, 0, 1);
+    setStartNode(this);
+    if (bSignal) {
+        setStartNode(histLayer.get());
+    } else {
+        setStartNode(lumLayer.get());
+    }
+}
+
+void VkEqualizeHistLayer::onInitLayer() {
+    VkLayer::onInitLayer();
+    ImageFormat iformt = {};
+    pipeGraph->getLayerInFormat(histLayer->getGraphIndex(), 0, iformt);
+    lutLayer->updateParamet(iformt.width * iformt.height);
+}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

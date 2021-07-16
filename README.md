@@ -2,6 +2,14 @@
 
 android/window 图像处理,多媒体以及游戏引擎交互.
 
+## 演示DEMO
+
+[aoce移植GPUImage展示](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoceswigtest-release.apk)
+
+![avatar](images/layers_demo.png "滤镜目录")
+
+[aoce.xswig封装aar包](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoce-release.aar)
+
 ## 配置项目
 
 本项目尽量不引入第三方库,暂时只有aoce_ffmpeg模块需要引入ffmpeg.其中有些samples需要引入opencv显示画面,但是项目本身是不需要opencv做为第三方库,详细情况请转入[samples](samples/README.md).
@@ -13,7 +21,7 @@ android/window 图像处理,多媒体以及游戏引擎交互.
 
 vulkan项目使用glsl,请安装Vulkan SDK,通过工具glslangValidator把glsl编译成SPIR-V.
 
-如果要查看aoce_cuda,请安装CUDA.
+如果要使用aoce_cuda模块,请安装CUDA.
 
 ## 做什么
 
@@ -21,19 +29,21 @@ vulkan项目使用glsl,请安装Vulkan SDK,通过工具glslangValidator把glsl�
 
 统一平台win/andorid的视频源的获取,图像的GPU处理,以及方便对接各种界面显示.
 
-GPU计算模块的选择,win平台准备完成cuda/vulkan模块,主要完成cuda,win平台推荐cuda.android平台原则上只实现vulkan模块.
+GPU计算模块的选择,win平台准备完成cuda/vulkan模块,主要完成cuda,win平台推荐cuda.android平台原则上只实现vulkan模块,但是能高效对接opengl es纹理.
 
 Camera内置WIN平台MF的SDK,而anroid基于ndk camera2实现.
 
-视频的编解码主要基于ffmpeg实现,以及相应推拉流的实现.
+视频的编解码主要基于ffmpeg实现,以及相应推拉流,打开/关闭媒体的实现.
 
 cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/vulkan库为基准,方便自己的layer层实现,其中aoce_talkto/aoce_vulkan_extra分别以aoce_cuda/aoce_vulkan库的类来扩展外置的gpugpu实现,各位可以参照实现.
 
 能方便对接各种引擎,使用各种UI框架进行显示,包含不限于Unity3D/UE4/WinForm等.
 
-各模块现主要通过CMake动态链接,通过相应选项可以选择去除不需要模块,后期完善静态编译成一个文件功能.
+各模块现主要通过CMake动态链接,其相应CMake编译选项在根目录下的CMakeLists.txt下,各位可以根据环境自己选择,其中使用Swig来转换成C#/Java接口,如果没装swig,请查找对应C#/Java实现提供相应的Swig封装包.
 
 ## [文档](doc)
+
+[Vulkan移植GPUImage的安卓Demo展示](Vulkan移植GPUImage的安卓Demo展示.md)
 
 [Vulkan移植GpuImage(一)高斯模糊与自适应阈值](doc/Vulkan移植GpuImage1.md)
 
@@ -47,19 +57,19 @@ cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/
 
 [Vulkan移植GPUImage总结](doc/GPUImage移植总结.md)
 
+[使用Swig转换C++到别的编程语言](doc/使用Swig转换成别的语言.md)
+
 [ChromaKey](doc/ChromaKey.md)
 
 [Vulkan与DX11交互](doc/Vulkan与DX11交互.md)
 
 [PC平台Vulkan运算层时间记录](doc/PC平台Vulkan运算层时间记录.md)
 
-[使用Swig转换C++到别的编程语言](doc/使用Swig转换成别的语言.md)
-
 ## [模块](code)
 
 ### [aoce](code/aoce)
 
-各个基本功能接口,结构定义.
+各个基本模块接口,结构定义,以及给Swig导出的C风格文件.
 
 ### [aoce_android](code/aoce_android)
 
@@ -71,7 +81,7 @@ aoce图像计算层的cuda实现
 
 ### [aoce_ffmpeg](code/aoce_ffmpeg)
 
-aoce音视频资源播放的ffmpeg实现
+aoce音视频资源播放/导出的ffmpeg实现
 
 ### [aoce_vulkan](code/aoce_vulkan)
 
@@ -91,7 +101,7 @@ win平台有些窗口使用bitblt抓取不到,添加winrt抓取窗口方式.
 
 ### [aoce_vulkan_extra](code/aoce_vulkan_extra)
 
-用vulkan的compute shader实现gpuimage
+用vulkan的compute shader实现gpuimage,以及移植相关的opencv算法.
 
 ## [例子](samples)
 

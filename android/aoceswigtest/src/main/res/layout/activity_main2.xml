@@ -84,7 +84,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:textColor="@android:color/white"
+        android:gravity="center"
         android:textAlignment="center"
-        android:text="" />
+        android:text="xy" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

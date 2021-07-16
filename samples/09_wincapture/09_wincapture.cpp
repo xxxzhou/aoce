@@ -12,7 +12,7 @@ using namespace aoce;
 using namespace aoce::win;
 using namespace aoce::vulkan;
 
-#define USE_DX11WINDOW 1
+#define USE_DX11WINDOW 0
 
 #if USE_DX11WINDOW
 static std::unique_ptr<Dx11Window> window = nullptr;
