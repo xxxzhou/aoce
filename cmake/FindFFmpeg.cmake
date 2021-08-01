@@ -4,8 +4,8 @@ start_android_find_host()
 set(FFmpeg_PREFIX_PATH ${AOCE_THIRDPARTY_PATH}/ffmpeg)
 create_search_paths(FFmpeg)
 
-message(STATUS "ffmpeg include:" ${FFmpeg_INC_SEARCH_PATH})
-message(STATUS "ffmpeg libs:" ${FFmpeg_LIB_SEARCH_PATH})
+# message(STATUS "ffmpeg include:" ${FFmpeg_INC_SEARCH_PATH})
+# message(STATUS "ffmpeg libs:" ${FFmpeg_LIB_SEARCH_PATH})
 
 set(FFMPEG_INCLUDE_DIRS)
 set(FFMPEG_LIBRARIES)

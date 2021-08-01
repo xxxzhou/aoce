@@ -175,11 +175,11 @@ void VkOutputLayer::outGLGpuTex(const GLOutGpuTex& outTex, uint32_t texType,
             resetGraph();
             return;
         }
-        int32_t oldIndex = hardwareImage->getTextureId();
-        if (oldIndex != outTex.image) {
-            hardwareImage->bindGL(outTex.image, bindType);
-        }
-        // hardwareImage->bindGL(outTex.image, bindType);
+//       int32_t oldIndex = hardwareImage->getTextureId();
+//       if (oldIndex < 0 || oldIndex != outTex.image) {
+//           hardwareImage->bindGL(outTex.image, bindType);
+//       }
+       hardwareImage->bindGL(outTex.image, bindType);
     }
 #endif
 }

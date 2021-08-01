@@ -141,7 +141,9 @@ struct WrapMat {
 
 extern "C" {
 
-ACOE_EXPORT void identMat(Mat4x4 &mat);
+ACOE_EXPORT void identMat4x4(Mat4x4 &mat);
+
+ACOE_EXPORT void identMat3x3(Mat3x3 &mat);
 
 ACOE_EXPORT Mat4x4 matMult(const Mat4x4 &a, const Mat4x4 &b);
 
@@ -167,6 +169,9 @@ ACOE_EXPORT Mat4x4 zshearMat(const Mat4x4 &mat, const float &dx,
 
 // rotate the hue, while maintaining luminance.
 ACOE_EXPORT Mat4x4 huerotateMat(const Mat4x4 &mat, const float &rot);
+
+ACOE_EXPORT Mat3x3 inverseMat(const Mat3x3& mat);
+
 }
 
 }  // namespace aoce

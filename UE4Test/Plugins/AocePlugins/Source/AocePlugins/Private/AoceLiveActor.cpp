@@ -32,7 +32,7 @@ void AAoceLiveActor::onLogin(int roleIndex) {
 	if (rtype == RoleType::student) {
 		userIndex = 5;
 	}
-	aoce::LiveManager::Get().loginRoom("123", rtype, userIndex);
+	aoce::LiveManager::Get().loginRoom("talkdolive", rtype, userIndex);
 	// 学生,显示拉流画面
 	if (rtype == RoleType::student) {
 		dispActor->setDisplay(aoce::LiveManager::Get().getVideoDisplay());

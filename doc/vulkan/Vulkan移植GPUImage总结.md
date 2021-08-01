@@ -56,7 +56,7 @@
 
 在运行时,设定节点/分支是否可用,以及有些层参数改变会影响输出大小都会导致图层重启标记开启,用标记是考虑到更新参数层与执行GPU运算不在同一线程的情况,图层下次运行前,检测到重启标记开启,就会重新开始构建.
 
-相关源码在[PipeGraph](../code/aoce/layer/PipeGraph.hpp)
+相关源码在[PipeGraph](../../code/aoce/layer/PipeGraph.hpp)
 
 而第二点,为了方便用户扩展自己的层,我需要尽可能的自动完善各种信息来让用户只专注需求实现.
 
@@ -72,7 +72,7 @@
 
 5. onUpdateParamet 层的参数更新,时序独立于上面的4个点,设定要求随时可以调用.
 
-相关源码在[BaseLayer](../code/aoce/layer/BaseLayer.hpp)
+相关源码在[BaseLayer](../../code/aoce/layer/BaseLayer.hpp)
 
 准确到Vulkan模块,Vulkan下的运算层基类(VkLayer)会针对BaseLayer提供更精确的Vulkan资源时序.
 
@@ -92,7 +92,7 @@
 
 8. onFrame 每桢处理时调用,一般来说,只有输入层或输出层override处理,用于把vulkan texture交给CPU/opengl es/dx11等等.
 
-相关源码在[VkLayer](../code/aoce_vulkan/layer/VkLayer.hpp)
+相关源码在[VkLayer](../../code/aoce_vulkan/layer/VkLayer.hpp)
 
 虽然列出有这么多,但是从我移植GPUImage里来看,很多层特别是混合模式那些处理,完全一个都不用重载,就只在初始化指定下glslPath就行了,还有许多层按上面设定只需要重载一到二个方法就不用管了.
 

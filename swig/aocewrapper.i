@@ -20,6 +20,9 @@
 #include "aoce_vulkan_extra/AoceVkExtra.h"
 #include "aoce_vulkan_extra/VkExtraExport.h"
 
+#ifdef AOCE_INSTALL_AGORA
+#include "aoce_talkto/Talkto.h"
+#endif
 %}
 
 #define ACOE_EXPORT
@@ -47,18 +50,19 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
     try {
         System.loadLibrary("aoce_swig_java");
     } catch (UnsatisfiedLinkError e) {
-      System.err.println("Native code library failed to load. \n" + e);
+      System.err.println("native code library failed to load. \n" + e);
       System.exit(1);
     }
   }
 %}
+ %apply long long { void *liveContext }
 #endif
 
 #ifdef SWIGCSHARP
-#endif
-
 // 将C++ 中 void*/uint8_t*转C# IntPtr
 %apply void *VOID_INT_PTR { void *,uint8_t * }
+#endif
+
 // 没有的话,int32_t对应不了int
 %include "stdint.i"
 // %include "arrays_csharp.i"
@@ -77,6 +81,7 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
 %include "aoce/AoceMetadata.h"  
 %include "aoce/AoceWindow.h"  
 %include "aoce/AoceAudioDevice.h"  
+
 // 针对ITLayer需预先实例化二个类告诉swig
 %template(AInputLayer) aoce::ITLayer<aoce::InputParamet>;
 %template(AOutputLayer) aoce::ITLayer<aoce::OutputParamet>; 
@@ -92,12 +97,6 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
 %template(ILStringMetadata) aoce::ILTMetadata<const char*>; 
 %template(ILIntMetadata) aoce::ILTRangeMetadata<int32_t>; 
 %template(ILFloatMetadata) aoce::ILTRangeMetadata<float>; 
-
-// %extend aoce::BGroupMetadata {
-//     static aoce::BGroupMetadata* dynamic_cast(aoce::ILMetadata *lmeta) {
-//         return dynamic_cast<aoce::BGroupMetadata*>(lmeta);
-//     }
-// };
 
 %template(ASoftEleganceLayer) aoce::ITLayer<aoce::SoftEleganceParamet>;
 %template(AFloatLayer) aoce::ITLayer<float>;
@@ -153,6 +152,17 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
 %template(IWhiteBalanceLayer) aoce::ITLayer<aoce::WhiteBalanceParamet> ;
 %template(IZoomBlurLayer) aoce::ITLayer<aoce::ZoomBlurParamet> ;
 
+#ifdef AOCE_INSTALL_AGORA
+// #warning "create talkto swig"
+// %include "talkto.i"
+#define AOCE_TALKTO_EXPORT
+%template(AMattingLayer) aoce::ITLayer<aoce::talkto::MattingParamet>;
+%include "aoce_talkto/Talkto.h"
+%template(ITexOperateLayer) aoce::ITLayer<aoce::talkto::TexOperateParamet> ;
+%template(ITexClipLayer) aoce::ITLayer<aoce::talkto::TexClipParamet> ;
+#else
+// #error "This is a fatal error message"
+#endif
 
 %nodefaultctor;
 %nodefaultdtor;

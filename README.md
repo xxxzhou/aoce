@@ -8,11 +8,11 @@ android/window 图像处理,多媒体以及游戏引擎交互.
 
 ![avatar](images/layers_demo.png "滤镜目录")
 
-[aoce.xswig封装aar包](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoce-release.aar)
+[aoce.xswig封装aar包](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoce-release.aar) 如果你没有装swig,就需要手动下载这个.
 
 ## 配置项目
 
-本项目尽量不引入第三方库,暂时只有aoce_ffmpeg模块需要引入ffmpeg.其中有些samples需要引入opencv显示画面,但是项目本身是不需要opencv做为第三方库,详细情况请转入[samples](samples/README.md).
+本项目尽量不引入第三方库,暂时只有aoce_ffmpeg模块需要引入ffmpeg.其中win平台有些samples需要引入opencv显示画面,但是项目本身是不需要opencv做为第三方库,详细情况请转入[samples](samples/README.md).
 
 本项目编写主要使用vscode,配合相应插件C++/CMake.用anroid studio完成anroid平台特定功能与测试等.visual studio 2019配合Nsight调试CUDA相关代码.通过CMake使vscode/android studio/visual studio针对项目文件统一修改.
 

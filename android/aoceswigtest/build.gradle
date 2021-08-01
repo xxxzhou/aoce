@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         aa {
-            //storeFile file('D:\\WorkSpace\\github\\aoce\\aoce_android_install.jks')
             storeFile file('..\\..\\aoce_android_install.jks')
             storePassword 'a123456'
             keyPassword 'a123456'

@@ -25,10 +25,7 @@ namespace aoce {
 		video = CameraManager::Get().getVideoDevice(cameraId.c_str());
 		if (video == nullptr) {
 			return false;
-		}
-		if (this->formatIndex < 0) {
-			this->formatIndex = video->findFormatIndex(1920, 1080);
-		}
+		}		
 		videoProcess->initDevice(video, this->formatIndex);
 		return true;
 	}

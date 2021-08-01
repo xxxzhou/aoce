@@ -4,7 +4,7 @@
 
 先看效果图,大约一百多种滤镜,有超过一半的滤镜有参数设置,其参数调整界面使用反射自动生成与绑定.
 
-![avatar](../images/layers_demo.png "滤镜目录")
+![avatar](../../images/layers_demo.png "滤镜目录")
 
 如下每种选择一些进行展示.
 

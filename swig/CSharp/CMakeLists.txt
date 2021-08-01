@@ -3,20 +3,27 @@ include(AoceHelper)
 
 include_directories("../../code")
 
-set(WRAPPERLIST ../aocewrapper.i) 
+set(WRAPPERLIST ../aocewrapper.i)  
 
 SET_SOURCE_FILES_PROPERTIES(${WRAPPERLIST} PROPERTIES CPLUSPLUS ON)
 SET_SOURCE_FILES_PROPERTIES(${WRAPPERLIST} PROPERTIES CMAKE_SWIG_FLAGS "-includeall")
+# 指定 definition
+set(CMAKE_SWIG_FLAGS -O ${SWIG_DEFINITIONS})
 SET(CMAKE_SWIG_OUTDIR "${CMAKE_CURRENT_SOURCE_DIR}/swig" )
 
-file(GLOB SHARP_OLD_FILES ${CMAKE_SWIG_OUTDIR}/*.cs)
-file(REMOVE ${SHARP_OLD_FILES} "")
+# file(GLOB SHARP_OLD_FILES ${CMAKE_SWIG_OUTDIR}/*.cs)
+# file(REMOVE ${SHARP_OLD_FILES} "")  
 
 swig_add_library(aoce_swig LANGUAGE csharp SOURCES ${WRAPPERLIST})
-target_link_libraries(aoce_swig aoce aoce_vulkan_extra)
+
+if(AOCE_INSTALL_AGORA)
+    target_link_libraries(aoce_swig aoce aoce_vulkan_extra aoce_talkto) 
+else()
+    target_link_libraries(aoce_swig aoce aoce_vulkan_extra)    
+endif()
 
 aoce_swig_output(aoce_swig)  
-install_aoce_swig_module(aoce_swig FALSE) 
+install_aoce_swig_module(aoce_swig FALSE)   
 message(STATUS "swig: create charp files ${CMAKE_CURRENT_BINARY_DIR}/swig")
 
 # file(GLOB SHARP_FILES "${CMAKE_CURRENT_BINARY_DIR}/swig/*.cs")

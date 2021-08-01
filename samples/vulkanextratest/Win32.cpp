@@ -223,6 +223,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     std::vector<IBaseLayer*> layers;
     // 如果为true,层需要二个输入,用原始图像做第二个输入
     bool bAutoIn = false;
+    // ---
+    // layers.push_back(box1Layer->getLayer());
     // ---高斯模糊
     // layers.push_back(gaussianLayer->getLayer());
     // 检测resize效果

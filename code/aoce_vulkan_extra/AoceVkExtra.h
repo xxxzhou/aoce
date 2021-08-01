@@ -610,7 +610,7 @@ typedef ITLayer<BilateralParamet> IBilateralLayer;
 typedef ITLayer<DistortionParamet> IDistortionLayer;
 typedef ITLayer<PositionParamet> IPositionLayer;
 typedef ITLayer<SelectiveParamet> ISelectiveLayer;
-typedef ITLayer<BlurPositionParamet> IBulrPositionLayer;
+typedef ITLayer<BlurPositionParamet> IBlurPositionLayer;
 typedef ITLayer<BlurSelectiveParamet> IBlurSelectiveLayer;
 typedef ITLayer<SphereRefractionParamet> ISphereRefractionLayer;
 typedef ITLayer<PixellateParamet> IPixellateLayer;

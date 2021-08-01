@@ -9,5 +9,32 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "OculusVR",
+			"Enabled": false,
+			"SupportedTargetPlatforms": [
+				"Win32",
+				"Win64",
+				"Android"
+			]
+		},
+		{
+			"Name": "OnlineSubsystemPico",
+			"Enabled": true
+		},
+		{
+			"Name": "PicoMobile",
+			"Enabled": true
+		},
+		{
+			"Name": "PicoMobileController",
+			"Enabled": true
+		},
+		{
+			"Name": "PicoNeoController",
+			"Enabled": true
+		}
 	]
 }

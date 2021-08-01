@@ -1,3 +1,4 @@
-histogramLut.comp
-histogramLutResult.comp histogramLutResult.comp CHANNEL_RGBA=1
-histogramLutResult.comp histogramLutResultC1.comp CHANNEL_R8=1
+filter2D.comp filter2D.comp CHANNEL_RGBA=1
+filter2D.comp filter2DC1.comp CHANNEL_R8=1
+filter2D.comp filter2DF4.comp CHANNEL_RGBA32F=1
+colorLocalBinaryPattern.comp

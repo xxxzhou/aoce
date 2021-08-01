@@ -108,6 +108,7 @@ set(AOCE_SET_STATIC 0)
 option(AOCE_INSTALL_FFMPEG "install ffmpeg module" TRUE)
 option(AOCE_ENABLE_SAMPLES "enable samples" TRUE) 
 option(AOCE_ENABLE_WINRT "enable winrt" TRUE) 
+option(AOCE_ENABLE_SWIG "enable swig" TRUE) 
 cmake_dependent_option(AOCE_CUDA_MODULE "install cuda module" TRUE "WIN32" FALSE)
 cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGORA_EXIST" FALSE) #FALSE
 
@@ -136,12 +137,14 @@ add_subdirectory(code)
 add_subdirectory(samples)
 add_subdirectory(glsl)
 
-# REQUIRED
-find_package(SWIG)
-if(SWIG_FOUND)
-    message(STATUS "SWIG found:${SWIG_EXECUTABLE}")
-    add_subdirectory(swig)
-endif(SWIG_FOUND)
+if(AOCE_ENABLE_SWIG)
+    # REQUIRED 
+    message(STATUS "start swig convert other language")
+    find_package(SWIG)
+    if(SWIG_FOUND)       
+        add_subdirectory(swig)
+    endif(SWIG_FOUND)
+endif()
 
 
 

@@ -27,6 +27,7 @@ class AVideoDevice : public VideoDevice {
     ACameraCaptureSession* session = nullptr;
     ANativeWindow* surface = nullptr;
     std::mutex procMtx;
+    std::condition_variable stopSignal;
     // std::string mid ="";
 
     friend void imageCallback(void* context, AImageReader* reader);
@@ -45,6 +46,8 @@ public:
 
    public:
     bool init(ACameraManager* manager, const char* id);
+
+    void onClose();
 
    public:
     // 摄像机有自己特定输出格式

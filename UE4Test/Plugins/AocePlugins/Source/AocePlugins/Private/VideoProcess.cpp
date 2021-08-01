@@ -41,7 +41,11 @@ namespace aoce {
 	void VideoProcess::initDevice(IVideoDevice* videoPtr, int32_t formatIndex) {
 		this->video = videoPtr;
 		if (formatIndex < 0) {
+#if WIN32
 			formatIndex = video->findFormatIndex(1920, 1080);
+#elif __ANDROID__
+			formatIndex = video->findFormatIndex(1280, 720);
+#endif
 		}
 		video->setFormat(formatIndex);
 		format = this->video->getSelectFormat();

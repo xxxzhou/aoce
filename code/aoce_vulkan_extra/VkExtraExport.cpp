@@ -40,7 +40,7 @@ using namespace aoce::vulkan::layer;
 namespace aoce {
 
 ITLayer<KernelSizeParamet>* createBoxFilterLayer(ImageType imageType) {
-    VkBoxBlurSLayer* boxBlur = new VkBoxBlurSLayer(imageType);
+    VkBoxBlurLayer* boxBlur = new VkBoxBlurLayer(imageType);
     return boxBlur;
 }
 

@@ -1,5 +1,6 @@
-#include "../AoceMath.h"
 #include <math.h>
+
+#include "../AoceMath.h"
 
 namespace aoce {
 
@@ -7,11 +8,17 @@ namespace aoce {
 #define GLUM (0.59f)
 #define BLUM (0.11f)
 
-void identMat(Mat4x4& mat) {
+void identMat4x4(Mat4x4& mat) {
     mat.col0 = {1.0, 0.0, 0.0, 0.0};
     mat.col1 = {0.0, 1.0, 0.0, 0.0};
     mat.col2 = {0.0, 0.0, 1.0, 0.0};
     mat.col3 = {0.0, 0.0, 0.0, 1.0};
+}
+
+void identMat3x3(Mat3x3& mat) {
+    mat.col0 = {1.0, 0.0, 0.0};
+    mat.col1 = {0.0, 1.0, 0.0};
+    mat.col2 = {0.0, 0.0, 1.0};
 }
 
 Mat4x4 matMult(const Mat4x4& a, const Mat4x4& b) {
@@ -36,7 +43,7 @@ vec3 transformMat(const Mat4x4& mat, const vec3& trans) {
 
 Mat4x4 scaleIdentMat(const vec3& scale) {
     Mat4x4 temp = {};
-    identMat(temp);
+    identMat4x4(temp);
     for (int32_t i = 0; i < 3; i++) {
         temp[i][i] = scale[i];
     }
@@ -65,7 +72,7 @@ Mat4x4 saturateMat(const Mat4x4& mat, const float& saturate) {
 
 Mat4x4 xrotateMat(const Mat4x4& mat, const float& rs, const float& rc) {
     Mat4x4 temp = {};
-    identMat(temp);
+    identMat4x4(temp);
     temp[1][1] = rc;
     temp[1][2] = rs;
 
@@ -77,7 +84,7 @@ Mat4x4 xrotateMat(const Mat4x4& mat, const float& rs, const float& rc) {
 
 Mat4x4 yrotateMat(const Mat4x4& mat, const float& rs, const float& rc) {
     Mat4x4 temp = {};
-    identMat(temp);
+    identMat4x4(temp);
     temp[0][0] = rc;
     temp[0][2] = -rs;
 
@@ -89,7 +96,7 @@ Mat4x4 yrotateMat(const Mat4x4& mat, const float& rs, const float& rc) {
 
 Mat4x4 zrotateMat(const Mat4x4& mat, const float& rs, const float& rc) {
     Mat4x4 temp = {};
-    identMat(temp);
+    identMat4x4(temp);
     temp[0][0] = rc;
     temp[0][1] = rs;
 
@@ -101,7 +108,7 @@ Mat4x4 zrotateMat(const Mat4x4& mat, const float& rs, const float& rc) {
 
 Mat4x4 zshearMat(const Mat4x4& mat, const float& dx, const float& dy) {
     Mat4x4 temp = {};
-    identMat(temp);
+    identMat4x4(temp);
     temp[0][2] = dx;
     temp[1][2] = dy;
     return matMult(temp, mat);
@@ -109,7 +116,7 @@ Mat4x4 zshearMat(const Mat4x4& mat, const float& dx, const float& dy) {
 
 Mat4x4 huerotateMat(const Mat4x4& mat, const float& rot) {
     Mat4x4 temp = {};
-    identMat(temp);
+    identMat4x4(temp);
 
     /* rotate the grey vector into positive Z */
     float mag = sqrt(2.0);
@@ -139,6 +146,31 @@ Mat4x4 huerotateMat(const Mat4x4& mat, const float& rot) {
     temp = yrotateMat(temp, -yrs, yrc);
     temp = xrotateMat(temp, -xrs, xrc);
     return temp;
+}
+
+Mat3x3 inverseMat(const Mat3x3& mat) {
+    Mat3x3 result = {};
+
+    vec3 col0 = mat.col0;
+    vec3 col1 = mat.col1;
+    vec3 col2 = mat.col2;
+
+    float det = col0.x * (col1.y * col2.z - col2.y * col1.z) -
+                col0.y * (col1.x * col2.z - col1.z * col2.x) +
+                col0.z * (col1.x * col2.y - col1.y * col2.x);
+    if (det > 0) {
+        float invdet = 1.0f / det;
+        result.col0.x = (col1.y * col2.z - col2.y * col1.z) * invdet;
+        result.col0.y = (col0.z * col2.y - col0.y * col2.z) * invdet;
+        result.col0.z = (col0.y * col1.z - col0.z * col1.y) * invdet;
+        result.col1.x = (col1.z * col2.x - col1.x * col2.z) * invdet;
+        result.col1.y = (col0.x * col2.z - col0.z * col2.x) * invdet;
+        result.col1.z = (col1.x * col0.z - col0.x * col1.z) * invdet;
+        result.col2.x = (col1.x * col2.y - col2.x * col1.y) * invdet;
+        result.col2.y = (col2.x * col0.y - col0.x * col2.y) * invdet;
+        result.col2.z = (col0.x * col1.y - col1.x * col0.y) * invdet;
+    }
+    return result;
 }
 
 }  // namespace aoce

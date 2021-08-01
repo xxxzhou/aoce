@@ -27,7 +27,7 @@ void VkHSBLayer::parametTransform() {
 }
 
 void VkHSBLayer::reset() {
-    identMat(paramet.mat);
+    identMat4x4(paramet.mat);
     parametTransform();
 }
 

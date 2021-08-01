@@ -10,63 +10,63 @@
 
 1 简单的取亮度,0.09ms,一般的图像处理,不取周边的点.
 
-[glsl代码](../glsl/source/luminance.comp)
+[glsl代码](../../glsl/source/luminance.comp)
 
-![avatar](../images/cs_time_1.png "亮度")
+![avatar](../../images/cs_time_1.png "亮度")
 
 2 计算XYDerivative,3*3,0.29ms.
 
-[glsl代码](../glsl/source/prewittEdge.comp)
+[glsl代码](../../glsl/source/prewittEdge.comp)
 
-![avatar](../images/cs_time_2.png "XYDerivative")
+![avatar](../../images/cs_time_2.png "XYDerivative")
 
 时间主要是取周边九个点上,不同于CPU,从显存取值是个大消费.
 
 3 针对XYDerivative高斯模糊,核长9,时间0.45ms*2.
 
-[glsl代码](../glsl/source/filterRow.comp)
+[glsl代码](../../glsl/source/filterRow.comp)
 
-![avatar](../images/cs_time_3_0.png "高斯模糊")
+![avatar](../../images/cs_time_3_0.png "高斯模糊")
 
 同上,取周边9*9=81个点,其中高斯模糊使用卷积核分离优化,列和长分别占用0.45ms左右.
 
 我用21核长,时间为0.79ms*2.
 
-![avatar](../images/cs_time_3_1.png "高斯模糊")
+![avatar](../../images/cs_time_3_1.png "高斯模糊")
 
 我用5核长,时间为0.34ms*2.
 
-![avatar](../images/cs_time_3_1.png "高斯模糊")
+![avatar](../../images/cs_time_3_1.png "高斯模糊")
 
 4 计算角点,0.13ms,同一类似,计算复杂度比一多点.
 
-[glsl代码](../glsl/source/harrisCornerDetection.comp)
+[glsl代码](../../glsl/source/harrisCornerDetection.comp)
 
-![avatar](../images/cs_time_4.png "计算角点")
+![avatar](../../images/cs_time_4.png "计算角点")
 
 5 NonMaximumSuppression非极大值抑制,3*3,0.19ms
 
-[glsl代码](../glsl/source/thresholdedNMS.comp)
+[glsl代码](../../glsl/source/thresholdedNMS.comp)
 
-![avatar](../images/cs_time_5.png "非极大值抑制")
+![avatar](../../images/cs_time_5.png "非极大值抑制")
 
 相对于XYDerivative来说,同样3*3,只使用0.19ms,后面具体分析下原因.
 
 6 角点结果box模糊,核长5,时间0.20ms*2.
 
-[glsl代码](../glsl/source/filterRow.comp)
+[glsl代码](../../glsl/source/filterRow.comp)
 
-![avatar](../images/cs_time_6.png "高斯模糊")
+![avatar](../../images/cs_time_6.png "高斯模糊")
 
 7 Reduce运算,用于求一张图的一些聚合运算,如最大值,最小值,总和这些,好奇怪,我在做之前粗略估算下需要的时间应该在0.4ms左右,但是实际只有(0.07+0.01)ms.
 
 嗯,这其实是有个很大区别,模糊那种核是图中每个点需要取周边多少个点,一共取点是像素x核长x核长,而Reduce运算最开始一个点取多个像素,但是总值还是只有图像像素大小.
 
-[pre reduce glsl代码](../glsl/source/reduce.comp)
+[pre reduce glsl代码](../../glsl/source/reduce.comp)
 
-[reduce glsl代码](../glsl/source/reduce2.comp)
+[reduce glsl代码](../../glsl/source/reduce2.comp)
 
-![avatar](../images/cs_time_7.png "Reduce运算")
+![avatar](../../images/cs_time_7.png "Reduce运算")
 
 主要分二步来操作.
 
@@ -82,15 +82,15 @@
 
 8 双边滤波,10*10的卷积,无优化,需要3ms.
 
-[glsl](../glsl/source/bilateral.comp)
+[glsl](../../glsl/source/bilateral.comp)
 
-![avatar](../images/cs_time_8.png "双边滤波")
+![avatar](../../images/cs_time_8.png "双边滤波")
 
 9 Dilation/Erosion.
 
-[row morph glsl](../glsl/source/morph1.comp)
+[row morph glsl](../../glsl/source/morph1.comp)
 
-[column morph glsl](../glsl/source/morph2.comp)
+[column morph glsl](../../glsl/source/morph2.comp)
 
 同样使用row/column分离操作,其中3x3卷积,0.15msx2.其中10x10,0.17msx2
 
@@ -105,18 +105,18 @@
 
 10 在Compute shader中插入vkCmdCopyImage发现会占用0.3ms-07ms左右的时间,从逻辑上来说,应该不可能啊,这个copy应该比最简单的运算层占去的时间要小才对,测试了二种方案,对应参数bUserPipe,表示用不用管线,用管线控制到0.2ms内,用vkCmdCopyImage在3ms以上,后面找下资料看看是什么问题
 
-![avatar](../images/cs_time_9.png "vkCmdCopyImage")
-![avatar](../images/cs_time_10.png "cs copy")
+![avatar](../../images/cs_time_9.png "vkCmdCopyImage")
+![avatar](../../images/cs_time_10.png "cs copy")
 
 11 直方图,单通道大部分聚合算使用的是原子操作,也算是一个代表.
 
-[glsl](../glsl/source/histogram.comp)
+[glsl](../../glsl/source/histogram.comp)
 
-![avatar](../images/cs_time_11.png "atiom")
+![avatar](../../images/cs_time_11.png "atiom")
 
 我在开始四通道时使用类似reduce2分二段,不用原子操作的方式,但是效果并不好,一是第一次把16*16块的方式转换成对应的一个个直方图,模块并没的缩小,导致第二块把这一个直方图通过for加在一起需要循环1920/16x1080/16(假设是1080P的图),这个会花费超过2ms,这种方式就pass掉,我直接使用原子操作导出四个图然后再结合都比这个快.
 
-![avatar](../images/cs_time_12.png "atiom")
+![avatar](../../images/cs_time_12.png "atiom")
 
 可以看到,在这之前,我们要先vkCmdClearColorImage,几乎不消费时间,我也是这样理解的,但是为什么vkCmdCopyImage会导致那么大的时间了?
 
@@ -124,41 +124,41 @@
 
 12 Kuwahara 因其算法特点,卷积分离没有使用,只使用了局部共享内部优化.
 
-[glsl](../glsl/source/kuwahara.comp)
+[glsl](../../glsl/source/kuwahara.comp)
 
 5*5的核,3.3ms,很有点高了.
 
-![avatar](../images/cs_time_13.png "Kuwahara")
+![avatar](../../images/cs_time_13.png "Kuwahara")
 
 10*10的核,9.7ms.
 
-![avatar](../images/cs_time_14.png "Kuwahara")
+![avatar](../../images/cs_time_14.png "Kuwahara")
 
 在手机Redmi 10X Pro 在720P下非常流畅,可以实时运行.
 
 13 Median 中值滤波,算法和kuwahara类似,但是中间需要排序,所以导致时间很高
 
-[glsl](../glsl/source/median.comp)
+[glsl](../../glsl/source/median.comp)
 
 10*10的核,4通道,76ms.
 
-![avatar](../images/cs_time_15.png "Kuwahara")
+![avatar](../../images/cs_time_15.png "Kuwahara")
 
 5*5的核,4通道,27ms.
 
-![avatar](../images/cs_time_16.png "Kuwahara")
+![avatar](../../images/cs_time_16.png "Kuwahara")
 
 10*10的核,1通道,28ms,奇怪了,为什么1通道与4通道相差这么多?我写法有问题?
 
-![avatar](../images/cs_time_17.png "Kuwahara")
+![avatar](../../images/cs_time_17.png "Kuwahara")
 
 5*5的核,1通道,12ms.
 
-![avatar](../images/cs_time_18.png "Kuwahara")
+![avatar](../../images/cs_time_18.png "Kuwahara")
 
 3*3的核,GPUImage里的方式,4通道,0.3ms.
 
-![avatar](../images/cs_time_19.png "Kuwahara")
+![avatar](../../images/cs_time_19.png "Kuwahara")
 
 总结,优化了个寂寞,虽然核大会导致排序也是指数增长,但是这次优化明显不成功,只能说是暂时可用大于3核的情况,后续找找更多的资料试试改进.
 

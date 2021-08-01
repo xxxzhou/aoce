@@ -40,12 +40,13 @@ static IMediaMuxer *muxer = nullptr;
 // rtmp://58.200.131.2:1935/livetv/hunantv
 // rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
 // D://tnmil3vss.flv
-static std::string uri = "rtmp://58.200.131.2:1935/livetv/cctv1";
+// static std::string uri = "rtmp://58.200.131.2:1935/livetv/cctv1";
 // static std::string uri = "D://备份/tnmil3.flv";
 // static std::string uri = "D://tnmil3d.flv";
+static std::string uri = "D://衔接课L1.mp4";
 // static std::string filePath = "D://tnmil3ds.flv";
 // rtmp://127.0.0.1:8011/live/oeiplive1_10_0
-static std::string filePath = "D://tnmil3ds.mp4";
+static std::string filePath = "D://test1.mp4";
 
 class TestMediaPlay : public IMediaPlayerObserver {
    public:
@@ -162,7 +163,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     xtop.detach();
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer
     window = std::make_unique<VulkanWindow>(onPreCommand, false);
-    window->initWindow(hInstance, 1280, 720, "vulkan test");
+    window->initWindow(hInstance, 960, 1280, "vulkan test");  // 960,1280
     window->run();
     muxer->stop();
     unloadAoce();

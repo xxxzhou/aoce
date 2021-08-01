@@ -28,7 +28,7 @@ LowPass有二个输入,然后就是第一输入节点是上层,第二个输入�
 
 HighPass就是比较与LowPass的差异,可用来显示变化大的像素.
 
-相应源码,有兴趣可以自己查看[VkLowPassLayer](../code/aoce_vulkan_extra/layer/VkLowPassLayer.cpp)
+相应源码,有兴趣可以自己查看[VkLowPassLayer](../../code/aoce_vulkan_extra/layer/VkLowPassLayer.cpp)
 
 ## Histogram 直方图
 
@@ -40,7 +40,7 @@ GPUImage通过回读到CPU然后计算,这种方式直接放弃,查看相应open
 
 保存到临时buffer,我在开始四通道时使用类似reduce2分二段,不用原子操作的方式,但是效果并不好,一是第一次把16*16块的方式转换成对应的一个个直方图,模块并没的缩小,导致第二块把这一个直方图通过for加在一起需要循环1920/16x1080/16(假设是1080P的图),这个会花费超过2ms,这种方式就pass掉,我直接使用原子操作导出四个图然后再结合都比这个快.
 
-![avatar](../images/cs_time_12.png "atiom")
+![avatar](../../images/cs_time_12.png "atiom")
 
 可以看到,在这之前,要先vkCmdClearColorImage结果,几乎不消费时间,我也是这样理解的,但是为什么vkCmdCopyImage会导致那么大的时间等待了?
 
@@ -186,4 +186,4 @@ void VkMotionDetectorLayer::onInitNode() {
 
 6. 直方图的显示,现框架实现的VkHistogramLayer里会输出分别为256x1x(R32UI/RGBA32UI)纹理,自己根据你的需求去写相应glsl显示更合适.
 
-其中从D到O的处理,有一部分因为前面实现别的层时,有一些已经实现过,也不在本文里说明,现在GPUImager移植进度大约有60%,相应的效果可以在[vulkanextratest](../samples/vulkanextratest),win端修改Win32.cpp,android修改Android.cpp查看对应平台效果,等所有效果移植完成后会写配套专门的UI界面查看.
+其中从D到O的处理,有一部分因为前面实现别的层时,有一些已经实现过,也不在本文里说明,现在GPUImager移植进度大约有60%,相应的效果可以在[vulkanextratest](../../samples/vulkanextratest),win端修改Win32.cpp,android修改Android.cpp查看对应平台效果,等所有效果移植完成后会写配套专门的UI界面查看.

@@ -9,7 +9,7 @@ create_search_paths(Agora)
 
 find_path(Agora_INCLUDE_DIR NAME AgoraBase.h HINTS ${Agora_INC_SEARCH_PATH} PATH_SUFFIXES)
 
-message(STATUS "agora include:" ${Agora_INC_SEARCH_PATH})
+# message(STATUS "agora include:" ${Agora_INC_SEARCH_PATH})
 
 if(WIN32)
     find_library(Agora_LIBRARYS NAME agora_rtc_sdk HINTS ${Agora_LIB_SEARCH_PATH} PATH_SUFFIXES)
@@ -18,7 +18,7 @@ elseif(ANDROID)
     find_library(Agora_LIBRARYS NAME agora-rtc-sdk-jni HINTS ${Agora_LIB_SEARCH_PATH} PATH_SUFFIXES ${ANDROID_ABI})
 endif()
 
-message(STATUS "agora bin " ${Agora_BIN_SEARCH_PATH})
+# message(STATUS "agora bin " ${Agora_BIN_SEARCH_PATH})
 
 if(Agora_INCLUDE_DIR AND Agora_LIBRARYS)
     set(Agora_FOUND TRUE)

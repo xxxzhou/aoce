@@ -27,6 +27,7 @@ android/android.zip
 android/aoce/src/main/java/aoce/android/library/xswig/*.java
 android/aoce/src/main/java/aoce/android/library/swig/*.java
 android/aoce/lib/*
+android/talkdolive/
 UE4Test/.vs
 UE4Test/Build
 UE4Test/Binaries
@@ -34,10 +35,11 @@ UE4Test/Intermediate
 UE4Test/DerivedDataCache
 UE4Test/Saved
 UE4Test/UE4Test.sln
-UE4Test/Plugins/AocePlugins/Binaries
-UE4Test/Plugins/AocePlugins/Intermediate
-UE4Test/Plugins/AocePlugins/Saved
-UE4Test/Plugins/AocePlugins/ThirdParty/Aoce
+UE4Test/Plugins/*
+!UE4Test/Plugins/AocePlugins/Binaries
+!UE4Test/Plugins/AocePlugins/Intermediate
+!UE4Test/Plugins/AocePlugins/Saved
+!UE4Test/Plugins/AocePlugins/ThirdParty/Aoce
 UE4Test/Content/Assets
 UE4Test/Content/Collections
 UE4Test/Content/Developers

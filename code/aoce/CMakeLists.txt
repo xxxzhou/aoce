@@ -26,8 +26,8 @@ add_sub_path(math AOCE_HEADER AOCE_SOURCE)
 add_sub_path(metadata AOCE_HEADER AOCE_SOURCE)  
 add_sub_path(audioDevice AOCE_HEADER AOCE_SOURCE)
 
-message("aoce head--" ${AOCE_HEADER})
-message("aoce source--" ${AOCE_SOURCE}) 
+# message("aoce head--" ${AOCE_HEADER})
+# message("aoce source--" ${AOCE_SOURCE}) 
 
 add_definitions(-DAOCE_EXPORT_DEFINE)
 add_library(aoce SHARED ${AOCE_SOURCE} ${AOCE_HEADER})

@@ -91,14 +91,14 @@ void onCaptureCompleted(void* context, ACameraCaptureSession* session,
 // AImageReader_ImageListener
 void imageCallback(void* context, AImageReader* reader) {
     AVideoDevice* device = (AVideoDevice*)context;
-
-    AImage* image = nullptr;  
+    if (device == nullptr) {
+        return;
+    }
+    // std::lock_guard<std::mutex> mtx_locker(device->procMtx);
+    AImage* image = nullptr;
     if (AImageReader_acquireLatestImage(reader, &image) != AMEDIA_OK) {
         return;
     }
-    // std::thread processor([=]() {
-    // 如果用join,就没必要std::lock_guard<std::mutex> mtx_locker(procMtx)
-    // 防止读取已经释放数据 Check status here ...
     // Try to process data without blocking the callback
     uint8_t* data = nullptr;
     int32_t numPlanes = 0;
@@ -126,10 +126,10 @@ void imageCallback(void* context, AImageReader* reader) {
         // AImage_delete(image);
     }
     AImage_delete(image);
-    //    });
-    //    当处理的速度慢于取图片的速度,AImageReader_new(maxImages)个图片一起读,然后等待一久时间,造成卡顿的感觉
-    //    // 不如用join,对于取大图片来说效果最好
-    //    processor.join();  // processor.detach();
+//    if(!device->isOpen){
+//        device->onClose();
+//    }
+//    device->stopSignal.notify_all();
 }
 
 AVideoDevice::AVideoDevice(/* args */) {}
@@ -207,40 +207,19 @@ bool AVideoDevice::open() {
 
 bool AVideoDevice::close() {
     // std::lock_guard<std::mutex> mtx_locker(procMtx);
-    if (session) {
-        ACameraCaptureSession_stopRepeating(session);
-        ACameraCaptureSession_close(session);
-        session = nullptr;
+    if(!isOpen){
+        return true;
     }
-    if (request) {
-        ACaptureRequest_removeTarget(request, outputTarget);
-        ACaptureRequest_free(request);
-        ACameraOutputTarget_free(outputTarget);
-        request = nullptr;
-        outputTarget = nullptr;
-    }
-    if (sessionOutput) {
-        ACaptureSessionOutputContainer_remove(outputContainer, sessionOutput);
-        ACaptureSessionOutput_free(sessionOutput);
-        sessionOutput = nullptr;
-    }
-    if (surface) {
-        ANativeWindow_release(surface);
-        surface = nullptr;
-    }
-    if (outputContainer) {
-        ACaptureSessionOutputContainer_free(outputContainer);
-        outputContainer = nullptr;
-    }
-    if (ndkDevice) {
-        ACameraDevice_close(ndkDevice);
-        ndkDevice = nullptr;
-    }
-    if (imageReader) {
-        AImageReader_delete(imageReader);
-        imageReader = nullptr;
-    }
+    onClose();
     return true;
+//    std::unique_lock<std::mutex> lck(procMtx);
+//    // 等待stopSignal信号回传
+//    auto status = stopSignal.wait_for(lck, std::chrono::seconds(2));
+//    if (status == std::cv_status::timeout) {
+//        logMessage(LogLevel::warn, "android ndk camera close time out.");
+//        return false;
+//    }
+//    return true;
 }
 
 bool AVideoDevice::init(ACameraManager* manager, const char* id) {
@@ -283,6 +262,43 @@ bool AVideoDevice::init(ACameraManager* manager, const char* id) {
     // 默认选择第一个输出格式
     setFormat(0);
     return true;
+}
+
+void AVideoDevice::onClose() {
+    if (session) {
+        ACameraCaptureSession_stopRepeating(session);
+        ACameraCaptureSession_close(session);
+        session = nullptr;
+    }
+    if (request) {
+        ACaptureRequest_removeTarget(request, outputTarget);
+        ACaptureRequest_free(request);
+        ACameraOutputTarget_free(outputTarget);
+        request = nullptr;
+        outputTarget = nullptr;
+    }
+    if (sessionOutput) {
+        ACaptureSessionOutputContainer_remove(outputContainer, sessionOutput);
+        ACaptureSessionOutput_free(sessionOutput);
+        sessionOutput = nullptr;
+    }
+    if (surface) {
+        ANativeWindow_release(surface);
+        surface = nullptr;
+    }
+    if (outputContainer) {
+        ACaptureSessionOutputContainer_free(outputContainer);
+        outputContainer = nullptr;
+    }
+    if (ndkDevice) {
+        ACameraDevice_close(ndkDevice);
+        ndkDevice = nullptr;
+    }
+    if (imageReader) {
+        AImageReader_delete(imageReader);
+        imageReader = nullptr;
+    }
+    isOpen = false;
 }
 
 }  // namespace android

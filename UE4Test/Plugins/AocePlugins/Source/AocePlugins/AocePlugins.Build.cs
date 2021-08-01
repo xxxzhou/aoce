@@ -63,7 +63,7 @@ public class AocePlugins : ModuleRules
             string binPath = Path.Combine(aocePath, "bin");
             // 链接库
             PublicSystemLibraryPaths.Add(libPath);
-            string[] runLibs = { "aoce", "aoce_talkto", "aoce_vulkan_extra" };
+            string[] runLibs = { "aoce", "aoce_talkto_cuda", "aoce_talkto", "aoce_vulkan_extra" };
             foreach (var runLib in runLibs)
             {
                 PublicSystemLibraries.Add(runLib + ".lib");
@@ -83,8 +83,8 @@ public class AocePlugins : ModuleRules
             Definitions.Add("WIN32=0");
             AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(ModuleDirectory, "AocePlugins_APL.xml"));
             string aocePath = Path.Combine(ThirdPartyPath, "Aoce/android");
-            // armeabi - v7a / arm64 - v8a  Architecture
-            string[] runAbis = { "armeabi-v7a", "arm64-v8a" };
+            // armeabi-v7a / arm64-v8a  Architecture
+            string[] runAbis = { "arm64-v8a" };
             foreach (var runAbi in runAbis)
             {
                 string libPath = Path.Combine(aocePath, runAbi);

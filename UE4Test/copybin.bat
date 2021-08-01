@@ -37,7 +37,7 @@ echo end copy bin
 
 timeout 1
 echo start copy android bin
-set androidDir=05_livetest
+set androidDir=aoce
 :: armeabi-v7a arm64-v8a
 set androidAbi=arm64-v8a
 if %copyMode%== 1 (

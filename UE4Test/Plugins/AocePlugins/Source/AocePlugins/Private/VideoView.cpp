@@ -17,9 +17,9 @@ namespace aoce {
 		auto* layerFactory = getLayerFactory(gpuType);
 		inputLayer = std::unique_ptr<IInputLayer>(layerFactory->createInput());
 		outputLayer = std::unique_ptr<IOutputLayer>(layerFactory->createOutput());
-// #if WIN32
+ #if WIN32
 		outputLayer->updateParamet({ false,true });
-// #endif
+ #endif
 		yuv2rgbLayer =
 			std::unique_ptr<IYUVLayer>(layerFactory->createYUV2RGBA());
 		// 链接图
