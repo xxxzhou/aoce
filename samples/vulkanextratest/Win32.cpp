@@ -81,11 +81,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
 
     chromKeyLayer = createChromaKeyLayer();
     ChromaKeyParamet keyParamet = {};
-    keyParamet.chromaColor = {0.15f, 0.6f, 0.0f};
-    keyParamet.alphaScale = 20.0f;
+    keyParamet.chromaColor = {0.0f, 0.0f, 0.27f};
+    keyParamet.alphaScale = 10.0f;
     keyParamet.alphaExponent = 0.1f;
-    keyParamet.alphaCutoffMin = 0.2f;
-    keyParamet.lumaMask = 2.0f;
+    keyParamet.alphaCutoffMin = 0.22f;
+    keyParamet.lumaMask = 1.0f;
     keyParamet.ambientColor = {0.1f, 0.1f, 0.9f};
     keyParamet.despillScale = 0.0f;
     keyParamet.despillExponent = 0.1f;
@@ -224,7 +224,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // 如果为true,层需要二个输入,用原始图像做第二个输入
     bool bAutoIn = false;
     // ---
-    // layers.push_back(box1Layer->getLayer());
+    //layers.push_back(box1Layer->getLayer());
     // ---高斯模糊
     // layers.push_back(gaussianLayer->getLayer());
     // 检测resize效果
@@ -241,9 +241,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // layers.push_back(boxFilterLayer1->getLayer());
     // layers.push_back(alphaShow2Layer);
     // ---查看导向滤波效果
-    // layers.push_back(chromKeyLayer->getLayer());
+    layers.push_back(chromKeyLayer->getLayer());
     // layers.push_back(guidedLayer->getLayer());
-    // layers.push_back(alphaShowLayer);
+    layers.push_back(alphaShowLayer);
     // ---平均亮度调整阈值
     // layers.push_back(averageLT->getLayer());
     // layers.push_back(alphaShowLayer);
@@ -325,13 +325,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     // ---softEleganceLayer
     // layers.push_back(seLayer->getLayer());
     // ---直方图均衡化
-    if (boolSignalEq) {
-        layers.push_back(luminanceLayer);
-        layers.push_back(eqHistLayer);
-        layers.push_back(alphaShowLayer);
-    } else {
-        layers.push_back(eqHistLayer);
-    }
+    // if (boolSignalEq) {
+    //     layers.push_back(luminanceLayer);
+    //     layers.push_back(eqHistLayer);
+    //     layers.push_back(alphaShowLayer);
+    // } else {
+    //     layers.push_back(eqHistLayer);
+    // }
 
     view->initGraph(layers, hInstance, bAutoIn);
     // 如果有LUT,需要在initGraph后,加载Lut表格数据

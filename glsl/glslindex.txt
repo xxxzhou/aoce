@@ -138,8 +138,10 @@ subtractBlend.comp
 swirl.comp
 sharpen.comp
 poissonBlend.comp
-sobelThreshold.comp
-sobelThreshold.comp sketchThreshold.comp SKETCH=1
+sobelThreshold.comp sobelThreshold.comp CHANNEL_RGBA=1
+sobelThreshold.comp sobelThresholdC1.comp CHANNEL_R8=1
+sobelThreshold.comp sketchThreshold.comp SKETCH=1 CHANNEL_RGBA=1
+sobelThreshold.comp sketchThresholdC1.comp SKETCH=1 CHANNEL_R8=1
 tiltShift.comp
 unsharpMask.comp
 vibrance.comp
@@ -162,3 +164,7 @@ directionalNMS.comp
 histogramLut.comp
 histogramLutResult.comp histogramLutResult.comp CHANNEL_RGBA=1
 histogramLutResult.comp histogramLutResultC1.comp CHANNEL_R8=1
+alphaSeparate.comp
+alphaCombin.comp
+twoImage.comp twoImageColumn.comp COLUMN=1
+twoImage.comp twoImageRow.comp ROW=1

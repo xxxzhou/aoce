@@ -48,6 +48,51 @@ void VkAlphaShow2Layer::onInitGraph() {
     outFormats[0].imageType = ImageType::rgba8;
 }
 
+VkAlphaSeparateLayer::VkAlphaSeparateLayer() {
+    glslPath = "glsl/alphaSeparate.comp.spv";
+    inCount = 1;
+    outCount = 1;
+}
+
+VkAlphaSeparateLayer::~VkAlphaSeparateLayer() {}
+
+void VkAlphaSeparateLayer::onInitGraph() {
+    VkLayer::onInitGraph();
+    //
+    inFormats[0].imageType = ImageType::rgba8;
+    outFormats[0].imageType = ImageType::r8;
+}
+
+VkAlphaCombinLayer::VkAlphaCombinLayer() {
+    glslPath = "glsl/alphaCombin.comp.spv";
+    inCount = 2;
+    outCount = 1;
+}
+
+VkAlphaCombinLayer::~VkAlphaCombinLayer() {}
+
+void VkAlphaCombinLayer::onInitGraph() {
+    VkLayer::onInitGraph();
+    //
+    inFormats[0].imageType = ImageType::rgba8;
+    inFormats[1].imageType = ImageType::r8;
+    outFormats[0].imageType = ImageType::rgba8;
+}
+
+VkTwoShowLayer::VkTwoShowLayer(bool bRow) {
+    glslPath = "glsl/twoImageColumn.comp.spv";
+    if (bRow) {
+        glslPath = "glsl/twoImageRow.comp.spv";
+    }
+    inCount = 2;
+    outCount = 1;
+    paramet = 0.5f;
+    setUBOSize(sizeof(paramet), true);
+    updateUBO(&paramet);
+}
+
+VkTwoShowLayer::~VkTwoShowLayer() {}
+
 }  // namespace layer
 }  // namespace vulkan
 }  // namespace aoce

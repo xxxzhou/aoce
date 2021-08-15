@@ -19,9 +19,13 @@ public:
 	AAoceDisplayActor();
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
-		class AStaticMeshActor* actor;
+		class AStaticMeshActor* actor = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
-		class UMaterialInterface* material;
+		class UMaterialInterface* material = nullptr;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		class AStaticMeshActor* actorCompared = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		class UMaterialInterface* materialCompared = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		UTexture2D* sourceTex = nullptr;
 private:
@@ -29,6 +33,7 @@ private:
 
 private:
 	class UMaterialInstanceDynamic* materialDynamic = nullptr;
+	class UMaterialInstanceDynamic* materialDynamicCompared = nullptr;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

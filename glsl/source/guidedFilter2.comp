@@ -23,7 +23,7 @@ void main(){
 	vec3 mean_I = color.xyz;
 	float mean_p = color.w;
 	vec3 mean_Ip = imageLoad(inTex1,uv).xyz;
-	vec3 var_I_r = imageLoad(inTex2,uv).xyz; - mean_I.x*mean_I;
+	vec3 var_I_r = imageLoad(inTex2,uv).xyz - mean_I.x*mean_I;
 	vec3 var_I_gbxfv = imageLoad(inTex3,uv).xyz;
 	//计算方差
 	float gg = var_I_gbxfv.x - mean_I.y*mean_I.y;

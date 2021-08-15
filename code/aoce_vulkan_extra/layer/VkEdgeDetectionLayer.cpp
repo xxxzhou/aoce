@@ -29,8 +29,12 @@ VkSketchLayer::VkSketchLayer(/* args */) { glslPath = "glsl/sketch.comp.spv"; }
 
 VkSketchLayer::~VkSketchLayer() {}
 
-VkThresholdSketchLayer::VkThresholdSketchLayer(/* args */) {
-    glslPath = "glsl/sketchThreshold.comp.spv";
+VkThresholdSketchLayer::VkThresholdSketchLayer(bool signalChannal) {
+    bSignal = signalChannal;
+    glslPath = "glsl/sketchThresholdC1.comp.spv";
+    if (!bSignal) {
+        glslPath = "glsl/sketchThreshold.comp.spv";
+    }
     setUBOSize(sizeof(paramet), true);
     updateUBO(&paramet);
 }
@@ -39,12 +43,16 @@ VkThresholdSketchLayer::~VkThresholdSketchLayer() {}
 
 void VkThresholdSketchLayer::onInitGraph() {
     VkLayer::onInitGraph();
-    inFormats[0].imageType = ImageType::r8;
+    inFormats[0].imageType = bSignal ? ImageType::r8 : ImageType::rgba8;
     outFormats[0].imageType = ImageType::r8;
 }
 
-VkThresholdEdgeDetectionLayer::VkThresholdEdgeDetectionLayer(/* args */) {
-    glslPath = "glsl/sobelThreshold.comp.spv";
+VkThresholdEdgeDetectionLayer::VkThresholdEdgeDetectionLayer(bool signalChannal)
+    : VkThresholdSketchLayer(signalChannal) {
+    glslPath = "glsl/sobelThresholdC1.comp.spv";
+    if (!bSignal) {
+        glslPath = "glsl/sobelThreshold.comp.spv";
+    }
     setUBOSize(sizeof(paramet), true);
     updateUBO(&paramet);
 }

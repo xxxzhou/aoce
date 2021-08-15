@@ -44,10 +44,12 @@ class VkThresholdSketchLayer : public VkLayer,
                                public ITLayer<ThresholdSobelParamet> {
     AOCE_LAYER_QUERYINTERFACE(VkThresholdSketchLayer)
     AOCE_VULKAN_PARAMETUPDATE()
-   private:
+   protected:
     /* data */
+    bool bSignal = true;
+
    public:
-    VkThresholdSketchLayer(/* args */);
+    VkThresholdSketchLayer(bool signalChannal = true);
     virtual ~VkThresholdSketchLayer();
 
    protected:
@@ -61,11 +63,9 @@ class VkThresholdEdgeDetectionLayer : public VkThresholdSketchLayer {
    private:
     /* data */
    public:
-    VkThresholdEdgeDetectionLayer(/* args */);
+    VkThresholdEdgeDetectionLayer(bool signalChannal = true);
     virtual ~VkThresholdEdgeDetectionLayer();
 };
-
-
 
 }  // namespace layer
 }  // namespace vulkan

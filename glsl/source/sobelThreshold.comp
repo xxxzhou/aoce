@@ -2,7 +2,12 @@
 
 layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
 
+#if CHANNEL_RGBA
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+#elif CHANNEL_R8
 layout (binding = 0, r8) uniform readonly image2D inTex;
+#endif
+
 layout (binding = 1, r8) uniform image2D outTex;
 
 layout (binding = 2) uniform UBO {
@@ -29,17 +34,19 @@ void main(){
             x = max(0,min(x,size.x-1));
             y = max(0,min(y,size.y-1));
             int index = j+i*3;
-            float value = imageLoad(inTex,ivec2(x,y)).r;
+            #if CHANNEL_RGBA 
+                float value = imageLoad(inTex,ivec2(x,y)).a;
+            #elif CHANNEL_R8
+                float value = imageLoad(inTex,ivec2(x,y)).r;
+            #endif
             vertical += value * verticalKernel[index];
             horizont += value * horizontKernel[index];
         }
     }
-    vertical = max(0.0,vertical);
-    horizont = max(0.0,horizont);
     float mag = length(vec2(horizont, vertical)) * ubo.edgeStrength;
     mag = step(ubo.threshold,mag);
 #if SKETCH
     mag = 1.0f - mag;
 #endif  
-    imageStore(outTex, uv, vec4(1.0 - mag));    
+    imageStore(outTex, uv, vec4(mag));    
 }

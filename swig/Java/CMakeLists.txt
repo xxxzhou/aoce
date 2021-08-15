@@ -21,7 +21,7 @@ SET(CMAKE_SWIG_OUTDIR ${AOCE_SWIG_TEMP_DIR})
 
 # 生成输出SO目录(和别的C++so文件不在一起,单独指定可能引起编译问题)
 # set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/android/aoce/libs/${ANDROID_ABI})
-swig_add_library(aoce_swig_java LANGUAGE java SOURCES ${WRAPPERLIST})
+SWIG_ADD_LIBRARY(aoce_swig_java LANGUAGE java SOURCES ${WRAPPERLIST})
 if(AOCE_INSTALL_AGORA)
     swig_link_libraries(aoce_swig_java android aoce aoce_vulkan_extra aoce_talkto)
 else()
@@ -33,15 +33,15 @@ file(GLOB JAVA_NTEMP_FILES ${AOCE_SWIG_TEMP_DIR}/*.java)
 file(GLOB JAVA_NOW_FILES ${AOCE_SWIG_OUTPUT_DIR}/*.java)
 message(STATUS "android swig src dir: ${AOCE_SWIG_TEMP_DIR}")
 message(STATUS "android swig dst dir: ${AOCE_SWIG_OUTPUT_DIR}")
-if(JAVA_NTEMP_FILES)
+#if(JAVA_NTEMP_FILES)
     message(STATUS "android swig start copy")
     # 移除老的生成文件
-    file(REMOVE ${JAVA_NOW_FILES} "")
+    #file(REMOVE ${JAVA_NOW_FILES} "")
     # copy新的生成文件
     file(COPY ${JAVA_NTEMP_FILES}
         DESTINATION ${AOCE_SWIG_OUTPUT_DIR})
     file(REMOVE ${JAVA_NTEMP_FILES} "")
-endif()
+#endif()
 
 end_android_find_host()
 

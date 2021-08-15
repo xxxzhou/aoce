@@ -41,7 +41,7 @@ class VkExtraBaseView : public IVideoDeviceObserver {
     ~VkExtraBaseView();
 
    private:
-        void onPreCommand(uint32_t index);
+    void onPreCommand(uint32_t index);
 
    public:
     virtual void onVideoFrame(VideoFrame frame) override;

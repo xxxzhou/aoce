@@ -191,7 +191,7 @@ AOCE_VE_EXPORT ITLayer<float>* createSobelEdgeDetectionLayer();
 AOCE_VE_EXPORT ITLayer<float>* createPrewittEdgeDetectionLayer();
 // 执行Sobel边缘阈值检测,根据threshold返回0/1
 AOCE_VE_EXPORT ITLayer<ThresholdSobelParamet>*
-createThresholdEdgeDetectionLayer();
+createThresholdEdgeDetectionLayer(bool bSingle = true);
 // 执行Canny边缘阈值检测
 AOCE_VE_EXPORT ITLayer<CannyEdgeDetectionParamet>*
 createCannyEdgeDetectionLayer();
@@ -324,7 +324,8 @@ AOCE_VE_EXPORT ITLayer<CrosshatchParamet>* createCrosshatchLayer();
 // 参数同SobelEdgeDetectionLayer
 AOCE_VE_EXPORT ITLayer<float>* createSketchLayer();
 // 与SketchLayer过滤器相同,仅对边缘进行阈值处理,而不是灰度
-AOCE_VE_EXPORT ITLayer<ThresholdSobelParamet>* createThresholdSketchLayer();
+AOCE_VE_EXPORT ITLayer<ThresholdSobelParamet>* createThresholdSketchLayer(
+    bool bSingle = true);
 // 使用Sobel边缘检测在对象周围放置黑色边框,然后对图像中存在的颜色进行量化,以使图像具有卡通般的质量.
 AOCE_VE_EXPORT ITLayer<ToonParamet>* createToonLayer();
 // 这使用与ToonLayer相似的过程,只是它在卡通效果之前带有高斯模糊用来平滑噪声
@@ -382,6 +383,12 @@ AOCE_VE_EXPORT IBaseLayer* createAlphaShowLayer();
 AOCE_VE_EXPORT IBaseLayer* createAlphaShow2Layer();
 // 用于图像格式转化,包含RGBA8->RGBA32F
 AOCE_VE_EXPORT IBaseLayer* createConvertImageLayer();
+
+AOCE_VE_EXPORT IBaseLayer* createAlphaSeparateLayer();
+
+AOCE_VE_EXPORT IBaseLayer* createAlphaCombinLayer();
+
+AOCE_VE_EXPORT AFloatLayer* createTwoShowLayer(bool bRow);
 }
 
 }  // namespace aoce

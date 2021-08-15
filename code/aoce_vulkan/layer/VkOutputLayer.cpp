@@ -57,7 +57,7 @@ void VkOutputLayer::onInitVkBuffer() {
 }
 
 bool VkOutputLayer::onFrame() {
-    if (paramet.bCpu) {
+    if (paramet.bCpu && inFormats.size() > 0) {
         onImageProcessHandle(outBuffer->getCpuData(), inFormats[0], 0);
     }
     if (paramet.bGpu) {

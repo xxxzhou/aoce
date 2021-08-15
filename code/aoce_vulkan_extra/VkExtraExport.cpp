@@ -40,7 +40,7 @@ using namespace aoce::vulkan::layer;
 namespace aoce {
 
 ITLayer<KernelSizeParamet>* createBoxFilterLayer(ImageType imageType) {
-    VkBoxBlurLayer* boxBlur = new VkBoxBlurLayer(imageType);
+    VkBoxBlurSLayer* boxBlur = new VkBoxBlurSLayer(imageType);
     return boxBlur;
 }
 
@@ -553,13 +553,15 @@ ITLayer<SwirlParamet>* createSwirlLayer() {
     return layer;
 }
 
-ITLayer<ThresholdSobelParamet>* createThresholdEdgeDetectionLayer() {
-    VkThresholdEdgeDetectionLayer* layer = new VkThresholdEdgeDetectionLayer();
+ITLayer<ThresholdSobelParamet>* createThresholdEdgeDetectionLayer(
+    bool bSingle) {
+    VkThresholdEdgeDetectionLayer* layer =
+        new VkThresholdEdgeDetectionLayer(bSingle);
     return layer;
 }
 
-ITLayer<ThresholdSobelParamet>* createThresholdSketchLayer() {
-    VkThresholdSketchLayer* layer = new VkThresholdSketchLayer();
+ITLayer<ThresholdSobelParamet>* createThresholdSketchLayer(bool bSingle) {
+    VkThresholdSketchLayer* layer = new VkThresholdSketchLayer(bSingle);
     return layer;
 }
 
@@ -625,6 +627,21 @@ IBaseLayer* createAlphaShow2Layer() {
 
 IBaseLayer* createConvertImageLayer() {
     VkConvertImageLayer* layer = new VkConvertImageLayer();
+    return layer;
+}
+
+IBaseLayer* createAlphaSeparateLayer() {
+    VkAlphaSeparateLayer* layer = new VkAlphaSeparateLayer();
+    return layer;
+}
+
+IBaseLayer* createAlphaCombinLayer() {
+    VkAlphaCombinLayer* layer = new VkAlphaCombinLayer();
+    return layer;
+}
+
+AFloatLayer* createTwoShowLayer(bool bRow) {
+    VkTwoShowLayer* layer = new VkTwoShowLayer(bRow);
     return layer;
 }
 

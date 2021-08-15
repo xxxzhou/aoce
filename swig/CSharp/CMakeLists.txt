@@ -14,10 +14,10 @@ SET(CMAKE_SWIG_OUTDIR "${CMAKE_CURRENT_SOURCE_DIR}/swig" )
 # file(GLOB SHARP_OLD_FILES ${CMAKE_SWIG_OUTDIR}/*.cs)
 # file(REMOVE ${SHARP_OLD_FILES} "")  
 
-swig_add_library(aoce_swig LANGUAGE csharp SOURCES ${WRAPPERLIST})
+SWIG_ADD_LIBRARY(aoce_swig LANGUAGE csharp SOURCES ${WRAPPERLIST})
 
 if(AOCE_INSTALL_AGORA)
-    target_link_libraries(aoce_swig aoce aoce_vulkan_extra aoce_talkto) 
+    target_link_libraries(aoce_swig aoce aoce_vulkan_extra aoce_talkto_cuda) 
 else()
     target_link_libraries(aoce_swig aoce aoce_vulkan_extra)    
 endif()

@@ -1,4 +1,5 @@
-filter2D.comp filter2D.comp CHANNEL_RGBA=1
-filter2D.comp filter2DC1.comp CHANNEL_R8=1
-filter2D.comp filter2DF4.comp CHANNEL_RGBA32F=1
-colorLocalBinaryPattern.comp
+twoImage.comp twoImageColumn.comp COLUMN=1
+twoImage.comp twoImageRow.comp ROW=1
+filterColumn.comp filterColumn.comp CHANNEL_RGBA=1
+filterColumn.comp filterColumnC1.comp CHANNEL_R8=1
+filterColumn.comp filterColumnF4.comp CHANNEL_RGBA32F=1

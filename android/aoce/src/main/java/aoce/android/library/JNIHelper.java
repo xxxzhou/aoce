@@ -1,6 +1,7 @@
 package aoce.android.library;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 
 import aoce.android.library.xswig.*;
@@ -27,5 +28,6 @@ public class JNIHelper {
     public static void setAgoraContext(AgoraContext agoraContext, Context context) {
         setAgoraContext(AgoraContext.getCPtr(agoraContext), context);
     }
+
 }
 

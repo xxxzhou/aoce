@@ -165,6 +165,10 @@ void FMediaPlayer::start() {
         OAVFrame aframe = getUniquePtr(av_frame_alloc());
         if (audioIndex >= 0) {
             aframe->nb_samples = audioCtx->frame_size;
+            // 原始PCM数据,frame_size=0
+            if(aframe->nb_samples == 0){
+                aframe->nb_samples = 1024;
+            }
             aframe->channel_layout = outLayout;
             aframe->format = outSampleFormat;
             aframe->sample_rate = audioCtx->sample_rate;

@@ -6,6 +6,17 @@ using namespace aoce;
 
 extern "C" {
 
+ImageType getBitmapType(int32_t format){
+    switch (format){
+        case ANDROID_BITMAP_FORMAT_RGBA_8888:
+            return ImageType::rgba8;
+        case ANDROID_BITMAP_FORMAT_A_8:
+            return ImageType::r8;
+        default:
+            return ImageType::other;
+    }
+}
+
 JNIEXPORT jboolean JNICALL
 Java_aoce_android_library_JNIHelper_loadBitmap(JNIEnv *env, jclass clazz, jlong inputLayerPtr,
                                                jobject bitmap) {
@@ -25,8 +36,8 @@ Java_aoce_android_library_JNIHelper_loadBitmap(JNIEnv *env, jclass clazz, jlong 
         logMessage(LogLevel::warn, "android bitmap lockPixels error");
         return false;
     }
-    if (sourceInfo.format != ANDROID_BITMAP_FORMAT_RGBA_8888 &&
-        sourceInfo.format == ANDROID_BITMAP_FORMAT_A_8) {
+    ImageType imageType = getBitmapType(sourceInfo.format);
+    if (imageType == ImageType::other) {
         logMessage(LogLevel::warn, "android bitmap only support rgba8 or r8");
         return false;
     }
@@ -34,8 +45,7 @@ Java_aoce_android_library_JNIHelper_loadBitmap(JNIEnv *env, jclass clazz, jlong 
     ImageFormat imageFormat = {};
     imageFormat.width = sourceInfo.width;
     imageFormat.height = sourceInfo.height;
-    imageFormat.imageType =
-            sourceInfo.format == ANDROID_BITMAP_FORMAT_RGBA_8888 ? ImageType::rgba8 : ImageType::r8;
+    imageFormat.imageType =imageType;
     inputLayer->inputCpuData(sourceData, imageFormat, true);
     AndroidBitmap_unlockPixels(env, bitmap);
     return true;

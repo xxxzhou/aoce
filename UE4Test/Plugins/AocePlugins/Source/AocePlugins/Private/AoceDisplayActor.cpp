@@ -28,12 +28,19 @@ void AAoceDisplayActor::BeginPlay() {
 
 	materialDynamic = UMaterialInstanceDynamic::Create(material, this);
 	actor->GetStaticMeshComponent()->SetMaterial(0, materialDynamic);
+	if (actorCompared != nullptr) {
+		materialDynamicCompared = UMaterialInstanceDynamic::Create(materialCompared, this);
+		actorCompared->GetStaticMeshComponent()->SetMaterial(0, materialDynamicCompared);		
+	}
 }
 
 void AAoceDisplayActor::onTextureChange(const aoce::ImageFormat imageFormat) {
 	if (videoDisplay && materialDynamic) {
-		materialDynamic->SetTextureParameterValue("mainTex", videoDisplay->displayTex);
+		materialDynamic->SetTextureParameterValue("mainTex", videoDisplay->displayTex);		
 		sourceTex = videoDisplay->displayTex;
+	}
+	if (videoDisplay && materialDynamicCompared) {
+		materialDynamicCompared->SetTextureParameterValue("mainTex", videoDisplay->displayTex);
 	}
 }
 

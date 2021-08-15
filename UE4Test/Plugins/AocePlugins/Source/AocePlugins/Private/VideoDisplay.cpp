@@ -1,9 +1,12 @@
 #include "VideoDisplay.hpp"
 #include "Core/Public/Core.h"
+#include "Runtime/Engine/Public/Rendering/Texture2DResource.h"
 #if PLATFORM_ANDROID
 #include "Runtime/Launch/Public/Android/AndroidJNI.h"
 #include "Runtime/ApplicationCore/Public/Android/AndroidApplication.h"
 #endif
+
+class FTexture2DResource;
 
 namespace aoce {
 

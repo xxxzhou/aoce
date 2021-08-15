@@ -137,6 +137,9 @@ public class DataManager {
     private IMedianLayer kuwaharaLayer = null;
     private IPerlinNoiseLayer perlinNoiseLayer = null;
     private IBaseLayer cgaColorspaceLayer = null;
+    // opencv 算法移植
+    private IBaseLayer equalizeHistLayer = null;
+    private IBaseLayer singleEqualizeHistLayer = null;
     // common layer
     private IBaseLayer alphaShowLayer = null;
     private IBaseLayer alphaShowLayer2 = null;
@@ -266,6 +269,7 @@ public class DataManager {
         initImageProcessingLayer();
         initBlendingModesLayer();
         initVisualEffectsLayer();
+        initOpencvLayer();
     }
 
     private void initColorAdjustmentsLayer() {
@@ -348,7 +352,7 @@ public class DataManager {
         tiltShiftLayer = AoceWrapper.createTiltShiftLayer();
         sobelEdgeDetectionLayer = AoceWrapper.createSobelEdgeDetectionLayer();
         prewittEdgeDetectionLayer = AoceWrapper.createPrewittEdgeDetectionLayer();
-        thresholdEdgeDetectionLayer = AoceWrapper.createThresholdEdgeDetectionLayer();
+        thresholdEdgeDetectionLayer = AoceWrapper.createThresholdEdgeDetectionLayer(true);
         cannyEdgeDetectionLayer = AoceWrapper.createCannyEdgeDetectionLayer();
         harrisCornerDetectionLayer = AoceWrapper.createHarrisCornerDetectionLayer();
         nobleCornerDetectionLayer = AoceWrapper.createNobleCornerDetectionLayer();
@@ -479,7 +483,7 @@ public class DataManager {
         halftoneLayer = AoceWrapper.createHalftoneLayer();
         crosshatchLayer = AoceWrapper.createCrosshatchLayer();
         sketchLayer = AoceWrapper.createSketchLayer();
-        thresholdSketchLayer = AoceWrapper.createThresholdSketchLayer();
+        thresholdSketchLayer = AoceWrapper.createThresholdSketchLayer(true);
         toonLayer = AoceWrapper.createToonLayer();
         smoothToonLayer = AoceWrapper.createSmoothToonLayer();
         embossLayer = AoceWrapper.createEmbossLayer();
@@ -519,6 +523,18 @@ public class DataManager {
         layerGroup.addItem("渐晕效果", "vignetteLayer", vignetteLayer);
         layerGroup.addItem("油画效果", "kuwaharaLayer", kuwaharaLayer);
         layerGroup.addItem("模拟CGA颜色空间", "cgaColorspaceLayer", cgaColorspaceLayer);
+
+        groups.add(layerGroup);
+    }
+
+    private void initOpencvLayer() {
+        equalizeHistLayer = AoceWrapper.createEqualizeHistLayer(false);
+        singleEqualizeHistLayer = AoceWrapper.createEqualizeHistLayer(true);
+
+        LayerGroup layerGroup = new LayerGroup();
+        layerGroup.addItem("直方图均衡化", "equalizeHistLayer", equalizeHistLayer);
+        layerGroup.addItemLum("直方图均衡化(单通道)", "equalizeHistLayer", luminanceLayer, singleEqualizeHistLayer, alphaShowLayer);
+        layerGroup.title = "Opencv";
 
         groups.add(layerGroup);
     }

@@ -1,0 +1,35 @@
+#version 450
+
+// 应用两个图像中间滑动显示
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform readonly image2D inTex1;
+layout (binding = 2, rgba8) uniform image2D outTex;
+
+layout (std140, binding = 3) uniform UBO {
+    float divider;
+} ubo;
+
+void main(){
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);    
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    }    
+	vec4 oneColor = imageLoad(inTex,uv);
+    vec4 twoColor = imageLoad(inTex1,uv);
+    vec4 result = oneColor;
+    vec2 fuv = vec2(uv);
+#if ROW    
+    if(fuv.x/size.x > ubo.divider){
+        result = twoColor;
+    }
+#endif
+#if COLUMN
+    if(fuv.y/size.y > ubo.divider){
+        result = twoColor;
+    }
+#endif
+    imageStore(outTex, uv, result); 
+}

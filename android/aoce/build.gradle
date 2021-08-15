@@ -60,21 +60,21 @@ task copyTask {
     }
 }
 
-//task copyFFmpeg {
-//    copy {
-//        from '../../thirdparty/ffmpeg/android'
-//        into 'libs'
-//        include('**/*.so','**/*.jar')
-//    }
-//}
-//
-//task copyAgorg {
-//    copy {
-//        from '../../thirdparty/agora/android'
-//        into 'libs'
-//        include('**/*.so', '**/*.jar')
-//    }
-//}
+task copyFFmpeg {
+    copy {
+        from '../../thirdparty/ffmpeg/android'
+        into 'libs'
+        include('**/*.so','**/*.jar')
+    }
+}
+
+task copyAgorg {
+    copy {
+        from '../../thirdparty/agora/android'
+        into 'libs'
+        include('**/*.so', '**/*.jar')
+    }
+}
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])

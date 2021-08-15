@@ -63,8 +63,25 @@ bool PipeGraph::addLine(int32_t from, int32_t to, int32_t formOut,
     line->toNode = to;
     line->toInIndex = toIn;
     // 数据连接节点无效
-    if (formOut >= nodes[from]->layer->outCount ||
-        toIn >= nodes[to]->layer->inCount) {
+    if (formOut >= nodes[from]->layer->outCount) {
+        std::string message;
+        string_format(message, nodes[from]->layer->getMark(),
+                      " out node index:", formOut, " out range");
+        logMessage(LogLevel::warn, message);
+        return false;
+    }
+    if (toIn >= nodes[to]->layer->inCount) {
+        std::string message;
+        string_format(message, nodes[to]->layer->getMark(),
+                      " in node index:", formOut, " out range");
+        logMessage(LogLevel::warn, message);
+        return false;
+    }
+    // 无效,自身连接自己
+    if (from == to) {
+        std::string message;
+        string_format(message, nodes[to]->layer->getMark(), " connect self");
+        logMessage(LogLevel::warn, message);
         return false;
     }
     // 节点有效性与重复性
@@ -109,13 +126,13 @@ bool PipeGraph::getLayerInFormat(int32_t nodeIndex, int32_t inputIndex,
     return false;
 }
 
-void PipeGraph::clearLines() {    
+void PipeGraph::clearLines() {
     lines.clear();
     validLines.clear();
     bReset = true;
 }
 
-void PipeGraph::clear() {    
+void PipeGraph::clear() {
     lines.clear();
     validLines.clear();
     // 置空,免指向野指针

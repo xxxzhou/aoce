@@ -160,6 +160,7 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
 %include "aoce_talkto/Talkto.h"
 %template(ITexOperateLayer) aoce::ITLayer<aoce::talkto::TexOperateParamet> ;
 %template(ITexClipLayer) aoce::ITLayer<aoce::talkto::TexClipParamet> ;
+%template(IEdgeBlurBlendLayer) aoce::ITLayer<aoce::talkto::EdgeBlurBlendParamet> ;
 #else
 // #error "This is a fatal error message"
 #endif

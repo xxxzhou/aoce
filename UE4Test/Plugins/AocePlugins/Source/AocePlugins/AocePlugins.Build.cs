@@ -12,6 +12,7 @@ public class AocePlugins : ModuleRules
 
         PublicIncludePaths.AddRange(
             new string[] {
+                "Engine"
 				// ... add public include paths required here ...
             }
             );
