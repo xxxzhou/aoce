@@ -43,7 +43,7 @@ class VkSoftEleganceLayer : public GroupLayer, public ISoftEleganceLayer {
 
    public:
     VkSoftEleganceLayer(/* args */);
-    ~VkSoftEleganceLayer();
+    virtual ~VkSoftEleganceLayer();
 
    public:
     virtual void loadLookUp1(uint8_t* data, int32_t size) override;

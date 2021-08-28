@@ -19,7 +19,6 @@ namespace vulkan {
 
 bool supportHardwareImage(VkDevice device);
 
-
 class HardwareImage {
    private:
     /* data */
@@ -28,7 +27,16 @@ class HardwareImage {
     VkImage vkImage = VK_NULL_HANDLE;
     VkDeviceMemory memory = VK_NULL_HANDLE;
     EGLImageKHR image = nullptr;
+
     EGLDisplay display = nullptr;
+    EGLContext context = nullptr;
+    EGLSurface surface = nullptr;
+
+    EGLDisplay oldDisplay = nullptr;
+    EGLContext oldContext = nullptr;
+    EGLSurface oldSurfaceDraw = nullptr;
+    EGLSurface oldSurfaceRead = nullptr;
+
     ImageFormat format = {};
     int32_t textureId = -1;
 
@@ -54,6 +62,13 @@ class HardwareImage {
     // gpu输出资源创建
     void createAndroidBuffer(const ImageFormat &format);
     void bindGL(uint32_t textureId, uint32_t texType = 0);
+
+   private:
+    // UE4上GPU交互更改成独立Context模式
+    bool initContext();
+    void saveContext();
+    void makeCurrent();
+    void restoreContext();
 };
 
 }  // namespace vulkan

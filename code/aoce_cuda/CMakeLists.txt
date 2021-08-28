@@ -42,15 +42,15 @@ else()
     target_link_libraries(aoce_cuda aoce CUDA::cudart_static CUDA::nppc)
 endif()
 #75 70 50 60
-target_compile_options(aoce_cuda PRIVATE
-  "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:
-  -gencode arch=compute_50,code=sm_50
-  -gencode arch=compute_60,code=sm_60 
-  -gencode arch=compute_70,code=sm_70 
-  -gencode arch=compute_75,code=sm_75
-  >")
+# target_compile_options(aoce_cuda PRIVATE
+#   "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:
+#   -gencode arch=compute_50,code=sm_50
+#   -gencode arch=compute_60,code=sm_60 
+#   -gencode arch=compute_70,code=sm_70 
+#   -gencode arch=compute_75,code=sm_75
+#   >")
+set_property(TARGET aoce_cuda PROPERTY CUDA_ARCHITECTURES 50 60 70 75)
 
 aoce_output(aoce_cuda)  
 install_aoce_module(aoce_cuda FLASE)   
 
-# set_property(aoce_cuda tgt PROPERTY CUDA_ARCHITECTURES 50 60 70 75 80)

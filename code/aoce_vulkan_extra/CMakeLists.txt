@@ -41,7 +41,7 @@ install_aoce_module(aoce_vulkan_extra FLASE)
 
 if(WIN32)
     # 复制LUT图片到运行目录下
-    file(GLOB AOCE_IMAGES_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../../images/*.binary" )
+    file(GLOB AOCE_IMAGES_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../../assets/images/*.binary" )
     message(STATUS "aoce_image_path: " ${AOCE_IMAGES_SOURCE})    
     file(COPY ${AOCE_IMAGES_SOURCE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/images")   
 endif()

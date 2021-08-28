@@ -22,4 +22,4 @@ endif()
 target_link_libraries(vulkanextratest aoce aoce_vulkan aoce_vulkan_extra)
 
 aoce_output(vulkanextratest) 
-install_aoce_module(vulkanextratest FALSE) 
+#install_aoce_module(vulkanextratest FALSE) 

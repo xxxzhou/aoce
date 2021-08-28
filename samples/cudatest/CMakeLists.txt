@@ -27,9 +27,9 @@ target_compile_options(cudatest PRIVATE
   -gencode arch=compute_75,code=sm_75
   >")
 
-  aoce_output(cudatest)
+aoce_output(cudatest)
 
 # 复制图片到运行目录下
-file(GLOB AOCE_IMAGES_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../../images/*.bmp" )
+file(GLOB AOCE_IMAGES_SOURCE CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../../assets/images/*.bmp" )
 message(STATUS "aoce_image_path: " ${AOCE_IMAGES_SOURCE})    
 file(COPY ${AOCE_IMAGES_SOURCE} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}/images")    

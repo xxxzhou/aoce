@@ -109,6 +109,8 @@ option(AOCE_INSTALL_FFMPEG "install ffmpeg module" TRUE)
 option(AOCE_ENABLE_SAMPLES "enable samples" TRUE) 
 option(AOCE_ENABLE_WINRT "enable winrt" TRUE) 
 option(AOCE_ENABLE_SWIG "enable swig" TRUE) 
+option(AOCE_INSTALL_NCNN "install ncnn module" TRUE)
+
 cmake_dependent_option(AOCE_CUDA_MODULE "install cuda module" TRUE "WIN32" FALSE)
 cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGORA_EXIST" FALSE) #FALSE
 

@@ -53,8 +53,8 @@ extern "C" void testFastGuided() {
 
 	std::string aocePath = aoce::getAocePath();
 
-	std::string imgPathI = aocePath + "/images/top.bmp";//lookup_amatorka  toy.bmp
-	std::string imgPathP = aocePath + "/images/toy-mask.bmp";
+	std::string imgPathI = aocePath + "/assets/images/top.bmp";//lookup_amatorka  toy.bmp
+	std::string imgPathP = aocePath + "/assets/images/toy-mask.bmp";
 	I = cv::imread(imgPathI.c_str(), IMREAD_COLOR);	
 	P = cv::imread(imgPathP.c_str(), IMREAD_GRAYSCALE);
 

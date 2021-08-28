@@ -114,6 +114,18 @@ void HardwareImage::release() {
         vkFreeMemory(vkDevice, memory, nullptr);
         memory = VK_NULL_HANDLE;
     }
+    if(surface != EGL_NO_SURFACE){
+        eglDestroySurface(display,surface);
+        surface = EGL_NO_SURFACE;
+    }
+    if(context != EGL_NO_CONTEXT){
+        eglDestroyContext(display,context);
+        context = EGL_NO_CONTEXT;
+    }
+    if(display){
+        eglTerminate(display);
+        display = EGL_NO_DISPLAY;
+    }
 }
 
 void HardwareImage::createAndroidBuffer(const ImageFormat &format) {
@@ -231,19 +243,28 @@ void HardwareImage::bindVK(AHardwareBuffer *buffer, bool useExternalFormat) {
 
     // android绑定AHardwareBuffer与egl image
     EGLClientBuffer native_buffer = eglGetNativeClientBufferANDROID(buffer);
-    assert(native_buffer);
+    if(!native_buffer){
+        logMessage(LogLevel::error, "eglGetNativeClientBufferANDROID failed");
+        return;
+    }
+    if(!initContext()){
+        logMessage(LogLevel::error, "hardwareImage initContext failed");
+        return;
+    }
+    saveContext();
+    makeCurrent();
     EGLint attrs[] = {EGL_NONE};
-    // eglGetCurrentDisplay()/eglGetDisplay(EGL_DEFAULT_DISPLAY)
-    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);  
-    image = eglCreateImageKHR(display, EGL_NO_CONTEXT,
-                              EGL_NATIVE_BUFFER_ANDROID, native_buffer, attrs);
+    image = eglCreateImageKHR(display, context, EGL_NATIVE_BUFFER_ANDROID,
+                              native_buffer, attrs);
     // assert(image != EGL_NO_IMAGE_KHR);
     if (image == EGL_NO_IMAGE_KHR) {
         int32_t errorId = eglGetError();
-        logMessage(LogLevel::error, "not create hardware image,error id" + errorId);
+        logMessage(LogLevel::error,
+                   "not create hardware image,error id" + errorId);
     } else {
         logMessage(LogLevel::info, "hardware image create success.");
     }
+    restoreContext();
 }
 
 void HardwareImage::bindGL(uint32_t textureId, uint32_t texType) {
@@ -254,6 +275,9 @@ void HardwareImage::bindGL(uint32_t textureId, uint32_t texType) {
     if (texType > 0) {
         bindType = texType;
     }
+    saveContext();
+    makeCurrent();
+
     this->textureId = textureId;
     // AHardwareBuffer_lock(AHARDWAREBUFFER_USAGE_CPU_READ_NEVER)
     // glActiveTexture(GL_TEXTURE0);
@@ -263,6 +287,56 @@ void HardwareImage::bindGL(uint32_t textureId, uint32_t texType) {
     // glTexParameteri(bindType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     // glTexParameteri(bindType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(bindType, 0);
+
+    restoreContext();
+}
+
+bool HardwareImage::initContext() {
+    EGLContext shareContext = EGL_NO_CONTEXT;
+    // eglGetCurrentDisplay()/eglGetDisplay(EGL_DEFAULT_DISPLAY)
+    display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if (display == EGL_NO_DISPLAY) {
+        logMessage(LogLevel::error, "unable to get egl14 display");
+        return false;
+    }
+    EGLint major = 0;
+    EGLint minor = 0;
+    if (!eglInitialize(display, &major, &minor)) {
+        return false;
+    }
+    EGLConfig config = nullptr;
+    EGLint numConfigs = 0;
+    const EGLint configSpec[] = {EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+                                 EGL_SURFACE_TYPE, EGL_PBUFFER_BIT, EGL_NONE};
+    if (!eglChooseConfig(display, configSpec, &config, 1, &numConfigs)) {
+        return false;
+    }
+    const EGLint contextAttribsES2[] = {EGL_CONTEXT_CLIENT_VERSION, 2,
+                                        EGL_NONE};
+    const EGLint contextAttribsES31[] = {EGL_CONTEXT_MAJOR_VERSION_KHR, 3,
+                                           EGL_CONTEXT_MINOR_VERSION_KHR, 1,
+                                           EGL_NONE};
+    context = eglCreateContext(display,config,shareContext,major ==3?contextAttribsES31:contextAttribsES2);
+    surface = EGL_NO_SURFACE;
+    return true;
+}
+
+void HardwareImage::saveContext() {
+    oldDisplay = eglGetCurrentDisplay();
+    oldContext = eglGetCurrentContext();
+    oldSurfaceDraw = eglGetCurrentSurface(EGL_DRAW);
+    oldSurfaceRead = eglGetCurrentSurface(EGL_READ);
+}
+
+void HardwareImage::makeCurrent() {
+    eglMakeCurrent(display,surface,surface,context);
+}
+
+void HardwareImage::restoreContext() {
+    if(!oldDisplay || oldDisplay == display){
+        return;
+    }
+    eglMakeCurrent(oldDisplay,oldSurfaceDraw,oldSurfaceRead,oldContext);
 }
 
 }  // namespace vulkan

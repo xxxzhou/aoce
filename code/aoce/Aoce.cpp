@@ -179,6 +179,10 @@ const char* getImageType(const ImageType& imageType) {
             return "r32";
         case ImageType::rgba32:
             return "rgba32";
+        case ImageType::rgb8:
+            return "rgb8";
+        case ImageType::bgr8:
+            return "bgr8";
         case ImageType::other:
         default:
             return "invalid";
@@ -543,6 +547,7 @@ std::string getAocePath() {
     ::GetModuleFileNameA(ihdll, sz, 512);
     ::PathRemoveFileSpecA(sz);
     std::string path = sz;
+    std::replace(path.begin(), path.end(), '\\', '/');
     return path;
 #elif __ANDROID__
     return "";

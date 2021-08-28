@@ -257,7 +257,7 @@ Java_aoce_samples_vulkanextratest_MainActivity_initEngine(JNIEnv* env,
     // --- LUT颜色表映射
     // std::string aocePath = getAocePath();
     // std::wstring spath =
-    //     utf8TWstring(aocePath + "/images/lookup_amatorka.binary");
+    //     utf8TWstring(aocePath + "/assets/images/lookup_amatorka.binary");
     // if (existsFile(spath.c_str())) {
     //     loadFileBinary(spath.c_str(), lutData);
     //     lutLayer = createLookupLayer();

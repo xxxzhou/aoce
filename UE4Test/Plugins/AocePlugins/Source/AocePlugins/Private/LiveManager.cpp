@@ -39,6 +39,9 @@ namespace aoce {
 		this->gpuType = gpuType;
 		// live在unload时会自动清理
 		live = getLiveRoom(liveType);
+		if (!live) {
+			logMessage(LogLevel::error, "live model failed.");
+		}
 		AgoraContext contex = {};
 		contex.bLoopback = false;
 		bool bInit = live->initRoom(&contex, this);

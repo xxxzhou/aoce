@@ -2,7 +2,7 @@
 
 ## Harris角点检测
 
-![avatar](../../images/harris_1.jpg "Harris角点检测")
+![avatar](../../assets/images/harris_1.jpg "Harris角点检测")
 
 UI还是用的上次扣像的,只有前后置可以用,别的没有效果,只看实现就好.
 
@@ -61,21 +61,21 @@ shared uint column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];//vec4[local_siz
 
 原图:
 
-![avatar](../../images/guidedtest_1.png "要扣像的图")
+![avatar](../../assets/images/guidedtest_1.png "要扣像的图")
 
 绿色扣图:
 
-![avatar](../../images/guidedtest_2.png "绿色扣图")
+![avatar](../../assets/images/guidedtest_2.png "绿色扣图")
 
 扣图经过导向滤波处理:
 
-![avatar](../../images/guidedtest_3.png "导向滤波处理")
+![avatar](../../assets/images/guidedtest_3.png "导向滤波处理")
 
 我原来移植到CUDA过里,有兴趣移步[CUDA加opencv复现导向滤波算法](https://www.cnblogs.com/zhouxin/p/10203954.html).
 
 我总结下了GPU里比较容易实现的流程.
 
-![avatar](../../images/guided_process.png "导向滤波流程")
+![avatar](../../assets/images/guided_process.png "导向滤波流程")
 
 看了这图,我忽然理解GPUImage为什么不实现这个算法了,算法不复杂,需要节点多输入多输出以及流程正确顺序保证,先看下类的主要流程实现,有兴趣可以查看[详细代码](https://github.com/xxxzhou/aoce/blob/master/code/aoce_vulkan_extra/layer/VkGuidedLayer.cpp).
 
@@ -119,7 +119,7 @@ void VkGuidedLayer::onInitNode() {
 
 可以看到虽然有很多计算层,但是效率非常高,N卡2070下,1080P的图像,快速导向resize长宽/8下,所有boxblur使用20核长,关于导向滤波的处理差不多就1ms,主要是导向滤波与图像的分辨率无关,中间所有计算可以在很少的分辨率下进行.
 
-![avatar](../../images/guidedtest_nsight.png "导向滤波性能图")
+![avatar](../../assets/images/guidedtest_nsight.png "导向滤波性能图")
 
 可以看到中间很多层大多全是0.02ms,主要就是因为导向滤波的分辨率无关性.
 

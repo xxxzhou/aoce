@@ -134,7 +134,7 @@ void main(){
 
 [AverageLuminanceThreshold C++ 实现](https://github.com/xxxzhou/aoce/tree/master/code/aoce_vulkan_extra/layer/VkReduceLayer.cpp)
 
-![avatar](../../images/cs_time_7.png "Reduce运算")
+![avatar](../../assets/images/cs_time_7.png "Reduce运算")
 
 我在做之前根据3x3卷积需要0.2ms左右粗略估算下需要的时间应该在0.3ms左右,但是实际只有(0.07+0.01)ms,后面想了下,这其实是有个很大区别,模糊那种核是图中每个点需要取周边多少个点,一共取点是像素x核长x核长,而Reduce运算最开始一个点取多个像素,但是总值还是只有图像像素大小.
 

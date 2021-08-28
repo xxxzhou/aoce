@@ -50,12 +50,12 @@ int main() {
 
     // std::string aocePath = getAocePath();
     // std::string imgPathI =
-    //     aocePath + "/images/lookup_amatorka.png";  // lookup_amatorka toy.bmp
-    // std::string imgPathP = aocePath + "/images/toy-mask.bmp";
+    //     aocePath + "/assets/images/lookup_amatorka.png";  // lookup_amatorka toy.bmp
+    // std::string imgPathP = aocePath + "/assets/images/toy-mask.bmp";
     // cv::Mat I = cv::imread(imgPathI.c_str(), IMREAD_COLOR);
     // cv::cvtColor(I, I, cv::COLOR_BGR2RGB);
     // std::wstring spath =
-    //     utf8TWstring(aocePath + "/images/lookup_amatorka.binary");
+    //     utf8TWstring(aocePath + "/assets/images/lookup_amatorka.binary");
     // saveFileBinary(spath.c_str(), (void*)I.data, 512 * 512 * 3);
 
     while (int key = cv::waitKey(20)) {

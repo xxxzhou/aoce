@@ -6,7 +6,7 @@ android/window 图像处理,多媒体以及游戏引擎交互.
 
 [aoce移植GPUImage展示](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoceswigtest-release.apk)
 
-![avatar](images/layers_demo.png "滤镜目录")
+![avatar](assets/images/layers_demo.png "滤镜目录")
 
 [aoce.xswig封装aar包](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoce-release.aar) 如果你没有装swig,就需要手动下载这个.
 
@@ -22,6 +22,8 @@ android/window 图像处理,多媒体以及游戏引擎交互.
 vulkan项目使用glsl,请安装Vulkan SDK,通过工具glslangValidator把glsl编译成SPIR-V.
 
 如果要使用aoce_cuda模块,请安装CUDA.
+
+在根目录下的CMakeLists.txt,可以根据需求打开/关闭AOCE_INSTALL_FFMPEG/AOCE_ENABLE_SAMPLES/AOCE_ENABLE_WINRT/AOCE_ENABLE_SWIG 这些选项,编译不过可以
 
 ## 做什么
 

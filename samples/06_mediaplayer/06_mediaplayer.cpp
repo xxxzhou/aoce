@@ -43,10 +43,11 @@ static IMediaMuxer *muxer = nullptr;
 // static std::string uri = "rtmp://58.200.131.2:1935/livetv/cctv1";
 // static std::string uri = "D://备份/tnmil3.flv";
 // static std::string uri = "D://tnmil3d.flv";
-static std::string uri = "D://衔接课L1.mp4";
+static std::string uri = "D://Book/G6/U3L2_1280_10.mp4";
 // static std::string filePath = "D://tnmil3ds.flv";
 // rtmp://127.0.0.1:8011/live/oeiplive1_10_0
-static std::string filePath = "D://test1.mp4";
+static std::string filePath = "D://test2.mp4";
+static int32_t tick = 0;
 
 class TestMediaPlay : public IMediaPlayerObserver {
    public:
@@ -61,7 +62,7 @@ class TestMediaPlay : public IMediaPlayerObserver {
         player->start();
         muxer->setOutput(filePath.c_str());
         muxer->setVideoStream(player->getVideoStream());
-        muxer->setAudioStream(player->getAudioStream());
+        // muxer->setAudioStream(player->getAudioStream());
         muxer->start();
 #endif
     }
@@ -75,7 +76,7 @@ class TestMediaPlay : public IMediaPlayerObserver {
 
     virtual void onVideoFrame(const VideoFrame &frame) override {
         std::string msg;
-        string_format(msg, "time stamp: ", frame.timeStamp);
+        // string_format(msg, "time stamp: ", frame.timeStamp);
         logMessage(LogLevel::info, msg);
         if (format.width != frame.width || format.height != frame.height) {
             format.width = frame.width;
@@ -86,7 +87,13 @@ class TestMediaPlay : public IMediaPlayerObserver {
         }
         inputLayer->inputCpuData(frame);
         vkGraph->run();
+        // if (tick == 0) {
         muxer->pushVideo(frame);
+        //}
+        tick++;
+        if (tick > 100) {
+            tick = 0;
+        }
 #if __ANDROID__
         if (window) {
             window->tick();
@@ -95,7 +102,7 @@ class TestMediaPlay : public IMediaPlayerObserver {
     };
 
     virtual void onAudioFrame(const AudioFrame &frame) override {
-        muxer->pushAudio(frame);
+        // muxer->pushAudio(frame);
     }
 
     virtual void onStop() override { muxer->stop(); };
@@ -157,8 +164,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     muxer->start();
 #endif
     std::thread xtop([=]() {
-        std::this_thread::sleep_for(std::chrono::seconds(20));
+        std::this_thread::sleep_for(std::chrono::seconds(10));
         muxer->stop();
+        logMessage(LogLevel::info, "stop muxer");
     });
     xtop.detach();
     // 因执行图里随时重启,会导致相应资源重启,故运行时确定commandbuffer

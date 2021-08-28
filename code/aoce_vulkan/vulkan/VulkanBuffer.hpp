@@ -21,7 +21,6 @@ enum class BufferUsage {
 // 后期专门设计一个memory对应多个view的类.(可以一个mesh的IBO,VBO放一起,也可多Mesh放一块)
 class AOCE_VULKAN_EXPORT VulkanBuffer {
    private:
-    VkDeviceMemory memory = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
     VkBufferView view = VK_NULL_HANDLE;
     VkPipelineStageFlags stageFlags =
@@ -36,13 +35,13 @@ class AOCE_VULKAN_EXPORT VulkanBuffer {
     ~VulkanBuffer();
 
    public:
+    VkDeviceMemory memory = VK_NULL_HANDLE;
     VkBuffer buffer = VK_NULL_HANDLE;
     VkDescriptorBufferInfo descInfo = {};
 
    public:
-    void initResoure(BufferUsage usage,
-                     uint32_t dataSize, VkBufferUsageFlags usageFlag,
-                     uint8_t* cpuData = nullptr);
+    void initResoure(BufferUsage usage, uint32_t dataSize,
+                     VkBufferUsageFlags usageFlag, uint8_t* cpuData = nullptr);
     void initView(VkFormat viewFormat);
     void release();
 
@@ -55,7 +54,7 @@ class AOCE_VULKAN_EXPORT VulkanBuffer {
     // 直接返回buffer关联pdata
     inline uint8_t* getCpuData() { return pData; };
 
-    inline int32_t getBufferSize() { return bufferSize;};
+    inline int32_t getBufferSize() { return bufferSize; };
 
     // Computer shader后,插入相关barrier,由读变写,由写变读,确保前面操作完成
     // 后续添加渲染管线与计算管线添加barrier的逻辑

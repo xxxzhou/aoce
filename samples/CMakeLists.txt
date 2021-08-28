@@ -4,10 +4,11 @@ set(targetopencvs 02_showdevice 03_findvulkan)
 set(targetvulkans 04_vulkantest 06_mediaplayer)
 set(targetdx11 07_wintest 09_wincapture)
 
+# 请添加环境变量OpenCV_DIR相应路径
+SET(OpenCV_DIR $ENV{OpenCV_DIR})
+find_package(OpenCV)
+
 if(WIN32)
-    # 请添加环境变量OpenCV_DIR相应路径
-    SET(OpenCV_DIR $ENV{OpenCV_DIR})
-    find_package(OpenCV)
     message(STATUS "OpenCV library status:")
     message(STATUS "    found: ${OpenCV_FOUND}")
     message(STATUS "    version: ${OpenCV_VERSION}")
@@ -74,6 +75,10 @@ if(WIN32 AND AOCE_ENABLE_SAMPLES)
         endif() 
     endif()   
     add_subdirectory(mathtest)
+
+    if(AOCE_INSTALL_NCNN )
+        add_subdirectory(ncnntest)
+    endif()
 endif()
 
 if(ANDROID AND AOCE_ENABLE_SAMPLES)
@@ -97,6 +102,4 @@ if(ANDROID AND AOCE_ENABLE_SAMPLES)
     target_link_libraries(07_androidtest android native-app-glue aoce aoce_vulkan aoce_android)
 endif()
 
-if(AOCE_ENABLE_SAMPLES)
-    add_subdirectory(vulkanextratest)
-endif()
+

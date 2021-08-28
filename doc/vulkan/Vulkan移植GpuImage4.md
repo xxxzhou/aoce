@@ -40,7 +40,7 @@ GPUImage通过回读到CPU然后计算,这种方式直接放弃,查看相应open
 
 保存到临时buffer,我在开始四通道时使用类似reduce2分二段,不用原子操作的方式,但是效果并不好,一是第一次把16*16块的方式转换成对应的一个个直方图,模块并没的缩小,导致第二块把这一个直方图通过for加在一起需要循环1920/16x1080/16(假设是1080P的图),这个会花费超过2ms,这种方式就pass掉,我直接使用原子操作导出四个图然后再结合都比这个快.
 
-![avatar](../../images/cs_time_12.png "atiom")
+![avatar](../../assets/images/cs_time_12.png "atiom")
 
 可以看到,在这之前,要先vkCmdClearColorImage结果,几乎不消费时间,我也是这样理解的,但是为什么vkCmdCopyImage会导致那么大的时间等待了?
 

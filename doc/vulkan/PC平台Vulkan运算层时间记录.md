@@ -12,13 +12,13 @@
 
 [glsl代码](../../glsl/source/luminance.comp)
 
-![avatar](../../images/cs_time_1.png "亮度")
+![avatar](../../assets/images/cs_time_1.png "亮度")
 
 2 计算XYDerivative,3*3,0.29ms.
 
 [glsl代码](../../glsl/source/prewittEdge.comp)
 
-![avatar](../../images/cs_time_2.png "XYDerivative")
+![avatar](../../assets/images/cs_time_2.png "XYDerivative")
 
 时间主要是取周边九个点上,不同于CPU,从显存取值是个大消费.
 
@@ -26,29 +26,29 @@
 
 [glsl代码](../../glsl/source/filterRow.comp)
 
-![avatar](../../images/cs_time_3_0.png "高斯模糊")
+![avatar](../../assets/images/cs_time_3_0.png "高斯模糊")
 
 同上,取周边9*9=81个点,其中高斯模糊使用卷积核分离优化,列和长分别占用0.45ms左右.
 
 我用21核长,时间为0.79ms*2.
 
-![avatar](../../images/cs_time_3_1.png "高斯模糊")
+![avatar](../../assets/images/cs_time_3_1.png "高斯模糊")
 
 我用5核长,时间为0.34ms*2.
 
-![avatar](../../images/cs_time_3_1.png "高斯模糊")
+![avatar](../../assets/images/cs_time_3_1.png "高斯模糊")
 
 4 计算角点,0.13ms,同一类似,计算复杂度比一多点.
 
 [glsl代码](../../glsl/source/harrisCornerDetection.comp)
 
-![avatar](../../images/cs_time_4.png "计算角点")
+![avatar](../../assets/images/cs_time_4.png "计算角点")
 
 5 NonMaximumSuppression非极大值抑制,3*3,0.19ms
 
 [glsl代码](../../glsl/source/thresholdedNMS.comp)
 
-![avatar](../../images/cs_time_5.png "非极大值抑制")
+![avatar](../../assets/images/cs_time_5.png "非极大值抑制")
 
 相对于XYDerivative来说,同样3*3,只使用0.19ms,后面具体分析下原因.
 
@@ -56,7 +56,7 @@
 
 [glsl代码](../../glsl/source/filterRow.comp)
 
-![avatar](../../images/cs_time_6.png "高斯模糊")
+![avatar](../../assets/images/cs_time_6.png "高斯模糊")
 
 7 Reduce运算,用于求一张图的一些聚合运算,如最大值,最小值,总和这些,好奇怪,我在做之前粗略估算下需要的时间应该在0.4ms左右,但是实际只有(0.07+0.01)ms.
 
@@ -66,7 +66,7 @@
 
 [reduce glsl代码](../../glsl/source/reduce2.comp)
 
-![avatar](../../images/cs_time_7.png "Reduce运算")
+![avatar](../../assets/images/cs_time_7.png "Reduce运算")
 
 主要分二步来操作.
 
@@ -84,7 +84,7 @@
 
 [glsl](../../glsl/source/bilateral.comp)
 
-![avatar](../../images/cs_time_8.png "双边滤波")
+![avatar](../../assets/images/cs_time_8.png "双边滤波")
 
 9 Dilation/Erosion.
 
@@ -105,18 +105,18 @@
 
 10 在Compute shader中插入vkCmdCopyImage发现会占用0.3ms-07ms左右的时间,从逻辑上来说,应该不可能啊,这个copy应该比最简单的运算层占去的时间要小才对,测试了二种方案,对应参数bUserPipe,表示用不用管线,用管线控制到0.2ms内,用vkCmdCopyImage在3ms以上,后面找下资料看看是什么问题
 
-![avatar](../../images/cs_time_9.png "vkCmdCopyImage")
-![avatar](../../images/cs_time_10.png "cs copy")
+![avatar](../../assets/images/cs_time_9.png "vkCmdCopyImage")
+![avatar](../../assets/images/cs_time_10.png "cs copy")
 
 11 直方图,单通道大部分聚合算使用的是原子操作,也算是一个代表.
 
 [glsl](../../glsl/source/histogram.comp)
 
-![avatar](../../images/cs_time_11.png "atiom")
+![avatar](../../assets/images/cs_time_11.png "atiom")
 
 我在开始四通道时使用类似reduce2分二段,不用原子操作的方式,但是效果并不好,一是第一次把16*16块的方式转换成对应的一个个直方图,模块并没的缩小,导致第二块把这一个直方图通过for加在一起需要循环1920/16x1080/16(假设是1080P的图),这个会花费超过2ms,这种方式就pass掉,我直接使用原子操作导出四个图然后再结合都比这个快.
 
-![avatar](../../images/cs_time_12.png "atiom")
+![avatar](../../assets/images/cs_time_12.png "atiom")
 
 可以看到,在这之前,我们要先vkCmdClearColorImage,几乎不消费时间,我也是这样理解的,但是为什么vkCmdCopyImage会导致那么大的时间了?
 
@@ -128,11 +128,11 @@
 
 5*5的核,3.3ms,很有点高了.
 
-![avatar](../../images/cs_time_13.png "Kuwahara")
+![avatar](../../assets/images/cs_time_13.png "Kuwahara")
 
 10*10的核,9.7ms.
 
-![avatar](../../images/cs_time_14.png "Kuwahara")
+![avatar](../../assets/images/cs_time_14.png "Kuwahara")
 
 在手机Redmi 10X Pro 在720P下非常流畅,可以实时运行.
 
@@ -142,23 +142,23 @@
 
 10*10的核,4通道,76ms.
 
-![avatar](../../images/cs_time_15.png "Kuwahara")
+![avatar](../../assets/images/cs_time_15.png "Kuwahara")
 
 5*5的核,4通道,27ms.
 
-![avatar](../../images/cs_time_16.png "Kuwahara")
+![avatar](../../assets/images/cs_time_16.png "Kuwahara")
 
 10*10的核,1通道,28ms,奇怪了,为什么1通道与4通道相差这么多?我写法有问题?
 
-![avatar](../../images/cs_time_17.png "Kuwahara")
+![avatar](../../assets/images/cs_time_17.png "Kuwahara")
 
 5*5的核,1通道,12ms.
 
-![avatar](../../images/cs_time_18.png "Kuwahara")
+![avatar](../../assets/images/cs_time_18.png "Kuwahara")
 
 3*3的核,GPUImage里的方式,4通道,0.3ms.
 
-![avatar](../../images/cs_time_19.png "Kuwahara")
+![avatar](../../assets/images/cs_time_19.png "Kuwahara")
 
 总结,优化了个寂寞,虽然核大会导致排序也是指数增长,但是这次优化明显不成功,只能说是暂时可用大于3核的情况,后续找找更多的资料试试改进.
 

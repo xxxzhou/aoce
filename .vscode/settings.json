@@ -78,7 +78,6 @@
         "xlocbuf": "cpp",
         "xlocmes": "cpp",
         "*.cuh": "cpp",
-        //"*.cu" : "cpp",
         "aoce.h": "c",
         "baselayer.hpp": "c",
         "aocemanager.hpp": "c",
@@ -101,7 +100,8 @@
         "format": "cpp",
         "forward_list": "cpp",
         "stop_token": "cpp",
-        "aoceaudiodevice.h": "c"
+        "aoceaudiodevice.h": "c",
+        "aocebuildsettings.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,
@@ -109,5 +109,15 @@
     "cmake.configureSettings": {
         "CMAKE_BUILD_TYPE": "${buildType}"
     },
-    "python.pythonPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Python36_64\\python.exe"
+    "files.exclude": {
+        "**/.vs": true,
+        "**/$tf": true,
+        "**/build": true,
+        "**/out": true,
+        "**/UE4Test/**/Build": true,
+        "**/UE4Test/**/Binaries": true,
+        "**/UE4Test/**/DerivedDataCache": true,
+        "**/UE4Test/**/Intermediate": true,
+        "**/UE4Test/**/Saved": true
+    }
 }

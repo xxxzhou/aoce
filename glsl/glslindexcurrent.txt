@@ -1,5 +1,2 @@
-twoImage.comp twoImageColumn.comp COLUMN=1
-twoImage.comp twoImageRow.comp ROW=1
-filterColumn.comp filterColumn.comp CHANNEL_RGBA=1
-filterColumn.comp filterColumnC1.comp CHANNEL_R8=1
-filterColumn.comp filterColumnF4.comp CHANNEL_RGBA32F=1
+ncnnInMat.comp twoImageBGR.comp NCNN_BGR=1
+ncnnInMat.comp twoImageRGB.comp NCNN_RGB=1

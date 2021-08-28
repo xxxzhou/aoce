@@ -2,7 +2,7 @@
 
 ## 自适应阈值效果图 [demo](https://github.com/xxxzhou/aoce/tree/master/samples/vulkanextratest)
 
-![avatar](../../images/adaptiveThreshold1.png "REPLICATE image")
+![avatar](../../assets/images/adaptiveThreshold1.png "REPLICATE image")
 
 这几天抽空看了下GpuImage的filter,移植了高斯模糊与自适应阈值的vulkan compute shader实现,一个是基本的图像处理,一个是组合基础图像处理聚合,算是比较有代表性的二种.
 
@@ -195,9 +195,9 @@ void main(){
 
 在1080P下取核长为21(半径为10)的高斯模糊查看PC平台没有优化及优化的效果.
 
-![avatar](../../images/gaussianA.png "gaussian image")
+![avatar](../../assets/images/gaussianA.png "gaussian image")
 
-![avatar](../../images/gaussianB.png "gaussian image")
+![avatar](../../assets/images/gaussianB.png "gaussian image")
 
 其中没优化的需要12.03ms,而优化后的是0.60+0.61=1.21ms,差不多10倍左右的差距,符合前面k/2的优化值,之所以快到理论值,应该要加上优化方向二使用局部共享显存减少访问纹理显存这个.
 

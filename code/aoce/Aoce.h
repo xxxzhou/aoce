@@ -67,6 +67,9 @@ enum class ImageType : int32_t {
     r32f,
     r32,
     rgba32,
+    // cnn使用
+    rgb8,
+    bgr8,
 };
 
 enum class VideoCodec : int32_t {
