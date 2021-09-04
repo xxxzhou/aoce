@@ -95,8 +95,10 @@ if(ANDROID AND AOCE_ENABLE_SAMPLES)
         target_link_libraries(05_livetest android native-app-glue aoce aoce_vulkan)
     endif()
 
-    add_library(06_mediaplayer SHARED 06_mediaplayer/06_mediaplayer.cpp)
-    target_link_libraries(06_mediaplayer android aoce aoce_vulkan aoce_ffmpeg)
+    if(AOCE_INSTALL_FFMPEG)
+        add_library(06_mediaplayer SHARED 06_mediaplayer/06_mediaplayer.cpp)
+        target_link_libraries(06_mediaplayer android aoce aoce_vulkan aoce_ffmpeg)
+    endif()
 
     add_library(07_androidtest SHARED 07_androidtest/07_androidtest.cpp)
     target_link_libraries(07_androidtest android native-app-glue aoce aoce_vulkan aoce_android)

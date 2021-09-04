@@ -106,9 +106,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/code/aoce_unity3d")
 endif()
 
 set(AOCE_SET_STATIC 0)
-option(AOCE_INSTALL_FFMPEG "install ffmpeg module" TRUE)
+option(AOCE_INSTALL_FFMPEG "install ffmpeg module" OFF)
 option(AOCE_ENABLE_SAMPLES "enable samples" TRUE) 
-option(AOCE_ENABLE_WINRT "enable winrt" TRUE) 
+option(AOCE_ENABLE_WINRT "enable winrt" OFF) 
 option(AOCE_ENABLE_SWIG "enable swig" TRUE) 
 option(AOCE_INSTALL_NCNN "install ncnn module" TRUE)
 
@@ -140,7 +140,7 @@ add_subdirectory(code)
 add_subdirectory(samples)
 add_subdirectory(glsl)
 
-if(AOCE_ENABLE_SWIG)
+if(AOCE_ENABLE_SWIG) 
     # REQUIRED 
     message(STATUS "start swig convert other language")
     find_package(SWIG)

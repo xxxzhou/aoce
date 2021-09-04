@@ -1,5 +1,6 @@
 package aoce.samples.aocencnntest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import aoce.android.library.xswig.*;
@@ -9,7 +10,8 @@ public class AoceManager extends IVideoDeviceObserver {
     private LayerFactory layerFactory = null;
     private IInputLayer inputLayer = null;
     private IOutputLayer outputLayer = null;
-    private IYUVLayer yuv2RGBALayer = null;
+    private IYUVLayer yuv2RGBALayer = null;   ;
+    private ITransposeLayer transposeLayerNcnn = null;
     private ITransposeLayer transposeLayer = null;
     private IFlipLayer flipLayer = null;
     private IReSizeLayer reSizeLayer = null;
@@ -34,6 +36,7 @@ public class AoceManager extends IVideoDeviceObserver {
         inputLayer = layerFactory.createInput();
         outputLayer = layerFactory.createOutput();
         yuv2RGBALayer = layerFactory.createYUV2RGBA();
+        transposeLayerNcnn = layerFactory.createTranspose();
         transposeLayer = layerFactory.createTranspose();
         flipLayer = layerFactory.createFlip();
         reSizeLayer = layerFactory.createSize();
@@ -46,12 +49,22 @@ public class AoceManager extends IVideoDeviceObserver {
         drawPointsLayer = AoceWrapper.createDrawPointsLayer();
 
         faceDetector.setDraw(5,new vec4(0.0f,1.0f,0.0f,1.0f));
-        faceKeypointDetector.setDraw(3,new vec4(1.0f,1.0f,0.0f,1.0f));
+        faceKeypointDetector.setDraw(5,new vec4(1.0f,0.0f,0.0f,1.0f));
+
+        FlipParamet fp = flipLayer.getParamet();
+        fp.setBFlipX(0);
+        fp.setBFlipY(1);
+        flipLayer.updateParamet(fp);
+
+        TransposeParamet tpNcnn = transposeLayerNcnn.getParamet();
+        tpNcnn.setBFlipX(1);
+        tpNcnn.setBFlipY(0);
+        transposeLayerNcnn.updateParamet(tpNcnn);
 
         TransposeParamet tp = transposeLayer.getParamet();
         tp.setBFlipX(1);
         tp.setBFlipY(0);
-        transposeLayer.updateParamet(tp);
+        transposeLayer.updateParamet(tpNcnn);
 
         OutputParamet op = outputLayer.getParamet();
         op.setBGpu(1);
@@ -61,6 +74,7 @@ public class AoceManager extends IVideoDeviceObserver {
         ReSizeParamet reSizeParamet = reSizeLayer.getParamet();
         reSizeParamet.setNewHeight(480);
         reSizeParamet.setNewWidth(480);
+        reSizeLayer.updateParamet(reSizeParamet);
 
         initLayers();
         loadNet();
@@ -89,6 +103,9 @@ public class AoceManager extends IVideoDeviceObserver {
         videoDevice.open();
 
         videoFormat = videoDevice.getSelectFormat();
+        width = videoFormat.getWidth();
+        height = videoFormat.getHeight();
+
         videoDevice.setObserver(this);
     }
 
@@ -106,17 +123,13 @@ public class AoceManager extends IVideoDeviceObserver {
 
     public void initLayers() {
         pipeGraph.clear();
-        extraLayer = pipeGraph.addNode(inputLayer).addNode(yuv2RGBALayer);
+        extraLayer = pipeGraph.addNode(inputLayer).addNode(yuv2RGBALayer);//.addNode(transposeLayerNcnn);
         pipeGraph.addNode(ncnnInLayer);
         pipeGraph.addNode(ncnnInCropLayer);
-        pipeGraph.addNode(drawRectLayer);
-        pipeGraph.addNode(drawPointsLayer);
-        pipeGraph.addNode(transposeLayer);
-        pipeGraph.addNode(outputLayer);
         yuv2RGBALayer.getLayer().addLine(ncnnInLayer);
         yuv2RGBALayer.getLayer().addLine(ncnnInCropLayer.getLayer());
-        yuv2RGBALayer.getLayer().addLine(drawRectLayer.getLayer())
-                .addLine(drawPointsLayer.getLayer()).addLine(transposeLayer.getLayer()).addLine(outputLayer.getLayer());
+        yuv2RGBALayer.getLayer().addNode(drawRectLayer).addNode(drawPointsLayer).addNode(transposeLayerNcnn)
+                .addNode(outputLayer);//.addNode(flipLayer)
     }
 
     public void clearLayers() {

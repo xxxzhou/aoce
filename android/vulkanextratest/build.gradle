@@ -64,14 +64,6 @@ task copyTask {
     }
 }
 
-task copyAgorg {
-    copy {
-        from '../../thirdparty/ffmpeg/android'
-        into 'libs'
-        include('**/*.*')
-    }
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     //for permission

@@ -60,7 +60,7 @@ int32_t VideoDevice::findFormatIndex(int32_t width, int32_t height,
     if (bFind) {
         return first >= 0 ? first : second;
     }
-    return 0;
+    return -1;
 }
 
 int32_t VideoDevice::findFormatIndex(int32_t width, int32_t height,

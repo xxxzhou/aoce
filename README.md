@@ -23,7 +23,9 @@ vulkan项目使用glsl,请安装Vulkan SDK,通过工具glslangValidator把glsl�
 
 如果要使用aoce_cuda模块,请安装CUDA.
 
-在根目录下的CMakeLists.txt,可以根据需求打开/关闭AOCE_INSTALL_FFMPEG/AOCE_ENABLE_SAMPLES/AOCE_ENABLE_WINRT/AOCE_ENABLE_SWIG 这些选项,编译不过可以
+在根目录下的CMakeLists.txt,可以根据需求打开/关闭AOCE_INSTALL_FFMPEG/AOCE_ENABLE_SAMPLES/AOCE_ENABLE_WINRT/AOCE_ENABLE_SWIG 这些选项,编译不过可以根据提示关闭对应选项.
+
+Android配置请转到[build](android/README.md)
 
 ## 做什么
 

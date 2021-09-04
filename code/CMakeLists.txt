@@ -31,7 +31,7 @@ if(AOCE_INSTALL_AGORA AND AOCE_AGORA_EXIST)
     endif()    
 endif()
 
-if(AOCE_INSTALL_FFMPEG)
+if(AOCE_INSTALL_FFMPEG)    
     add_subdirectory(aoce_ffmpeg)
 endif()
 
@@ -39,8 +39,8 @@ if(AOCE_UNITY3D_EXIST)
     add_subdirectory(aoce_unity3d)
 endif()
 
-if(AOCE_INSTALL_NCNN)
-    add_subdirectory(aoce_ncnn)
+if(AOCE_INSTALL_NCNN)    
+    add_subdirectory(aoce_ncnn)    
 endif()
 
 
