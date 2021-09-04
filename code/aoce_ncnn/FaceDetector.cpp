@@ -1,5 +1,4 @@
 #include "FaceDetector.hpp"
-
 #include <AoceManager.hpp>
 
 #define clip(x, y) (x < 0 ? 0 : (x > y ? y : x))
@@ -10,10 +9,11 @@ FaceDetector::FaceDetector(/* args */) {
     net = std::make_unique<ncnn::Net>();
     net->opt.use_vulkan_compute = true;
     // 网络输入图像格式
-    netFormet.width = 320;
-    netFormet.height = 240;
+    netFormet.width = 160;   // 320;
+    netFormet.height = 120;  // 240;
     netFormet.imageType = ImageType::bgr8;
     detectorFaces.resize(MAX_FACE);
+    // inMat.create(netFormet.width, netFormet.height, 3);
 }
 
 FaceDetector::~FaceDetector() {}
@@ -54,12 +54,17 @@ void FaceDetector::initAnchors() {
     anchorsNum = anchors.size();
 }
 
-void FaceDetector::setObserver(IFaceDetectorObserver* observer) {
+void FaceDetector::setObserver(IFaceObserver* observer) {
     this->observer = observer;
+}
+
+void FaceDetector::setFaceKeypointObserver(INcnnInCropLayer* cropLayer) {
+    this->cropLayer = cropLayer;
 }
 
 bool FaceDetector::initNet(FaceDetectorType detectortype) {
     detectorType = detectortype;
+
     int gpu_count = ncnn::get_gpu_count();
     net->set_vulkan_device(0);
 
@@ -74,7 +79,7 @@ bool FaceDetector::initNet(FaceDetectorType detectortype) {
     assert(assetManager != nullptr);
     int ret = net->load_param(assetManager, paramFile.c_str());
     if (ret == 0) {
-        ret = net->load_model(assetManager, binPath.c_str());
+        ret = net->load_model(assetManager, binFile.c_str());
     }
 #else
     std::string paramPath = getAocePath() + "/" + paramFile;
@@ -91,21 +96,62 @@ bool FaceDetector::initNet(FaceDetectorType detectortype) {
     return false;
 }
 
-void FaceDetector::detect(uint8_t* data, const ImageFormat& inFormat) {
-    long long time1 = getNowTimeStamp();
-    ncnn::Mat in = getMat(data, inFormat, netFormet);
-    float meanVal[] = {104.f, 117.f, 123.f};
-    long long time2 = getNowTimeStamp();
-    std::string tmsg;
-    string_format(tmsg, "face time:", time2 - time1);
-    logMessage(LogLevel::info, tmsg);
+bool FaceDetector::initNet(IBaseLayer* ncnnLayer, IDrawRectLayer* drawlayer) {
+    if (bInitNet) {
+        return true;
+    }
+    bool bInit = initNet(detectorType);
+    ncnnInLayer = static_cast<VkNcnnInLayer*>(ncnnLayer);
+    drawLayer = drawlayer;
+    if (bInit && ncnnInLayer) {
+        // const float meanVal[] = {104.f, 117.f, 123.f};
+        NcnnInParamet paramet = {};
+        paramet.mean = {104.f, 117.f, 123.f, 0.0f};
+        paramet.outWidth = netFormet.width;
+        paramet.outHeight = netFormet.height;
+        ncnnInLayer->updateParamet(paramet);
+        ncnnInLayer->setObserver(this, netFormet.imageType);
+        bInitNet = true;
+        bVulkanInput = false;
+        return true;
+    }
+    return false;
+}
 
-    in.substract_mean_normalize(meanVal, 0);
-    // long long time1 = getNowTimeStamp();
+void FaceDetector::onResult(VulkanBuffer* buffer,
+                            const ImageFormat& imageFormat) {
+    if (!bInitNet) {
+        return;
+    }
+    long long time1 = getNowTimeStamp();
+
     ncnn::Extractor netEx = net->create_extractor();
     ncnn::Mat boxMat, scoreMat, landmarkMat;
+    // memcpy(inMat.data, buffer->getCpuData(),
+    //        netFormet.width * netFormet.height * 3 * 4);
+    // 这逻辑现在有问题,首先要拿到ncnn的commandbuffer,然后在二边上的cmd锁buffer.
+    if (bVulkanInput) {
+        ncnn::VkBufferMemory nBuffer = {};
+        nBuffer.buffer = buffer->buffer;
+        nBuffer.memory = buffer->memory;
+        nBuffer.offset = 0;
+        nBuffer.capacity = buffer->getBufferSize();
+        nBuffer.mapped_ptr = buffer->getCpuData();
+        nBuffer.access_flags = 0;
+        nBuffer.stage_flags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        nBuffer.refcount = 1;
+
+        const ncnn::VulkanDevice* device = net->vulkan_device();
+        ncnn::VkAllocator* vkallocator = device->acquire_blob_allocator();
+        ncnn::VkMat nMat(netFormet.width, netFormet.height, 3, &nBuffer, 4,
+                         vkallocator);
+        netEx.input(0, nMat);
+    } else {
+        ncnn::Mat inMat(netFormet.width, netFormet.height, 3,
+                        buffer->getCpuData());
+        netEx.input(0, inMat);
+    }
     if (detectorType == FaceDetectorType::face_landmark) {
-        netEx.input(0, in);
         // loc
         netEx.extract("output0", boxMat);
         // class
@@ -113,7 +159,6 @@ void FaceDetector::detect(uint8_t* data, const ImageFormat& inFormat) {
         // landmark
         netEx.extract("529", landmarkMat);
     } else {
-        netEx.input("input", in);
         netEx.extract("scores", scoreMat);
         netEx.extract("boxes", boxMat);
     }
@@ -130,11 +175,15 @@ void FaceDetector::detect(uint8_t* data, const ImageFormat& inFormat) {
         if (*(scores + 1) > threshold) {
             Box locBox = {};
             FaceBox result = {};
-            // loc and conf
+            // center
             locBox.cx = anchors[i].cx + *boxes * 0.1f * anchors[i].sx;
             locBox.cy = anchors[i].cy + *(boxes + 1) * 0.1f * anchors[i].sy;
+            // size
             locBox.sx = anchors[i].sx * exp(*(boxes + 2) * 0.2f);
             locBox.sy = anchors[i].sy * exp(*(boxes + 3) * 0.2f);
+            // 扩大下size
+            locBox.sx = locBox.sx * 1.2f;
+            locBox.sy = locBox.sy * 1.2f;
 
             result.x1 = std::max(0.0f, (locBox.cx - locBox.sx / 2.0f));
             result.y1 = std::max(0.0f, (locBox.cy - locBox.sy / 2.0f));
@@ -206,9 +255,29 @@ void FaceDetector::detect(uint8_t* data, const ImageFormat& inFormat) {
             break;
         }
     }
+    if (drawLayer) {
+        drawRect.color = color;
+        drawRect.radius = std::max(1, radius / 2);
+        if (faceIndex > 0) {
+            drawRect.rect.x = detectorFaces[0].x1;
+            drawRect.rect.y = detectorFaces[0].x2;
+            drawRect.rect.z = detectorFaces[0].y1;
+            drawRect.rect.w = detectorFaces[0].y2;
+        } else {
+            drawRect.color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        }
+        drawLayer->updateParamet(drawRect);
+    }
+    if (cropLayer) {
+        cropLayer->detectFaceBox(detectorFaces.data(), faceIndex);
+    }
     if (observer) {
         observer->onDetectorBox(detectorFaces.data(), faceIndex);
     }
-}
 
+    long long time2 = getNowTimeStamp();
+    std::string tmsg;
+    string_format(tmsg, "face time:", time2 - time1);
+    logMessage(LogLevel::info, tmsg);
+}
 }  // namespace aoce

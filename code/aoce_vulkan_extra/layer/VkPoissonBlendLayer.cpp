@@ -1,6 +1,9 @@
 #include "VkPoissonBlendLayer.hpp"
 
 #include "aoce_vulkan/layer/VkPipeGraph.hpp"
+#if __ANDROID__
+#include "aoce_vulkan/android/vulkan_wrapper.h"
+#endif
 
 namespace aoce {
 namespace vulkan {

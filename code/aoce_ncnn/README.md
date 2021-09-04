@@ -1,5 +1,13 @@
 # 参考
 
+[FaceDetect-FaceLandmark](https://github.com/hzq-zjm/FaceDetect-FaceLandmark)
+
+[pfld-ncnn](https://github.com/Hsintao/pfld-ncnn)
+
+[pfld-ncnn](https://github.com/nilseuropa/pfld_ncnn)
+
+[PFLD-pytorch](https://github.com/polarisZhao/PFLD-pytorch)
+
 [Face-Detector-1MB-with-landmark](https://github.com/biubug6/Face-Detector-1MB-with-landmark)
 
 [Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)

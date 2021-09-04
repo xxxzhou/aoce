@@ -16,9 +16,9 @@ namespace layer {
 class AOCE_VULKAN_EXPORT VkInputLayer : public InputLayer, public VkLayer {
     AOCE_LAYER_QUERYINTERFACE(VkInputLayer)
    private:
-    std::unique_ptr<VulkanBuffer> inBuffer;
+    std::unique_ptr<VulkanBuffer> inBuffer = nullptr;
     // 如果需要GPU计算,需要先把inBuffer copy 到 gpu local
-    std::unique_ptr<VulkanBuffer> inBufferX;
+    std::unique_ptr<VulkanBuffer> inBufferX = nullptr;
     // 是否需要GPU计算
     bool bUsePipe = false;
     bool bDateUpdate = false;

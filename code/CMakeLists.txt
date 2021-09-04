@@ -1,6 +1,9 @@
 
 # 所有目录的对位相对于code,导出到外部相对于统一位置
 include_directories("./")
+if(ANDROID)
+    include_directories(${ANDROID_NDK}/sources/android/native_app_glue)
+endif()
 
 add_subdirectory(aoce) 
 message(STATUS "system:" ${WIN32})
@@ -17,7 +20,7 @@ if(WIN32)
     if(AOCE_CUDA_MODULE)
         add_subdirectory(aoce_cuda)    
     endif()
-elseif(ANDROID)
+elseif(ANDROID)    
     add_subdirectory(aoce_android)
 endif()
 

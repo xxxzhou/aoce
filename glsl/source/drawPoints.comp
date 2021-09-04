@@ -1,0 +1,39 @@
+#version 450
+
+layout (local_size_x = 240, local_size_y = 1) in;
+
+layout (binding = 0) buffer inBuffer{
+    vec2 points[];
+};
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (binding = 2) uniform UBO {
+	int showCount;
+    int radius;
+    float colorR;	
+    float colorG;
+    float colorB;
+    float colorA;  
+} ubo;
+
+void main(){   
+    int index = int(gl_GlobalInvocationID.x);    
+    ivec2 size = imageSize(outTex);   
+    if(index >= ubo.showCount){
+        return;
+    }
+    ivec2 uv = ivec2(points[index] * size);
+    vec4 drawColor = vec4(ubo.colorR,ubo.colorG,ubo.colorB,ubo.colorA);
+    int radius = max(1,ubo.radius);
+    for(int i = 0; i< radius; ++i){
+        for(int j= 0; j< radius; ++j){
+            int x = uv.x - 1 + j;
+            int y = uv.y - 1 + i;
+            // REPLICATE border
+            x = max(0,min(x,size.x-1));
+            y = max(0,min(y,size.y-1));
+            imageStore(outTex, ivec2(x,y), drawColor);
+        } 
+    }
+    
+}

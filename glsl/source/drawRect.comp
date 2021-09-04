@@ -1,0 +1,45 @@
+#version 450
+
+layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
+
+layout (binding = 0, rgba8) uniform readonly image2D inTex;
+layout (binding = 1, rgba8) uniform image2D outTex;
+
+layout (binding = 2) uniform UBO {
+	int radius; 
+    float x1;
+    float x2;
+    float y1;
+    float y2;  
+    float colorR;	
+    float colorG;
+    float colorB;
+    float colorA; 
+} ubo;
+
+void main(){    
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(inTex);
+    if(uv.x >= size.x || uv.y >= size.y){
+        return;
+    } 
+
+    int xmin = int(ubo.x1 * size.x);
+    int xmax = int(ubo.x2 * size.x); 
+    int ymin = int(ubo.y1 * size.y);
+    int ymax = int(ubo.y2 * size.y);
+
+    ivec4 xx = ivec4(uv.x, xmax, uv.y, ymax);
+    ivec4 yy = ivec4(xmin, uv.x, ymin, uv.y);
+
+    ivec4 xy = abs(xx - yy);
+    float sum =  step(xy.x, ubo.radius) + step(xy.y, ubo.radius) + step(xy.z, ubo.radius) + step(xy.w, ubo.radius);
+	vec2 lr = vec2(xy.x + xy.y, xy.z + xy.w);
+	vec2 rl = vec2(xmax - xmin, ymax - ymin);
+    vec4 color = imageLoad(inTex,uv);  
+	if (sum > 0 && length(lr - rl) < ubo.radius) {
+		vec3 drawColor = vec3(ubo.colorR,ubo.colorG,ubo.colorB);
+        color.rgb = color.rgb*(1.0f - ubo.colorA) + drawColor*ubo.colorA;
+	}
+    imageStore(outTex,uv,color);
+}

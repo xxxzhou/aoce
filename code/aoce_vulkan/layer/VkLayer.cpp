@@ -7,6 +7,8 @@
 #include <windows.h>
 #elif __ANDROID__
 #include <android/asset_manager.h>
+
+#include "../android/vulkan_wrapper.h"
 #endif
 
 namespace aoce {
@@ -60,8 +62,8 @@ void VkLayer::submitUBO() {
 
 void VkLayer::onInit() {
     BaseLayer::onInit();
-    vkPipeGraph =
-        static_cast<VkPipeGraph*>(pipeGraph);  // dynamic_cast android open rtti
+    // dynamic_cast android open rtti
+    vkPipeGraph = static_cast<VkPipeGraph*>(pipeGraph);
     context = vkPipeGraph->getContext();
     assert(context != nullptr);
     cmd = context->computerCmd;
@@ -133,9 +135,11 @@ void VkLayer::createOutTexs() {
             texFlags = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
         }
         // 输入与输出都给传输位
-        if (bInput || bMustOutput) {
+        if (bInput) {
             texFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-            texFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+        }
+        if (bMustOutput) {
+            // texFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
         }
         texPtr->InitResource(format.width, format.height, vkft, texFlags, 0);
         outTexs.push_back(texPtr);
@@ -144,9 +148,9 @@ void VkLayer::createOutTexs() {
 
 void VkLayer::clearColor(vec4 color) {
     for (int i = 0; i < outCount; i++) {
-        outTexs[i]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
-                               VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-                               VK_ACCESS_SHADER_WRITE_BIT);
+         outTexs[i]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
+                                VK_PIPELINE_STAGE_TRANSFER_BIT,
+                                VK_ACCESS_SHADER_WRITE_BIT);
         VkImageSubresourceRange subResourceRange = {};
         subResourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         subResourceRange.baseMipLevel = 0;

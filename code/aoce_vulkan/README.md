@@ -118,6 +118,8 @@ UBO一般来说,有四种.
 
 嗯,这个问题用上面的方法解决,加入中间层,原因应该就是如上需要满足计算与使用二线程无等待关系,那这样,直接用中间层,VK运行线程直接写入结果,也不需要用D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX,改为D3D11_RESOURCE_MISC_SHARED,用vkFence保证GPU里VK CommandBuffer执行顺序与DX11拷贝到临时变量的顺序.这样VK执行线程与DX11外部显示线程可以用不同频率跑.
 
+3 vulkan_wrapper.h在android可能会与别的库引起重命名函数问题,为避免这种情况,不要用头文件引用这个文件
+
 ## Resize 重置大小
 
 可以用完全的imageLoad/imageStore实现.

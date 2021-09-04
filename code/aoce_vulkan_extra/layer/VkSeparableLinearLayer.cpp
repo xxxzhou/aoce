@@ -1,6 +1,9 @@
 #include "VkSeparableLinearLayer.hpp"
 
 #include "aoce/layer/PipeGraph.hpp"
+#if __ANDROID__
+#include "aoce_vulkan/android/vulkan_wrapper.h"
+#endif
 #define PATCH_PER_BLOCK 4
 
 namespace aoce {

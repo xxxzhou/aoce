@@ -19,7 +19,7 @@ android {
                 cppFlags "-std=c++14"
                 arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang",
                         "-DAOCE_ENABLE_SAMPLES=OFF", "-DAOCE_INSTALL_FFMPEG=OFF",
-                        "-DAOCE_INSTALL_AGORA=OFF","-DAOCE_ENABLE_SWIG=ON"
+                        "-DAOCE_INSTALL_AGORA=OFF","-DAOCE_ENABLE_SWIG=ON","-DAOCE_INSTALL_NCNN=ON"
             }
         }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -60,21 +60,13 @@ task copyTask {
     }
 }
 
-task copyFFmpeg {
-    copy {
-        from '../../thirdparty/ffmpeg/android'
-        into 'libs'
-        include('**/*.so','**/*.jar')
-    }
-}
-
-task copyAgorg {
-    copy {
-        from '../../thirdparty/agora/android'
-        into 'libs'
-        include('**/*.so', '**/*.jar')
-    }
-}
+//task copyFFmpeg {
+//    copy {
+//        from '../../thirdparty/ffmpeg/android'
+//        into 'libs'
+//        include('**/*.so','**/*.jar')
+//    }
+//}
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])

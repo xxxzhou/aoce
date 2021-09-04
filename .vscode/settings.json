@@ -101,7 +101,8 @@
         "forward_list": "cpp",
         "stop_token": "cpp",
         "aoceaudiodevice.h": "c",
-        "aocebuildsettings.h": "c"
+        "aocebuildsettings.h": "c",
+        "aocencnnexport.h": "c"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.dimInactiveRegions": false,
@@ -113,6 +114,7 @@
         "**/.vs": true,
         "**/$tf": true,
         "**/build": true,
+        // "!**/build/CMakeCache.txt":true,
         "**/out": true,
         "**/UE4Test/**/Build": true,
         "**/UE4Test/**/Binaries": true,

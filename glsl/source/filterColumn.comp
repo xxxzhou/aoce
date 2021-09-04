@@ -24,14 +24,14 @@ const int PATCH_PER_BLOCK = 4;
 const int HALO_SIZE = 1; 
 
 // 共享块,扩充前后二边HALO_SIZE(分为上HALO_SIZE,中间自身*PATCH_PER_BLOCK,下HALO_SIZE)
-// 经测试,column使用这个packUnorm4x8/unpackUnorm4x8优化共享显存会导致r8负优化.
-//#if CHANNEL_RGBA32F
+// 经测试,column使用这个packUnorm4x8/unpackUnorm4x8优化共享显存会导致r8负优化.但是rgba8需要这个优化
+#if CHANNEL_RGBA32F || CHANNEL_R8
 shared vec4 column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];
 #define packUnorm4x8
 #define unpackUnorm4x8
-// #else
-// shared uint column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];
-// #endif
+#else
+shared uint column_shared[16*(PATCH_PER_BLOCK+HALO_SIZE*2)][16];
+#endif
 
 // 假定1920*1080,gl_WorkGroupSize(16,16),gl_NumWorkGroups(120,68/4),每一个线程高度要管理4个
 // 核心的最大高度由HALO_SIZE*gl_WorkGroupSize.y决定

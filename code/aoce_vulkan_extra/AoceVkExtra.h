@@ -573,6 +573,26 @@ struct ZoomBlurParamet {
     }
 };
 
+struct PointsParamet {
+    int32_t showCount = 0;
+    int32_t radius = 1;
+    vec4 color = {1.0f, 0.0, 0.0, 1.0f};
+    inline bool operator==(const PointsParamet& right) {
+        return showCount == right.showCount && color == right.color &&
+               radius == right.radius;
+    }
+};
+
+struct DrawRectParamet {
+    int32_t radius = 1;
+    vec4 rect = {0.0f, 1.0f, 0.0f, 1.0f};
+    vec4 color = {1.0f, 0.0, 0.0, 1.0f};
+    inline bool operator==(const DrawRectParamet& right) {
+        return rect == right.rect && color == right.color &&
+               radius == right.radius;
+    }
+};
+
 typedef ITLayer<SoftEleganceParamet> ASoftEleganceLayer;
 typedef ITLayer<PerlinNoiseParamet> APerlinNoiseLayer;
 typedef ITLayer<float> AFloatLayer;
@@ -640,5 +660,7 @@ typedef ITLayer<UnsharpMaskParamet> IUnsharpMaskLayer;
 typedef ITLayer<VignetteParamet> IVignetteLayer;
 typedef ITLayer<WhiteBalanceParamet> IWhiteBalanceLayer;
 typedef ITLayer<ZoomBlurParamet> IZoomBlurLayer;
+
+typedef ITLayer<DrawRectParamet> IDrawRectLayer;
 
 }  // namespace aoce

@@ -2,6 +2,10 @@
 
 #include "../vulkan/VulkanManager.hpp"
 #include "VkPipeGraph.hpp"
+#if __ANDROID__
+#include "../android/vulkan_wrapper.h"
+#endif
+
 #if WIN32
 using namespace aoce::win;
 #endif
@@ -26,6 +30,9 @@ void VkInputLayer::onInitGraph() {
         hardwareImage = std::make_unique<HardwareImage>();
     }
 #endif
+    if (layout->pipelineLayout != VK_NULL_HANDLE) {
+        return;
+    }
     std::vector<UBOLayoutItem> items = {
         {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT},
         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT}};
@@ -50,7 +57,7 @@ void VkInputLayer::onInitVkBuffer() {
         }
         shader->loadShaderModule(context->device, path);
         assert(shader->shaderStage.module != VK_NULL_HANDLE);
-        int imageSize = inFormats[0].width * inFormats[0].height;
+        int32_t imageSize = inFormats[0].width * inFormats[0].height;
         // 如果是rgb-rgba,则先buffer转cs buffer,然后cs shader转rgba.
         // 不直接在cs shader用buf->tex,兼容性考虑cpu map/cs read权限.
         if (videoType == VideoType::rgb8) {

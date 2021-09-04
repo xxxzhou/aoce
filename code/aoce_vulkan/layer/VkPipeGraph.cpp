@@ -1,6 +1,9 @@
 #include "VkPipeGraph.hpp"
 
 #include <thread>
+#if __ANDROID__
+#include "../android/vulkan_wrapper.h"
+#endif
 
 namespace aoce {
 namespace vulkan {
@@ -124,6 +127,9 @@ bool VkPipeGraph::executeOut() {
 bool VkPipeGraph::onRun() {
     // 更新所有层的发生改动的vulkan资源
     for (auto* layer : vkLayers) {
+        layer->onPreFrame();
+    }
+    for (auto* layer : vkOutputLayers) {
         layer->onPreFrame();
     }
     // 等待上一桢执行完成,这种模式会导致当前桢输出的是上一桢的数据

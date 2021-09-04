@@ -9,6 +9,10 @@
 %feature("director") ICaptureObserver; 
 %feature("director") IAudioDeviceObserver;
 %feature("director") IMotionDetectorObserver;
+//#ifdef AOCE_INSTALL_NCNN
+%feature("director") IFaceObserver;
+%feature("director") IFaceKeypointObserver;
+//#endif
 %{
 #if __ANDROID__
 #include <jni.h> 
@@ -23,6 +27,10 @@
 #ifdef AOCE_INSTALL_AGORA
 #include "aoce_talkto/Talkto.h"
 #endif
+
+//#ifdef AOCE_INSTALL_NCNN
+#include "aoce_ncnn/AoceNcnnExport.h"
+//#endif
 %}
 
 #define ACOE_EXPORT
@@ -101,6 +109,7 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
 %template(ASoftEleganceLayer) aoce::ITLayer<aoce::SoftEleganceParamet>;
 %template(AFloatLayer) aoce::ITLayer<float>;
 %template(APerlinNoiseLayer) aoce::ITLayer<aoce::PerlinNoiseParamet>;
+%template(APointsParamet) aoce::ITLayer<aoce::PointsParamet>;
 %include "aoce_vulkan_extra/AoceVkExtra.h"
 %include "aoce_vulkan_extra/VkExtraExport.h"
 %template(IStretchDistortionLayer) aoce::ITLayer<aoce::vec2> ;
@@ -161,9 +170,13 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
 %template(ITexOperateLayer) aoce::ITLayer<aoce::talkto::TexOperateParamet> ;
 %template(ITexClipLayer) aoce::ITLayer<aoce::talkto::TexClipParamet> ;
 %template(IEdgeBlurBlendLayer) aoce::ITLayer<aoce::talkto::EdgeBlurBlendParamet> ;
-#else
-// #error "This is a fatal error message"
 #endif
+
+//#ifdef AOCE_INSTALL_NCNN
+#define AOCE_NCNN_EXPORT
+%include "aoce_ncnn/AoceNcnnExport.h"
+%template(IDrawRectLayer) aoce::ITLayer<aoce::DrawRectParamet>;
+//#endif
 
 %nodefaultctor;
 %nodefaultdtor;

@@ -17,9 +17,9 @@ SET(CMAKE_SWIG_OUTDIR "${CMAKE_CURRENT_SOURCE_DIR}/swig" )
 SWIG_ADD_LIBRARY(aoce_swig LANGUAGE csharp SOURCES ${WRAPPERLIST})
 
 if(AOCE_INSTALL_AGORA)
-    target_link_libraries(aoce_swig aoce aoce_vulkan_extra aoce_talkto_cuda) 
+    target_link_libraries(aoce_swig aoce aoce_vulkan_extra aoce_talkto_cuda aoce_ncnn) 
 else()
-    target_link_libraries(aoce_swig aoce aoce_vulkan_extra)    
+    target_link_libraries(aoce_swig aoce aoce_vulkan_extra aoce_ncnn)    
 endif()
 
 aoce_swig_output(aoce_swig)  

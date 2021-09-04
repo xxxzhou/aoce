@@ -66,13 +66,13 @@ struct vec4 {
         this->x = x;
         this->y = y;
         this->z = z;
-        this->x = w;
+        this->w = w;
     }
     vec4(vec3 vec, float w) {
         this->x = vec.x;
         this->y = vec.y;
         this->z = vec.z;
-        this->x = w;
+        this->w = w;
     }
     inline bool operator==(const vec4 &right) {
         return this->x == right.x && this->y == right.y && this->z == right.z &&

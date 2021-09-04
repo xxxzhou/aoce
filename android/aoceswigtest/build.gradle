@@ -36,9 +36,18 @@ android {
     sourceSets {
         main {
             assets.srcDirs = ['assets']
+            jniLibs.srcDirs = ['libs']
         }
     }
     // ndkVersion '21.1.6352462'
+}
+
+task copyAgorg {
+    copy {
+        from '../../thirdparty/agora/android'
+        into 'libs'
+        include('**/*.so', '**/*.jar')
+    }
 }
 
 dependencies {

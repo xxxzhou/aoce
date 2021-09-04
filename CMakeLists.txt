@@ -25,6 +25,7 @@ message(STATUS "install:" ${CMAKE_INSTALL_PREFIX})
 
 if(ANDROID)
     message(STATUS "android abi:" ${ANDROID_ABI})
+    message(STATUS "android ndk:" ${ANDROID_NDK})
 endif()
 # 检查32bit or 64bit system
 include(CheckTypeSize)

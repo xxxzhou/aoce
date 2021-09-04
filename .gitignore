@@ -24,8 +24,8 @@ android/gradlew.bat
 android/gradlew
 android/gradle/
 android/android.zip
-android/aoce/src/main/java/aoce/android/library/xswig/*.java
-android/aoce/src/main/java/aoce/android/library/swig/*.java
+android/aoce/src/main/java/aoce/android/library/xswig/*.*
+android/aoce/src/main/java/aoce/android/library/swig/*.*
 android/aoce/lib/*
 android/talkdolive/
 UE4Test/.vs
@@ -49,6 +49,7 @@ UE4Test/UE4Test.zip
 swig/CSharp/swig
 swig/Java/swig
 swig/CSharp/CSharpTest
+android/*/assets/net
 
 out/
 .vs/
@@ -66,4 +67,5 @@ code/aoce_agora/
 code/aoce_talkto/
 code/aoce_unity3d/
 doc/work/
+
 

@@ -3,6 +3,10 @@
 #include "VulkanContext.hpp"
 #include "VulkanHelper.hpp"
 #include "VulkanManager.hpp"
+#if __ANDROID__
+#include "../android/vulkan_wrapper.h"
+#endif
+
 namespace aoce {
 namespace vulkan {
 VulkanBuffer::VulkanBuffer() {}
@@ -29,7 +33,7 @@ void VulkanBuffer::initResoure(BufferUsage usage,
     bufInfo.flags = 0;
     // 生成一个buffer标识(可以多个标识到同一个显存空间DeviceMemory里,标识用来指定VBO/IBO/UBO等)
     VK_CHECK_RESULT(vkCreateBuffer(device, &bufInfo, nullptr, &buffer));
-    //
+    // Buffer存入位置
     VkMemoryPropertyFlags memoryFlag = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
     if (usage == BufferUsage::onestore || usage == BufferUsage::store) {
         memoryFlag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |

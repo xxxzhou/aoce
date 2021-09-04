@@ -12,7 +12,11 @@ endfunction(add_swig_definitions def)
 
 if (AOCE_INSTALL_AGORA)
     add_swig_definitions("-DAOCE_INSTALL_AGORA")
-endif (AOCE_INSTALL_AGORA)
+endif (AOCE_INSTALL_AGORA) 
+
+if (AOCE_INSTALL_NCNN)
+    add_swig_definitions("-DAOCE_INSTALL_NCNN")
+endif (AOCE_INSTALL_NCNN)
 
 if(WIN32)
     add_swig_definitions("-DWIN32")    

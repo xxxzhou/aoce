@@ -11,6 +11,7 @@
 #include "layer/VkColorMatrixLayer.hpp"
 #include "layer/VkColourFASTFeatureDetector.hpp"
 #include "layer/VkCropLayer.hpp"
+#include "layer/VkDrawLayer.hpp"
 #include "layer/VkEdgeDetectionLayer.hpp"
 #include "layer/VkGuidedLayer.hpp"
 #include "layer/VkHarrisCornerDetectionLayer.hpp"
@@ -612,6 +613,16 @@ ITLayer<ZoomBlurParamet>* createZoomBlurLayer() {
 
 IBaseLayer* createEqualizeHistLayer(bool bSingle) {
     VkEqualizeHistLayer* layer = new VkEqualizeHistLayer(bSingle);
+    return layer;
+}
+
+IDrawPointsLayer* createDrawPointsLayer() {
+    VkDrawPointsLayer* layer = new VkDrawPointsLayer();
+    return layer;
+}
+
+IDrawRectLayer* createDrawRectLayer() {
+    VkDrawRectLayer* layer = new VkDrawRectLayer();
     return layer;
 }
 

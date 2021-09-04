@@ -31,8 +31,7 @@ add_sub_path(audioDevice AOCE_HEADER AOCE_SOURCE)
 
 add_definitions(-DAOCE_EXPORT_DEFINE)
 add_library(aoce SHARED ${AOCE_SOURCE} ${AOCE_HEADER})
-if(ANDROID)
-    include_directories(${ANDROID_NDK}/sources/android/native_app_glue) 
+if(ANDROID)   
     target_link_libraries(aoce android log)
 endif()
 # install的头文件

@@ -17,7 +17,7 @@ if(WIN32)
     message(STATUS "vulkan include = ${Vulkan_INCLUDE_DIR}")  
     message(STATUS "vulkan lib = ${Vulkan_LIBRARY}")    
 elseif(ANDROID) 
-    include_directories(${ANDROID_NDK}/sources/android/native_app_glue)  
+    #include_directories(${ANDROID_NDK}/sources/android/native_app_glue)  
 endif()   
 
 include_directories(${Vulkan_INCLUDE_DIR} ${AOCE_HEADER_DIR})      

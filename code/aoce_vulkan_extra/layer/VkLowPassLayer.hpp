@@ -36,7 +36,7 @@ class VkSaveFrameLayer : public VkLayer {
 };
 
 class VkLowPassLayer : public VkDissolveBlendLayer {
-    AOCE_LAYER_GETNAME(VkSaveFrameLayer)
+    AOCE_LAYER_GETNAME(VkLowPassLayer)
    private:
     /* data */
     std::unique_ptr<VkSaveFrameLayer> saveLayer = nullptr;

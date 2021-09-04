@@ -23,9 +23,9 @@ SET(CMAKE_SWIG_OUTDIR ${AOCE_SWIG_TEMP_DIR})
 # set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/android/aoce/libs/${ANDROID_ABI})
 SWIG_ADD_LIBRARY(aoce_swig_java LANGUAGE java SOURCES ${WRAPPERLIST})
 if(AOCE_INSTALL_AGORA)
-    swig_link_libraries(aoce_swig_java android aoce aoce_vulkan_extra aoce_talkto)
+    swig_link_libraries(aoce_swig_java android aoce aoce_vulkan_extra aoce_talkto aoce_ncnn)
 else()
-    swig_link_libraries(aoce_swig_java android aoce aoce_vulkan_extra)
+    swig_link_libraries(aoce_swig_java android aoce aoce_vulkan_extra aoce_ncnn)
 endif()
 
 # 直接复制过去,会导致android studio每次打开把相关包变成目录,使编缉器丢掉包名引用等智能提示出现错误

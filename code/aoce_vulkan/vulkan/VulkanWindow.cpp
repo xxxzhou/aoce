@@ -7,6 +7,9 @@
 #include "VulkanContext.hpp"
 #include "VulkanHelper.hpp"
 #include "VulkanManager.hpp"
+#if __ANDROID__
+#include "../android/vulkan_wrapper.h"
+#endif
 
 namespace aoce {
 namespace vulkan {

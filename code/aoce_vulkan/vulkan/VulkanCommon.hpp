@@ -16,7 +16,7 @@
 #include <android_native_app_glue.h>
 #include <sys/system_properties.h>
 // vulkan_wrapper需在vulkan之前,否则许多函数指针会重定义
-#include "../android/vulkan_wrapper.h"
+// #include "../android/vulkan_wrapper.h"
 #endif
 
 #include <vulkan/vulkan.h>

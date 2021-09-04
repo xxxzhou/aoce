@@ -1,6 +1,9 @@
 #include "VkLinearFilterLayer.hpp"
 
 #include "aoce/layer/PipeGraph.hpp"
+#if __ANDROID__
+#include "aoce_vulkan/android/vulkan_wrapper.h"
+#endif
 
 namespace aoce {
 namespace vulkan {

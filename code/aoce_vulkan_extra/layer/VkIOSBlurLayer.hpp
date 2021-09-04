@@ -19,7 +19,7 @@ class VkIOSBlurLayer : public GroupLayer, public ITLayer<IOSBlurParamet> {
     /* data */
    public:
     VkIOSBlurLayer(/* args */);
-    ~VkIOSBlurLayer();
+    virtual ~VkIOSBlurLayer();
 
    private:
     std::unique_ptr<VkSizeScaleLayer> downLayer = nullptr;

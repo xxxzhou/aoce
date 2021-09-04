@@ -1,2 +1,7 @@
-ncnnInMat.comp twoImageBGR.comp NCNN_BGR=1
-ncnnInMat.comp twoImageRGB.comp NCNN_RGB=1
+ncnnInMat.comp ncnnInMatBGR.comp NCNN_BGR=1
+ncnnInMat.comp ncnnInMatRGB.comp NCNN_RGB=1
+ncnnInCropMat.comp ncnnInCropMatBGR.comp NCNN_BGR=1
+ncnnInCropMat.comp ncnnInCropMatRGB.comp NCNN_RGB=1
+drawPoints.comp
+drawPointBlend.comp
+drawRect.comp

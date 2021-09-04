@@ -68,8 +68,17 @@ class IPerlinNoiseLayer : public ITLayer<PerlinNoiseParamet> {
     virtual void setImageSize(int32_t width, int32_t height) = 0;
 };
 
-extern "C" {
+class IDrawPointsLayer : public ITLayer<PointsParamet> {
+   public:
+    IDrawPointsLayer() = default;
+    virtual ~IDrawPointsLayer(){};
 
+   public:
+    virtual void drawPoints(const vec2* points, int32_t size, vec4 color,
+                            int32_t raduis) = 0;
+};
+
+extern "C" {
 // 色彩调整
 #pragma region Color adjustments
 // 亮度:调整后的亮度(-1.0-1.0,默认值为0.0)
@@ -372,6 +381,10 @@ AOCE_VE_EXPORT IBaseLayer* createVoronoiConsumerLayer();
 // 直方图均衡化
 AOCE_VE_EXPORT IBaseLayer* createEqualizeHistLayer(bool bSingle);
 #pragma endregion
+
+AOCE_VE_EXPORT IDrawPointsLayer* createDrawPointsLayer();
+
+AOCE_VE_EXPORT IDrawRectLayer* createDrawRectLayer();
 
 AOCE_VE_EXPORT ITLayer<SizeScaleParamet>* createSizeScaleLayer(
     ImageType imageType = ImageType::rgba8);
