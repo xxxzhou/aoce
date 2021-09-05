@@ -4,7 +4,7 @@
 
 查看路径 android/aoce/src/main/java/aoce/android/library是否有个文件夹xswig,这个文件夹放的是swig把C++接口转换生成的java代码.
 
-如果没有,请在这个目录下,新建一个xswig文件夹,并让下面步骤操作.
+如果没有,需要先使用swig生成,首先请在这个目录下,新建一个xswig文件夹,并让下面步骤操作.
 
 1 安装[swig](http://www.swig.org/download.html),把带swig.exe的目录添加到环境变量Path中.
 
@@ -18,15 +18,15 @@
 
 ![avatar](../assets/images/android_build2.png)
 
-一般来说,这个目录会在(project\.cxx\cmake\{build type}\{abi}\swig\Java\swig)下,根据我的配置,就在(04_vulkantest\.cxx\cmake\debug\arm64-v8a\swig\Java\swig)下.
+一般来说,这个目录会在(project/.cxx/cmake/{build type}/{abi}/swig/Java/swig)下,根据我的配置,就在(04_vulkantest/.cxx/cmake/debug/arm64-v8a/swig/Java/swig)下.
 
-4 复制这个目录文件到android/aoce/src/main/java/aoce/android/library/xswig下.
+4 复制这个目录所有文件到android/aoce/src/main/java/aoce/android/library/xswig下.
 
 5 转到我们java项目上来,还是针对settings.gradle设置.
 
 ![avatar](../assets/images/android_build3.png)
 
-等待Sync Now完成后,应该就是如上图显示.
+等待Sync Now完成后,应该就是如上图显示,有了swig的生成文件,项目相应引用就不会有问题了.
 
 aoce包含了swig转换的C++到java接口以及一些针对JNI操作和一些公共方法.
 
