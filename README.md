@@ -8,7 +8,7 @@ android/window 图像处理,多媒体以及游戏引擎交互.
 
 ![avatar](assets/images/layers_demo.png "滤镜目录")
 
-aoce结合ncnn推理框架图像处理.
+aoce结合ncnn推理框架优化图像预处理与显示.
 
 ![avatar](https://github.com/xxxzhou/aoce_thirdparty/blob/main/ncnnfkmin.gif)
 
