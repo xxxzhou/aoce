@@ -10,6 +10,8 @@
 
 [NdkCamera Sample](https://github.com/android/ndk-samples/tree/master/camera)
 
+[NdkCamera FPS](https://ffmpeg.org/doxygen/trunk/android__camera_8c_source.html)
+
 1. AIMAGE_FORMAT_YUV_420_888 可能是YUV420P,也可能是NV12,需要在AImageReader_ImageListener里拿到image通过AImage_getPlanePixelStride里的UV的plan是否为1来判断是否为YUV420P,或者看data[u]-data[y]=1来看是否为NV12.
 
 2. AImageReader_new里的maxImages比较重要,简单理解为预先申请几张图,这个值越大,显示越平滑.

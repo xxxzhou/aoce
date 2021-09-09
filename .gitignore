@@ -1,6 +1,7 @@
 /build
 /thirdparty/
-code/aoce/AoceBuildSettings.h
+code/aoce/AoceBuildSettingsWin.h
+code/aoce/AoceBuildSettingsAndroid.h
 android/base/CMakeFiles/
 android/base/cmake_install.cmake
 android/build

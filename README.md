@@ -8,11 +8,13 @@ android/window 图像处理,多媒体以及游戏引擎交互.
 
 ![avatar](assets/images/layers_demo.png "滤镜目录")
 
-aoce结合ncnn推理框架优化图像预处理与显示.
+[aoceswigtest的封装aar包](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoce-release.aar) 如果你没有装swig,就需要手动下载这个.
+
+[aoce结合ncnn推理框架优化图像预处理与显示](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aocencnntest-release.zip)
 
 ![avatar](https://github.com/xxxzhou/aoce_thirdparty/blob/main/ncnnfkmin.gif)
 
-[aoce.xswig封装aar包](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoce-release.aar) 如果你没有装swig,就需要手动下载这个.
+[NCNN优化实时面部关键点检测](https://zhuanlan.zhihu.com/p/407299327)
 
 ## 配置项目
 

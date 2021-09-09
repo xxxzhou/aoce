@@ -79,6 +79,16 @@ void VkAlphaCombinLayer::onInitGraph() {
     outFormats[0].imageType = ImageType::rgba8;
 }
 
+VkAlphaScaleCombinLayer::VkAlphaScaleCombinLayer() {
+    glslPath = "glsl/alphaScaleCombin.comp.spv";
+    inCount = 2;
+    outCount = 1;
+}
+
+VkAlphaScaleCombinLayer::~VkAlphaScaleCombinLayer() {}
+
+bool VkAlphaScaleCombinLayer::getSampled(int inIndex) { return inIndex == 1; }
+
 VkTwoShowLayer::VkTwoShowLayer(bool bRow) {
     glslPath = "glsl/twoImageColumn.comp.spv";
     if (bRow) {

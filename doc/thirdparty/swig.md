@@ -62,3 +62,5 @@
 swig在处理里添加特有的宏(#ifdef SWIG).
 
 [jni-faiss](https://github.com/gameofdimension/jni-faiss/blob/master/jni/swigfaiss.swig)不同语言处理.#ifdef SWIGJAVA/#ifdef SWIGPYTHON/#ifdef SWIGLUA
+
+需要注意的是,在i文件中,如果放入的%{...%}代码中的宏,需要用add_definitions定义,而非代码段的宏需要在CMAKE_SWIG_FLAGS定义,如果有相应的宏定义,最好二者都加上.

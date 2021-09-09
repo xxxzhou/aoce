@@ -43,3 +43,5 @@ android camera里的AImageReader_acquireNextImage用AImageReader_acquireLatestIm
 可以多加一步,先复制到一个非android模块目录(最好是CMAKE的BINARY目录,否则android studio容易检测到重命),然后使用cmake里的file复制过去,可以解决.
 
 6 对应Cmake输出文件在如下目录-project\.cxx\cmake\{build type}\{abi}\build_output.txt,如deubg/v8下对应(project\.cxx\cmake\debug\arm64-v8a\build_output.txt).
+
+7 android中通过aoce引用ncnn,在相关的ncnn方法里会crash,需要在在java中,调用System.loadLibrary("ncnn").

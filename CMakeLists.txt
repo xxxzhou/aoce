@@ -115,10 +115,16 @@ option(AOCE_INSTALL_NCNN "install ncnn module" TRUE)
 cmake_dependent_option(AOCE_CUDA_MODULE "install cuda module" TRUE "WIN32" FALSE)
 cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGORA_EXIST" FALSE) #FALSE
 
-# 配置联系cmake/c++
-configure_file(${CMAKE_SOURCE_DIR}/cmake/AoceBuildSettings.h.in ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h @ONLY)
+# 配置联系cmake/c++,android/win之间配置分开
+if(WIN32)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/AoceBuildSettings.h.in ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettingsWin.h @ONLY)
+endif()
+if(ANDROID)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/AoceBuildSettings.h.in ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettingsAndroid.h @ONLY)
+endif()
 # 导出给外部用户使用的C头文件,主要是抽像类/结构/C风格创建对象三种
-install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettings.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettingsWin.h DESTINATION include/aoce)
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettingsAndroid.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceDefine.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/Aoce.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceCore.h DESTINATION include/aoce)

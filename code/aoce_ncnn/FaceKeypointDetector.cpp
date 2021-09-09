@@ -34,26 +34,22 @@ void FaceKeypointDetector::setObserver(IFaceKeypointObserver* observer) {
 bool FaceKeypointDetector::initNet(INcnnInCropLayer* ncnnLayer,
                                    IDrawPointsLayer* drawlayer) {
     // m3_pfld_1029 pfld-sim
+    if (bInitNet) {
+        return true;
+    }
     std::string paramFile = "net/pfld-sim.param";
     std::string binFile = "net/pfld-sim.bin";
-#if defined(__ANDROID__)
-    AAssetManager* assetManager = AoceManager::Get().getAppEnv().assetManager;
-    assert(assetManager != nullptr);
-    int ret = net->load_param(assetManager, paramFile.c_str());
-    if (ret == 0) {
-        ret = net->load_model(assetManager, binFile.c_str());
-    }
-#else
-    std::string paramPath = getAocePath() + "/" + paramFile;
-    std::string binPath = getAocePath() + "/" + binFile;
-    int ret = net->load_param(paramPath.c_str());
-    if (ret == 0) {
-        ret = net->load_model(binPath.c_str());
-    }
-#endif
-    bInitNet = false;
+    int32_t ret = loadNet(net.get(), paramFile, binFile);
     if (ret == 0) {
         ncnnInLayer = static_cast<VkNcnnInCropLayer*>(ncnnLayer);
+        if (!ncnnInLayer) {
+            logMessage(
+                LogLevel::warn,
+                "FaceKeypointDetector initialize the network parameters "
+                "ncnnlayer, "
+                "please use the function createNcnnInCropLayer to create");
+            return false;
+        }
         drawLayer = drawlayer;
         NcnnInParamet paramet = {};
         paramet.scale = {1 / 255.f, 1 / 255.f, 1 / 255.f, 1.0f};
@@ -62,9 +58,8 @@ bool FaceKeypointDetector::initNet(INcnnInCropLayer* ncnnLayer,
         ncnnInLayer->updateParamet(paramet);
         ncnnInLayer->setObserver(this, netFormet.imageType);
         bInitNet = true;
-        return true;
     }
-    return false;
+    return bInitNet;
 }
 
 void FaceKeypointDetector::onResult(VulkanBuffer* buffer,

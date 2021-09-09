@@ -14,7 +14,9 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++14 -frtti -fexceptions"
-                arguments "-DANDROID_STL=c++_shared","-DANDROID_TOOLCHAIN=clang","-DAOCE_INSTALL_FFMPEG=OFF"
+                arguments "-DANDROID_STL=c++_shared", "-DANDROID_TOOLCHAIN=clang",
+                        "-DAOCE_ENABLE_SAMPLES=OFF", "-DAOCE_INSTALL_FFMPEG=OFF",
+                        "-DAOCE_INSTALL_AGORA=OFF","-DAOCE_ENABLE_SWIG=ON","-DAOCE_INSTALL_NCNN=ON"
             }
         }
     }

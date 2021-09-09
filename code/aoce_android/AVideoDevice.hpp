@@ -29,6 +29,8 @@ class AVideoDevice : public VideoDevice {
     std::mutex procMtx;
     std::condition_variable stopSignal;
     // std::string mid ="";
+    const int32_t fps = 30;
+    int32_t framerateRange[2];
 
     friend void imageCallback(void* context, AImageReader* reader);
     friend void onDisconnected(void* context, ACameraDevice* device);

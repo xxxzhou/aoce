@@ -67,7 +67,7 @@ enum class ImageType : int32_t {
     r32f,
     r32,
     rgba32,
-    // cnn使用,根据情况对应rgb8交叉/r8Pg8Pb8P三平面
+    // cnn使用,根据情况对应rgb8交叉/r8g8b8三平面
     rgb8,
     bgr8,
 };

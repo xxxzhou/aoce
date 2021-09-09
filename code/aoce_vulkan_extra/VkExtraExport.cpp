@@ -651,6 +651,11 @@ IBaseLayer* createAlphaCombinLayer() {
     return layer;
 }
 
+IBaseLayer* createAlphaScaleCombinLayer() {
+    VkAlphaScaleCombinLayer* layer = new VkAlphaScaleCombinLayer();
+    return layer;
+}
+
 AFloatLayer* createTwoShowLayer(bool bRow) {
     VkTwoShowLayer* layer = new VkTwoShowLayer(bRow);
     return layer;

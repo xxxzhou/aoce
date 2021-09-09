@@ -1,7 +1,5 @@
 include ':aoce'
 
-//include ':talkdolive'
-
 //include ":04_vulkantest"
 //project(":04_vulkantest").projectDir = new File("04_vulkantest")
 //

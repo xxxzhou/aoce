@@ -115,6 +115,16 @@ class IFaceKeypointDetector : public virtual IDrawProperty {
                          IDrawPointsLayer* drawLayer) = 0;
 };
 
+class IVideoMatting {
+   public:
+    IVideoMatting() = default;
+    virtual ~IVideoMatting(){};
+
+   public:
+    virtual bool initNet(IBaseLayer* ncnnInLayer,
+                         IBaseLayer* ncnnUploadLayer) = 0;
+};
+
 extern "C" {
 
 AOCE_NCNN_EXPORT IFaceDetector* createFaceDetector();
@@ -124,6 +134,10 @@ AOCE_NCNN_EXPORT IFaceKeypointDetector* createFaceKeypointDetector();
 AOCE_NCNN_EXPORT IBaseLayer* createNcnnInLayer();
 
 AOCE_NCNN_EXPORT INcnnInCropLayer* createNcnnInCropLayer();
+
+AOCE_NCNN_EXPORT IVideoMatting* createVideoMatting();
+
+AOCE_NCNN_EXPORT IBaseLayer* createNcnnUploadLayer();
 }
 
 }  // namespace aoce

@@ -30,7 +30,7 @@ void main(){
     int index = uv.y*ubo.outWidth+uv.x;
     vec4 mean = vec4(ubo.meanX,ubo.meanY,ubo.meanZ,ubo.meanW);
     vec4 scale = vec4(ubo.scaleX,ubo.scaleY,ubo.scaleZ,ubo.scaleW);
-    inColor = inColor*scale-mean;
+    inColor = (inColor-mean)*scale;
 #if NCNN_BGR    
     dataOut[index] = inColor.b;
     dataOut[index+size] = inColor.g;

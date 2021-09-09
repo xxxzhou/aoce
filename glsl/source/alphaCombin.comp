@@ -2,7 +2,11 @@
 
 layout (local_size_x = 16, local_size_y = 16) in;// gl_WorkGroupSize
 layout (binding = 0, rgba8) uniform readonly image2D inTex;
+#if ALPHA_SCALE
+layout (binding = 1) uniform sampler2D inSampler;
+#else
 layout (binding = 1, r8) uniform readonly image2D inTex1;
+#endif
 layout (binding = 2, rgba8) uniform image2D outTex;
 
 void main(){
@@ -12,7 +16,11 @@ void main(){
         return;
     } 
     vec4 color = imageLoad(inTex,uv);  
-    float alpha = imageLoad(inTex1,uv).r;
-    
+    #if ALPHA_SCALE
+        vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(size);
+        float alpha = textureLod(inSampler,suv ,0).r;  
+    #else
+        float alpha = imageLoad(inTex1,uv).r;
+    #endif    
     imageStore(outTex,uv,vec4(color.rgb,alpha));     
 }

@@ -165,6 +165,7 @@ histogramLut.comp
 histogramLutResult.comp histogramLutResult.comp CHANNEL_RGBA=1
 histogramLutResult.comp histogramLutResultC1.comp CHANNEL_R8=1
 alphaSeparate.comp
+alphaCombin.comp alphaScaleCombin.comp ALPHA_SCALE=1
 alphaCombin.comp
 twoImage.comp twoImageColumn.comp COLUMN=1
 twoImage.comp twoImageRow.comp ROW=1

@@ -2,7 +2,6 @@
 
 #include "CNNHelper.hpp"
 #include "aoce_vulkan/layer/VkLayer.hpp"
-#include "aoce_vulkan/vulkan/VulkanBuffer.hpp"
 #include "aoce_vulkan_extra/VkExtraExport.h"
 
 using namespace aoce::vulkan;
@@ -87,6 +86,27 @@ class VkNcnnInCropLayer : public VkNcnnInLayer, public INcnnInCropLayer {
    public:
     virtual void detectFaceBox(const FaceBox* boxs, int32_t lenght) override;
     virtual bool onFrame() override;
+};
+
+class VkNcnnUploadLayer : public VkLayer {
+    AOCE_LAYER_GETNAME(VkNcnnUploadLayer)
+   protected:
+    std::unique_ptr<VulkanBuffer> inBuffer = nullptr;
+    ImageFormat imageFormat = {};
+
+   public:
+    VkNcnnUploadLayer();
+    virtual ~VkNcnnUploadLayer();
+
+    void setImageFormat(const ImageFormat& inFormat);
+    void uploadBuffer(const void* data);
+
+   protected:
+    virtual void onInitGraph() override;
+    virtual void onInitLayer() override;
+    virtual void onInitVkBuffer() override;
+    virtual void onInitPipe() override;
+    virtual void onCommand() override;
 };
 
 }  // namespace aoce

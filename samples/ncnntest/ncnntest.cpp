@@ -165,19 +165,12 @@ int main() {
     std::cout << "name: " << name << std::endl;
     std::cout << "id: " << id << std::endl;
     auto& formats = video->getFormats();
-    std::wcout << "formats count: " << formats.size() << std::endl;
-    for (const auto& vf : formats) {
-        std::cout << "index:" << vf.index << " width: " << vf.width
-                  << " hight:" << vf.height << " fps:" << vf.fps
-                  << " format:" << getVideoType(vf.videoType) << std::endl;
-    }
     formatIndex = video->findFormatIndex(1280, 720);
     video->setFormat(formatIndex);
     video->open();
     auto& selectFormat = video->getSelectFormat();
     TestCameraObserver cameraObserver = {};
     video->setObserver(&cameraObserver);
-
     // 生成一张执行图
     vkGraph = getPipeGraphFactory(gpuType)->createGraph();
     auto* layerFactory = AoceManager::Get().getLayerFactory(gpuType);
@@ -189,7 +182,6 @@ int main() {
 #else
     outputLayer->updateParamet({true, false});
 #endif
-
     VideoType videoType = selectFormat.videoType;
     if (selectFormat.videoType == VideoType::mjpg) {
         videoType = VideoType::yuv2I;
@@ -201,15 +193,19 @@ int main() {
     vkGraph->addNode(inputLayer)->addNode(yuv2rgbLayer);
     vkGraph->addNode(ncnnLayer);
     vkGraph->addNode(ncnnPointLayer);
-    vkGraph->addNode(drawPointsLayer);
     vkGraph->addNode(outputLayer);
-    vkGraph->addNode(drawRectLayer);
     yuv2rgbLayer->getLayer()->addLine(ncnnLayer);
     yuv2rgbLayer->getLayer()->addLine(ncnnPointLayer->getLayer());
+#if VULKAN_SHOW
+    vkGraph->addNode(drawRectLayer);
+    vkGraph->addNode(drawPointsLayer);
     yuv2rgbLayer->getLayer()
         ->addLine(drawRectLayer->getLayer())
         ->addLine(drawPointsLayer->getLayer())
         ->addLine(outputLayer->getLayer());
+#else
+    yuv2rgbLayer->getLayer()->addLine(outputLayer->getLayer());
+#endif
     // 设定输出函数回调
     OutputLayerObserver outputObserver = {};
     outputLayer->setObserver(&outputObserver);

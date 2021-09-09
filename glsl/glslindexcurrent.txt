@@ -5,3 +5,6 @@ ncnnInCropMat.comp ncnnInCropMatRGB.comp NCNN_RGB=1
 drawPoints.comp
 drawPointBlend.comp
 drawRect.comp
+ncnnUpload.comp
+alphaCombin.comp alphaScaleCombin.comp ALPHA_SCALE=1
+alphaCombin.comp

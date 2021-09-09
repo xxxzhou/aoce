@@ -9,10 +9,11 @@
 %feature("director") ICaptureObserver; 
 %feature("director") IAudioDeviceObserver;
 %feature("director") IMotionDetectorObserver;
-//#ifdef AOCE_INSTALL_NCNN
+#ifdef AOCE_INSTALL_NCNN
 %feature("director") IFaceObserver;
 %feature("director") IFaceKeypointObserver;
-//#endif
+#endif
+
 %{
 #if __ANDROID__
 #include <jni.h> 
@@ -28,9 +29,9 @@
 #include "aoce_talkto/Talkto.h"
 #endif
 
-//#ifdef AOCE_INSTALL_NCNN
+#ifdef AOCE_INSTALL_NCNN
 #include "aoce_ncnn/AoceNcnnExport.h"
-//#endif
+#endif
 %}
 
 #define ACOE_EXPORT
@@ -172,11 +173,11 @@ SWIG_JAVABODY_TYPEWRAPPER(public, public, public, SWIGTYPE)
 %template(IEdgeBlurBlendLayer) aoce::ITLayer<aoce::talkto::EdgeBlurBlendParamet> ;
 #endif
 
-//#ifdef AOCE_INSTALL_NCNN
+#ifdef AOCE_INSTALL_NCNN
 #define AOCE_NCNN_EXPORT
 %include "aoce_ncnn/AoceNcnnExport.h"
 %template(IDrawRectLayer) aoce::ITLayer<aoce::DrawRectParamet>;
-//#endif
+#endif
 
 %nodefaultctor;
 %nodefaultdtor;

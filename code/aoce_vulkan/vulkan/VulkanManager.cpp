@@ -58,6 +58,10 @@ VulkanManager& VulkanManager::Get() {
 }
 
 VulkanManager::~VulkanManager() {
+    if (cmdPool) {
+        vkDestroyCommandPool(device, cmdPool, 0);
+        cmdPool = VK_NULL_HANDLE;
+    }
     if (device) {
         vkDestroyDevice(device, nullptr);
         device = VK_NULL_HANDLE;
@@ -220,6 +224,13 @@ bool VulkanManager::createDevice(bool bAloneCompute) {
     bAloneCompute = computeIndex != graphicsIndex;
     vkGetDeviceQueue(device, computeIndex, 0, &computeQueue);
     vkGetDeviceQueue(device, graphicsIndex, 0, &graphicsQueue);
+    // context和呈现渲染相应command分开
+    VkCommandPoolCreateInfo cmdPoolInfo = {};
+    cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    cmdPoolInfo.queueFamilyIndex = computeIndex;
+    cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    VK_CHECK_RESULT(
+        vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool));
 #if WIN32
     // 检测是否支持dx11交互
     VkPhysicalDeviceExternalImageFormatInfo

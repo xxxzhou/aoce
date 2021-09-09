@@ -649,6 +649,7 @@ void loadAoce() {
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().regAndLoad("aoce_ffmpeg");
 #endif
+    // ModuleManager::Get().regAndLoad("aoce_ncnn");
     loadLayerMetadata();
 }
 
@@ -675,6 +676,7 @@ void unloadAoce() {
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().unloadModule("aoce_ffmpeg");
 #endif
+    // ModuleManager::Get().unloadModule("aoce_ncnn");
     LayerMetadataManager::Get().clean();
 }
 

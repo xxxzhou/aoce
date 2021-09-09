@@ -52,6 +52,7 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     VkDevice device = VK_NULL_HANDLE;
     VkQueue computeQueue = VK_NULL_HANDLE;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
+    VkCommandPool cmdPool = VK_NULL_HANDLE;
 #if __ANDROID__
     bool bAndroidHardware = false;
 #endif

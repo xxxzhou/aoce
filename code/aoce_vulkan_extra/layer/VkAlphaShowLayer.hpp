@@ -52,6 +52,17 @@ class VkAlphaCombinLayer : public VkLayer {
     virtual void onInitGraph() override;
 };
 
+// 原图与mask图大小不一致
+class VkAlphaScaleCombinLayer : public VkAlphaCombinLayer {
+    AOCE_LAYER_GETNAME(VkAlphaScaleCombinLayer)
+   public:
+    VkAlphaScaleCombinLayer();
+    virtual ~VkAlphaScaleCombinLayer();
+
+   protected:
+    virtual bool getSampled(int inIndex) override;
+};
+
 class VkTwoShowLayer : public VkLayer, public ITLayer<float> {
     AOCE_LAYER_QUERYINTERFACE(VkTwoShowLayer)
     AOCE_VULKAN_PARAMETUPDATE()

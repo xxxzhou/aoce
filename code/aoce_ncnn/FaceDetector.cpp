@@ -1,4 +1,5 @@
 #include "FaceDetector.hpp"
+
 #include <AoceManager.hpp>
 
 #define clip(x, y) (x < 0 ? 0 : (x > y ? y : x))
@@ -9,8 +10,8 @@ FaceDetector::FaceDetector(/* args */) {
     net = std::make_unique<ncnn::Net>();
     net->opt.use_vulkan_compute = true;
     // 网络输入图像格式
-    netFormet.width = 160;   // 320;
-    netFormet.height = 120;  // 240;
+    netFormet.width = 160;   // 160;   // 320;
+    netFormet.height = 120;  // 120;  // 240;
     netFormet.imageType = ImageType::bgr8;
     detectorFaces.resize(MAX_FACE);
     // inMat.create(netFormet.width, netFormet.height, 3);
@@ -65,7 +66,7 @@ void FaceDetector::setFaceKeypointObserver(INcnnInCropLayer* cropLayer) {
 bool FaceDetector::initNet(FaceDetectorType detectortype) {
     detectorType = detectortype;
 
-    int gpu_count = ncnn::get_gpu_count();
+    int32_t gpu_count = ncnn::get_gpu_count();
     net->set_vulkan_device(0);
 
     std::string paramFile = "net/slim_320.param";
@@ -74,21 +75,7 @@ bool FaceDetector::initNet(FaceDetectorType detectortype) {
         paramFile = "net/face.param";
         binFile = "net/face.bin";
     }
-#if defined(__ANDROID__)
-    AAssetManager* assetManager = AoceManager::Get().getAppEnv().assetManager;
-    assert(assetManager != nullptr);
-    int ret = net->load_param(assetManager, paramFile.c_str());
-    if (ret == 0) {
-        ret = net->load_model(assetManager, binFile.c_str());
-    }
-#else
-    std::string paramPath = getAocePath() + "/" + paramFile;
-    std::string binPath = getAocePath() + "/" + binFile;
-    int ret = net->load_param(paramPath.c_str());
-    if (ret == 0) {
-        ret = net->load_model(binPath.c_str());
-    }
-#endif
+    int32_t ret = loadNet(net.get(), paramFile, binFile);
     if (ret == 0) {
         initAnchors();
         return true;
@@ -111,11 +98,17 @@ bool FaceDetector::initNet(IBaseLayer* ncnnLayer, IDrawRectLayer* drawlayer) {
         paramet.outHeight = netFormet.height;
         ncnnInLayer->updateParamet(paramet);
         ncnnInLayer->setObserver(this, netFormet.imageType);
+        if (!ncnnInLayer) {
+            logMessage(
+                LogLevel::warn,
+                "FaceDetector initialize the network parameters ncnnlayer, "
+                "please use the function createNcnnInLayer to create");
+            return false;
+        }
         bInitNet = true;
         bVulkanInput = false;
-        return true;
     }
-    return false;
+    return bInitNet;
 }
 
 void FaceDetector::onResult(VulkanBuffer* buffer,
@@ -131,21 +124,7 @@ void FaceDetector::onResult(VulkanBuffer* buffer,
     //        netFormet.width * netFormet.height * 3 * 4);
     // 这逻辑现在有问题,首先要拿到ncnn的commandbuffer,然后在二边上的cmd锁buffer.
     if (bVulkanInput) {
-        ncnn::VkBufferMemory nBuffer = {};
-        nBuffer.buffer = buffer->buffer;
-        nBuffer.memory = buffer->memory;
-        nBuffer.offset = 0;
-        nBuffer.capacity = buffer->getBufferSize();
-        nBuffer.mapped_ptr = buffer->getCpuData();
-        nBuffer.access_flags = 0;
-        nBuffer.stage_flags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-        nBuffer.refcount = 1;
-
-        const ncnn::VulkanDevice* device = net->vulkan_device();
-        ncnn::VkAllocator* vkallocator = device->acquire_blob_allocator();
-        ncnn::VkMat nMat(netFormet.width, netFormet.height, 3, &nBuffer, 4,
-                         vkallocator);
-        netEx.input(0, nMat);
+        // netEx.input(0, vkDest);
     } else {
         ncnn::Mat inMat(netFormet.width, netFormet.height, 3,
                         buffer->getCpuData());

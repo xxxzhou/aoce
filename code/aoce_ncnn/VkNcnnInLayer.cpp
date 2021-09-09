@@ -121,6 +121,8 @@ void VkNcnnInLayer::onCommand() {
                             layout->pipelineLayout, 0, 1,
                             layout->descSets[0].data(), 0, 0);
     vkCmdDispatch(cmd, sizeX, sizeY, 1);
+    outBuffer->addBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT,
+                          VK_ACCESS_SHADER_READ_BIT);
     // 复制CS BUFFER到中转BUFFER上
     // VkBufferCopy copyRegion = {};
     // copyRegion.size = outBuffer->getBufferSize();
@@ -191,6 +193,74 @@ bool VkNcnnInCropLayer::onFrame() {
         return true;
     }
     return VkNcnnInLayer::onFrame();
+}
+
+VkNcnnUploadLayer::VkNcnnUploadLayer() {
+    bInput = true;
+    glslPath = "glsl/ncnnUpload.comp.spv";
+}
+
+VkNcnnUploadLayer::~VkNcnnUploadLayer() {}
+
+void VkNcnnUploadLayer::setImageFormat(const ImageFormat& inFormat) {
+    imageFormat = inFormat;
+}
+
+void VkNcnnUploadLayer::uploadBuffer(const void* data) {
+    if (inBuffer) {
+        inBuffer->upload((uint8_t*)data);
+    }
+}
+
+void VkNcnnUploadLayer::onInitGraph() {
+    // 加载shader
+    shader->loadShaderModule(context->device, glslPath);
+    assert(shader->shaderStage.module != VK_NULL_HANDLE);
+    if (layout->pipelineLayout != VK_NULL_HANDLE) {
+        return;
+    }
+    std::vector<UBOLayoutItem> items = {
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT}};
+    layout->addSetLayout(items);
+    layout->generateLayout();
+}
+
+void VkNcnnUploadLayer::onInitLayer() {
+    // 输出数据格式
+    outFormats[0].width = imageFormat.width;
+    outFormats[0].height = imageFormat.height;
+    outFormats[0].imageType = ImageType::r8;
+    sizeX = divUp(imageFormat.width, groupX);
+    sizeY = divUp(imageFormat.width, groupY);
+}
+
+void VkNcnnUploadLayer::onInitVkBuffer() {
+    int32_t bufferSize = imageFormat.width * imageFormat.height * 4;
+    inBuffer = std::make_unique<VulkanBuffer>();
+    inBuffer->initResoure(BufferUsage::store, bufferSize,
+                          VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);
+}
+
+void VkNcnnUploadLayer::onInitPipe() {
+    outTexs[0]->descInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+    layout->updateSetLayout(0, 0, &inBuffer->descInfo, &outTexs[0]->descInfo);
+    auto computePipelineInfo = VulkanPipeline::createComputePipelineInfo(
+        layout->pipelineLayout, shader->shaderStage);
+    VK_CHECK_RESULT(vkCreateComputePipelines(
+        context->device, context->pipelineCache, 1, &computePipelineInfo,
+        nullptr, &computerPipeline));
+}
+
+void VkNcnnUploadLayer::onCommand() {
+    outTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_GENERAL,
+                           VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+                           VK_ACCESS_SHADER_WRITE_BIT);
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, computerPipeline);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE,
+                            layout->pipelineLayout, 0, 1,
+                            layout->descSets[0].data(), 0, 0);
+    vkCmdDispatch(cmd, sizeX, sizeY, 1);
 }
 
 }  // namespace aoce

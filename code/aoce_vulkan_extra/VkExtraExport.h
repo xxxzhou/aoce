@@ -398,8 +398,10 @@ AOCE_VE_EXPORT IBaseLayer* createAlphaShow2Layer();
 AOCE_VE_EXPORT IBaseLayer* createConvertImageLayer();
 
 AOCE_VE_EXPORT IBaseLayer* createAlphaSeparateLayer();
-
+// 合并图与mask,图与mask大小相同
 AOCE_VE_EXPORT IBaseLayer* createAlphaCombinLayer();
+// 合并图与mask,图与mask大小不同
+AOCE_VE_EXPORT IBaseLayer* createAlphaScaleCombinLayer();
 
 AOCE_VE_EXPORT AFloatLayer* createTwoShowLayer(bool bRow);
 }

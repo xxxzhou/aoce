@@ -126,10 +126,10 @@ void imageCallback(void* context, AImageReader* reader) {
         // AImage_delete(image);
     }
     AImage_delete(image);
-//    if(!device->isOpen){
-//        device->onClose();
-//    }
-//    device->stopSignal.notify_all();
+    //    if(!device->isOpen){
+    //        device->onClose();
+    //    }
+    //    device->stopSignal.notify_all();
 }
 
 AVideoDevice::AVideoDevice(/* args */) {}
@@ -158,6 +158,10 @@ bool AVideoDevice::open() {
     if (status == ACAMERA_OK) {
         status = ACameraDevice_createCaptureRequest(ndkDevice, TEMPLATE_PREVIEW,
                                                     &request);
+        if (ACaptureRequest_setEntry_i32(request, ACAMERA_CONTROL_AE_TARGET_FPS_RANGE,
+                                         2, framerateRange) != ACAMERA_OK) {
+            logMessage(LogLevel::warn,"failed to set target fps range in capture request");
+        }
         media_status_t mstatus = AImageReader_new(
             selectFormat.width, selectFormat.height,
             getImageFormat(selectFormat.videoType), 4, &imageReader);
@@ -167,7 +171,7 @@ bool AVideoDevice::open() {
                     .context = this,
                     .onImageAvailable = imageCallback,
                 };
-                mstatus = AImageReader_setImageListener(imageReader, &listener);
+                AImageReader_setImageListener(imageReader, &listener);
                 if (mstatus == AMEDIA_OK) {
                     ANativeWindow_acquire(surface);
                     ACameraOutputTarget_create(surface, &outputTarget);
@@ -207,19 +211,19 @@ bool AVideoDevice::open() {
 
 bool AVideoDevice::close() {
     // std::lock_guard<std::mutex> mtx_locker(procMtx);
-    if(!isOpen){
+    if (!isOpen) {
         return true;
     }
     onClose();
     return true;
-//    std::unique_lock<std::mutex> lck(procMtx);
-//    // 等待stopSignal信号回传
-//    auto status = stopSignal.wait_for(lck, std::chrono::seconds(2));
-//    if (status == std::cv_status::timeout) {
-//        logMessage(LogLevel::warn, "android ndk camera close time out.");
-//        return false;
-//    }
-//    return true;
+    //    std::unique_lock<std::mutex> lck(procMtx);
+    //    // 等待stopSignal信号回传
+    //    auto status = stopSignal.wait_for(lck, std::chrono::seconds(2));
+    //    if (status == std::cv_status::timeout) {
+    //        logMessage(LogLevel::warn, "android ndk camera close time out.");
+    //        return false;
+    //    }
+    //    return true;
 }
 
 bool AVideoDevice::init(ACameraManager* manager, const char* id) {
@@ -250,6 +254,42 @@ bool AVideoDevice::init(ACameraManager* manager, const char* id) {
     }
     if (formats.size() < 1) {
         return false;
+    }
+    // FPS
+    ACameraMetadata_const_entry frameRates = {};
+    if (ACameraMetadata_getConstEntry(metadata,
+                                      ACAMERA_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES,
+                                      &frameRates) == ACAMERA_OK) {
+        int currentBestMatch = -1;
+        bool bFindFps = false;
+        for (uint32_t i = 0; i < frameRates.count; i += 2) {
+            auto fpsMin = frameRates.data.i32[i + 0];
+            auto fpsMax = frameRates.data.i32[i + 1];
+            if(fpsMax == fps){
+                if(fpsMax == fpsMin){
+                    bFindFps = true;
+                    framerateRange[0] = fpsMin;
+                    framerateRange[0] = fpsMax;
+                    break;
+                }else if (currentBestMatch >= 0) {
+                    int32_t oldCurrentMin = frameRates.data.i32[currentBestMatch * 2 + 0];
+                    if (fpsMin > oldCurrentMin) {
+                        currentBestMatch = i;
+                    }
+                } else {
+                    currentBestMatch = i;
+                }
+            }
+        }
+        if (!bFindFps) {
+            if (currentBestMatch >= 0) {
+                framerateRange[0] = frameRates.data.i32[currentBestMatch * 2 + 0];
+                framerateRange[1] = frameRates.data.i32[currentBestMatch * 2 + 1];
+            } else {
+                framerateRange[0] = frameRates.data.i32[0];
+                framerateRange[1] = frameRates.data.i32[1];
+            }
+        }
     }
     // 查找前后置
     camera_status_t status =

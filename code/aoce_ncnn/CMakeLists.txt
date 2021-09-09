@@ -10,10 +10,10 @@ else()
     message(FATAL_ERROR "unsupported platform.")
 endif()  
 
-find_package(NCNN)
+find_package(NCNN) 
 if(NOT NCNN_FOUND)
     message(FATAL_ERROR "NCNN not find.please set option AOCE_INSTALL_NCNN false")
-endif()
+endif() 
 
 include_directories(${NCNN_INCLUDE_DIRS} ${Vulkan_INCLUDE_DIR} ${AOCE_HEADER_DIR})
 
@@ -30,7 +30,7 @@ endif()
 aoce_output(aoce_ncnn)
 install_aoce_module(aoce_ncnn FLASE)
   
-message(STATUS "ncnn lib path: " ${NCNN_LIBRARYS})  
+message(STATUS "ncnn lib path: " ${NCNN_LIBRARYS})   
 message(STATUS "ncnn dll path: " ${NCNN_BINARYS})  
 if(WIN32)  
     file(COPY ${NCNN_BINARYS} DESTINATION "${CMAKE_BINARY_DIR}/bin/${CMAKE_BUILD_TYPE}")    

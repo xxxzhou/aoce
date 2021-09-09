@@ -1,18 +1,22 @@
 #pragma once
-#include "AoceBuildSettings.h"
+#ifdef _WIN32
+#include "AoceBuildSettingsWin.h"
+#elif __ANDROID__
+#include "AoceBuildSettingsAndroid.h"
+#endif
 
 #ifdef _WIN32
-    #if defined(AOCE_EXPORT_DEFINE)
-        #define ACOE_EXPORT __declspec(dllexport)
-    #else
-        #define ACOE_EXPORT __declspec(dllimport)
-    #endif
+#if defined(AOCE_EXPORT_DEFINE)
+#define ACOE_EXPORT __declspec(dllexport)
+#else
+#define ACOE_EXPORT __declspec(dllimport)
+#endif
 #elif __ANDROID__
-    #if defined(AOCE_EXPORT_DEFINE)
-        #define ACOE_EXPORT __attribute__((visibility("default")))
-    #else
-        #define ACOE_EXPORT
-    #endif
+#if defined(AOCE_EXPORT_DEFINE)
+#define ACOE_EXPORT __attribute__((visibility("default")))
+#else
+#define ACOE_EXPORT
+#endif
 #endif
 
 #ifdef _WIN32
@@ -158,4 +162,3 @@
 // #if defined(DEBUG)
 // #define AOCE_DEBUG_TYPE 1
 // #endif
-
