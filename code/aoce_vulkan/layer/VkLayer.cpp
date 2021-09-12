@@ -135,12 +135,10 @@ void VkLayer::createOutTexs() {
             texFlags = VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
         }
         // 输入与输出都给传输位
-        if (bInput) {
+        if (bInput | bMustOutput) {
             texFlags |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-        }
-        if (bMustOutput) {
-            // texFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
-        }
+            texFlags |= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
+        }        
         texPtr->InitResource(format.width, format.height, vkft, texFlags, 0);
         outTexs.push_back(texPtr);
     }

@@ -3,19 +3,17 @@
 #include <module/IModule.hpp>
 
 namespace aoce {
-namespace vulkan {
-    
-class VkExtraModule : public IModule {
+
+class VkNcnnModule : public IModule {
    private:
     /* data */
    public:
-    VkExtraModule(/* args */);
-    virtual ~VkExtraModule();
+    VkNcnnModule(/* args */);
+    virtual ~VkNcnnModule();
 
    public:
     virtual bool loadModule() override;
     virtual void unloadModule() override;
 };
 
-}  // namespace vulkan
 }  // namespace aoce

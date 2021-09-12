@@ -47,6 +47,18 @@ ncnn::Mat getMat(uint8_t* data, const ImageFormat& inFormat,
     return in;
 }
 
+void testVkMat(ncnn::VkMat& mat) {
+#if AOCE_DEBUG_TYPE
+    float* data = (float*)mat.mapped_ptr();
+    float xx = 0.0f;
+    for (int32_t i = 0; i < mat.c; i++) {
+        int32_t size = mat.w * mat.h;
+        std::vector<float> fd(size, 0.0f);
+        memcpy(fd.data(), data + i * size, size);        
+    }
+#endif
+}
+
 int32_t loadNet(ncnn::Net* net, const std::string& paramFile,
                 const std::string& modelFile) {
 #if defined(__ANDROID__)

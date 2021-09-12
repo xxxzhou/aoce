@@ -35,12 +35,12 @@ VulkanWindow::~VulkanWindow() {
                              static_cast<uint32_t>(cmdBuffers.size()),
                              cmdBuffers.data());
         vkDestroyCommandPool(device, cmdPool, nullptr);
+        swapChain = VK_NULL_HANDLE;
     }
     if (surface) {
         vkDestroySurfaceKHR(instance, surface, nullptr);
+        surface = VK_NULL_HANDLE;
     }
-    surface = VK_NULL_HANDLE;
-    swapChain = VK_NULL_HANDLE;
 }
 
 #if WIN32
@@ -540,7 +540,7 @@ void VulkanWindow::createRenderPass() {
 }
 
 void VulkanWindow::tick() {
-    // std::lock_guard<std::mutex> mtx_locker(sizeMtx); 
+    // std::lock_guard<std::mutex> mtx_locker(sizeMtx);
     if (bCanDraw) {
         // 发送信号给presentComplete
         VkResult result = vkAcquireNextImageKHR(

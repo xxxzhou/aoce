@@ -26,6 +26,11 @@ class FaceDetector : public virtual IFaceDetector,
     std::unique_ptr<ncnn::Net> net = nullptr;
     // ncnn::Mat inMat;
     ImageFormat netFormet = {};
+    ncnn::VkMat inVkMat = {};
+    ncnn::VkAllocator* inAlloc = nullptr;
+    VulkanBuffer* oldBuffer = nullptr;
+    std::unique_ptr<VkCommand> vkCmd = nullptr;
+    
 
     std::vector<Box> anchors;
     IFaceObserver* observer = nullptr;
@@ -38,7 +43,6 @@ class FaceDetector : public virtual IFaceDetector,
     INcnnInCropLayer* cropLayer = nullptr;
 
     DrawRectParamet drawRect = {};
-
     bool bInitNet = false;
     bool bVulkanInput = false;
 

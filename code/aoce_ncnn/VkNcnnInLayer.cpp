@@ -89,11 +89,7 @@ void VkNcnnInLayer::onInitVkBuffer() {
     outBuffer = std::make_unique<VulkanBuffer>();
     outBuffer->initResoure(
         BufferUsage::store, bufferSize,
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT);  // |
-                                              // VK_BUFFER_USAGE_TRANSFER_SRC_BIT
-    //    outBufferX = std::make_unique<VulkanBuffer>();
-    //    outBufferX->initResoure(BufferUsage::store, bufferSize,
-    //                            VK_BUFFER_USAGE_TRANSFER_DST_BIT);
+        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT);
     sizeX = divUp(paramet.outWidth, 16);
     sizeY = divUp(paramet.outHeight, 16);
 }
@@ -115,19 +111,14 @@ void VkNcnnInLayer::onCommand() {
                           VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
                           VK_ACCESS_SHADER_READ_BIT);
     outBuffer->addBarrier(cmd, VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-                          VK_ACCESS_SHADER_WRITE_BIT);
+                          VK_ACCESS_MEMORY_WRITE_BIT);
     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, computerPipeline);
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE,
                             layout->pipelineLayout, 0, 1,
                             layout->descSets[0].data(), 0, 0);
     vkCmdDispatch(cmd, sizeX, sizeY, 1);
     outBuffer->addBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT,
-                          VK_ACCESS_SHADER_READ_BIT);
-    // 复制CS BUFFER到中转BUFFER上
-    // VkBufferCopy copyRegion = {};
-    // copyRegion.size = outBuffer->getBufferSize();
-    // vkCmdCopyBuffer(cmd, outBuffer->buffer, outBufferX->buffer, 1,
-    // &copyRegion);
+                          VK_ACCESS_MEMORY_READ_BIT);
 }
 
 bool VkNcnnInLayer::onFrame() {

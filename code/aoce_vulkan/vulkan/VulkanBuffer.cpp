@@ -13,9 +13,8 @@ VulkanBuffer::VulkanBuffer() {}
 
 VulkanBuffer::~VulkanBuffer() { release(); }
 
-void VulkanBuffer::initResoure(BufferUsage usage,
-                               uint32_t dataSize, VkBufferUsageFlags usageFlag,
-                               uint8_t* cpuData) {
+void VulkanBuffer::initResoure(BufferUsage usage, uint32_t dataSize,
+                               VkBufferUsageFlags usageFlag, uint8_t* cpuData) {
     // 先释放可能已经在的资源
     this->release();
     // 重新生成

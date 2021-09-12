@@ -23,8 +23,8 @@ class AOCE_VULKAN_EXPORT VulkanBuffer {
    private:
     VkDevice device = VK_NULL_HANDLE;
     VkBufferView view = VK_NULL_HANDLE;
-    VkPipelineStageFlags stageFlags =
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;  // VK_PIPELINE_STAGE_HOST_BIT;
+    // VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;  // VK_PIPELINE_STAGE_HOST_BIT;
+    VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_HOST_BIT;
     VkAccessFlags accessFlags = VK_ACCESS_HOST_WRITE_BIT;
     int32_t bufferSize = 0;
     uint8_t* pData = nullptr;

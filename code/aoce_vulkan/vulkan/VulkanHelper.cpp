@@ -147,6 +147,10 @@ const std::map<VkFormat, FormatInfo> formatTable = {
     {VK_FORMAT_D32_SFLOAT_S8_UINT, {8, 2}},
 };
 
+void setVulkanContext(VkPhysicalDevice pdevice, VkDevice vdevice) {
+    VulkanManager::Get().setVulkanContext(pdevice, vdevice);
+}
+
 std::string errorString(VkResult errorCode) {
     switch (errorCode) {
 #define STR(r)   \
@@ -279,8 +283,33 @@ VkResult createInstance(VkInstance& instance, const char* appName,
     return vkResult;
 }
 
+void getPhysicalDeviceInfo(VkPhysicalDevice physical, PhysicalDevice& pDevice) {
+    pDevice.clear();
+    pDevice.physicalDevice = physical;
+    vkGetPhysicalDeviceProperties(physical, &pDevice.properties);
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(physical, &queueFamilyCount,
+                                             nullptr);
+    vkGetPhysicalDeviceMemoryProperties(physical, &pDevice.mempryProperties);
+    if (queueFamilyCount > 0) {
+        pDevice.queueFamilyProps.resize(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(
+            physical, &queueFamilyCount, pDevice.queueFamilyProps.data());
+    }
+    for (int j = 0; j < pDevice.queueFamilyProps.size(); j++) {
+        if ((pDevice.queueFamilyProps[j].queueFlags & VK_QUEUE_GRAPHICS_BIT) ==
+            VK_QUEUE_GRAPHICS_BIT) {
+            pDevice.queueGraphicsIndexs.push_back(j);
+        }
+        if ((pDevice.queueFamilyProps[j].queueFlags & VK_QUEUE_COMPUTE_BIT) ==
+            VK_QUEUE_COMPUTE_BIT) {
+            pDevice.queueComputeIndexs.push_back(j);
+        }
+    }
+}
+
 VkResult enumerateDevice(VkInstance instance,
-                         std::vector<PhysicalDevicePtr>& pDevices) {
+                         std::vector<PhysicalDevice>& pDevices) {
     VkResult err;
     // Physical device
     uint32_t gpuCount = 0;
@@ -295,36 +324,7 @@ VkResult enumerateDevice(VkInstance instance,
     err =
         vkEnumeratePhysicalDevices(instance, &gpuCount, physicalDevices.data());
     for (uint32_t i = 0; i < gpuCount; i++) {
-        pDevices[i] = std::shared_ptr<PhysicalDevice>(new PhysicalDevice());
-        pDevices[i]->physicalDevice = physicalDevices[i];
-    }
-    if (err != VK_SUCCESS) {
-        return err;
-    }
-    for (uint32_t i = 0; i < gpuCount; i++) {
-        vkGetPhysicalDeviceProperties(pDevices[i]->physicalDevice,
-                                      &pDevices[i]->properties);
-        uint32_t queueFamilyCount = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(pDevices[i]->physicalDevice,
-                                                 &queueFamilyCount, nullptr);
-        vkGetPhysicalDeviceMemoryProperties(pDevices[i]->physicalDevice,
-                                            &pDevices[i]->mempryProperties);
-        if (queueFamilyCount > 0) {
-            pDevices[i]->queueFamilyProps.resize(queueFamilyCount);
-            vkGetPhysicalDeviceQueueFamilyProperties(
-                pDevices[i]->physicalDevice, &queueFamilyCount,
-                pDevices[i]->queueFamilyProps.data());
-        }
-        for (int j = 0; j < pDevices[i]->queueFamilyProps.size(); j++) {
-            if ((pDevices[i]->queueFamilyProps[j].queueFlags &
-                 VK_QUEUE_GRAPHICS_BIT) == VK_QUEUE_GRAPHICS_BIT) {
-                pDevices[i]->queueGraphicsIndexs.push_back(j);
-            }
-            if ((pDevices[i]->queueFamilyProps[j].queueFlags &
-                 VK_QUEUE_COMPUTE_BIT) == VK_QUEUE_COMPUTE_BIT) {
-                pDevices[i]->queueComputeIndexs.push_back(j);
-            }
-        }
+        getPhysicalDeviceInfo(physicalDevices[i], pDevices[i]);
     }
     return VK_SUCCESS;
 }
@@ -339,12 +339,13 @@ int32_t getByteSize(VkFormat format) {
 
 bool getMemoryTypeIndex(uint32_t typeBits, VkFlags quirementsMaks,
                         uint32_t& index) {
-    const auto& memoryPropertys =
-        VulkanManager::Get().physical->mempryProperties;
-    for (uint32_t i = 0; i < memoryPropertys.memoryTypeCount; i++) {
+    auto physicalDevice = VulkanManager::Get().physicalDevice;
+    VkPhysicalDeviceMemoryProperties mempryProperties = {};
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &mempryProperties);
+    for (uint32_t i = 0; i < mempryProperties.memoryTypeCount; i++) {
         if ((typeBits & 1) == 1) {
             // Type is available, does it match user properties?
-            if ((memoryPropertys.memoryTypes[i].propertyFlags &
+            if ((mempryProperties.memoryTypes[i].propertyFlags &
                  quirementsMaks) == quirementsMaks) {
                 index = i;
                 return true;

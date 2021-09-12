@@ -623,9 +623,7 @@ void loadAoce() {
 #else
     logMessage(LogLevel::info, "aoce 32bit run model");
 #endif
-
-    ModuleManager::Get().regAndLoad("aoce_vulkan");
-    ModuleManager::Get().regAndLoad("aoce_vulkan_extra");
+// 加载基于特定平台的实现
 #if WIN32
     ModuleManager::Get().regAndLoad("aoce_win");
     ModuleManager::Get().regAndLoad("aoce_winrt");
@@ -634,8 +632,16 @@ void loadAoce() {
 #elif __ANDROID__
     ModuleManager::Get().regAndLoad("aoce_android");
 #endif
+// 加载ffmpeg
+#if defined(AOCE_INSTALL_FFMPEG)
+    ModuleManager::Get().regAndLoad("aoce_ffmpeg");
+#endif
+    // 加载vulkan
+    ModuleManager::Get().regAndLoad("aoce_vulkan");
+    ModuleManager::Get().regAndLoad("aoce_vulkan_extra");
 #if defined(AOCE_INSTALL_AGORA)
     ModuleManager::Get().regAndLoad("aoce_agora");
+// win32优先加载特定版本
 #if WIN32
     ModuleManager::Get().regAndLoad("aoce_talkto_cuda");
     // 如果cuda版本加载不上,就加载只有vulkan版本的
@@ -646,10 +652,8 @@ void loadAoce() {
     }
 #endif
 #endif
-#if defined(AOCE_INSTALL_FFMPEG)
-    ModuleManager::Get().regAndLoad("aoce_ffmpeg");
-#endif
-    // ModuleManager::Get().regAndLoad("aoce_ncnn");
+    // 加载神经网络推理框架ncnn
+    ModuleManager::Get().regAndLoad("aoce_ncnn");
     loadLayerMetadata();
 }
 
@@ -676,7 +680,7 @@ void unloadAoce() {
 #if defined(AOCE_INSTALL_FFMPEG)
     ModuleManager::Get().unloadModule("aoce_ffmpeg");
 #endif
-    // ModuleManager::Get().unloadModule("aoce_ncnn");
+    ModuleManager::Get().unloadModule("aoce_ncnn");
     LayerMetadataManager::Get().clean();
 }
 

@@ -51,21 +51,14 @@ VulkanManager& VulkanManager::Get() {
     if (instance == nullptr) {
         instance = new VulkanManager();
 #if AOCE_DEBUG_TYPE
-        // instance->bDebugMsg = true;
+        instance->bDebugMsg = true;
 #endif
     }
     return *instance;
 }
 
 VulkanManager::~VulkanManager() {
-    if (cmdPool) {
-        vkDestroyCommandPool(device, cmdPool, 0);
-        cmdPool = VK_NULL_HANDLE;
-    }
-    if (device) {
-        vkDestroyDevice(device, nullptr);
-        device = VK_NULL_HANDLE;
-    }
+    release();
 #if AOCE_DEBUG_TYPE
     if (debugMessenger) {
         DestroyDebugUtilsMessengerEXT(instace, debugMessenger, nullptr);
@@ -75,152 +68,21 @@ VulkanManager::~VulkanManager() {
         vkDestroyInstance(instace, nullptr);
         instace = VK_NULL_HANDLE;
     }
+}
+
+void VulkanManager::release() {
+    if (cmdPool) {
+        vkDestroyCommandPool(device, cmdPool, 0);
+        cmdPool = VK_NULL_HANDLE;
+    }
+    if (device && !bExternalContext) {
+        vkDestroyDevice(device, nullptr);
+    }
+    device = VK_NULL_HANDLE;
     physicalDevice = VK_NULL_HANDLE;
 }
 
-bool VulkanManager::createInstance(const char* appName) {
-#if __ANDROID__
-    if (!InitVulkan()) {
-        logMessage(LogLevel::error, "Failied initializing Vulkan APIs!");
-        return false;
-    }
-#endif
-    aoce::vulkan::createInstance(instace, appName, bDebugMsg);
-#if AOCE_DEBUG_TYPE
-    if (bDebugMsg) {
-        VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
-        createInfo.sType =
-            VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        createInfo.messageSeverity =
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-        createInfo.messageType =
-            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
-        createInfo.pfnUserCallback = debugCallback;
-        if (CreateDebugUtilsMessengerEXT(instace, &createInfo, nullptr,
-                                         &debugMessenger) != VK_SUCCESS) {
-            logMessage(LogLevel::warn, "not create vk debug utils message.");
-        } else {
-            logMessage(LogLevel::info, "create vk debug utils message.");
-        }
-    }
-#endif
-    std::vector<PhysicalDevicePtr> physicalDevices;
-    enumerateDevice(instace, physicalDevices);
-    if (physicalDevices.empty()) {
-        return false;
-    }
-    bool find = false;
-    // 首选独立显卡
-    for (auto& pdevice : physicalDevices) {
-        if (pdevice->properties.deviceType ==
-            VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
-            this->physical = pdevice;
-            find = true;
-            break;
-        }
-    }
-    if (!find) {
-        physical = physicalDevices[0];
-    }
-    assert(physical != nullptr);
-
-    std::string message = physical->properties.deviceName;
-    logMessage(aoce::LogLevel::info, "select gpu: " + message);
-    physicalDevice = this->physical->physicalDevice;
-#if __ANDROID__
-    uint32_t count = 0;
-    std::vector<VkExtensionProperties> extensions;
-    VkResult result = vkEnumerateDeviceExtensionProperties(
-        physicalDevice, nullptr, &count, nullptr);
-    if (result == VK_SUCCESS) {
-        extensions.resize(count);
-        result = vkEnumerateDeviceExtensionProperties(
-            physicalDevice, nullptr, &count, extensions.data());
-    }
-    for (auto& extPorperty : extensions) {
-        if (strcmp(
-                extPorperty.extensionName,
-                VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME) ==
-            0) {
-            bAndroidHardware = true;
-            break;
-        }
-    }
-#endif
-    return true;
-}
-
-bool VulkanManager::findAloneCompute(int32_t& familyIndex) {
-    const auto& queueFamilys = physical->queueGraphicsIndexs;
-    for (const auto& cindex : physical->queueComputeIndexs) {
-        if (std::find(queueFamilys.begin(), queueFamilys.end(), cindex) ==
-            queueFamilys.end()) {
-            familyIndex = cindex;
-            return true;
-        }
-    }
-    return false;
-}
-
-bool VulkanManager::createDevice(bool bAloneCompute) {
-    assert(physical->queueGraphicsIndexs.size() > 0);
-    // 创建虚拟设备
-    // 创建一个device,这个device根据条件能否访问graphics/compute
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    graphicsIndex = physical->queueGraphicsIndexs[0];
-    computeIndex = graphicsIndex;
-    if (bAloneCompute) {
-        findAloneCompute(computeIndex);
-    }
-    float queuePriorities[1] = {0.0};
-    VkDeviceQueueCreateInfo queueInfo = {};
-    queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueInfo.queueFamilyIndex = graphicsIndex;
-    queueInfo.queueCount = 1;
-    queueInfo.pQueuePriorities = queuePriorities;
-    queueCreateInfos.push_back(queueInfo);
-    if (computeIndex != graphicsIndex) {
-        queueInfo = {};
-        queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueInfo.queueFamilyIndex = computeIndex;
-        queueInfo.queueCount = 1;
-        queueInfo.pQueuePriorities = queuePriorities;
-        queueCreateInfos.push_back(queueInfo);
-    }
-    VkDeviceCreateInfo deviceCreateInfo = {};
-    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    deviceCreateInfo.queueCreateInfoCount =
-        static_cast<uint32_t>(queueCreateInfos.size());
-    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
-    deviceCreateInfo.pEnabledFeatures = nullptr;
-    std::vector<const char*> deviceExtensions;
-    deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-#if WIN32
-    deviceExtensions.push_back(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
-#elif __ANDROID_API__ >= 26  //__ANDROID__
-    // 和android里的AHardwareBuffer交互,没有的话,相关vkGetDeviceProcAddr获取不到对应函数
-    deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
-    deviceExtensions.push_back(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME);
-    deviceExtensions.push_back(
-        VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME);
-#endif
-    deviceCreateInfo.enabledExtensionCount = (uint32_t)deviceExtensions.size();
-    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
-    VK_CHECK_RESULT(
-        vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
+void VulkanManager::onDeviceComplete() {
     bAloneCompute = computeIndex != graphicsIndex;
     vkGetDeviceQueue(device, computeIndex, 0, &computeQueue);
     vkGetDeviceQueue(device, graphicsIndex, 0, &graphicsQueue);
@@ -270,7 +132,26 @@ bool VulkanManager::createDevice(bool bAloneCompute) {
         logMessage(LogLevel::info, "aoce_vulkan can interp dx11");
     }
 #endif
+
 #if __ANDROID__
+    uint32_t count = 0;
+    std::vector<VkExtensionProperties> extensions;
+    VkResult result = vkEnumerateDeviceExtensionProperties(
+        physicalDevice, nullptr, &count, nullptr);
+    if (result == VK_SUCCESS) {
+        extensions.resize(count);
+        result = vkEnumerateDeviceExtensionProperties(
+            physicalDevice, nullptr, &count, extensions.data());
+    }
+    for (auto& extPorperty : extensions) {
+        if (strcmp(
+                extPorperty.extensionName,
+                VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME) ==
+            0) {
+            bAndroidHardware = true;
+            break;
+        }
+    }
     bInterpGLES = supportHardwareImage(device);
     if (!bInterpGLES) {
         logMessage(LogLevel::warn, "aoce_vulkan not interp opengl es");
@@ -278,12 +159,137 @@ bool VulkanManager::createDevice(bool bAloneCompute) {
         logMessage(LogLevel::info, "aoce_vulkan can interp opengl es");
     }
 #endif
+}
+
+bool VulkanManager::createInstance(const char* appName) {
+#if __ANDROID__
+    if (!InitVulkan()) {
+        logMessage(LogLevel::error, "Failied initializing Vulkan APIs!");
+        return false;
+    }
+#endif
+    aoce::vulkan::createInstance(instace, appName, bDebugMsg);
+#if AOCE_DEBUG_TYPE
+    if (bDebugMsg) {
+        VkDebugUtilsMessengerCreateInfoEXT createInfo = {};
+        createInfo.sType =
+            VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        createInfo.messageSeverity =
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        createInfo.messageType =
+            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        createInfo.pfnUserCallback = debugCallback;
+        if (CreateDebugUtilsMessengerEXT(instace, &createInfo, nullptr,
+                                         &debugMessenger) != VK_SUCCESS) {
+            logMessage(LogLevel::warn, "not create vk debug utils message.");
+        } else {
+            logMessage(LogLevel::info, "create vk debug utils message.");
+        }
+    }
+#endif
+    std::vector<PhysicalDevice> physicalDevices;
+    enumerateDevice(instace, physicalDevices);
+    if (physicalDevices.empty()) {
+        return false;
+    }
+    bool find = false;
+    // 首选独立显卡
+    for (auto& pdevice : physicalDevices) {
+        if (pdevice.properties.deviceType ==
+            VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+            this->physical = pdevice;
+            find = true;
+            break;
+        }
+    }
+    assert(physicalDevices.size() > 0);
+    if (!find) {
+        physical = physicalDevices[0];
+    }
+    std::string message = physical.properties.deviceName;
+    logMessage(aoce::LogLevel::info, "select gpu: " + message);
+    physicalDevice = physical.physicalDevice;
+    return true;
+}
+
+bool VulkanManager::findAloneCompute(int32_t& familyIndex) {
+    const auto& queueFamilys = physical.queueGraphicsIndexs;
+    for (const auto& cindex : physical.queueComputeIndexs) {
+        if (std::find(queueFamilys.begin(), queueFamilys.end(), cindex) ==
+            queueFamilys.end()) {
+            familyIndex = cindex;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool VulkanManager::createDevice(bool bAloneCompute) {
+    assert(physical.queueGraphicsIndexs.size() > 0);
+    // 创建虚拟设备
+    // 创建一个device,这个device根据条件能否访问graphics/compute
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    graphicsIndex = physical.queueGraphicsIndexs[0];
+    computeIndex = graphicsIndex;
+    if (bAloneCompute) {
+        findAloneCompute(computeIndex);
+    }
+    float queuePriorities[1] = {0.0};
+    VkDeviceQueueCreateInfo queueInfo = {};
+    queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    queueInfo.queueFamilyIndex = graphicsIndex;
+    queueInfo.queueCount = 1;
+    queueInfo.pQueuePriorities = queuePriorities;
+    queueCreateInfos.push_back(queueInfo);
+    if (computeIndex != graphicsIndex) {
+        queueInfo = {};
+        queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueInfo.queueFamilyIndex = computeIndex;
+        queueInfo.queueCount = 1;
+        queueInfo.pQueuePriorities = queuePriorities;
+        queueCreateInfos.push_back(queueInfo);
+    }
+    VkDeviceCreateInfo deviceCreateInfo = {};
+    deviceCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.queueCreateInfoCount =
+        static_cast<uint32_t>(queueCreateInfos.size());
+    deviceCreateInfo.pQueueCreateInfos = queueCreateInfos.data();
+    deviceCreateInfo.pEnabledFeatures = nullptr;
+    std::vector<const char*> deviceExtensions;
+    deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+#if WIN32
+    deviceExtensions.push_back(VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME);
+#elif __ANDROID_API__ >= 26  //__ANDROID__
+    // 和android里的AHardwareBuffer交互,没有的话,相关vkGetDeviceProcAddr获取不到对应函数
+    deviceExtensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_MEMORY_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME);
+    deviceExtensions.push_back(VK_KHR_SAMPLER_YCBCR_CONVERSION_EXTENSION_NAME);
+    deviceExtensions.push_back(
+        VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME);
+#endif
+    deviceCreateInfo.enabledExtensionCount = (uint32_t)deviceExtensions.size();
+    deviceCreateInfo.ppEnabledExtensionNames = deviceExtensions.data();
+    VK_CHECK_RESULT(
+        vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device));
+    onDeviceComplete();
     return true;
 }
 
 bool VulkanManager::findSurfaceQueue(VkSurfaceKHR surface,
                                      int32_t& presentIndex) {
-    uint32_t queueFamilyCount = physical->queueFamilyProps.size();
+    uint32_t queueFamilyCount = physical.queueFamilyProps.size();
     std::vector<VkBool32> supportsPresent(queueFamilyCount);
     // 检查每个通道的表面是否支持显示
     for (uint32_t i = 0; i < queueFamilyCount; i++) {
@@ -303,6 +309,22 @@ bool VulkanManager::findSurfaceQueue(VkSurfaceKHR surface,
     }
     presentIndex = -1;
     return false;
+}
+
+void VulkanManager::setVulkanContext(VkPhysicalDevice pdevice,
+                                     VkDevice vdevice) {
+    logMessage(aoce::LogLevel::info, "use third-party vulkan context.");
+    release();
+    physicalDevice = pdevice;
+    getPhysicalDeviceInfo(physicalDevice, physical);
+    std::string message = physical.properties.deviceName;
+    logMessage(aoce::LogLevel::info, "select gpu: " + message);
+    graphicsIndex = physical.queueGraphicsIndexs[0];
+    computeIndex = graphicsIndex;
+    // findAloneCompute(computeIndex);
+    device = vdevice;
+    bExternalContext = true;
+    onDeviceComplete();
 }
 
 void VulkanManager::blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,

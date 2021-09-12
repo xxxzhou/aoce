@@ -9,7 +9,7 @@
         VkResult res = (f);                                             \
         if (res != VK_SUCCESS) {                                        \
             std::string str = "aoce vulkan error: " + errorString(res); \
-            logMessage(aoce::LogLevel::error, str.c_str());                    \
+            logMessage(aoce::LogLevel::error, str.c_str());             \
             assert(res == VK_SUCCESS);                                  \
         }                                                               \
     }
@@ -17,7 +17,11 @@
 namespace aoce {
 namespace vulkan {
 
-using PhysicalDevicePtr = std::shared_ptr<PhysicalDevice>;
+// using PhysicalDevice = PhysicalDevice;
+
+// 第三方库有自己的vulkan上下方,并且aoce需要与之交互显存信息等,用第三方库替换
+AOCE_VULKAN_EXPORT void setVulkanContext(VkPhysicalDevice pdevice,
+                                         VkDevice vdevice);
 
 // errorcode转显示
 AOCE_VULKAN_EXPORT std::string errorString(VkResult errorCode);
@@ -28,9 +32,11 @@ AOCE_VULKAN_EXPORT std::string physicalDeviceTypeString(
 AOCE_VULKAN_EXPORT VkResult createInstance(VkInstance& instance,
                                            const char* appName,
                                            bool bDebugMsg = false);
+AOCE_VULKAN_EXPORT void getPhysicalDeviceInfo(VkPhysicalDevice physical,
+                                              PhysicalDevice& pDevice);
 // 得到所有物理显卡
 AOCE_VULKAN_EXPORT VkResult enumerateDevice(
-    VkInstance instance, std::vector<PhysicalDevicePtr>& physicalDevices);
+    VkInstance instance, std::vector<PhysicalDevice>& physicalDevices);
 
 AOCE_VULKAN_EXPORT bool getMemoryTypeIndex(uint32_t typeBits,
                                            VkFlags quirementsMaks,

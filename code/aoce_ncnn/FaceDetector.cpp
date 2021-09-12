@@ -9,12 +9,16 @@ namespace aoce {
 FaceDetector::FaceDetector(/* args */) {
     net = std::make_unique<ncnn::Net>();
     net->opt.use_vulkan_compute = true;
+    // net->opt.use_fp16_storage = false;
+    // net->opt.use_fp16_arithmetic = false;
+    // net->opt.use_fp16_packed = false;
     // 网络输入图像格式
     netFormet.width = 160;   // 160;   // 320;
     netFormet.height = 120;  // 120;  // 240;
     netFormet.imageType = ImageType::bgr8;
     detectorFaces.resize(MAX_FACE);
     // inMat.create(netFormet.width, netFormet.height, 3);
+    vkCmd = std::make_unique<VkCommand>();
 }
 
 FaceDetector::~FaceDetector() {}
@@ -105,6 +109,8 @@ bool FaceDetector::initNet(IBaseLayer* ncnnLayer, IDrawRectLayer* drawlayer) {
                 "please use the function createNcnnInLayer to create");
             return false;
         }
+        inAlloc = net->vulkan_device()->acquire_blob_allocator();
+        inVkMat.create(netFormet.width, netFormet.height, 3, 4u, inAlloc);
         bInitNet = true;
         bVulkanInput = false;
     }
@@ -113,18 +119,28 @@ bool FaceDetector::initNet(IBaseLayer* ncnnLayer, IDrawRectLayer* drawlayer) {
 
 void FaceDetector::onResult(VulkanBuffer* buffer,
                             const ImageFormat& imageFormat) {
-    if (!bInitNet) {
+    if (!bInitNet || !buffer) {
         return;
     }
     long long time1 = getNowTimeStamp();
 
     ncnn::Extractor netEx = net->create_extractor();
     ncnn::Mat boxMat, scoreMat, landmarkMat;
-    // memcpy(inMat.data, buffer->getCpuData(),
-    //        netFormet.width * netFormet.height * 3 * 4);
-    // 这逻辑现在有问题,首先要拿到ncnn的commandbuffer,然后在二边上的cmd锁buffer.
     if (bVulkanInput) {
-        // netEx.input(0, vkDest);
+        if (oldBuffer != buffer) {
+            vkCmd->reset();
+            // vkCmd->barrier(inVkMat.buffer(), VK_PIPELINE_STAGE_TRANSFER_BIT,
+            //                VK_ACCESS_MEMORY_WRITE_BIT,
+            //                inVkMat.data->stage_flags,
+            //                inVkMat.data->access_flags);
+            // inVkMat.data->stage_flags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+            // inVkMat.data->access_flags = VK_ACCESS_MEMORY_WRITE_BIT;
+            vkCmd->record(buffer->buffer, inVkMat.buffer(),
+                          inVkMat.buffer_offset(), buffer->getBufferSize());
+            oldBuffer = buffer;
+        }
+        vkCmd->submit();
+        netEx.input(0, inVkMat);
     } else {
         ncnn::Mat inMat(netFormet.width, netFormet.height, 3,
                         buffer->getCpuData());

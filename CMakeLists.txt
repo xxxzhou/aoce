@@ -112,8 +112,12 @@ option(AOCE_ENABLE_WINRT "enable winrt" OFF)
 option(AOCE_ENABLE_SWIG "enable swig" TRUE) 
 option(AOCE_INSTALL_NCNN "install ncnn module" TRUE)
 
-cmake_dependent_option(AOCE_CUDA_MODULE "install cuda module" TRUE "WIN32" FALSE)
-cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGORA_EXIST" FALSE) #FALSE
+cmake_dependent_option(AOCE_CUDA_MODULE "install cuda module" ON "WIN32" OFF)
+#FALSE
+option(AOCE_INSTALL_AGORA "install ncnn module" OFF)
+# cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGORA_EXIST" FALSE) 
+
+
 
 # 配置联系cmake/c++,android/win之间配置分开
 if(WIN32)
