@@ -21,7 +21,8 @@ namespace vulkan {
 
 // 第三方库有自己的vulkan上下方,并且aoce需要与之交互显存信息等,用第三方库替换
 AOCE_VULKAN_EXPORT void setVulkanContext(VkPhysicalDevice pdevice,
-                                         VkDevice vdevice);
+                                         VkDevice vdevice,
+                                         VkInstance vinstance = VK_NULL_HANDLE);
 
 // errorcode转显示
 AOCE_VULKAN_EXPORT std::string errorString(VkResult errorCode);
@@ -58,6 +59,11 @@ AOCE_VULKAN_EXPORT void changeLayout(
     VkPipelineStageFlags newStageFlags,
     VkImageAspectFlags aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
     VkAccessFlags newAccessFlags = 0);
+AOCE_VULKAN_EXPORT void changeLayout(VkCommandBuffer command, VkBuffer buffer,
+                                     VkPipelineStageFlags oldStageFlags,
+                                     VkPipelineStageFlags newStageFlags,
+                                     VkAccessFlags oldAccessFlags,
+                                     VkAccessFlags newAccessFlags);
 
 }  // namespace vulkan
 }  // namespace aoce

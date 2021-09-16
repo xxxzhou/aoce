@@ -7,6 +7,17 @@
 
 namespace aoce {
 
+DrawProperty::DrawProperty() {}
+
+DrawProperty::~DrawProperty() {}
+
+void DrawProperty::setDraw(bool bDraw) { this->bDraw = bDraw; }
+
+void DrawProperty::setDraw(int32_t radius, const vec4 color) {
+    this->radius = std::max(1, radius);
+    this->color = color;
+}
+
 int32_t getPixelType(ImageType imageType) {
     switch (imageType) {
         case ImageType::bgra8:
@@ -47,6 +58,16 @@ ncnn::Mat getMat(uint8_t* data, const ImageFormat& inFormat,
     return in;
 }
 
+int32_t getNetIndex(ncnn::Net* net, const char* blob_name) {
+    const std::vector<ncnn::Blob>& blobs = net->blobs();
+    for (size_t i = 0; i < blobs.size(); i++) {        
+        if (blobs[i].name == blob_name) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void testVkMat(ncnn::VkMat& mat) {
 #if AOCE_DEBUG_TYPE
     float* data = (float*)mat.mapped_ptr();
@@ -54,7 +75,7 @@ void testVkMat(ncnn::VkMat& mat) {
     for (int32_t i = 0; i < mat.c; i++) {
         int32_t size = mat.w * mat.h;
         std::vector<float> fd(size, 0.0f);
-        memcpy(fd.data(), data + i * size, size);        
+        memcpy(fd.data(), data + i * size, size);
     }
 #endif
 }

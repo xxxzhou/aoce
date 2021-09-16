@@ -7,6 +7,8 @@
 #include <vulkan/VulkanContext.hpp>
 #include <vulkan/VulkanWindow.hpp>
 
+// #include "packing.comp.hex.h"
+
 #if !VULKAN_SHOW
 #include <opencv2/opencv.hpp>
 using namespace cv;
@@ -136,6 +138,9 @@ int main() {
     cvPoints.resize(FACE_POINT_COUNT);
 #endif
     loadAoce();
+
+    // std::string x = packing_comp_data;
+    // logMessage(LogLevel::info,x);    
 
     ncnnLayer = createNcnnInLayer();
     ncnnPointLayer = createNcnnInCropLayer();

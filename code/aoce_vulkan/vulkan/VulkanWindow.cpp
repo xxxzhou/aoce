@@ -614,7 +614,9 @@ void VulkanWindow::run() {
         if (quit) {
             break;
         }
-        tick();
+        if (width > 0 && height > 0) {
+            tick();
+        }
     }
 
 #elif defined(__ANDROID__)

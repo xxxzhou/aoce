@@ -183,7 +183,7 @@ struct MapChannelParamet {
     }
 };
 
-// 方便C#交互不做额外设置,以及GPU参数结构对应,bool全用int表示
+// 方便C#/java交互不做额外设置,以及GPU参数结构对应,bool全用int表示
 struct FlipParamet {
     // 是否X倒转
     int32_t bFlipX = false;

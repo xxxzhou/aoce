@@ -28,7 +28,7 @@ class FaceKeypointDetector : public virtual IFaceKeypointDetector,
                          IDrawPointsLayer* drawLayer) override;
 
    public:
-    virtual void onResult(VulkanBuffer* buffer,
+    virtual void onResult(ncnn::VkMat& vkMat,
                           const ImageFormat& imageFormat) override;
 };
 

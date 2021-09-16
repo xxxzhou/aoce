@@ -1,10 +1,10 @@
 ncnnInMat.comp ncnnInMatBGR.comp NCNN_BGR=1
 ncnnInMat.comp ncnnInMatRGB.comp NCNN_RGB=1
-ncnnInCropMat.comp ncnnInCropMatBGR.comp NCNN_BGR=1
-ncnnInCropMat.comp ncnnInCropMatRGB.comp NCNN_RGB=1
-drawPoints.comp
-drawPointBlend.comp
-drawRect.comp
+ncnnInMat.comp ncnnInCropMatBGR.comp NCNN_BGR=1 NCNN_CROP=1
+ncnnInMat.comp ncnnInCropMatRGB.comp NCNN_RGB=1 NCNN_CROP=1
+ncnnInMat.comp ncnnInMatBGRF16.comp NCNN_BGR=1 NCNN_FP16=1
+ncnnInMat.comp ncnnInMatRGBF16.comp NCNN_RGB=1 NCNN_FP16=1
+ncnnInMat.comp ncnnInCropMatBGRF16.comp NCNN_BGR=1 NCNN_CROP=1 NCNN_FP16=1
+ncnnInMat.comp ncnnInCropMatRGBF16.comp NCNN_RGB=1 NCNN_CROP=1 NCNN_FP16=1
 ncnnUpload.comp
-alphaCombin.comp alphaScaleCombin.comp ALPHA_SCALE=1
-alphaCombin.comp
+ncnnUpload.comp ncnnUploadF16.comp NCNN_FP16=1

@@ -1,38 +1,8 @@
 #pragma once
 
 #include "CNNHelper.hpp"
-#include "aoce_vulkan/layer/VkLayer.hpp"
-#include "aoce_vulkan_extra/VkExtraExport.h"
-
-using namespace aoce::vulkan;
-using namespace aoce::vulkan::layer;
 
 namespace aoce {
-
-class INcnnInLayerObserver {
-   public:
-    INcnnInLayerObserver() = default;
-    virtual ~INcnnInLayerObserver(){};
-
-   public:
-    virtual void onResult(VulkanBuffer* buffer,
-                          const ImageFormat& imageFormat) = 0;
-};
-
-class DrawProperty : public virtual IDrawProperty {
-   public:
-    DrawProperty();
-    virtual ~DrawProperty();
-
-   protected:
-    bool bDraw = true;
-    int32_t radius = 3;
-    vec4 color = {1.0f, 0.0f, 0.0f, 1.0f};
-
-   public:
-    virtual void setDraw(bool bDraw) override;
-    virtual void setDraw(int32_t radius, const vec4 color) override;
-};
 
 class VkNcnnInLayer : public VkLayer {
     AOCE_LAYER_GETNAME(VkNcnnInLayer)
@@ -46,6 +16,11 @@ class VkNcnnInLayer : public VkLayer {
     // ncnn::VkBufferMemory nBuffer = {};
     INcnnInLayerObserver* observer = nullptr;
     NcnnInParamet paramet = {};
+    bool bFP16 = false;
+    ncnn::VkAllocator* inAlloc = nullptr;
+    ncnn::VkMat inVkMat = {};
+    // vulkan管线是否与ncnn同一vkdevice,如果是,结果直接用vkMat
+    bool bOneVkDevice = false;
 
    public:
     VkNcnnInLayer();
@@ -53,12 +28,14 @@ class VkNcnnInLayer : public VkLayer {
 
     virtual void setObserver(INcnnInLayerObserver* observer,
                              ImageType outType = ImageType::bgr8);
-    virtual void updateParamet(const NcnnInParamet& paramet);
+    void updateParamet(const NcnnInParamet& paramet, bool bFP16);
+    virtual void onParametChange(bool bUpdateUBO);
 
    protected:
     virtual bool getSampled(int32_t inIndex) override;
 
     virtual void onInitGraph() override;
+    virtual void onInitLayer() override;
     virtual void onInitVkBuffer() override;
     virtual void onInitPipe() override;
     virtual void onCommand() override;
@@ -79,12 +56,12 @@ class VkNcnnInCropLayer : public VkNcnnInLayer, public INcnnInCropLayer {
    public:
     virtual void setObserver(INcnnInLayerObserver* observer,
                              ImageType outType = ImageType::bgr8) override;
-    virtual void updateParamet(const NcnnInParamet& paramet) override;
-
+    virtual void onParametChange(bool bUpdateUBO);
     void getInFaceBox(FaceBox& faceBox);
 
    public:
     virtual void detectFaceBox(const FaceBox* boxs, int32_t lenght) override;
+    virtual void onInitLayer() override;
     virtual bool onFrame() override;
 };
 
@@ -93,13 +70,15 @@ class VkNcnnUploadLayer : public VkLayer {
    protected:
     std::unique_ptr<VulkanBuffer> inBuffer = nullptr;
     ImageFormat imageFormat = {};
+    bool bFP16 = false;
 
    public:
     VkNcnnUploadLayer();
     virtual ~VkNcnnUploadLayer();
 
-    void setImageFormat(const ImageFormat& inFormat);
+    void setImageFormat(const ImageFormat& inFormat, bool bFP16);
     void uploadBuffer(const void* data);
+    VulkanBuffer* getVkBuffer();
 
    protected:
     virtual void onInitGraph() override;

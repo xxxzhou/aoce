@@ -147,8 +147,9 @@ const std::map<VkFormat, FormatInfo> formatTable = {
     {VK_FORMAT_D32_SFLOAT_S8_UINT, {8, 2}},
 };
 
-void setVulkanContext(VkPhysicalDevice pdevice, VkDevice vdevice) {
-    VulkanManager::Get().setVulkanContext(pdevice, vdevice);
+void setVulkanContext(VkPhysicalDevice pdevice, VkDevice vdevice,
+                      VkInstance vinstance) {
+    VulkanManager::Get().setVulkanContext(pdevice, vdevice, vinstance);
 }
 
 std::string errorString(VkResult errorCode) {
@@ -481,6 +482,24 @@ void changeLayout(VkCommandBuffer command, VkImage image,
     // 等待命令列表里GPU里处理完成
     vkCmdPipelineBarrier(command, oldStageFlags, newStageFlags, 0, 0, nullptr,
                          0, nullptr, 1, &imageMemoryBarrier);
+}
+
+void changeLayout(VkCommandBuffer command, VkBuffer buffer,
+                  VkPipelineStageFlags oldStageFlags,
+                  VkPipelineStageFlags newStageFlags,
+                  VkAccessFlags oldAccessFlags, VkAccessFlags newAccessFlags) {
+    VkBufferMemoryBarrier bufBarrier = {};
+    bufBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+
+    bufBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    bufBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    bufBarrier.buffer = buffer;
+    bufBarrier.offset = 0;
+    bufBarrier.size = VK_WHOLE_SIZE;
+    bufBarrier.srcAccessMask = oldAccessFlags;
+    bufBarrier.dstAccessMask = newAccessFlags;
+    vkCmdPipelineBarrier(command, oldStageFlags, newStageFlags, 0, 0, nullptr,
+                         1, &bufBarrier, 0, nullptr);
 }
 
 }  // namespace vulkan

@@ -1,9 +1,18 @@
 #version 450
 
+#if NCNN_FP16
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#endif
+
 layout (local_size_x = 16, local_size_y = 16) in;
 layout (binding = 0) uniform sampler2D inSampler;
 layout (binding = 1) buffer outBuffer{
+#if NCNN_FP16
+    float16_t dataOut[]; 
+#else
     float dataOut[];
+#endif
 };
 
 layout (std140, binding = 2) uniform UBO {    
@@ -17,6 +26,12 @@ layout (std140, binding = 2) uniform UBO {
     float scaleY;
     float scaleZ;
     float scaleW;
+#if NCNN_CROP
+    float x1;
+    float x2;
+    float y1;
+    float y2;
+#endif
 } ubo;
 
 void main(){
@@ -24,22 +39,32 @@ void main(){
     if(uv.x >= ubo.outWidth || uv.y >= ubo.outHeight){
         return;
     }      
-    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(ubo.outWidth,ubo.outHeight);  
+#if NCNN_CROP
+    vec2 isize = vec2(ubo.x2-ubo.x1,ubo.y2-ubo.y1);
+    vec2 isuv = (vec2(uv)+vec2(0.5f))/vec2(ubo.outWidth,ubo.outHeight); 
+    vec2 suv = isuv*isize+vec2(ubo.x1,ubo.y1); 
+#else
+    vec2 suv = (vec2(uv)+vec2(0.5f))/vec2(ubo.outWidth,ubo.outHeight); 
+#endif 
     vec4 inColor = textureLod(inSampler,suv,0)*255.0f;  
     int size = ubo.outWidth*ubo.outHeight;
     int index = uv.y*ubo.outWidth+uv.x;
     vec4 mean = vec4(ubo.meanX,ubo.meanY,ubo.meanZ,ubo.meanW);
     vec4 scale = vec4(ubo.scaleX,ubo.scaleY,ubo.scaleZ,ubo.scaleW);
-    inColor = (inColor-mean)*scale;
+#if NCNN_FP16    
+    f16vec4 result = f16vec4((inColor-mean)*scale);
+#else
+    vec4 result = (inColor-mean)*scale;
+#endif
 #if NCNN_BGR    
-    dataOut[index] = inColor.b;
-    dataOut[index+size] = inColor.g;
-    dataOut[index+2*size] = inColor.r;
+    dataOut[index] = result.b;
+    dataOut[index+size] = result.g;
+    dataOut[index+2*size] = result.r;
 #endif
 #if NCNN_RGB
-    dataOut[index] = inColor.r;
-    dataOut[index+size] = inColor.g;
-    dataOut[index+2*size] = inColor.b;
+    dataOut[index] = result.r;
+    dataOut[index+size] = result.g;
+    dataOut[index+2*size] = result.b;
 #endif
 }
 

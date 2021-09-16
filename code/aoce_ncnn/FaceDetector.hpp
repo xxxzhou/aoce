@@ -25,12 +25,7 @@ class FaceDetector : public virtual IFaceDetector,
     int anchorsNum = 0;
     std::unique_ptr<ncnn::Net> net = nullptr;
     // ncnn::Mat inMat;
-    ImageFormat netFormet = {};
-    ncnn::VkMat inVkMat = {};
-    ncnn::VkAllocator* inAlloc = nullptr;
-    VulkanBuffer* oldBuffer = nullptr;
-    std::unique_ptr<VkCommand> vkCmd = nullptr;
-    
+    ImageFormat netFormet = {};    
 
     std::vector<Box> anchors;
     IFaceObserver* observer = nullptr;
@@ -61,7 +56,7 @@ class FaceDetector : public virtual IFaceDetector,
                          IDrawRectLayer* drawLayer) override;
 
    public:
-    virtual void onResult(VulkanBuffer* buffer,
+    virtual void onResult(ncnn::VkMat& vkMat,
                           const ImageFormat& imageFormat) override;
 };
 

@@ -97,7 +97,7 @@ class ILiveObserver {
     // 拉流质量
     virtual void onPullQuality(int32_t userId, int32_t index, int32_t quality,
                                float fps, float kbs){};
-    // 拿出房间
+    // 登出房间
     virtual void onLogoutRoom(){};
 };
 

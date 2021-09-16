@@ -9,16 +9,19 @@ namespace aoce {
 FaceDetector::FaceDetector(/* args */) {
     net = std::make_unique<ncnn::Net>();
     net->opt.use_vulkan_compute = true;
-    // net->opt.use_fp16_storage = false;
-    // net->opt.use_fp16_arithmetic = false;
-    // net->opt.use_fp16_packed = false;
-    // 网络输入图像格式
-    netFormet.width = 160;   // 160;   // 320;
-    netFormet.height = 120;  // 120;  // 240;
+// net->opt.use_fp16_storage = false;
+// net->opt.use_fp16_arithmetic = false;
+// net->opt.use_fp16_packed = false;
+// 网络输入图像格式
+#if WIN32
+    netFormet.width = 320;
+    netFormet.height = 240;
+#elif __ANDROID__
+    netFormet.width = 160;
+    netFormet.height = 120;
+#endif
     netFormet.imageType = ImageType::bgr8;
     detectorFaces.resize(MAX_FACE);
-    // inMat.create(netFormet.width, netFormet.height, 3);
-    vkCmd = std::make_unique<VkCommand>();
 }
 
 FaceDetector::~FaceDetector() {}
@@ -100,7 +103,7 @@ bool FaceDetector::initNet(IBaseLayer* ncnnLayer, IDrawRectLayer* drawlayer) {
         paramet.mean = {104.f, 117.f, 123.f, 0.0f};
         paramet.outWidth = netFormet.width;
         paramet.outHeight = netFormet.height;
-        ncnnInLayer->updateParamet(paramet);
+        ncnnInLayer->updateParamet(paramet, net->opt.use_fp16_storage);
         ncnnInLayer->setObserver(this, netFormet.imageType);
         if (!ncnnInLayer) {
             logMessage(
@@ -108,44 +111,24 @@ bool FaceDetector::initNet(IBaseLayer* ncnnLayer, IDrawRectLayer* drawlayer) {
                 "FaceDetector initialize the network parameters ncnnlayer, "
                 "please use the function createNcnnInLayer to create");
             return false;
-        }
-        inAlloc = net->vulkan_device()->acquire_blob_allocator();
-        inVkMat.create(netFormet.width, netFormet.height, 3, 4u, inAlloc);
+        }        
         bInitNet = true;
         bVulkanInput = false;
     }
     return bInitNet;
 }
 
-void FaceDetector::onResult(VulkanBuffer* buffer,
+void FaceDetector::onResult(ncnn::VkMat& vkMat,
                             const ImageFormat& imageFormat) {
-    if (!bInitNet || !buffer) {
+    if (!bInitNet) {
         return;
     }
     long long time1 = getNowTimeStamp();
 
     ncnn::Extractor netEx = net->create_extractor();
     ncnn::Mat boxMat, scoreMat, landmarkMat;
-    if (bVulkanInput) {
-        if (oldBuffer != buffer) {
-            vkCmd->reset();
-            // vkCmd->barrier(inVkMat.buffer(), VK_PIPELINE_STAGE_TRANSFER_BIT,
-            //                VK_ACCESS_MEMORY_WRITE_BIT,
-            //                inVkMat.data->stage_flags,
-            //                inVkMat.data->access_flags);
-            // inVkMat.data->stage_flags = VK_PIPELINE_STAGE_TRANSFER_BIT;
-            // inVkMat.data->access_flags = VK_ACCESS_MEMORY_WRITE_BIT;
-            vkCmd->record(buffer->buffer, inVkMat.buffer(),
-                          inVkMat.buffer_offset(), buffer->getBufferSize());
-            oldBuffer = buffer;
-        }
-        vkCmd->submit();
-        netEx.input(0, inVkMat);
-    } else {
-        ncnn::Mat inMat(netFormet.width, netFormet.height, 3,
-                        buffer->getCpuData());
-        netEx.input(0, inMat);
-    }
+
+    netEx.input(0, vkMat);
     if (detectorType == FaceDetectorType::face_landmark) {
         // loc
         netEx.extract("output0", boxMat);

@@ -7,7 +7,7 @@ set(AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/${SRC_FILE}.cpp")
 
 if(SRC_FILE MATCHES "ncnntest")
     # 用Nsight查看vulkan计算流程必需有窗口渲染
-    set(NCNN_VULKAN_WINDOW OFF)    
+    set(NCNN_VULKAN_WINDOW ON)    
     if(NCNN_VULKAN_WINDOW)
         message(STATUS "NCNN_VULKAN_WINDOW ON") 
         add_definitions(-DVULKAN_SHOW=1)

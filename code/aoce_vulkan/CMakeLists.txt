@@ -19,7 +19,7 @@ if(WIN32)
 elseif(ANDROID)   
 endif() 
 # 查找vulkan库引用  
-include_directories(${Vulkan_INCLUDE_DIR} ${AOCE_HEADER_DIR})  
+include_directories(${Vulkan_INCLUDE_DIR} ${AOCE_HEADER_DIR})   
 
 file(GLOB AOCE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" )  
 file(GLOB AOCE_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")

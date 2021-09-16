@@ -84,8 +84,10 @@ void VkOutputLayer::onCommand() {
         destImage = winImage->getImage();
 #endif
 #if __ANDROID_API__ >= 26
-        bInterop = VulkanManager::Get().bInterpGLES;
-        destImage = hardwareImage->getImage();
+        if (VulkanManager::Get().bInterpGLES) {
+            destImage = hardwareImage->getImage();
+            bInterop = true;
+        }
 #endif
         if (bInterop && destImage) {
             inTexs[0]->addBarrier(cmd, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
@@ -129,6 +131,7 @@ void VkOutputLayer::outVkGpuTex(const VkOutGpuTex& outVkTex, int32_t outIndex) {
         if (width == 0 && height == 0) {
             width = inFormats[0].width;
             height = inFormats[0].height;
+            return;
         }
         VulkanManager::blitFillImage(copyCmd, inTexs[0].get(), copyImage, width,
                                      height);
@@ -175,11 +178,11 @@ void VkOutputLayer::outGLGpuTex(const GLOutGpuTex& outTex, uint32_t texType,
             resetGraph();
             return;
         }
-//       int32_t oldIndex = hardwareImage->getTextureId();
-//       if (oldIndex < 0 || oldIndex != outTex.image) {
-//           hardwareImage->bindGL(outTex.image, bindType);
-//       }
-       hardwareImage->bindGL(outTex.image, bindType);
+        //       int32_t oldIndex = hardwareImage->getTextureId();
+        //       if (oldIndex < 0 || oldIndex != outTex.image) {
+        //           hardwareImage->bindGL(outTex.image, bindType);
+        //       }
+        hardwareImage->bindGL(outTex.image, bindType);
     }
 #endif
 }

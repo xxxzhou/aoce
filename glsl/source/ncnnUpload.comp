@@ -1,9 +1,19 @@
 #version 450
 
+#if NCNN_FP16
+#extension GL_EXT_shader_16bit_storage: require
+#extension GL_EXT_shader_explicit_arithmetic_types_float16: require
+#endif
+
 layout (local_size_x = 16, local_size_y = 16) in;
 layout (binding = 0) buffer inBuffer{
+#if NCNN_FP16
+    float16_t dataIn[]; 
+#else
     float dataIn[];
+#endif
 };
+
 layout (binding = 1, r8) uniform image2D outTex;
 
 void main(){
@@ -12,7 +22,7 @@ void main(){
     if(uv.x >= size.x || uv.y >= size.y){
         return;
     } 
-    float vaule = dataIn[uv.y*size.x + uv.x];
+    float vaule = float(dataIn[uv.y*size.x + uv.x]);
     imageStore(outTex,uv,vec4(vaule));  
 }
 

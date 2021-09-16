@@ -51,3 +51,5 @@ aocencnntest 是联合深度神经网络推理框架ncnn的一些demo测试.
 ## 注意
 
 如果你改变aoce下的build.gradle里的externalNativeBuild/cmake/arguments里选项,如有些选项AOCE_INSTALL_NCNN会改变swig产生的文件,改变后请按照如上步骤重新生成swig转换的java文件.比如你要看aoceswigtest里的滤镜,就不用包含ncnn相关的so文件(vulkan版本有点大),就把AOCE_INSTALL_NCNN=OFF,让如上设置重新生成,如果你不介意大小,可以使用相同生成的swig,但是需要注意,需要在aoceswigtest当前build.gradle里复制ncnn相关so文件,类似aocencnntest中的build.gradle中的任务copyNcnn,并且需要调用System.loadLibrary("ncnn");确保不会因为没正确加载so文件而crash.
+
+如果你要运行04_vulkantest/05_livetest/06_mediaplayer/07_androidtest/vulkanextratest这几个项目,你需要AOCE_ENABLE_SAMPLES设置为ON,这个选项不会改变SWIG生成的文件.

@@ -6,6 +6,7 @@
 #include <string>
 #include <vulkan/VulkanContext.hpp>
 #include <vulkan/VulkanWindow.hpp>
+#include <array>
 
 using namespace aoce;
 using namespace aoce::vulkan;

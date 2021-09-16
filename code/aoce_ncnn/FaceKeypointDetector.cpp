@@ -19,9 +19,10 @@ float expSpecial(float x) {
 FaceKeypointDetector::FaceKeypointDetector(/* args */) {
     net = std::make_unique<ncnn::Net>();
     net->opt.use_vulkan_compute = true;
-    // 网络输入图像格式
+// 网络输入图像格式
     netFormet.width = 112;
     netFormet.height = 112;
+
     netFormet.imageType = ImageType::bgr8;
 }
 
@@ -55,14 +56,14 @@ bool FaceKeypointDetector::initNet(INcnnInCropLayer* ncnnLayer,
         paramet.scale = {1 / 255.f, 1 / 255.f, 1 / 255.f, 1.0f};
         paramet.outWidth = netFormet.width;
         paramet.outHeight = netFormet.height;
-        ncnnInLayer->updateParamet(paramet);
+        ncnnInLayer->updateParamet(paramet, net->opt.use_fp16_storage);
         ncnnInLayer->setObserver(this, netFormet.imageType);
         bInitNet = true;
     }
     return bInitNet;
 }
 
-void FaceKeypointDetector::onResult(VulkanBuffer* buffer,
+void FaceKeypointDetector::onResult(ncnn::VkMat& vkMat,
                                     const ImageFormat& imageFormat) {
     if (!bInitNet) {
         return;
@@ -73,8 +74,7 @@ void FaceKeypointDetector::onResult(VulkanBuffer* buffer,
     ncnnInLayer->getInFaceBox(faceBox);
 
     ncnn::Extractor netEx = net->create_extractor();
-    ncnn::Mat inMat(netFormet.width, netFormet.height, 3, buffer->getCpuData());
-    netEx.input("input_1", inMat);
+    netEx.input("input_1", vkMat);
     ncnn::Mat out;
     netEx.extract("415", out);
 

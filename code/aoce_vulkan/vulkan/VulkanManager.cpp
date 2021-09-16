@@ -58,7 +58,27 @@ VulkanManager& VulkanManager::Get() {
 }
 
 VulkanManager::~VulkanManager() {
-    release();
+    if (!bExternalContext) {
+        releaseDevice();
+    }
+    if (!bExternalInstance) {
+        releaseInstance();
+    }
+}
+
+void VulkanManager::releaseDevice() {
+    if (cmdPool) {
+        vkDestroyCommandPool(device, cmdPool, 0);
+        cmdPool = VK_NULL_HANDLE;
+    }
+    if (device && !bExternalContext) {
+        vkDestroyDevice(device, nullptr);
+        device = VK_NULL_HANDLE;
+    }
+    physicalDevice = VK_NULL_HANDLE;
+}
+
+void VulkanManager::releaseInstance() {
 #if AOCE_DEBUG_TYPE
     if (debugMessenger) {
         DestroyDebugUtilsMessengerEXT(instace, debugMessenger, nullptr);
@@ -68,18 +88,6 @@ VulkanManager::~VulkanManager() {
         vkDestroyInstance(instace, nullptr);
         instace = VK_NULL_HANDLE;
     }
-}
-
-void VulkanManager::release() {
-    if (cmdPool) {
-        vkDestroyCommandPool(device, cmdPool, 0);
-        cmdPool = VK_NULL_HANDLE;
-    }
-    if (device && !bExternalContext) {
-        vkDestroyDevice(device, nullptr);
-    }
-    device = VK_NULL_HANDLE;
-    physicalDevice = VK_NULL_HANDLE;
 }
 
 void VulkanManager::onDeviceComplete() {
@@ -311,20 +319,26 @@ bool VulkanManager::findSurfaceQueue(VkSurfaceKHR surface,
     return false;
 }
 
-void VulkanManager::setVulkanContext(VkPhysicalDevice pdevice,
-                                     VkDevice vdevice) {
-    logMessage(aoce::LogLevel::info, "use third-party vulkan context.");
-    release();
-    physicalDevice = pdevice;
-    getPhysicalDeviceInfo(physicalDevice, physical);
-    std::string message = physical.properties.deviceName;
-    logMessage(aoce::LogLevel::info, "select gpu: " + message);
-    graphicsIndex = physical.queueGraphicsIndexs[0];
-    computeIndex = graphicsIndex;
-    // findAloneCompute(computeIndex);
-    device = vdevice;
-    bExternalContext = true;
-    onDeviceComplete();
+void VulkanManager::setVulkanContext(VkPhysicalDevice pdevice, VkDevice vdevice,
+                                     VkInstance vinstance) {
+    if (pdevice && vdevice) {
+        releaseDevice();
+        physicalDevice = pdevice;
+        getPhysicalDeviceInfo(physicalDevice, physical);
+        std::string message = physical.properties.deviceName;
+        logMessage(aoce::LogLevel::info, "select gpu: " + message);
+        graphicsIndex = physical.queueGraphicsIndexs[0];
+        computeIndex = graphicsIndex;
+        findAloneCompute(computeIndex);
+        device = vdevice;
+        bExternalContext = true;
+        onDeviceComplete();
+    }
+    if (vinstance) {
+        releaseInstance();
+        instace = vinstance;
+        bExternalInstance = true;
+    }
 }
 
 void VulkanManager::blitFillImage(VkCommandBuffer cmd, const VulkanTexture* src,

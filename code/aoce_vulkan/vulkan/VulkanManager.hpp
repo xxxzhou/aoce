@@ -20,7 +20,8 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     ~VulkanManager();
 
    private:
-    void release();
+    void releaseDevice();
+    void releaseInstance();
     void onDeviceComplete();
 
    public:
@@ -31,7 +32,8 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     // presentIndex默认会选择graphicsIndex,如果graphicsIndex支持呈现,返回true
     bool findSurfaceQueue(VkSurfaceKHR surface, int32_t& presentIndex);
     // 第三方库有自己的vulkan上下文,并且aoce需要与之交互显存信息等,用第三方库替换
-    void setVulkanContext(VkPhysicalDevice pdevice, VkDevice vdevice);
+    void setVulkanContext(VkPhysicalDevice pdevice, VkDevice vdevice,
+                          VkInstance vinstance = VK_NULL_HANDLE);
 
    public:
     static void blitFillImage(
@@ -51,6 +53,7 @@ class AOCE_VULKAN_EXPORT VulkanManager {
     bool bInterpGLES = false;
     bool bDebugMsg = false;
     bool bExternalContext = false;
+    bool bExternalInstance = false;
 
    private:
     PhysicalDevice physical = {};

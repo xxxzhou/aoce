@@ -117,8 +117,6 @@ cmake_dependent_option(AOCE_CUDA_MODULE "install cuda module" ON "WIN32" OFF)
 option(AOCE_INSTALL_AGORA "install ncnn module" OFF)
 # cmake_dependent_option(AOCE_INSTALL_AGORA "install agora module" TRUE "AOCE_AGORA_EXIST" FALSE) 
 
-
-
 # 配置联系cmake/c++,android/win之间配置分开
 if(WIN32)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/AoceBuildSettings.h.in ${CMAKE_SOURCE_DIR}/code/aoce/AoceBuildSettingsWin.h @ONLY)
@@ -142,6 +140,7 @@ install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceWindow.h DESTINATION include/aoc
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce/AoceAudioDevice.h DESTINATION include/aoce)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_vulkan_extra/AoceVkExtra.h DESTINATION include/aoce_vulkan_extra)
 install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_vulkan_extra/VkExtraExport.h DESTINATION include/aoce_vulkan_extra) 
+install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_ncnn/AoceNcnnExport.h DESTINATION include/aoce_ncnn)
 if(AOCE_TALKTO_EXIST)
     install(FILES ${CMAKE_SOURCE_DIR}/code/aoce_talkto/TalkTo.h DESTINATION include/aoce_talkto)
 endif()

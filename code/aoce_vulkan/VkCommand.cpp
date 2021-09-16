@@ -1,6 +1,9 @@
 #include "VkCommand.hpp"
 
 #include "vulkan/VulkanManager.hpp"
+#if __ANDROID__
+#include "aoce_vulkan/android/vulkan_wrapper.h"
+#endif
 
 namespace aoce {
 namespace vulkan {
@@ -16,13 +19,13 @@ VkCommand::VkCommand(/* args */) {
     cmdBufInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     cmdBufInfo.commandBufferCount = 1;
     VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufInfo, &cmd));
-    // ´´½¨cpu-gpuÍ¨Öª
+    // åˆ›å»ºcpu-gpué€šçŸ¥
     VkFenceCreateInfo fenceInfo = {};
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-    // ³õÊ¼ÊÇÃ»ÓĞĞÅºÅµÄ
+    // åˆå§‹æ˜¯æ²¡æœ‰ä¿¡å·çš„
     fenceInfo.flags = 0;
     vkCreateFence(device, &fenceInfo, nullptr, &fence);
-    // ÉèÖÃÎª¼ÇÂ¼×´Ì¬
+    // è®¾ç½®ä¸ºè®°å½•çŠ¶æ€
     beginRecord();
 }
 
@@ -40,9 +43,9 @@ VkCommand::~VkCommand() {
 void VkCommand::beginRecord() {
     VkCommandBufferBeginInfo cmdBeginInfo = {};
     cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    // VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT Ö»»á±»Ö´ĞĞÒ»´Î,È»ºó±»Ïú»Ù.
-    // VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT ¿ÉÒÔ¶à´ÎÖ´ĞĞ»òÔİÍ£
-    // °ÑflagsÉèÖÃÎª0ÊÇ°²È«µÄ,ÄÜ¶à´ÎÖ´ĞĞ
+    // VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT åªä¼šè¢«æ‰§è¡Œä¸€æ¬¡,ç„¶åè¢«é”€æ¯.
+    // VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT å¯ä»¥å¤šæ¬¡æ‰§è¡Œæˆ–æš‚åœ
+    // æŠŠflagsè®¾ç½®ä¸º0æ˜¯å®‰å…¨çš„,èƒ½å¤šæ¬¡æ‰§è¡Œ
     cmdBeginInfo.flags = 0;
     VK_CHECK_RESULT(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
     bRecord = true;
@@ -50,7 +53,7 @@ void VkCommand::beginRecord() {
 }
 
 void VkCommand::endRecord() {
-    // ¼ÇÂ¼×´Ì¬¸ÄÎª¿ÉÖ´ĞĞ×´Ì¬
+    // è®°å½•çŠ¶æ€æ”¹ä¸ºå¯æ‰§è¡ŒçŠ¶æ€
     vkEndCommandBuffer(cmd);
     bRecord = false;
 }
@@ -69,14 +72,19 @@ void VkCommand::barrier(VkBuffer buffer, VkPipelineStageFlags stageFlag,
     bufBarrier.size = VK_WHOLE_SIZE;
     bufBarrier.srcAccessMask = oldAssessFlag;
     bufBarrier.dstAccessMask = assessFlag;
-    vkCmdPipelineBarrier(cmd, oldStageFlag, stageFlag, 0, 0, nullptr,
-                         1, &bufBarrier, 0, nullptr);
+    vkCmdPipelineBarrier(cmd, oldStageFlag, stageFlag, 0, 0, nullptr, 1,
+                         &bufBarrier, 0, nullptr);
+}
+
+void VkCommand::fill(VkBuffer src, int32_t size, int32_t offset,
+                     uint32_t value) {
+    vkCmdFillBuffer(cmd, src, offset, size, value);
 }
 
 void VkCommand::record(VkBuffer src, VkBuffer dest, int32_t destOffset,
                        int32_t size) {
     VkBufferCopy region = {};
-    region.srcOffset = 0;
+    region.srcOffset = destOffset;
     region.dstOffset = destOffset;
     region.size = size;
     vkCmdCopyBuffer(cmd, src, dest, 1, &region);
@@ -87,22 +95,22 @@ void VkCommand::submit() {
         endRecord();
         bSubmit = true;
     }
-    // Ìá½»GPUÖ´ĞĞ
+    // æäº¤GPUæ‰§è¡Œ
     VkSubmitInfo submitInfo = {};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &cmd;
     VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, fence));
-    // µÈ´ıGPUÖ´ĞĞÍê³É¸ø³öĞÅºÅ
+    // ç­‰å¾…GPUæ‰§è¡Œå®Œæˆç»™å‡ºä¿¡å·
     vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
-    // ÖØÖÃĞÅºÅ
+    // é‡ç½®ä¿¡å·
     vkResetFences(device, 1, &fence);
 }
 
 void VkCommand::reset() {
-    // ÖØÖÃCMD×´Ì¬
+    // é‡ç½®CMDçŠ¶æ€
     vkResetCommandBuffer(cmd, VK_COMMAND_BUFFER_RESET_RELEASE_RESOURCES_BIT);
-    // ÖØĞÂ¿ªÊ¼¼ÇÂ¼
+    // é‡æ–°å¼€å§‹è®°å½•
     beginRecord();
 }
 

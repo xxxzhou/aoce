@@ -34,7 +34,10 @@ class AOCE_VULKAN_EXPORT VkCommand {
     void barrier(VkBuffer buffer, VkPipelineStageFlags stageFlag,
                  VkAccessFlags assessFlag, VkPipelineStageFlags oldStageFlag,
                  VkAccessFlags oldAssessFlag);
+    void fill(VkBuffer src, int32_t size, int32_t offset = 0,
+              uint32_t value = 0);
     void record(VkBuffer src, VkBuffer dest, int32_t destOffset, int32_t size);
+
     void submit();
     void reset();
 };
