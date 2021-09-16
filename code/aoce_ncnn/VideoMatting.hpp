@@ -30,6 +30,9 @@ class VideoMatting : public IVideoMatting, public INcnnInLayerObserver {
     ncnn::VkMat temp2;
     ncnn::VkMat temp3;
     ncnn::VkMat temp4;
+
+    ncnn::VkAllocator* blob_vkallocator = nullptr;
+    ncnn::VkAllocator* staging_vkallocator = nullptr;
 #else
     ncnn::Mat temp1;
     ncnn::Mat temp2;

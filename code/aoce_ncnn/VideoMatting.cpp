@@ -11,11 +11,11 @@ VideoMatting::VideoMatting(/* args */) {
 }
 
 VideoMatting::~VideoMatting() {
-    // if (net) {
-    //     const ncnn::VulkanDevice* device = net->vulkan_device();
-    //     device->reclaim_blob_allocator(blobVkallocator);
-    //     device->reclaim_staging_allocator(stagingVkallocator);
-    // }
+#if VULKAN_OUTPUT
+    const ncnn::VulkanDevice* device = getNgParamet().vkDevice;
+    device->reclaim_blob_allocator(blobVkallocator);
+    device->reclaim_staging_allocator(stagingVkallocator);
+#endif
 }
 
 bool VideoMatting::initNet(IBaseLayer* ncnnInLayer,
@@ -51,9 +51,8 @@ bool VideoMatting::initNet(IBaseLayer* ncnnInLayer,
         paramet.outHeight = netFormet.height;
 #if VULKAN_OUTPUT
         vkCmd = std::make_unique<VkCommand>();
-        ncnn::VkAllocator* blob_vkallocator =
-            getNgParamet().vkDevice->acquire_blob_allocator();
-        ncnn::VkAllocator* staging_vkallocator =
+        blob_vkallocator = getNgParamet().vkDevice->acquire_blob_allocator();
+        staging_vkallocator =
             getNgParamet().vkDevice->acquire_staging_allocator();
         net->opt.blob_vkallocator = blob_vkallocator;
         net->opt.workspace_vkallocator = blob_vkallocator;
@@ -65,7 +64,7 @@ bool VideoMatting::initNet(IBaseLayer* ncnnInLayer,
         uploadLayer->setImageFormat(netFormet, false);
 #endif
         ncnnLayer->setObserver(this, netFormet.imageType);
-#if VULKAN_TEMP
+#if VULKAN_OUTPUT
         ncnn::VkAllocator* vkAllocator = getNgParamet().vkAllocator;
         // 输入Mat的通道数如果是4的倍数,那么Mat对应的VkMat通道数/4,elempack*4.
         // 详细请看VkCompute::record_upload,对应思路不明(CPU对应SIMD,GPU了).
@@ -162,7 +161,7 @@ void VideoMatting::onResult(ncnn::VkMat& vkMat,
     totalIndex++;
     std::string tmsg;
     string_format(tmsg, "video matting time:", time2 - time1,
-                  " avg time:", total/totalIndex);
+                  " avg time:", total / totalIndex);
     logMessage(LogLevel::info, tmsg);
 }
 

@@ -2,7 +2,7 @@
 
 接上篇[NCNN优化实时面部关键点检测](NCNN优化实时面部关键点检测.md)没有实现vulkan前期处理后的buffer直接和ncnn进行显存对接.
 
-由[ncnn_Android_RobustVideoMatting](https://github.com/FeiGeChuanShu/ncnn_Android_RobustVideoMatting)这个项目来测试,其中ncnn接收512x512x4x3Byte的数据,输出512x512x4Byte的数据,经过直接使用VkBuffer对接,在PC平台2070下,平均13.9ms到12.7ms,可以说不明显,没有上篇改进效果好,并且现在中间临时变量通过GPU复制应该有问题,因此只用来记录下对应过程.
+由[ncnn_Android_RobustVideoMatting](https://github.com/FeiGeChuanShu/ncnn_Android_RobustVideoMatting)这个项目逻辑使用[aoce](../../code/aoce_ncnn/VideoMatting.cpp)来测试,其中ncnn接收512x512x4x3Byte的数据,输出512x512x4Byte的数据,经过直接使用VkBuffer对接,在PC平台2070下,平均13.9ms到12.7ms,可以说不明显,没有上篇改进效果好,并且现在中间临时变量通过GPU复制应该有问题,因此只用来记录下对应过程.
 
 在上篇,从aoce的vkBuffer复制到ncnn的vkbuffer一直不成功,于是打开vulkan调试层,提示说操作ncnn的vkbuffer无效,很奇怪,我用ncnn里的VkCompute操作这个buffer正常,后面才忽然想到,aoce与ncnn二者都用的不是同一个VkDevice,搜索了下不同VkDevice之间复制VkBuffer后,暂时没找到有用信息,故从aoce_vulkan本身考虑,可以使用第三方库的vulkan环境替换aoce的vulkan环境.
 
