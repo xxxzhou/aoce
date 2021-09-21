@@ -14,6 +14,8 @@ PS:
 
 [dx11-vulkan-keymutex](https://github.com/KhronosGroup/VK-GL-CTS/blob/master/external/vulkancts/modules/vulkan/synchronization/vktSynchronizationWin32KeyedMutexTests.cpp)
 
+[OpenCL Merging Roadmap into Vulkan](https://pcper.com/2017/05/follow-up-neil-trevett-and-tom-olson-from-khronos-group-discuss-opencl-and-vulkan-roadmap/)
+
 ## 注意点
 
 每个VkPipeGraph肯定有个数据更新线程,每个层更新的参数可能不在这个数据更新线程上,更新了参数要么导致vkPipeGraph重置,要么置更新UBO flag为true,然后更新UBO在数据更新线程上,这样可以避免很多可能的问题.

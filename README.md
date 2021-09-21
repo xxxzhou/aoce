@@ -53,27 +53,27 @@ cuda/vulkan除了内置的一个简单图像处理,使用者可以以相应cuda/
 
 ## [文档](doc)
 
-[Vulkan移植GPUImage的安卓Demo展示](Vulkan移植GPUImage的安卓Demo展示.md)
+[Vulkan移植GPUImage的安卓Demo展示](doc/vulkan/Vulkan移植GPUImage的安卓Demo展示.md)
 
-[Vulkan移植GpuImage(一)高斯模糊与自适应阈值](doc/Vulkan移植GpuImage1.md)
+[Vulkan移植GpuImage(一)高斯模糊与自适应阈值](doc/vulkan/Vulkan移植GpuImage1.md)
 
-[Vulkan移植GpuImage(二)Harris角点检测与导向滤波](doc/Vulkan移植GpuImage2.md)
+[Vulkan移植GpuImage(二)Harris角点检测与导向滤波](doc/vulkan/Vulkan移植GpuImage2.md)
 
-[Vulkan移植GpuImage(三)从A到C的滤镜](doc/Vulkan移植GpuImage3.md)
+[Vulkan移植GpuImage(三)从A到C的滤镜](doc/vulkan/Vulkan移植GpuImage3.md)
 
-[Vulkan移植GpuImage(四)从D到M的滤镜](doc/Vulkan移植GpuImage4.md)
+[Vulkan移植GpuImage(四)从D到M的滤镜](doc/vulkan/Vulkan移植GpuImage4.md)
 
-[Vulkan移植GPUImage(五)从P到Z的滤镜](doc/Vulkan移植GpuImage5.md)
+[Vulkan移植GPUImage(五)从P到Z的滤镜](doc/vulkan/Vulkan移植GpuImage5.md)
 
-[Vulkan移植GPUImage总结](doc/GPUImage移植总结.md)
+[Vulkan移植GPUImage总结](doc/vulkan/Vulkan移植GPUImage总结.md)
 
-[使用Swig转换C++到别的编程语言](doc/使用Swig转换成别的语言.md)
+[使用Swig转换C++到别的编程语言](doc/thirdparty/使用Swig转换成别的语言.md)
 
-[ChromaKey](doc/ChromaKey.md)
+[ChromaKey](doc/vulkan/ChromaKey.md)
 
-[Vulkan与DX11交互](doc/Vulkan与DX11交互.md)
+[Vulkan与DX11交互](doc/vulkan/Vulkan与DX11交互.md)
 
-[PC平台Vulkan运算层时间记录](doc/PC平台Vulkan运算层时间记录.md)
+[PC平台Vulkan运算层时间记录](doc/vulkan/PC平台Vulkan运算层时间记录.md)
 
 ## [模块](code)
 
