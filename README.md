@@ -4,9 +4,11 @@ android/window 图像处理,多媒体以及游戏引擎交互.
 
 ## 演示DEMO
 
-[aoce移植GPUImage展示](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoceswigtest-release.apk)
+[Vulkan移植GPUImage的安卓Demo展示](https://zhuanlan.zhihu.com/p/388055520)
 
 ![avatar](assets/images/layers_demo.png "滤镜目录")
+
+[aoce移植GPUImage展示](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoceswigtest-release.apk)
 
 [aoceswigtest的封装aar包](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoce-release.aar) 如果你没有装swig,就需要手动下载这个.
 
