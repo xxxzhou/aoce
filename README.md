@@ -4,9 +4,11 @@ android/window 图像处理,多媒体以及游戏引擎交互.
 
 ## 演示DEMO
 
-[aoce移植GPUImage展示](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoceswigtest-release.apk)
+[Vulkan移植GPUImage的安卓Demo展示](https://zhuanlan.zhihu.com/p/388055520)
 
 ![avatar](assets/images/layers_demo.png "滤镜目录")
+
+[aoce移植GPUImage展示](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoceswigtest-release.apk)
 
 [aoceswigtest的封装aar包](https://github.com/xxxzhou/aoce_thirdparty/blob/main/aoce-release.aar) 如果你没有装swig,就需要手动下载这个.
 
@@ -39,7 +41,7 @@ Android配置请转到 [android build](android/README.md)
 
 统一平台win/andorid的视频源的获取,图像的GPU处理,以及方便对接各种界面显示.
 
-GPU计算模块的选择,win平台准备完成cuda/vulkan模块,主要完成cuda,win平台推荐cuda.android平台原则上只实现vulkan模块,但是能高效对接opengl es纹理.
+GPU计算模块的选择,win平台准备完成cuda/vulkan模块,android平台原则上只实现vulkan模块,但是能高效对接opengl es纹理.
 
 Camera内置WIN平台MF的SDK,而anroid基于ndk camera2实现.
 

@@ -20,6 +20,8 @@
 
 [人脸检测--MTCNN从头到尾的详解](https://zhuanlan.zhihu.com/p/58825924)
 
+[人体姿态](https://github.com/FeiGeChuanShu/ncnn_Android_MoveNet)
+
 ## 注意
 
 ncnn 与 aoce 调用二个不同的VkDevice,所以他们不能互相访问VkBuffer. [The fact that each program's VkDevice is distinct means you can't just straight up share VkImages](https://computergraphics.stackexchange.com/questions/6310/why-do-vulkan-extensions-need-to-be-enabled)
