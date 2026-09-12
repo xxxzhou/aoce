@@ -1,5 +1,7 @@
 # aoce([oeip](https://github.com/xxxzhou/oeip)的android平台扩展版)
 
+新版更多功能，更多平台请看avox(https://github.com/xxxzhou/avox)
+
 android/window 图像处理,多媒体以及游戏引擎交互.
 
 ## 演示DEMO
